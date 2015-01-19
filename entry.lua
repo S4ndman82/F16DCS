@@ -4,13 +4,14 @@ declare_plugin(self_ID,
 {
 installed 	 = true, -- if false that will be place holder , or advertising
 dirName	  	 = current_mod_path,
-version		 = "1.2.12-141215k",		 
+version		 = "1.2.14-141231",		 
 state		 = "installed",
 info		 = _("F-16 Technology Demonstration.  High Fidelity Flight Dynamics Model"),
 binaries	= { 'F_16Demo', },  -- The DLL of the external flight model 
 Skins	= 
 	{
 		{
+      --for simulator loading window etc.
 			name	= "F-16Demo",
 			dir		= "Theme"
 		},
@@ -35,8 +36,24 @@ InputProfiles =
 		["F-16Demo"]     = current_mod_path .. '/Input',
 	},
 })
+-- /declare_plugin()
 ---------------------------------------------------------------------------------------
-dofile(current_mod_path..'/F16Demo.lua')
+
+--mounting 3d model paths and texture paths 
+
+mount_vfs_model_path	(current_mod_path.."/Shapes")
+mount_vfs_model_path	(current_mod_path.."/Cockpit/Shapes")
+mount_vfs_texture_path  (current_mod_path.."/Cockpit/Textures")
+mount_vfs_texture_path  (current_mod_path.."/Textures/Avionics")
+mount_vfs_texture_path  (current_mod_path.."/Textures/Base_Textures")
+mount_vfs_texture_path  (current_mod_path.."/Textures/147thFW")
+mount_vfs_texture_path  (current_mod_path.."/Textures/Blue_Digital")
+mount_vfs_texture_path  (current_mod_path.."/Textures/Digital")
+mount_vfs_liveries_path (current_mod_path.."/Liveries")
+
+---------------------------------------------------------------------------------------
+-- currently needed for DCS to detect plugin as flyable..
+dofile(current_mod_path..'/Database/F16Demo.lua')
 
 suspension = 
 {
@@ -229,13 +246,16 @@ suspension =
 local FM = 
 {
 	[1] = self_ID,
-	[2] = "F_16Demo",
+	[2] = "F_16Demo", -- DLL binarires for FM
 	center_of_mass		=	{ 0.183 , 0.261 , 0.0},		-- center of mass position relative to object 3d model center for empty aircraft
 	moment_of_inertia  	= 	{12874.0, 85552.1, 75673.6},   	-- moment of inertia of empty aircraft
 	suspension   		= suspension, -- gear posts initialization
 }
 
 --make_flyable(obj_name,optional_cockpit path,optional_fm = {mod_of_fm_origin,dll_with_fm})
-make_flyable('F-16Demo',nil,FM,nil)
 --current_mod_path..'/Cockpit/Scripts/'
+----local support_cockpit = current_mod_path..'/Cockpit/'
+make_flyable('F-16Demo', nil, FM, nil)
+----------------------------------------------------------------------------------------
+
 plugin_done()-- finish declaration , clear temporal data

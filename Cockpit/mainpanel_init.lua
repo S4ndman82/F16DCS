@@ -1,3 +1,4 @@
+--shape_name   	   = "Cockpit-Wunderluft"
 shape_name   	   = "Cockpit-Viper"
 is_EDM			   = true
 new_model_format   = true
@@ -38,36 +39,43 @@ mirrors_draw.input   			= {0,1}
 mirrors_draw.output   			= {1,0}
 mirrors_draw.controller         = controllers.mirrors_draw
 
+-- not animated in edm?
 Canopy      = CreateGauge()
 Canopy.arg_number = 1
 Canopy.input   = {0,1}
 Canopy.output  = {0,1}
 Canopy.controller = controllers.base_gauge_CanopyPos
 
+-- stick arg 2 and 3 match args in cockpit edm, anim should work with proper input binding
 StickPitch						= CreateGauge()
 StickPitch.arg_number			= 2
 StickPitch.input				= {-100, 100}
 StickPitch.output				= {-1, 1}
 StickPitch.controller			= controllers.base_gauge_StickPitchPosition
 
+-- stick arg 2 and 3 match args in cockpit edm, anim should work with proper input binding
 StickBank						= CreateGauge()
 StickBank.arg_number			= 3
 StickBank.input					= {-100, 100}
 StickBank.output				= {-1, 1}
 StickBank.controller			= controllers.base_gauge_StickRollPosition
 
+-- not animated in edm?
 RudderPedals					= CreateGauge()
 RudderPedals.arg_number			= 4
 RudderPedals.input				= {-100,100}
 RudderPedals.output				= {-1,1}
 RudderPedals.controller			= controllers.base_gauge_RudderPosition
 
+--[[ does not exist in edm?
 Throttle						= CreateGauge()
 Throttle.arg_number				= 5
 Throttle.input					= {0, 1}
 Throttle.output					= {0, 1}
 Throttle.controller				= controllers.base_gauge_ThrottleLeftPosition
+--]]
 
+-- not animated in edm?
 Landinggearhandle							= CreateGauge()
 Landinggearhandle.arg_number				= 8
 Landinggearhandle.input						= {0, 1}
@@ -78,33 +86,42 @@ Landinggearhandle.controller				= controllers.base_gauge_LandingGearHandlePos
 -- ENGINE
 ---------------------------------------------------------------
 
+--[[ does not work (removes seat)
 Engine_RPM							= CreateGauge()
 Engine_RPM.arg_number				= 50
 Engine_RPM.input					= {0.0, 110.0} 
 Engine_RPM.output					= {0.0, 1.0}
 Engine_RPM.controller				= controllers.base_gauge_EngineLeftRPM
+--]]
 
-
+--[[ does not work (removes seat)
 Engine_TEMP							= CreateGauge()
 Engine_TEMP.arg_number				= 51
 Engine_TEMP.input					= {300, 900} 
 Engine_TEMP.output					= {0.0, 1.00}
 Engine_TEMP.controller				= controllers.base_gauge_EngineLeftTemperatureBeforeTurbine
+--]]
 
 ---------------------------------------------------------------
 -- INSTRUMENTS
 ---------------------------------------------------------------
+--[[ does not work
 IndicatedAirSpeed							= CreateGauge()
 IndicatedAirSpeed.arg_number				= 100
 IndicatedAirSpeed.input						= {0.0, 600}  --m/s
 IndicatedAirSpeed.output					= {0.0, 1.0}
 IndicatedAirSpeed.controller				= controllers.base_gauge_IndicatedAirSpeed
+--]]
 
+--[[
 TEST_PARAM_GAUGE      			  = CreateGauge("parameter")
-TEST_PARAM_GAUGE.parameter_name   = "TEST_PARAM4"
+--TEST_PARAM_GAUGE.parameter_name   = "TEST"
+TEST_PARAM_GAUGE.parameter_name   = "TEST_PARAM4" -- see test_device.lua
+--TEST_PARAM_GAUGE.arg_number    	  = 113
 TEST_PARAM_GAUGE.arg_number    	  = 2
 TEST_PARAM_GAUGE.input    		  = {0,100} 
 TEST_PARAM_GAUGE.output    		  = {0,1} 
+--]]
 
 need_to_be_closed = true -- close lua state after initialization 
 

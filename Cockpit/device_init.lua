@@ -40,8 +40,28 @@ creators[devices.LANDING_GEAR]	 = {"avLuaDevice"			,LockOn_Options.script_path..
 
 -- Indicators
 indicators = {}
-indicators[#indicators + 1] = {"ccIndicator" ,LockOn_Options.script_path.."HUD/Indicator/init.lua"  ,nil,{{"PNT-HUD-CENTER","PNT-HUD-DOWN","PNT-HUD-RIGHT"},{sx_l = 0,sy_l = 0,sz_l = 0,sh = 0,sw = 0}}} --HUD
 
- --RADAR
+--[[ does not work now for some reason
+indicators[#indicators + 1] = {"ccHudIndicator" ,LockOn_Options.script_path.."HUD/Indicator/init.lua",
+  nil,
+  {{"PNT-HUD-CENTER","PNT-HUD-DOWN","PNT-HUD-RIGHT"},
+    {sx_l = 0,sy_l = 0,sz_l = 0,sh = 0,sw = 0}}
+} --HUD
 
+-- from older version
+indicators[#indicators + 1] = {"ccRadarIndicator",LockOn_Options.script_path.."RADAR/Indicator/init.lua",--init script
+  nil,--id of parent device
+  {	
+	{}, -- initial geometry anchor , triple of connector names 
+	{sx_l =  0,  -- center position correction in meters (forward , backward)
+	 sy_l =  0,  -- center position correction in meters (up , down)
+	 sz_l =  0,  -- center position correction in meters (left , right)
+	 sh   =  0,  -- half height correction 
+	 sw   =  0,  -- half width correction 
+	 rz_l =  0,  -- rotation corrections  
+	 rx_l =  0,
+	 ry_l =  0}
+  }
+} --RADAR
+--]]
 			 

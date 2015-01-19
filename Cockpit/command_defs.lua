@@ -5,9 +5,9 @@ Keys =
 	PlanePickleOff	= 351,
 	PlaneFireOn		= 84,
 	PlaneFireOff	= 85,
-	iCommandPlaneGear = 68,
-	iCommandPlaneWheelBrakeOn = 74,
-	iCommandPlaneWheelBrakeOff = 75,
+	--iCommandPlaneGear = 68,
+	--iCommandPlaneWheelBrakeOn = 74,
+	--iCommandPlaneWheelBrakeOff = 75,
 }
 
 start_command   = 3000

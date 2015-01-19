@@ -1,5 +1,8 @@
 local dev 	    = GetSelf()
-local my_param4  = get_param_handle("TEST_PARAM4")
+--local my_param  = get_param_handle("TEST_PARAM") -- obtain shared parameter (created if not exist ), i.e. databus
+--local my_param2  = get_param_handle("TEST_PARAM2")
+--local my_param3  = get_param_handle("TEST_PARAM3")
+--local my_param4  = get_param_handle("TEST_PARAM4")
 local altitude = get_param_handle("ALTITUDE")
 local indicated_airspeed = get_param_handle("INDICATED_AIRSPEED")
 local mach_number = get_param_handle("MACH_NUMBER")
@@ -25,7 +28,7 @@ function post_initialize()
 end
 
 function update()
-	my_param4:set(sensor_data.getStickPitchPosition())
+	--my_param4:set(sensor_data.getStickPitchPosition())
 	altitude:set(sensor_data.getRadarAltitude()*3.28084)
 	local barometric_altitude = sensor_data.getBarometricAltitude()*3.28084
 	local radar_altitude = sensor_data.getRadarAltitude()*3.28084

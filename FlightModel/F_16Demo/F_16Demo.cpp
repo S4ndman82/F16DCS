@@ -70,6 +70,10 @@
 #include "stdafx.h"
 #include "F_16Demo.h"
 
+// for debug use
+#include <wchar.h>
+#include <stdio.h>
+
 #include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "UtilityFunctions.h"			// Utility help functions 
 
@@ -85,8 +89,14 @@
 #include "Engine/F16Engine.h"					//Engine model functions
 #include "Engine/F16FuelSystem.h"				//Fuel usage and tank usage functions
 #include "LandingGear/F16LandingGear.h"			//Landing gear actuators, aerodynamic drag, wheelbrake function
+#include "Airframe/F16Airframe.h"				//Canopy, dragging chute, refuel slot, section damages..
+#include "Electrics/F16ElectricBus.h"			//Generators, battery etc.
+#include "PilotSupport/F16Oxygen.h"				//Oxygen system
 
 #include "EquationsOfMotion/F16EquationsOfMotion.h"
+
+wchar_t dbgmsg[255] = {0};
+//dbgmsg[0] = 0;
 
 //-------------------------------------------------------
 // Start of F-16 Simulation Variables
@@ -119,10 +129,6 @@ namespace F16
 	double		accz					= 0.0;			// Az (per normal direction convention) out the bottom of the a/c (m/s^2)
 	double		accy					= 0.0;			// Ay (per normal direction convention) out the right wing (m/s^2)
 
-	double		weight_N				= 0.0;			// Weight force of aircraft (N)
-	double		canopyAngle				= 0.0;			// Canopy status/angle
-	double		refuelingBoomAngle		= 0.0;			// Refueling boom status/angle (0=retracted;1=extended)
-
 	F16Atmosphere Atmos;
 	F16Aero Aero;
 	F16Engine Engine;
@@ -130,7 +136,10 @@ namespace F16
 	F16FlightControls FlightControls;
 	F16FuelSystem Fuel;
 	F16LandingGear LandingGear;
+	F16Airframe Airframe;
 	F16Motion Motion;
+	F16ElectricBus Electrics;
+	F16Oxygen Oxygen;
 }
 
 // This is where the simulation send the accumulated forces to the DCS Simulation
@@ -146,10 +155,19 @@ void ed_fm_add_global_force(double & x,double &y,double &z,double & pos_x,double
 
 }
 
-// Not used
-void ed_fm_add_global_moment(double & x,double &y,double &z)
+/* same but in component form , return value bool : function will be called until return value is true
+while (ed_fm_add_local_force_component(x,y,z,pos_xpos_y,pos_z))
 {
-
+	--collect 
+}
+*/
+bool ed_fm_add_local_force_component (double & x,double &y,double &z,double & pos_x,double & pos_y,double & pos_z)
+{
+	return false;
+}
+bool ed_fm_add_global_force_component (double & x,double &y,double &z,double & pos_x,double & pos_y,double & pos_z)
+{
+	return false;
 }
 
 // This is where the simulation send the accumulated moments to the DCS Simulation
@@ -157,6 +175,27 @@ void ed_fm_add_global_moment(double & x,double &y,double &z)
 void ed_fm_add_local_moment(double &x,double &y,double &z)
 {
 	F16::Motion.getLocalMoment(x, y, z);
+}
+
+// Not used
+void ed_fm_add_global_moment(double & x,double &y,double &z)
+{
+
+}
+
+/* same but in component form , return value bool : function will be called until return value is true
+while (ed_fm_add_local_moment_component(x,y,z))
+{
+	--collect 
+}
+*/
+bool ed_fm_add_local_moment_component (double & x,double &y,double &z)
+{
+	return false;
+}
+bool ed_fm_add_global_moment_component (double & x,double &y,double &z)
+{
+	return false;
 }
 
 //-----------------------------------------------------------------------
@@ -183,16 +222,17 @@ void ed_fm_simulate(double dt)
 	// using english units so airspeed is in feet/second here
 	F16::Atmos.updateFrame(dt);
 
-	// TODO:
-	// update amount of fuel used and change in mass
-	//F16::Fuel.updateFrame(F16::Engine.thrust_N, dt);
-	//F16::Motion.setMassChange(F16::Fuel.getFuelMass());
-
-	//thrustsetting = Engine.getThrustForInput(throttleInput);
-	//Fuel.updateFrame(thrustsetting, dt);
-
 	// update thrust
 	F16::Engine.updateFrame(F16::Atmos.mach, F16::Atmos.altitude_FT, dt);
+
+	// update amount of fuel used and change in mass
+	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), dt);
+
+	// update oxygen provided to pilot: tanks, bleed air from engine etc.
+	F16::Oxygen.updateFrame(dt);
+
+	F16::Electrics.updateFrame(dt);
+	F16::Airframe.updateFrame(dt);
 
 	//---------------------------------------------
 	//-----CONTROL DYNAMICS------------------------
@@ -233,82 +273,14 @@ void ed_fm_simulate(double dt)
 	F16::rudder_PCT = F16::rudder_DEG / 30.0;
 	F16::flap_PCT = F16::flap_DEG / 20.0;
 
-	double alpha1_DEG_Limited	= limit(F16::alpha_DEG,-20.0,90.0);
-	double beta1_DEG_Limited	= limit(F16::beta_DEG,-30.0,30.0);
+	F16::LandingGear.updateFrame(F16::Motion.getWeightN(), dt);
 
-	// FLAPS (From JBSim F16.xml config)
-	double CLFlaps = 0.35 * F16::flap_PCT;
-	double CDFlaps = 0.08 * F16::flap_PCT;
-
-	double CzFlaps = - (CLFlaps * cos(F16::alpha_DEG * (F16::pi/180.0)) + CDFlaps * sin(F16::pi/180.0));
-	double CxFlaps = - (-CLFlaps * sin(F16::alpha_DEG * (F16::pi/180.0)) + CDFlaps * cos(F16::pi/180.0));
-	
-	// TODO Speedbrakes aero (from JBSim F16.xml config)
-	F16::Aero.updateFrame(dt);
-
-	// TODO: give wheelbrake input also
-	F16::LandingGear.updateFrame(F16::weight_N, F16::rudder_PCT, dt);
-
-	if (F16::LandingGear.weight_on_wheels)
-	{
-		/*
-		Vec3 cx_wheel_friction_force(F16::LandingGear.CxWheelFriction, 0.0,0.0);
-		Vec3 cx_wheel_friction_pos(0.0,0.0,0.0);
-		add_local_force(cx_wheel_friction_force,cx_wheel_friction_pos);
-
-		Vec3 cy_wheel_friction_force(0.0, 0.0, F16::LandingGear.CyWheelFriction);
-		Vec3 cy_wheel_friction_pos(0.0,0.0,0.0);
-		add_local_force(cy_wheel_friction_force,cy_wheel_friction_pos);
-		*/
-	}
-
-	F16::Aero.hifi_C(alpha1_DEG_Limited, beta1_DEG_Limited, F16::elevator_DEG);
-	F16::Aero.hifi_damping(alpha1_DEG_Limited);
-    F16::Aero.hifi_C_lef(alpha1_DEG_Limited, beta1_DEG_Limited);
-    F16::Aero.hifi_damping_lef(alpha1_DEG_Limited);
-    F16::Aero.hifi_rudder(alpha1_DEG_Limited, beta1_DEG_Limited);
-    F16::Aero.hifi_ailerons(alpha1_DEG_Limited, beta1_DEG_Limited);
-	F16::Aero.hifi_other_coeffs(alpha1_DEG_Limited, F16::elevator_DEG);
-
-	/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
-	(as on NASA report p37-40)
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-
-	// TODO: move calculations from here to separate method
-	//F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS);
-
-	/* XXXXXXXX Cx_tot XXXXXXXX */
-	F16::Aero.dXdQ = (F16::meanChord_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cxq + F16::Aero.Cxq_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.Cx_total = F16::Aero.Cx + F16::Aero.Cx_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dXdQ*F16::pitchRate_RPS;
-	F16::Aero.Cx_total += CxFlaps + F16::LandingGear.CxGearAero;
-
-	/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
-	F16::Aero.dZdQ = (F16::meanChord_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Czq + F16::Aero.Cz_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.Cz_total = F16::Aero.Cz + F16::Aero.Cz_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dZdQ*F16::pitchRate_RPS;
-	F16::Aero.Cz_total += CzFlaps + F16::LandingGear.CzGearAero;
-
-	/* MMMMMMMM Cm_tot MMMMMMMM */ 
-	F16::Aero.dMdQ = (F16::meanChord_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cmq + F16::Aero.Cmq_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.Cm_total = F16::Aero.Cm*F16::Aero.eta_el + F16::Aero.Cz_total*(F16::referenceCG_PCT-F16::actualCG_PCT) + F16::Aero.Cm_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dMdQ*F16::pitchRate_RPS + F16::Aero.Cm_delta + F16::Aero.Cm_delta_ds;
-
-	/* YYYYYYYY Cy_tot YYYYYYYY */
-	F16::Aero.dYdail = F16::Aero.Cy_delta_a20 + F16::Aero.Cy_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-	F16::Aero.dYdR = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cyr + F16::Aero.Cyr_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.dYdP = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cyp + F16::Aero.Cyp_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.Cy_total = F16::Aero.Cy + F16::Aero.Cy_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dYdail*F16::aileron_PCT + F16::Aero.Cy_delta_r30*F16::rudder_PCT + F16::Aero.dYdR*F16::yawRate_RPS + F16::Aero.dYdP*F16::rollRate_RPS;
-	
-	/* NNNNNNNN Cn_tot NNNNNNNN */ 
-	F16::Aero.dNdail = F16::Aero.Cn_delta_a20 + F16::Aero.Cn_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-	F16::Aero.dNdR = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cnr + F16::Aero.Cnr_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.dNdP = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cnp + F16::Aero.Cnp_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.Cn_total = F16::Aero.Cn + F16::Aero.Cn_delta_lef*F16::leadingEdgeFlap_PCT - F16::Aero.Cy_total*(F16::referenceCG_PCT-F16::actualCG_PCT)*(F16::meanChord_FT/F16::wingSpan_FT) + F16::Aero.dNdail*F16::aileron_PCT + F16::Aero.Cn_delta_r30*F16::rudder_PCT + F16::Aero.dNdR*F16::yawRate_RPS + F16::Aero.dNdP*F16::rollRate_RPS + F16::Aero.Cn_delta_beta*F16::beta_DEG;
-
-	/* LLLLLLLL Cl_total LLLLLLLL */
-	F16::Aero.dLdail = F16::Aero.Cl_delta_a20 + F16::Aero.Cl_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-	F16::Aero.dLdR = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Clr + F16::Aero.Clr_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.dLdP = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Clp + F16::Aero.Clp_delta_lef*F16::leadingEdgeFlap_PCT);
-	F16::Aero.Cl_total = F16::Aero.Cl + F16::Aero.Cl_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dLdail*F16::aileron_PCT + F16::Aero.Cl_delta_r30*F16::rudder_PCT + F16::Aero.dLdR*F16::yawRate_RPS + F16::Aero.dLdP*F16::rollRate_RPS + F16::Aero.Cl_delta_beta*F16::beta_DEG;
+	F16::Aero.updateFrame(F16::alpha_DEG, F16::beta_DEG, F16::elevator_DEG, dt);
+	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
+		F16::flap_PCT, F16::leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
+		F16::pitchRate_RPS, F16::rollRate_RPS, F16::yawRate_RPS, 
+		F16::alpha_DEG, F16::beta_DEG, 
+		F16::LandingGear.CxGearAero, F16::LandingGear.CzGearAero);
 
 	//----------------------------------------------------------------
 	// All prior forces calculated in lbs, needs to be converted
@@ -316,9 +288,24 @@ void ed_fm_simulate(double dt)
 	// to be converted into N*m
 	//----------------------------------------------------------------
 
-	F16::Motion.updateAeroForces(F16::Aero.Cy_total, F16::Aero.Cx_total, F16::Aero.Cz_total, F16::Aero.Cl_total, F16::Aero.Cm_total, F16::Aero.Cn_total, F16::Atmos.dynamicPressure_LBFT2);
-	F16::Motion.updateEngineForces(F16::Engine.thrust_N);
-	
+	F16::Motion.updateAeroForces(F16::Aero.getCyTotal(), F16::Aero.getCxTotal(), F16::Aero.getCzTotal(), 
+								F16::Aero.getClTotal(), F16::Aero.getCmTotal(), F16::Aero.getCnTotal(), 
+								F16::Atmos.dynamicPressure_LBFT2);
+	F16::Motion.updateEngineForces(F16::Engine.getThrustN());
+	F16::Motion.updateFuelUsageMass(F16::Fuel.getUsageSinceLastFrame(), 0, 0, 0);
+	F16::Fuel.clearUsageSinceLastFrame();
+
+	// TODO: weight-on-wheels detection does not work currently, need to figure out landing gears properly..
+	if (F16::LandingGear.isWoW() == true)
+	{
+		F16::Motion.updateWheelForces(F16::LandingGear.wheelLeft.CxWheelFriction,
+									F16::LandingGear.wheelLeft.CyWheelFriction,
+									F16::LandingGear.wheelRight.CxWheelFriction,
+									F16::LandingGear.wheelRight.CyWheelFriction,
+									F16::LandingGear.wheelNose.CxWheelFriction,
+									F16::LandingGear.wheelNose.CyWheelFriction);
+	}
+
 	// Tell the simulation that it has gone through the first frame
 	//F16::simInitialized = true;
 	F16::Actuators.simInitialized = true;
@@ -326,12 +313,26 @@ void ed_fm_simulate(double dt)
 
 	/*
 	F16::weight_on_wheels = false;
-	if((F16::weight_N > cz_force.y) && (abs(F16::ay_world) >= -0.5) && (F16::gearDown == 1.0))
+	if((F16::Motion.getWeightN() > cz_force.y) && (abs(F16::ay_world) >= -0.5) && (F16::gearDown == 1.0))
 	{
 		F16::weight_on_wheels = true;
 	}
 	*/
 	
+}
+
+/*
+called before simulation to set up your environment for the next step
+give parameters of surface under your aircraft usefull for ground effect
+*/
+void ed_fm_set_surface (double		h,//surface height under the center of aircraft
+						double		h_obj,//surface height with objects
+						unsigned		surface_type,
+						double		normal_x,//components of normal vector to surface
+						double		normal_y,//components of normal vector to surface
+						double		normal_z//components of normal vector to surface
+						)
+{
 }
 
 void ed_fm_set_atmosphere(	double h,//altitude above sea level			(meters)
@@ -344,7 +345,7 @@ void ed_fm_set_atmosphere(	double h,//altitude above sea level			(meters)
 							double wind_vz //components of velocity vector, including turbulence in world coordinate system (meters/sec)
 						)
 {
-	F16::Atmos.setAtmosphere(t, ro, h * F16::meterToFoot, p * 0.020885434273);
+	F16::Atmos.setAtmosphere(t, ro, a, h, p);
 }
 
 void ed_fm_set_current_mass_state ( double mass,
@@ -356,10 +357,9 @@ void ed_fm_set_current_mass_state ( double mass,
 									double moment_of_inertia_z
 									)
 {
-	F16::Motion.setMassState(center_of_mass_x, center_of_mass_y, center_of_mass_z,
+	F16::Motion.setMassState(mass, 
+							center_of_mass_x, center_of_mass_y, center_of_mass_z,
 							moment_of_inertia_x, moment_of_inertia_y, moment_of_inertia_z);
-
-	F16::weight_N = mass * 9.80665002864;
 }
 
 /*
@@ -430,7 +430,10 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 	// if in air, set engine running here?
 }
 
-void ed_fm_set_command(int command, float value)	// Command = Command Index (See Export.lua), Value = Signal Value (-1 to 1 for Joystick Axis)
+// list of input enums kept in separate header for easier documenting..
+//
+// Command = Command Index (See Export.lua), Value = Signal Value (-1 to 1 for Joystick Axis)
+void ed_fm_set_command(int command, float value)
 {
 	//----------------------------------
 	// Set F-16 Raw Inputs
@@ -439,98 +442,113 @@ void ed_fm_set_command(int command, float value)	// Command = Command Index (See
 	switch (command)
 	{
 	case JoystickRoll:
+		F16::FlightControls.latStickInputRaw = value;
 		F16::FlightControls.setLatStickInput(limit(value, -1.0, 1.0));
 		break;
 
 	case JoystickPitch:
+		F16::FlightControls.longStickInputRaw = value;
 		F16::FlightControls.setLongStickInput(limit(-value, -1.0, 1.0));
 		break;
 
 	case JoystickYaw:
-		F16::FlightControls.setPedInput(limit(-value, -1.0, 1.0));
+		{
+			F16::FlightControls.pedInputRaw = value;
+			double limited = limit(-value, -1.0, 1.0);
+			F16::FlightControls.setPedInput(limited);
+			F16::LandingGear.nosewheelTurn(limited); // <- does nothing if not enabled or no weight on wheels
+		}
 		break;
 
 	case JoystickThrottle:
-		F16::Engine.setThrottleInput(limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0));
+		{
+			double limited = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
+			F16::Engine.setThrottleInput(limited);
+		}
 		break;
 
+		/*
 	case EnginesStart:
 		F16::Engine.startEngine();
 		break;
 	case EnginesStop:
 		F16::Engine.stopEngine();
 		break;
-
-		/*
-	case AirBrake:
-		if (F16::FlightControls.airbrakeDown > 0)
-		{
-			// down -> up
-			F16::FlightControls.airbrakeDown = 0;
-		}
-		else
-		{
-			// up -> down
-			F16::FlightControls.airbrakeDown = 1.0;
-		}
+	case PowerOnOff:
+		// electric system
 		break;
 		*/
+
+	case AirBrake:
+		F16::FlightControls.switchAirbrake();
+		swprintf(dbgmsg, 255, L" F16::Airbrake (toggle): %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+		break;
 	case AirBrakeOn:
-		F16::FlightControls.setAirbrake(0); // up?
+		F16::FlightControls.setAirbrakeON();
+		swprintf(dbgmsg, 255, L" F16::Airbrake ON: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
 		break;
 	case AirBrakeOff:
-		F16::FlightControls.setAirbrake(1.0); // down?
+		F16::FlightControls.setAirbrakeOFF();
+		swprintf(dbgmsg, 255, L" F16::Airbrake OFF: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
 		break;
 
-		/*
 		// analog input (axis)
-	case WheelBrakeLeft:
-	case WheelBrakeRight:
-		//F16::LandingGear
+	case WheelBrake:
+		F16::LandingGear.setWheelBrakeLeft(limit(value, -1.0, 1.0));
+		F16::LandingGear.setWheelBrakeRight(limit(value, -1.0, 1.0));
 		break;
-		*/
+	case WheelBrakeLeft:
+		F16::LandingGear.setWheelBrakeLeft(limit(value, -1.0, 1.0));
+		break;
+	case WheelBrakeRight:
+		F16::LandingGear.setWheelBrakeRight(limit(value, -1.0, 1.0));
+		break;
 
 		// switch/button input
 	case WheelBrakesOn:
+		F16::LandingGear.setWheelBrakesON();
+		break;
 	case WheelBrakesOff:
-		//F16::LandingGear
+		F16::LandingGear.setWheelBrakesOFF();
 		break;
 
-		/**/
 	case Gear:
-		if (F16::LandingGear.gearDownAngle > 0)
-		{
-			// down -> up
-			F16::LandingGear.gearDownAngle = 0;
-		}
-		else
-		{
-			// up -> down
-			F16::LandingGear.gearDownAngle = 1.0;
-		}
+		F16::LandingGear.switchGearUpDown();
+
+		swprintf(dbgmsg, 255, L" F16::Gear: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
 		break;
 	case LandingGearUp:
-		F16::LandingGear.gearDownAngle = 0.0; // up?
+		F16::LandingGear.setGearUp();
+
+		swprintf(dbgmsg, 255, L" F16::GearUp: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
 		break;
 	case LandingGearDown:
-		F16::LandingGear.gearDownAngle = 1.0; // 1.0 = down (see drawargs)
+		F16::LandingGear.setGearDown();
+
+		swprintf(dbgmsg, 255, L" F16::GearDown: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
 		break;
 		/**/
 
 	case Canopy:
 		// on/off toggle (needs some actuator support as well)
-		if (F16::canopyAngle > 0)
-		{
-			F16::canopyAngle = 0; // down
-		}
-		else
-		{
-			F16::canopyAngle = 0.9; // up
-		}
+		F16::Airframe.canopyToggle();
+
+		swprintf(dbgmsg, 255, L" F16::canopy: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
 		break;
 
 	default:
-		// do nothing
+		{
+			swprintf(dbgmsg, 255, L" F16::unknown command: %d value: %f \r\n", command, value);
+			::OutputDebugString(dbgmsg);
+			// do nothing
+		}
 		break;
 	}
 }
@@ -555,6 +573,27 @@ void ed_fm_set_command(int command, float value)	// Command = Command Index (See
 	//internal DCS calculations for changing mass, center of gravity,  and moments of inertia
 	}
 */
+/*
+if (fuel_consumption_since_last_time > 0)
+{
+	delta_mass		 = fuel_consumption_since_last_time;
+	delta_mass_pos_x = -1.0;
+	delta_mass_pos_y =  1.0;
+	delta_mass_pos_z =  0;
+
+	delta_mass_moment_of_inertia_x	= 0;
+	delta_mass_moment_of_inertia_y	= 0;
+	delta_mass_moment_of_inertia_z	= 0;
+
+	fuel_consumption_since_last_time = 0; // set it 0 to avoid infinite loop, because it called in cycle 
+	// better to use stack like structure for mass changing 
+	return true;
+}
+else 
+{
+	return false;
+}
+*/
 bool ed_fm_change_mass(double & delta_mass,
 						double & delta_mass_pos_x,
 						double & delta_mass_pos_y,
@@ -564,9 +603,7 @@ bool ed_fm_change_mass(double & delta_mass,
 						double & delta_mass_moment_of_inertia_z
 						)
 {
-	// get fuel mass according to consumption
-	//see: F16::Fuel.updateFrame()
-
+	// TODO: better integration of fuel mass position and actual fuel usage calculation
 	if (F16::Motion.isMassChanged() == true)
 	{
 		F16::Motion.getMassMomentInertiaChange(delta_mass, 
@@ -576,37 +613,11 @@ bool ed_fm_change_mass(double & delta_mass,
 											delta_mass_moment_of_inertia_x, 
 											delta_mass_moment_of_inertia_y, 
 											delta_mass_moment_of_inertia_z);
-
-
 		// Can't set to true...crashing right now :(
 		return false;
 	}
-	else
-	{
-		return false;
-	}
 
-	/*
-	if (fuel_consumption_since_last_time > 0)
-	{
-		delta_mass		 = fuel_consumption_since_last_time;
-		delta_mass_pos_x = -1.0;
-		delta_mass_pos_y =  1.0;
-		delta_mass_pos_z =  0;
-
-		delta_mass_moment_of_inertia_x	= 0;
-		delta_mass_moment_of_inertia_y	= 0;
-		delta_mass_moment_of_inertia_z	= 0;
-
-		fuel_consumption_since_last_time = 0; // set it 0 to avoid infinite loop, because it called in cycle 
-		// better to use stack like structure for mass changing 
-		return true;
-	}
-	else 
-	{
-		return false;
-	}
-	*/
+	return false;
 }
 
 /*
@@ -615,7 +626,7 @@ bool ed_fm_change_mass(double & delta_mass,
 */
 void ed_fm_set_internal_fuel(double fuel)
 {
-	F16::Fuel.internal_fuel = fuel;
+	F16::Fuel.setInternalFuel(fuel);
 }
 
 /*
@@ -623,7 +634,7 @@ void ed_fm_set_internal_fuel(double fuel)
 */
 double ed_fm_get_internal_fuel()
 {
-	return F16::Fuel.internal_fuel;
+	return F16::Fuel.getInternalFuel();
 }
 
 /*
@@ -646,24 +657,33 @@ double ed_fm_get_external_fuel ()
 	return F16::Fuel.getExternalFuel();
 }
 
-// is there somewhere a list of what each entry in array is for??
+/*
+	incremental adding of fuel in case of refueling process 
+*/
+void ed_fm_refueling_add_fuel(double fuel)
+{
+	return F16::Fuel.refuelAdd(fuel);
+}
+
+// see arguments in: Draw arguments for aircrafts 1.1.pdf
+// also (more accurate) use ModelViewer for details in F-16DCS.edm
 //
 void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 {
 	// nose gear
-	drawargs[0].f = (float)F16::LandingGear.gearDownAngle; // gear angle {0=retracted;1=extended}
-	drawargs[1].f = (float)F16::LandingGear.strutCompressionNose; // strut compression {0=extended;0.5=parking;1=retracted}
+	drawargs[0].f = (float)F16::LandingGear.getNoseGearDown(); // gear angle {0=retracted;1=extended}
+	drawargs[1].f = (float)F16::LandingGear.wheelNose.getStrutCompression(); // strut compression {0=extended;0.5=parking;1=retracted}
 
 	//Nose Gear Steering
-	drawargs[2].f = (float)F16::LandingGear.noseGearAngle; // nose gear angle {-1=CW max;1=CCW max}
+	drawargs[2].f = (float)F16::LandingGear.getNosegearTurn(); // nose gear turn angle {-1=CW max;1=CCW max}
 
 	// right gear
-	drawargs[3].f = (float)F16::LandingGear.gearDownAngle; // gear angle {0;1}
-	drawargs[4].f = (float)F16::LandingGear.strutCompressionRight; // strut compression {0;0.5;1}
+	drawargs[3].f = (float)F16::LandingGear.getRightGearDown(); // gear angle {0;1}
+	drawargs[4].f = (float)F16::LandingGear.wheelRight.getStrutCompression(); // strut compression {0;0.5;1}
 
 	// left gear
-	drawargs[5].f = (float)F16::LandingGear.gearDownAngle; // gear angle {0;1}
-	drawargs[6].f = (float)F16::LandingGear.strutCompressionLeft; // strut compression {0;0.5;1}
+	drawargs[5].f = (float)F16::LandingGear.getLeftGearDown(); // gear angle {0;1}
+	drawargs[6].f = (float)F16::LandingGear.wheelLeft.getStrutCompression(); // strut compression {0;0.5;1}
 
 	drawargs[9].f = (float)F16::flap_PCT; // right flap
 	drawargs[10].f = (float)F16::flap_PCT; // left flap
@@ -680,37 +700,148 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[17].f = (float) F16::rudder_PCT; // right rudder
 	drawargs[18].f = (float)-F16::rudder_PCT; // left rudder
 
-	//drawargs[22].f // refueling boom
+	//drawargs[22].f // refueling door (not implemented)
 
 	drawargs[28].f   = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner right engine
 	drawargs[29].f   = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner left engine
 
-	drawargs[38].f = (float)F16::canopyAngle; // draw angle of canopy {0=closed;0.9=elevated;1=no draw}
+	drawargs[38].f = (float)F16::Airframe.getCanopyAngle(); // draw angle of canopy {0=closed;0.9=elevated;1=no draw}
+
+
+	//drawargs[182].f // right-side brake flaps 0..1
+	//drawargs[186].f // left-side brake flaps 0..1
+	drawargs[182].f = F16::FlightControls.getAirbrake();
+	drawargs[186].f = F16::FlightControls.getAirbrake();
 
 	//drawargs[49].f // nav lights
 	//drawargs[51].f // landing lights
+
+	//drawargs[190..199].f // nav light #1..10
+	//drawargs[200..207].f // formation light #1..8
+	//drawargs[208..212].f // landing lamp #1..5
+
+	/*
+	// !! template has this addition, what are those values really for?
+	// (documentation?)
+	if (size > 616)
+	{
+		drawargs[611].f = drawargs[0].f;
+		drawargs[614].f = drawargs[3].f;
+		drawargs[616].f = drawargs[5].f;
+	}
+	*/
 }
 
+/*
+	update draw arguments for your aircraft 
+	also same prototype is used for ed_fm_set_fc3_cockpit_draw_args  : direct control over cockpit arguments , 
+	it can be use full for FC3 cockpits reintegration with new flight model 
+	size: count of elements in array
+*/
+// use ModelViewer for details in Cockpit-Viper.edm
+void ed_fm_set_fc3_cockpit_draw_args (EdDrawArgument * drawargs,size_t size)
+{
+	/*
+		-- stick arg 2 and 3 match args in cockpit edm, anim should work with proper input binding
+		StickPitch.arg_number			= 2
+		StickPitch.input				= {-100, 100}
+		StickPitch.output				= {-1, 1}
+		StickPitch.controller			= controllers.base_gauge_StickPitchPosition
+		StickBank.arg_number			= 3
+		StickBank.input					= {-100, 100}
+		StickBank.output				= {-1, 1}
+		StickBank.controller			= controllers.base_gauge_StickRollPosition
+	*/
+	// yay! this seems to work ok!
+	drawargs[2].f = (float)F16::FlightControls.longStickInputRaw;
+	drawargs[3].f = (float)F16::FlightControls.latStickInputRaw;
+
+	/*
+		Engine_TEMP.arg_number				= 51
+		Engine_TEMP.input					= {300, 900} 
+		Engine_TEMP.output					= {0.0, 1.00}
+		Engine_TEMP.controller				= controllers.base_gauge_EngineLeftTemperatureBeforeTurbine
+	*/
+	/* does not exist in the 3d model currently?
+	if (size > 51)
+	{
+		drawargs[51].f = (float)F16::Engine.getEngineTemperature();
+	}
+	*/
+
+	/*
+		Engine_RPM.arg_number				= 50
+		Engine_RPM.input					= {0.0, 110.0} 
+		Engine_RPM.output					= {0.0, 1.0}
+		Engine_RPM.controller				= controllers.base_gauge_EngineLeftRPM
+	*/
+	/* does not work
+	if (size > 50)
+	{
+		drawargs[50].f = (float)limit(F16::Engine.getEngineRelatedRpm(), 0, 100);
+	}
+	*/
+
+	/*
+		IndicatedAirSpeed.arg_number				= 100
+		IndicatedAirSpeed.input						= {0.0, 600}  --m/s
+		IndicatedAirSpeed.output					= {0.0, 1.0}
+		IndicatedAirSpeed.controller				= controllers.base_gauge_IndicatedAirSpeed
+	*/
+	/* does not work
+	if (size > 100)
+	{
+		// now gives value in ft/s, not m/s but enough to test..
+		drawargs[100].f = (float)limit(F16::Atmos.totalVelocity_FPS, 0, 600);
+	}
+	*/
+
+}
+
+/*
+shake level amplitude for head simulation , 
+*/
+double ed_fm_get_shake_amplitude ()
+{
+	return 0;
+}
+
+/*
+will be called for your internal configuration
+*/
 void ed_fm_configure(const char * cfg_path)
 {
-
 }
 
-double ed_fm_get_param(unsigned index)
-{	
-	if (index > ED_FM_END_ENGINE_BLOCK)
-	{
-		// unlikely case?
-		return 0;
-	}
+/*
+will be called for your internal configuration
+void ed_fm_release   called when fm not needed anymore : aircraft death etc.
+*/
+void ed_fm_release ()
+{
+	// we are calling destructors automatically but could cleanup earlier here..
+}
 
-	switch (index)
+// see enum ed_fm_param_enum in wHumanCustomPhysicsAPI.h
+double ed_fm_get_param(unsigned param_enum)
+{
+	switch (param_enum)
 	{
-	case ED_FM_ENGINE_0_RPM:			
-	case ED_FM_ENGINE_0_RELATED_RPM:	
-	case ED_FM_ENGINE_0_THRUST:			
-	case ED_FM_ENGINE_0_RELATED_THRUST:	
-		return 0; // APU
+		// APU parameters at engine index 0
+	case ED_FM_ENGINE_0_RPM:
+	case ED_FM_ENGINE_0_RELATED_RPM:
+	case ED_FM_ENGINE_0_CORE_RPM:
+	case ED_FM_ENGINE_0_CORE_RELATED_RPM:
+	case ED_FM_ENGINE_0_THRUST:
+	case ED_FM_ENGINE_0_RELATED_THRUST:
+	case ED_FM_ENGINE_0_CORE_THRUST:
+	case ED_FM_ENGINE_0_CORE_RELATED_THRUST:
+		return 0;
+	case ED_FM_ENGINE_0_TEMPERATURE:
+	case ED_FM_ENGINE_0_OIL_PRESSURE:
+	case ED_FM_ENGINE_0_FUEL_FLOW:
+		// add these for APU ?
+		return 0;
 
 	case ED_FM_ENGINE_1_RPM:
 		return F16::Engine.getEngineRpm();
@@ -720,6 +851,89 @@ double ed_fm_get_param(unsigned index)
 		return F16::Engine.getEngineThrust();
 	case ED_FM_ENGINE_1_RELATED_THRUST:
 		return F16::Engine.getEngineRelatedThrust();
+	case ED_FM_ENGINE_1_CORE_RPM:
+	case ED_FM_ENGINE_1_CORE_RELATED_RPM:
+	case ED_FM_ENGINE_1_CORE_THRUST:
+	case ED_FM_ENGINE_1_CORE_RELATED_THRUST:
+		// not implemented now
+		return 0;
+	case ED_FM_ENGINE_1_TEMPERATURE:
+		return F16::Engine.getEngineTemperature();
+	case ED_FM_ENGINE_1_OIL_PRESSURE:
+		return F16::Engine.getOilPressure();
+	case ED_FM_ENGINE_1_FUEL_FLOW:
+		return F16::Engine.getFuelFlow();
+
+	case ED_FM_SUSPENSION_0_GEAR_POST_STATE: // from 0 to 1 : from fully retracted to full released
+		return limit(F16::LandingGear.getNoseGearDown(), 0, 1);
+	case ED_FM_SUSPENSION_0_RELATIVE_BRAKE_MOMENT:
+	case ED_FM_SUSPENSION_0_UP_LOCK:
+	case ED_FM_SUSPENSION_0_DOWN_LOCK:
+	case ED_FM_SUSPENSION_0_WHEEL_YAW:
+	case ED_FM_SUSPENSION_0_WHEEL_SELF_ATTITUDE:
+		return 0;
+
+	case ED_FM_SUSPENSION_1_GEAR_POST_STATE: // from 0 to 1 : from fully retracted to full released
+		return limit(F16::LandingGear.getRightGearDown(), 0, 1);
+	case ED_FM_SUSPENSION_1_RELATIVE_BRAKE_MOMENT:
+	case ED_FM_SUSPENSION_1_UP_LOCK:
+	case ED_FM_SUSPENSION_1_DOWN_LOCK:
+	case ED_FM_SUSPENSION_1_WHEEL_YAW:
+	case ED_FM_SUSPENSION_1_WHEEL_SELF_ATTITUDE:
+		return 0;
+
+	case ED_FM_SUSPENSION_2_GEAR_POST_STATE: // from 0 to 1 : from fully retracted to full released
+		return limit(F16::LandingGear.getLeftGearDown(), 0, 1);
+	case ED_FM_SUSPENSION_2_RELATIVE_BRAKE_MOMENT:
+	case ED_FM_SUSPENSION_2_UP_LOCK:
+	case ED_FM_SUSPENSION_2_DOWN_LOCK:
+	case ED_FM_SUSPENSION_2_WHEEL_YAW:
+	case ED_FM_SUSPENSION_2_WHEEL_SELF_ATTITUDE:
+		return 0;
+
+	case ED_FM_OXYGEN_SUPPLY: // oxygen provided from on board oxygen system, pressure - pascal
+		return F16::Oxygen.getPressure();
+	case ED_FM_FLOW_VELOCITY:
+		return 0;
+
+	case ED_FM_CAN_ACCEPT_FUEL_FROM_TANKER: // return positive value if all conditions are matched to connect to tanker and get fuel
+		return 0;
+
+	// Groups for fuel indicator
+	case ED_FM_FUEL_FUEL_TANK_GROUP_0_LEFT:			// Values from different group of tanks
+	case ED_FM_FUEL_FUEL_TANK_GROUP_0_RIGHT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_1_LEFT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_1_RIGHT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_2_LEFT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_2_RIGHT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_3_LEFT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_3_RIGHT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_4_LEFT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_4_RIGHT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_5_LEFT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_5_RIGHT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_6_LEFT:
+	case ED_FM_FUEL_FUEL_TANK_GROUP_6_RIGHT:
+		return 0;
+
+	case ED_FM_FUEL_INTERNAL_FUEL:
+		return F16::Fuel.getInternalFuel();
+	case ED_FM_FUEL_TOTAL_FUEL:
+		return F16::Fuel.getInternalFuel() + F16::Fuel.getExternalFuel();
+
+	case ED_FM_FUEL_LOW_SIGNAL:
+		// Low fuel signal
+		return F16::Fuel.isLowFuel();
+
+	case ED_FM_ANTI_SKID_ENABLE:
+		/* return positive value if anti skid system is on , it also corresspond with suspension table "anti_skid_installed"  parameter for each gear post .i.e 
+		anti skid system will be applied only for those wheels who marked with   anti_skid_installed = true
+		*/
+		return 0;
+
+	case ED_FM_COCKPIT_PRESSURIZATION_OVER_EXTERNAL: 
+		// additional pressure from pressurization system , pascal , actual cabin pressure will be AtmoPressure + COCKPIT_PRESSURIZATION_OVER_EXTERNAL
+		return F16::Airframe.getCockpitPressure();
 
 	default:
 		// silence compiler warning(s)
@@ -730,17 +944,241 @@ double ed_fm_get_param(unsigned index)
 
 void ed_fm_cold_start()
 {
-	//F16::LandingGear.gearDownAngle = 1.0; // 1.0 as gear down?
+	// landing gear down
+	// canopy open
+	// electrics off
+	// engine off
+	/*
+	F16::LandingGear.setGearDown();
+	F16::canopyAngle = 0.9;
+	F16::Engine.stopEngine();
+	F16::FlightControls.setAirbrakeON();
+	*/
+
+	// input does not work correctly yet
+	F16::LandingGear.setGearDown();
+	F16::Airframe.setCanopyClosed();
+	F16::Engine.startEngine();
+	F16::FlightControls.setAirbrakeOFF();
 }
 
 void ed_fm_hot_start()
 {
-	//F16::LandingGear.gearDownAngle = 1.0; // 1.0 as gear down?
+	// landing gear down
+	// canopy closed
+	// electrics on
+	// engine on
+	F16::LandingGear.setGearDown();
+	F16::Airframe.setCanopyClosed();
+	F16::Engine.startEngine();
+	F16::FlightControls.setAirbrakeOFF();
 }
 
 void ed_fm_hot_start_in_air()
 {
+	// landing gear up
+	// canopy closed
+	// electrics on
+	// engine on
+	F16::LandingGear.setGearUp();
+	F16::Airframe.setCanopyClosed();
+	F16::Engine.startEngine();
+	F16::FlightControls.setAirbrakeOFF();
+}
 
+/* 
+for experts only : called  after ed_fm_hot_start_in_air for balance FM at actual speed and height , it is directly force aircraft dynamic data in case of success 
+*/
+bool ed_fm_make_balance (double & ax,//linear acceleration component in world coordinate system);
+									double & ay,//linear acceleration component in world coordinate system
+									double & az,//linear acceleration component in world coordinate system
+									double & vx,//linear velocity component in world coordinate system
+									double & vy,//linear velocity component in world coordinate system
+									double & vz,//linear velocity component in world coordinate system
+									double & omegadotx,//angular accelearation components in world coordinate system
+									double & omegadoty,//angular accelearation components in world coordinate system
+									double & omegadotz,//angular accelearation components in world coordinate system
+									double & omegax,//angular velocity components in world coordinate system
+									double & omegay,//angular velocity components in world coordinate system
+									double & omegaz,//angular velocity components in world coordinate system
+									double & yaw,  //radians
+									double & pitch,//radians
+									double & roll)//radians
+{
+	return false;
+}
+
+/*
+enable additional information like force vector visualization , etc.
+*/
+bool ed_fm_enable_debug_info()
+{
+	return false;
+}
+
+/*debuf watch output for topl left corner DCS window info  (Ctrl + Pause to show)
+ed_fm_debug_watch(int level, char *buffer,char *buf,size_t maxlen)
+level - Watch verbosity level.
+ED_WATCH_BRIEF   = 0,
+ED_WATCH_NORMAL  = 1,
+ED_WATCH_FULL	 = 2,
+
+return value  - amount of written bytes
+
+using
+
+size_t ed_fm_debug_watch(int level, char *buffer,size_t maxlen)
+{
+	float  value_1 = .. some value;
+	float  value_2 = .. some value;
+	//optional , you can change depth of displayed information with level 
+	switch (level)
+	{
+		case 0:     //ED_WATCH_BRIEF,
+			..do something
+			break;
+		case 1:     //ED_WATCH_NORMAL,
+			..do something
+		break;
+		case 2:     //ED_WATCH_FULL,
+			..do something
+		break;
+	}
+	... do something 
+	if (do not want to display)
+	{	
+		return 0;
+	}
+	else // ok i want to display some vars 
+	{    
+		return sprintf_s(buffer,maxlen,"var value1 %f ,var value2 %f",value_1,value_2);
+	}
+}
+*/
+size_t ed_fm_debug_watch(int level, char *buffer,size_t maxlen)
+{
+	/*
+	if (level < ED_WATCH_FULL)
+	{
+		return 0;
+	}
+	*/
+	/*
+	if (level == 1 || level == 2)
+	{
+		return sprintf_s(buffer, maxlen, "fuel: %f", F16::Fuel.getInternalFuel());
+	}
+	*/
+	return 0;
+}
+
+/* 
+path to your plugin installed
+*/
+void ed_fm_set_plugin_data_install_path(const char * path)
+{
+}
+
+// damages and failures
+// callback when preplaneed failure triggered from mission 
+void ed_fm_on_planned_failure(const char * data)
+{
+}
+
+// callback when damage occurs for airframe element 
+void ed_fm_on_damage(int Element, double element_integrity_factor)
+{
+}
+
+// called in case of repair routine 
+void ed_fm_repair()
+{
+}
+
+// in case of some internal damages or system failures this function return true , to switch on repair process
+bool ed_fm_need_to_be_repaired()
+{
+	return false;
+}
+
+// inform about  invulnerability settings
+void ed_fm_set_immortal(bool value)
+{
+}
+
+// inform about  unlimited fuel
+void ed_fm_unlimited_fuel(bool value)
+{
+	F16::Fuel.setUnlimitedFuel(value);
+}
+
+// inform about simplified flight model request 
+void ed_fm_set_easy_flight(bool value)
+{
+}
+
+// custom properties sheet 
+void ed_fm_set_property_numeric(const char * property_name,float value)
+{
+}
+
+// custom properties sheet 
+void ed_fm_set_property_string(const char * property_name,const char * value)
+{
+}
+
+/*
+	called on each sim step 
+
+	ed_fm_simulation_event event;
+	while (ed_fm_pop_simulation_event(event))
+	{
+		do some with event data;
+	}
+*/
+bool ed_fm_pop_simulation_event(ed_fm_simulation_event & out)
+{
+	// something like this when triggered? (reset return value after output)
+	//out.event_type = ED_FM_EVENT_FAILURE;
+	//memcpy(out.event_message, "autopilot", strlen("autopilot"));
+
+	return false;
+}
+
+/*
+	feedback to your fm about suspension state
+*/
+void ed_fm_suspension_feedback(int idx,const ed_fm_suspension_info * info)
+{
+	// TODO: update landing gears
+	//info->acting_force;
+	//info->acting_force_point;
+	//info->integrity_factor;
+	//info->struct_compression;
+
+	/*
+	swprintf(dbgmsg, 255, L" F16::Suspension: idx: %d comp: %f \r\n", idx, info->struct_compression);
+	::OutputDebugString(dbgmsg);
+	*/
+
+	switch (idx)
+	{
+	case 0:
+		// 0.231
+		F16::LandingGear.wheelNose.setStrutCompression(info->struct_compression);
+		break;
+	case 1:
+		// 0.750
+		F16::LandingGear.wheelRight.setStrutCompression(info->struct_compression);
+		break;
+	case 2:
+		// 0.750
+		F16::LandingGear.wheelLeft.setStrutCompression(info->struct_compression);
+		break;
+
+	default:
+		break;
+	}
 }
 
 double test()

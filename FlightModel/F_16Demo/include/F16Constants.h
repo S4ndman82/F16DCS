@@ -15,7 +15,8 @@ namespace F16
 	const double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord
 	const double		actualCG_PCT			= 0.30;			// Actual CG as a % of wing chord
 	const double		pi						= M_PI;			// Pi (3.14159....) - use value from math.h
-	const double		radiansToDegrees		= 180.0/M_PI;		// Conversion factor from radians to degrees - use value from math.h
+	const double		degtorad				= M_PI/180.0;	// 
+	const double		radiansToDegrees		= 180.0/M_PI;	// Conversion factor from radians to degrees - use value from math.h
 	const double		inertia_Ix_KGM2			= 12874.0;		// Reference moment of inertia (kg/m^2)
 	const double		inertia_Iy_KGM2			= 75673.6;		// Reference moment of inertia (kg/m^2)
 	const double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2)

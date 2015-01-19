@@ -154,14 +154,16 @@
     <ClInclude Include="Actuators\F16Actuators.h" />
     <ClInclude Include="Aerodynamics\F16Aero.h" />
     <ClInclude Include="Aerodynamics\F16AeroData.h" />
+    <ClInclude Include="Airframe\F16Airframe.h" />
     <ClInclude Include="Atmosphere\F16Atmosphere.h" />
+    <ClInclude Include="ED_FM_API.h" />
+    <ClInclude Include="Electrics\F16ElectricBus.h" />
     <ClInclude Include="Engine\F16Engine.h" />
     <ClInclude Include="Engine\F16FuelSystem.h" />
     <ClInclude Include="EquationsOfMotion\F16EquationsOfMotion.h" />
     <ClInclude Include="FlightControls\DummyFilter.h" />
     <ClInclude Include="FlightControls\F16FlightControls.h" />
     <ClInclude Include="F_16Demo.h" />
-    <ClInclude Include="ED_FM_TemplateAPI.h" />
     <ClInclude Include="include\ED_FM_Utility.h" />
     <ClInclude Include="include\F16Constants.h" />
     <ClInclude Include="include\FM\wHumanCustomPhysicsAPI.h" />

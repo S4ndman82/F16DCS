@@ -2,7 +2,7 @@ dofile(LockOn_Options.script_path.."HUD/Indicator/definitions.lua")
 
 local TST  		 = MakeMaterial(nil,{255,255,0,120})
 local TST2 		 = MakeMaterial(nil,{255,255,0,120})
-local SHOW_MASKS = FALSE
+local SHOW_MASKS = false
 
 arc_sectors           = 16;
 arc_shift             = 10;

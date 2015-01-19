@@ -1,5 +1,5 @@
 F-16 High Fidelity Flight Dynamics and Tech/Academic Initial Demonstration
-Build 2014-12-15-k
+Build 2014-12-31-k
 
 Update to: SkateZilla Build (version?)
 Update to: Cpt.Smileys v.3 Build
@@ -25,6 +25,16 @@ Changes since SkateZilla build:
 - removed "GeneralFilter" since the library only works with VC++ 2010 compiler *without* Service Pack 1 and needs Windows 7.1 SDK
  * in the place is currently "DummyFilter" which does nothing so we can work on the rest of it all
  * better solution needs to be worked out sooner or later..
+- some small additions to support different tanks in fuel system
+- wheel brakes (toe brakes) are now caught in the input, not finished adding braking factor yet
+- started DLL to support cockpit functions, just dummy library so far
+- some work on force vectors: use cross-product calculation from FM template, needs force positions in code still
+- landing gears should be down when starting from ground now
+ * using strut compression value given to DLL in new API method
+ * TODO: wheel positions (not in CG)
+ * TODO: wheel brakes forces, use proper calculation with kinetic energy
+- cockpit stick should move according to pitch/bank input
+ * controlled from the DLL, binding in the lua-script to "gauge"
 
 
 Known Issues:

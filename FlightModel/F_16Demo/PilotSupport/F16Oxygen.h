@@ -11,9 +11,26 @@ namespace F16
 
 	class F16Oxygen
 	{
+	protected:
+		double pressure; // pressure provided (pascals)
+
 	public:
-		F16Oxygen() {}
+		F16Oxygen() 
+			: pressure(0)
+		{}
 		~F16Oxygen() {}
+
+		double getPressure() const
+		{
+			return pressure;
+		}
+
+		void updateFrame(const double frameTime)
+		{
+			// double use = frameTime * usage;
+			//tanks -= use;
+			//tanks += o2_gen;
+		}
 	};
 }
 

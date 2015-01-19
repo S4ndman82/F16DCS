@@ -7,7 +7,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="F_16Demo.h" />
-    <ClInclude Include="ED_FM_TemplateAPI.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UtilityFunctions.h" />
@@ -59,6 +58,13 @@
     <ClInclude Include="FlightControls\DummyFilter.h">
       <Filter>FlightControls</Filter>
     </ClInclude>
+    <ClInclude Include="Electrics\F16ElectricBus.h">
+      <Filter>Electrics</Filter>
+    </ClInclude>
+    <ClInclude Include="Airframe\F16Airframe.h">
+      <Filter>Airframe</Filter>
+    </ClInclude>
+    <ClInclude Include="ED_FM_API.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -99,6 +105,12 @@
     </Filter>
     <Filter Include="PilotSupport">
       <UniqueIdentifier>{29163abe-4f69-45d3-b184-3de938c9e430}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Electrics">
+      <UniqueIdentifier>{8d2233c9-616b-4f2c-8565-6c5b6a73949d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Airframe">
+      <UniqueIdentifier>{8c166f06-b752-4c2f-bc8a-34cd95f66da4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

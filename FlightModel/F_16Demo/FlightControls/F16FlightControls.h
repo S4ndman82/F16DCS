@@ -24,18 +24,23 @@ namespace F16
 		double		leading_edge_flap_integrated_gained;
 		double		leading_edge_flap_integrated_gained_biased;
 
-		double airbrakeDown; // 0 = off
+		// TODO: just use as boolean or use this as angle?
+		//double airbrake; // 0 = off
+		bool airbrakeExtended;
 
 		// Pitch controller variables
-		double		longStickInput;
+		double		longStickInput; // pitch normalized
+		double		latStickInput; // bank normalized
+		double		longStickInputRaw; // pitch orig
+		double		latStickInputRaw; // bank orig
 		
 		double		stickCommandPosFiltered;
 		double		azFiltered;
 		double		alphaFiltered;
 		double		longStickForce;
-		double		latStickInput;
 
 		double		pedInput;		// Pedal input command normalized (-1 to 1)
+		double		pedInputRaw;	// yaw orig
 
 		// Control filters (general filters to easily code up when compared to report block diagrams)
 		DummyFilter	pitchRateWashout;
@@ -62,14 +67,18 @@ namespace F16
 			, leading_edge_flap_rate(0)
 			, leading_edge_flap_integrated_gained(0)
 			, leading_edge_flap_integrated_gained_biased(0)
-			, airbrakeDown(0)
+			//, airbrake(0)
+			, airbrakeExtended(false)
 			, longStickInput(0)
+			, latStickInput(0)
+			, longStickInputRaw(0)
+			, latStickInputRaw(0)
 			, stickCommandPosFiltered(0)
 			, azFiltered(0)
 			, alphaFiltered(0)
 			, longStickForce(0)
-			, latStickInput(0)
 			, pedInput(0)
+			, pedInputRaw(0)
 			, pitchRateWashout()
 			, pitchIntegrator()
 			, pitchPreActuatorFilter()
@@ -99,9 +108,28 @@ namespace F16
 		{
 			longStickInput = value;
 		}
-		void setAirbrake(double value)
+		void setAirbrakeON()
 		{
-			airbrakeDown = value;
+			//airbrake = value;
+			airbrakeExtended = true;
+		}
+		void setAirbrakeOFF()
+		{
+			//airbrake = value;
+			airbrakeExtended = false;
+		}
+		void switchAirbrake()
+		{
+			airbrakeExtended = !airbrakeExtended;
+		}
+
+		float getAirbrake()
+		{
+			if (airbrakeExtended == true)
+			{
+				return 1.0;
+			}
+			return 0.0;
 		}
 
 	//protected:

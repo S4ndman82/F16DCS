@@ -50,8 +50,22 @@ namespace F16
 		// current total mass (including fuel)
 		//double mass;
 
+		// mass times speed
+		//double kinetic_energy;
+
+		double fuel_mass_delta; // change in fuel mass since last frame
+
+		double weight_N; // Weight force of aircraft (N)
+
 	public:
-		F16Motion() {}
+		F16Motion() 
+			: common_moment()
+			, common_force()
+			, center_of_gravity()
+			, inertia()
+			, fuel_mass_delta(0)
+			, weight_N(0)
+		{}
 		~F16Motion() {}
 
 		// Very important! This function sum up all the forces acting on
@@ -59,8 +73,47 @@ namespace F16
 		// is acting at the CG
 		void add_local_force(const Vec3 & Force, const Vec3 & Force_pos)
 		{
-			sum_vec3(common_force, Force);
+			// TODO:! force position
+			//sum_vec3(common_force, Force);
+
+			common_force.x += Force.x;
+			common_force.y += Force.y;
+			common_force.z += Force.z;
+
+			Vec3 delta_pos(Force_pos.x - center_of_gravity.x,
+						   Force_pos.y - center_of_gravity.y,
+						   Force_pos.z - center_of_gravity.z);
+
+			Vec3 delta_moment = cross(delta_pos, Force);
+
+			common_moment.x += delta_moment.x;
+			common_moment.y += delta_moment.y;
+			common_moment.z += delta_moment.z;
 		}
+		void add_local_force_cg(const Vec3 & Force)
+		{
+			// old for comparison
+			//sum_vec3(common_force, Force);
+
+			Vec3 force_pos(0,0,0); // cg
+			add_local_force(Force, force_pos);
+		}
+
+		/*
+		void dec_local_force(const Vec3 & Force, const Vec3 & Force_pos)
+		{
+			// TODO:! force position
+
+			dec_vec3(common_force, Force);
+		}
+		void dec_local_force_cg(const Vec3 & Force)
+		{
+			// TODO:! force position
+			Vec3 force_pos(0,0,0);
+			dec_local_force(Force, force_pos);
+			//dec_vec3(common_force, Force);
+		}
+		*/
 
 		// Very important! This function sums up all the moments acting
 		// on the aircraft for this run frame.  It currently assumes the
@@ -76,6 +129,7 @@ namespace F16
 			// a new set for this run frame
 			clear_vec3(common_force);
 			clear_vec3(common_moment);
+			fuel_mass_delta = 0;
 		}
 
 		/*
@@ -85,13 +139,16 @@ namespace F16
 		}
 		*/
 
-		void setMassState(double center_of_mass_x,
+		void setMassState(double mass,
+						double center_of_mass_x,
 						double center_of_mass_y,
 						double center_of_mass_z,
 						double moment_of_inertia_x,
 						double moment_of_inertia_y,
 						double moment_of_inertia_z)
 		{
+			weight_N = mass * 9.80665002864;
+
 			center_of_gravity.x  = center_of_mass_x;
 			center_of_gravity.y  = center_of_mass_y;
 			center_of_gravity.z  = center_of_mass_z;
@@ -120,6 +177,10 @@ namespace F16
 
 		bool isMassChanged() const
 		{
+			if (fuel_mass_delta != 0)
+			{
+				return true;
+			}
 			if (inertia.x != F16::inertia_Ix_KGM2 
 				|| inertia.y != F16::inertia_Iz_KGM2 
 				|| inertia.z != F16::inertia_Iy_KGM2)
@@ -139,16 +200,22 @@ namespace F16
 		{
 			// TODO: change in amount of fuel -> change in mass -> set here
 
-			delta_mass = 0.0;
+			delta_mass -= fuel_mass_delta;
+			//delta_mass = 0;
 			delta_mass_pos_x = 0.0;
 			delta_mass_pos_y = 0.0;
 			delta_mass_pos_z = 0.0;
+
+			//delta_mass_pos_x = -1.0;
+			//delta_mass_pos_y =  1.0;
+			//delta_mass_pos_z =  0;
 
 			delta_mass_moment_of_inertia_x = F16::inertia_Ix_KGM2 - inertia.x;
 			delta_mass_moment_of_inertia_y = F16::inertia_Iy_KGM2 - inertia.y;
 			delta_mass_moment_of_inertia_z = F16::inertia_Iz_KGM2 - inertia.z;
 
 			// TODO: decrement this delta from inertia now?
+			fuel_mass_delta = 0;
 		}
 
 		//----------------------------------------------------------------
@@ -161,17 +228,17 @@ namespace F16
 			// Cy	(force out the right wing)
 			Vec3 cy_force(0.0, 0.0, Cy_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * 4.44822162825  );		// Output force in Newtons
 			Vec3 cy_force_pos(0.0,0,0); //0.01437
-			add_local_force(cy_force,cy_force_pos);	
+			add_local_force_cg(cy_force /*,cy_force_pos*/);	
 
 			// Cx (force out the nose)
 			Vec3 cx_force(Cx_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * 4.44822162825, 0, 0 );		// Output force in Newtons
 			Vec3 cx_force_pos(0, 0.0,0.0);
-			add_local_force(cx_force,cx_force_pos);
+			add_local_force_cg(cx_force /*,cx_force_pos*/);
 
 			// Cz (force down the bottom of the aircraft)
 			Vec3 cz_force(0.0,  -Cz_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * 4.44822162825, 0.0 );	// Output force in Newtons
 			Vec3 cz_force_pos(0,0,0);
-			add_local_force(cz_force,cz_force_pos);
+			add_local_force_cg(cz_force /*,cz_force_pos*/);
 
 			// Cl	(Output force in N/m)
 			Vec3 cl_moment(Cl_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * F16::wingSpan_FT * 1.35581795, 0.0,  0.0  );
@@ -191,7 +258,39 @@ namespace F16
 			// Thrust	
 			Vec3 thrust_force(thrust_N , 0.0, 0.0);	// Output force in Newtons
 			Vec3 thrust_force_pos(0,0,0);
-			add_local_force(thrust_force, thrust_force_pos);	
+			add_local_force_cg(thrust_force /*, thrust_force_pos*/);	
+		}
+
+		// TODO: left, right and nose wheel forces
+		void updateWheelForces(double leftWheelXFriction, double leftWheelYFriction, double rightWheelXFriction, double rightWheelYFriction, double noseWheelXFriction, double noseWheelYFriction)
+		{
+			// TODO: offset pos of each wheel,
+			// how much is it in the coordinate system?
+
+			// TODO: nose wheel turn
+
+			// TODO: debug: check force direction!
+
+			// check reduction in kinetic energy per wheel
+			// and check that we don't underflow..
+			add_local_force_cg(Vec3(leftWheelXFriction, 0.0,0.0) /*, Vec3(0.0,0.0,0.0)*/);
+
+			add_local_force_cg(Vec3(0.0, 0.0, leftWheelYFriction) /*, Vec3(0.0,0.0,0.0)*/);
+
+			add_local_force_cg(Vec3(rightWheelXFriction, 0.0,0.0) /*, Vec3(0.0,0.0,0.0)*/);
+
+			add_local_force_cg(Vec3(0.0, 0.0, rightWheelYFriction) /*, Vec3(0.0,0.0,0.0)*/);
+		}
+
+		// 
+		void updateFuelUsageMass(double mass_delta, double posX, double posY, double posZ)
+		{
+			fuel_mass_delta = mass_delta;
+		}
+
+		double getWeightN() const
+		{
+			return weight_N;
 		}
 	};
 }

@@ -8,6 +8,7 @@ namespace F16
 	// Engine: Pratt & Whitney F100-PW-129 or General Electric F110-GE-129
 	// Thrust: Pratt & Whitney: 65 kN, AB 106 kN; General Electric: 76 kN, AB 129 kN
 	// -> adapt to support either one?
+	// Turbine inlet temperature: 1,350 °C (2,460 °F)
 
 	// Coded from the simulator study document
 	class F16Engine
@@ -16,21 +17,30 @@ namespace F16
 		double m_power3;
 
 	public:
-		double		thrust_N; // Engine thrust (N)
-		double		throttleInput;	// Throttle input command normalized (-1 to 1)
+		double	thrust_N; // Engine thrust (N)
+		double	throttleInput;	// Throttle input command normalized (-1 to 1)
 
 		double percentPower;
 		double afterburner;
+
+		// amount of fuel used in this engine setting in current flight conditions (temperature, airspeed..)
+		double fuelPerFrame;
 
 		// fuel flow: LEAN - RICH
 		// -> 100pph increase?
 		// range 0 - 80,000pph (instruments)
 
 		// oil pressure: 0-100 psi
+		double oilPressure;
 
 		// temperatures, overheat
 
-		double engineRPM; // rounds per minute: non-zero if shutdown in air?
+		// which part of engine we need? 
+		// likely we need calculation of each section separately?
+		// cockpit gauge: 300..900 range
+		double engineTemperature;
+
+		//double engineRPM; // rounds per minute: non-zero if shutdown in air?
 		//double drag; // amount of drag if not running while in air?
 
 		bool starting; // "spooling up"
@@ -38,14 +48,16 @@ namespace F16
 
 		bool isIgnited; // if it is really running or just rotating from airflow? (out of fuel mid-air?)
 
-
 		F16Engine() 
 			: m_power3(0)
 			, thrust_N(0)
 			, throttleInput(0)
 			, percentPower(0)
 			, afterburner(0)
-			, engineRPM(0)
+			, fuelPerFrame(0)
+			, oilPressure(100)
+			, engineTemperature(900)
+			//, engineRPM(0)
 			, starting(false)
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
@@ -59,6 +71,19 @@ namespace F16
 		double getThrottleInput() const
 		{
 			return throttleInput;
+		}
+
+		double getOilPressure() const
+		{
+			return oilPressure;
+		}
+		double getEngineTemperature() const
+		{
+			return engineTemperature;
+		}
+		double getFuelFlow() const
+		{
+			return fuelPerFrame;
 		}
 
 		double getEngineRpm() const
@@ -117,6 +142,17 @@ namespace F16
 
 			// temporary for testing
 			isIgnited = false;
+			fuelPerFrame = 0;
+		}
+
+		// fuel use per frame in current conditions
+		double getFuelPerFrame() const
+		{
+			return fuelPerFrame;
+		}
+		double getThrustN() const
+		{
+			return thrust_N;
 		}
 
 		void updateFrame(const double mach, double alt, double frameTime);
@@ -237,6 +273,10 @@ namespace F16
 		}
 
 		thrust_N = limit(thrustTmp,0.0,129000.0);
+
+		// TODO: usage by actual engine ?
+		//fuelPerFrame =  10 * throttleInput * frameTime; //10 kg persecond
+		fuelPerFrame =  10 * frameTime; //10 kg persecond
 	}
 }
 

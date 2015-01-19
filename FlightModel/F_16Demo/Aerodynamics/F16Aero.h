@@ -56,24 +56,21 @@ namespace F16
 	// this is temporary while sorting out the stuff in namespace..
 	class F16Aero
 	{
-	public:
+	protected:
 		double		Cx_total;
 		double		Cx;
 		double		Cx_delta_lef;
-		double		dXdQ;
 		double		Cxq;
 		double		Cxq_delta_lef;
 		double		Cz_total;
 		double		Cz;
 		double		Cz_delta_lef;
-		double		dZdQ;
 		double		Czq;
 		double		Czq_delta_lef;
 		double		Cm_total;
 		double		Cm;
 		double		eta_el;
 		double		Cm_delta_lef;
-		double		dMdQ;
 		double		Cmq;
 		double		Cmq_delta_lef;
 		double		Cm_delta;
@@ -81,10 +78,7 @@ namespace F16
 		double		Cy_total;
 		double		Cy;
 		double		Cy_delta_lef;
-		double		dYdail;
 		double		Cy_delta_r30;
-		double		dYdR;
-		double		dYdP;
 		double		Cy_delta_a20;
 		double		Cy_delta_a20_lef;
 		double		Cyr;
@@ -94,10 +88,7 @@ namespace F16
 		double		Cn_total;
 		double		Cn;
 		double		Cn_delta_lef;
-		double		dNdail;
 		double		Cn_delta_r30;
-		double		dNdR;
-		double		dNdP;
 		double		Cn_delta_beta;
 		double		Cn_delta_a20;
 		double		Cn_delta_a20_lef;
@@ -108,10 +99,7 @@ namespace F16
 		double		Cl_total;
 		double		Cl;
 		double		Cl_delta_lef;
-		double		dLdail;
 		double		Cl_delta_r30;
-		double		dLdR;
-		double		dLdP;
 		double		Cl_delta_beta;
 		double		Cl_delta_a20;
 		double		Cl_delta_a20_lef;
@@ -163,132 +151,6 @@ namespace F16
 		AERO_Function fn_delta_CLbeta;
 		AERO_Function fn_delta_Cm;
 		AERO_Function fn_eta_el;
-
-		F16Aero();
-		~F16Aero() {};
-
-		void hifi_C(double alpha,double beta,double el)
-		{
-			Cx = _Cx(alpha,beta,el);
-			Cz = _Cz(alpha,beta,el);
-			Cm = _Cm(alpha,beta,el);
-			Cy = _Cy(alpha,beta);
-			Cn = _Cn(alpha,beta,el);
-			Cl = _Cl(alpha,beta,el);
-		}
-
-		void hifi_damping(double alpha)
-		{
-			Cxq = _CXq(alpha);
-			Cyr = _CYr(alpha);
-			Cyp = _CYp(alpha);
-			Czq = _CZq(alpha);
-			Clr = _CLr(alpha);
-			Clp = _CLp(alpha);
-			Cmq = _CMq(alpha);
-			Cnr = _CNr(alpha);
-			Cnp = _CNp(alpha);
-		}
-
-		void hifi_C_lef(double alpha, double beta)
-		{
-			Cx_delta_lef = _Cx_lef(alpha,beta) - _Cx(alpha,beta,0);
-			Cz_delta_lef = _Cz_lef(alpha,beta) - _Cz(alpha,beta,0);
-			Cm_delta_lef = _Cm_lef(alpha,beta) - _Cm(alpha,beta,0);
-			Cy_delta_lef = _Cy_lef(alpha,beta) - _Cy(alpha,beta);
-			Cn_delta_lef = _Cn_lef(alpha,beta) - _Cn(alpha,beta,0);
-			Cl_delta_lef = _Cl_lef(alpha,beta) - _Cl(alpha,beta,0);
-		}
-
-		void hifi_damping_lef(double alpha)
-		{
-			Cxq_delta_lef = _delta_CXq_lef(alpha);
-			Cyr_delta_lef = _delta_CYr_lef(alpha);
-			Cyp_delta_lef = _delta_CYp_lef(alpha);
-			Czq_delta_lef = _delta_CZq_lef(alpha);
-			Clr_delta_lef = _delta_CLr_lef(alpha);
-			Clp_delta_lef = _delta_CLp_lef(alpha);
-			Cmq_delta_lef = _delta_CMq_lef(alpha);
-			Cnr_delta_lef = _delta_CNr_lef(alpha);
-			Cnp_delta_lef = _delta_CNp_lef(alpha);
-		}
-
-		void hifi_rudder(double alpha, double beta)
-		{
-			Cy_delta_r30 = _Cy_r30(alpha,beta) - _Cy(alpha,beta);
-			Cn_delta_r30 = _Cn_r30(alpha,beta) - _Cn(alpha,beta,0);
-			Cl_delta_r30 = _Cl_r30(alpha,beta) - _Cl(alpha,beta,0);
-		}
-
-		void hifi_ailerons(double alpha, double beta)
-		{
-			Cy_delta_a20     = _Cy_a20(alpha,beta) - _Cy(alpha,beta);
-			Cy_delta_a20_lef = _Cy_a20_lef(alpha,beta) - _Cy_lef(alpha,beta) - Cy_delta_a20;
-			Cn_delta_a20     = _Cn_a20(alpha,beta) - _Cn(alpha,beta,0);
-			Cn_delta_a20_lef = _Cn_a20_lef(alpha,beta) - _Cn_lef(alpha,beta) - Cn_delta_a20;
-			Cl_delta_a20     = _Cl_a20(alpha,beta) - _Cl(alpha,beta,0);
-			Cl_delta_a20_lef = _Cl_a20_lef(alpha,beta) - _Cl_lef(alpha,beta) - Cl_delta_a20;
-		}
-
-		void hifi_other_coeffs(double alpha, double el)
-		{
-			Cn_delta_beta = _delta_CNbeta(alpha);
-			Cl_delta_beta = _delta_CLbeta(alpha);
-			Cm_delta      = _delta_Cm(alpha);
-			eta_el        = _eta_el(el);
-			Cm_delta_ds   = 0;       /* ignore deep-stall regime, delta_Cm_ds = 0 */
-		}
-
-		void updateFrame(double frameTime)
-		{
-			// TODO: speed brake handling..
-			// TODO Speedbrakes aero (from JBSim F16.xml config)
-		}
-
-		// TODO: move calculations from DLL exported functions
-		void computeTotals()
-		{
-			/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-			compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
-			(as on NASA report p37-40)
-			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-
-			/*
-			// XXXXXXXX Cx_tot XXXXXXXX 
-			F16::Aero.dXdQ = (F16::meanChord_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cxq + F16::Aero.Cxq_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.Cx_total = F16::Aero.Cx + F16::Aero.Cx_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dXdQ*F16::pitchRate_RPS;
-			F16::Aero.Cx_total += CxFlaps + F16::LandingGear.CxGearAero;
-
-			// ZZZZZZZZ Cz_tot ZZZZZZZZ 
-			F16::Aero.dZdQ = (F16::meanChord_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Czq + F16::Aero.Cz_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.Cz_total = F16::Aero.Cz + F16::Aero.Cz_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dZdQ*F16::pitchRate_RPS;
-			F16::Aero.Cz_total += CzFlaps + F16::LandingGear.CzGearAero;
-
-			// MMMMMMMM Cm_tot MMMMMMMM  
-			F16::Aero.dMdQ = (F16::meanChord_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cmq + F16::Aero.Cmq_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.Cm_total = F16::Aero.Cm*F16::Aero.eta_el + F16::Aero.Cz_total*(F16::referenceCG_PCT-F16::actualCG_PCT) + F16::Aero.Cm_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dMdQ*F16::pitchRate_RPS + F16::Aero.Cm_delta + F16::Aero.Cm_delta_ds;
-
-			// YYYYYYYY Cy_tot YYYYYYYY 
-			F16::Aero.dYdail = F16::Aero.Cy_delta_a20 + F16::Aero.Cy_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-			F16::Aero.dYdR = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cyr + F16::Aero.Cyr_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.dYdP = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cyp + F16::Aero.Cyp_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.Cy_total = F16::Aero.Cy + F16::Aero.Cy_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dYdail*F16::aileron_PCT + F16::Aero.Cy_delta_r30*F16::rudder_PCT + F16::Aero.dYdR*F16::yawRate_RPS + F16::Aero.dYdP*F16::rollRate_RPS;
-	
-			// NNNNNNNN Cn_tot NNNNNNNN 
-			F16::Aero.dNdail = F16::Aero.Cn_delta_a20 + F16::Aero.Cn_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-			F16::Aero.dNdR = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cnr + F16::Aero.Cnr_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.dNdP = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Cnp + F16::Aero.Cnp_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.Cn_total = F16::Aero.Cn + F16::Aero.Cn_delta_lef*F16::leadingEdgeFlap_PCT - F16::Aero.Cy_total*(F16::referenceCG_PCT-F16::actualCG_PCT)*(F16::meanChord_FT/F16::wingSpan_FT) + F16::Aero.dNdail*F16::aileron_PCT + F16::Aero.Cn_delta_r30*F16::rudder_PCT + F16::Aero.dNdR*F16::yawRate_RPS + F16::Aero.dNdP*F16::rollRate_RPS + F16::Aero.Cn_delta_beta*F16::beta_DEG;
-
-			// LLLLLLLL Cl_total LLLLLLLL 
-			F16::Aero.dLdail = F16::Aero.Cl_delta_a20 + F16::Aero.Cl_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-			F16::Aero.dLdR = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Clr + F16::Aero.Clr_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.dLdP = (F16::wingSpan_FT/(2*F16::Atmos.totalVelocity_FPS))*(F16::Aero.Clp + F16::Aero.Clp_delta_lef*F16::leadingEdgeFlap_PCT);
-			F16::Aero.Cl_total = F16::Aero.Cl + F16::Aero.Cl_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dLdail*F16::aileron_PCT + F16::Aero.Cl_delta_r30*F16::rudder_PCT + F16::Aero.dLdR*F16::yawRate_RPS + F16::Aero.dLdP*F16::rollRate_RPS + F16::Aero.Cl_delta_beta*F16::beta_DEG;
-			*/
-		}
-
-	protected:
 
 		double _Cx(double alpha,double beta,double dele)
 		{
@@ -793,6 +655,162 @@ namespace F16
 		...............
 		} End of function(...) */
 
+		void hifi_C(double alpha,double beta,double el)
+		{
+			Cx = _Cx(alpha,beta,el);
+			Cz = _Cz(alpha,beta,el);
+			Cm = _Cm(alpha,beta,el);
+			Cy = _Cy(alpha,beta);
+			Cn = _Cn(alpha,beta,el);
+			Cl = _Cl(alpha,beta,el);
+		}
+
+		void hifi_damping(double alpha)
+		{
+			Cxq = _CXq(alpha);
+			Cyr = _CYr(alpha);
+			Cyp = _CYp(alpha);
+			Czq = _CZq(alpha);
+			Clr = _CLr(alpha);
+			Clp = _CLp(alpha);
+			Cmq = _CMq(alpha);
+			Cnr = _CNr(alpha);
+			Cnp = _CNp(alpha);
+		}
+
+		void hifi_C_lef(double alpha, double beta)
+		{
+			Cx_delta_lef = _Cx_lef(alpha,beta) - _Cx(alpha,beta,0);
+			Cz_delta_lef = _Cz_lef(alpha,beta) - _Cz(alpha,beta,0);
+			Cm_delta_lef = _Cm_lef(alpha,beta) - _Cm(alpha,beta,0);
+			Cy_delta_lef = _Cy_lef(alpha,beta) - _Cy(alpha,beta);
+			Cn_delta_lef = _Cn_lef(alpha,beta) - _Cn(alpha,beta,0);
+			Cl_delta_lef = _Cl_lef(alpha,beta) - _Cl(alpha,beta,0);
+		}
+
+		void hifi_damping_lef(double alpha)
+		{
+			Cxq_delta_lef = _delta_CXq_lef(alpha);
+			Cyr_delta_lef = _delta_CYr_lef(alpha);
+			Cyp_delta_lef = _delta_CYp_lef(alpha);
+			Czq_delta_lef = _delta_CZq_lef(alpha);
+			Clr_delta_lef = _delta_CLr_lef(alpha);
+			Clp_delta_lef = _delta_CLp_lef(alpha);
+			Cmq_delta_lef = _delta_CMq_lef(alpha);
+			Cnr_delta_lef = _delta_CNr_lef(alpha);
+			Cnp_delta_lef = _delta_CNp_lef(alpha);
+		}
+
+		void hifi_rudder(double alpha, double beta)
+		{
+			Cy_delta_r30 = _Cy_r30(alpha,beta) - _Cy(alpha,beta);
+			Cn_delta_r30 = _Cn_r30(alpha,beta) - _Cn(alpha,beta,0);
+			Cl_delta_r30 = _Cl_r30(alpha,beta) - _Cl(alpha,beta,0);
+		}
+
+		void hifi_ailerons(double alpha, double beta)
+		{
+			Cy_delta_a20     = _Cy_a20(alpha,beta) - _Cy(alpha,beta);
+			Cy_delta_a20_lef = _Cy_a20_lef(alpha,beta) - _Cy_lef(alpha,beta) - Cy_delta_a20;
+			Cn_delta_a20     = _Cn_a20(alpha,beta) - _Cn(alpha,beta,0);
+			Cn_delta_a20_lef = _Cn_a20_lef(alpha,beta) - _Cn_lef(alpha,beta) - Cn_delta_a20;
+			Cl_delta_a20     = _Cl_a20(alpha,beta) - _Cl(alpha,beta,0);
+			Cl_delta_a20_lef = _Cl_a20_lef(alpha,beta) - _Cl_lef(alpha,beta) - Cl_delta_a20;
+		}
+
+		void hifi_other_coeffs(double alpha, double el)
+		{
+			Cn_delta_beta = _delta_CNbeta(alpha);
+			Cl_delta_beta = _delta_CLbeta(alpha);
+			Cm_delta      = _delta_Cm(alpha);
+			eta_el        = _eta_el(el);
+			Cm_delta_ds   = 0;       /* ignore deep-stall regime, delta_Cm_ds = 0 */
+		}
+
+	public:
+		F16Aero();
+		~F16Aero() {};
+
+		void updateFrame(const double alpha_DEG, const double beta_DEG, const double elevator_DEG, const double frameTime)
+		{
+			const double alpha1_DEG_Limited	= limit(alpha_DEG,-20.0,90.0);
+			const double beta1_DEG_Limited	= limit(beta_DEG,-30.0,30.0);
+
+			// TODO: speed brake handling..
+			// TODO Speedbrakes aero (from JBSim F16.xml config)
+
+			hifi_C(alpha1_DEG_Limited, beta1_DEG_Limited, elevator_DEG);
+			hifi_damping(alpha1_DEG_Limited);
+			hifi_C_lef(alpha1_DEG_Limited, beta1_DEG_Limited);
+			hifi_damping_lef(alpha1_DEG_Limited);
+			hifi_rudder(alpha1_DEG_Limited, beta1_DEG_Limited);
+			hifi_ailerons(alpha1_DEG_Limited, beta1_DEG_Limited);
+			hifi_other_coeffs(alpha1_DEG_Limited, elevator_DEG);
+		}
+
+		/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
+		(as on NASA report p37-40)
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+		void computeTotals(const double AtmosTotalVelocity_FPS, 
+						const double flap_PCT, const double leadingEdgeFlap_PCT, const double aileron_PCT, const double rudder_PCT,
+						const double pitchRate_RPS, const double rollRate_RPS, const double yawRate_RPS, 
+						const double alpha_DEG, const double beta_DEG, const double LgCxGearAero, const double LgCzGearAero)
+		{
+			// precalculate some terms to simplify statements
+			const double totalVelocity_FPS = 2*AtmosTotalVelocity_FPS;
+			const double meanChordFPS = (F16::meanChord_FT / totalVelocity_FPS);
+			const double wingSpanFPS = (F16::wingSpan_FT / totalVelocity_FPS);
+
+			const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
+			const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
+
+			// FLAPS (From JBSim F16.xml config)
+			double CLFlaps = 0.35 * flap_PCT;
+			double CDFlaps = 0.08 * flap_PCT;
+			double CzFlaps = - (CLFlaps * cos(alpha_DEG * F16::degtorad) + CDFlaps * sin(F16::degtorad));
+			double CxFlaps = - (-CLFlaps * sin(alpha_DEG * F16::degtorad) + CDFlaps * cos(F16::degtorad));
+
+			/* XXXXXXXX Cx_tot XXXXXXXX */
+			double dXdQ = meanChordFPS * (Cxq + Cxq_delta_lef*leadingEdgeFlap_PCT);
+			Cx_total = Cx + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*pitchRate_RPS;
+			Cx_total += CxFlaps + LgCxGearAero;
+
+			/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
+			double dZdQ = meanChordFPS * (Czq + Cz_delta_lef*leadingEdgeFlap_PCT);
+			Cz_total = Cz + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*pitchRate_RPS;
+			Cz_total += CzFlaps + LgCzGearAero;
+
+			/* MMMMMMMM Cm_tot MMMMMMMM */ 
+			double dMdQ = meanChordFPS * (Cmq + Cmq_delta_lef*leadingEdgeFlap_PCT);
+			Cm_total = Cm*eta_el + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*pitchRate_RPS + Cm_delta + Cm_delta_ds;
+
+			/* YYYYYYYY Cy_tot YYYYYYYY */
+			double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT;
+			double dYdR = wingSpanFPS * (Cyr + Cyr_delta_lef*leadingEdgeFlap_PCT);
+			double dYdP = wingSpanFPS * (Cyp + Cyp_delta_lef*leadingEdgeFlap_PCT);
+			Cy_total = Cy + Cy_delta_lef*leadingEdgeFlap_PCT + dYdail*aileron_PCT + Cy_delta_r30*rudder_PCT + dYdR*yawRate_RPS + dYdP*rollRate_RPS;
+	
+			/* NNNNNNNN Cn_tot NNNNNNNN */ 
+			double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT;
+			double dNdR = wingSpanFPS * (Cnr + Cnr_delta_lef*leadingEdgeFlap_PCT);
+			double dNdP = wingSpanFPS * (Cnp + Cnp_delta_lef*leadingEdgeFlap_PCT);
+			Cn_total = Cn + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + dNdail*aileron_PCT + Cn_delta_r30*rudder_PCT + dNdR*yawRate_RPS + dNdP*rollRate_RPS + Cn_delta_beta*beta_DEG;
+
+			/* LLLLLLLL Cl_total LLLLLLLL */
+			double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT;
+			double dLdR = wingSpanFPS * (Clr + Clr_delta_lef*leadingEdgeFlap_PCT);
+			double dLdP = wingSpanFPS * (Clp + Clp_delta_lef*leadingEdgeFlap_PCT);
+			Cl_total = Cl + Cl_delta_lef*leadingEdgeFlap_PCT + dLdail*aileron_PCT + Cl_delta_r30*rudder_PCT + dLdR*yawRate_RPS + dLdP*rollRate_RPS + Cl_delta_beta*beta_DEG;
+		}
+
+		double getCxTotal() const { return Cx_total; }
+		double getCzTotal() const { return Cz_total; }
+		double getCmTotal() const { return Cm_total; }
+		double getCyTotal() const { return Cy_total; }
+		double getCnTotal() const { return Cn_total; }
+		double getClTotal() const { return Cl_total; }
+
 	}; // class F16Aero
 
 	// constructor
@@ -800,20 +818,17 @@ namespace F16
 		Cx_total(0),
 		Cx(0),				
 		Cx_delta_lef(0),	
-		dXdQ(0),			
 		Cxq(0),				
 		Cxq_delta_lef(0),	
 		Cz_total(0),		
 		Cz(0),				
 		Cz_delta_lef(0),	
-		dZdQ(0),			
 		Czq(0),				
 		Czq_delta_lef(0),	
 		Cm_total(0),		
 		Cm(0),				
 		eta_el(0),			
 		Cm_delta_lef(0),	
-		dMdQ(0),			
 		Cmq(0),				
 		Cmq_delta_lef(0),	
 		Cm_delta(0),		
@@ -821,10 +836,7 @@ namespace F16
 		Cy_total(0),		
 		Cy(0),				
 		Cy_delta_lef(0),	
-		dYdail(0),			
 		Cy_delta_r30(0),	
-		dYdR(0),			
-		dYdP(0),			
 		Cy_delta_a20(0),	
 		Cy_delta_a20_lef(0),
 		Cyr(0),				
@@ -834,10 +846,7 @@ namespace F16
 		Cn_total(0),		
 		Cn(0),				
 		Cn_delta_lef(0),	
-		dNdail(0),			
 		Cn_delta_r30(0),	
-		dNdR(0),			
-		dNdP(0),			
 		Cn_delta_beta(0),	
 		Cn_delta_a20(0),	
 		Cn_delta_a20_lef(0),
@@ -848,10 +857,7 @@ namespace F16
 		Cl_total(0),		
 		Cl(0),				
 		Cl_delta_lef(0),	
-		dLdail(0),			
 		Cl_delta_r30(0),	
-		dLdR(0),			
-		dLdP(0),			
 		Cl_delta_beta(0),	
 		Cl_delta_a20(0),	
 		Cl_delta_a20_lef(0),

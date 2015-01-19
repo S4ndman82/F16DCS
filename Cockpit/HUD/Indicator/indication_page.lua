@@ -9,10 +9,16 @@ function AddElement(object)
 	object.level			= HUD_DEFAULT_LEVEL
     Add(object)
 end
+
 local BASE_COLOR  = {255,0  ,0,255}
 local BASE_COLOR2 = {0  ,255,0,255} --128,165,0,120
-local GRID_   			= MakeMaterial("HUD_grid.tga",BASE_COLOR2) -- image of the fixed net
+
 local BASE_COLOR_MAT    = MakeMaterial(nil,BASE_COLOR)
+
+--local IndicationTexturesPath = LockOn_Options.script_path.."../Textures/"
+--local GRID_MAT   			= MakeMaterial(IndicationTexturesPath.."HUD_grid.tga",BASE_COLOR2) -- image of the fixed net
+--local GRID_MAT   			= MakeMaterial(IndicationTexturesPath.."F-16HUD.tga",BASE_COLOR2) -- image of the fixed net
+local GRID_MAT   			= MakeMaterial("HUD_grid.tga",BASE_COLOR2) -- image of the fixed net
 
 local shape_rotation = 0
 
@@ -28,27 +34,26 @@ grid_origin.name 		     = create_guid_string() -- no such function in this scrip
 grid_origin.collimated 		 = true
 AddElement(grid_origin)
 
-local grid	    = CreateElement "ceTexPoly" --this could be the text area on HUD
-grid.name 		= create_guid_string() -- this must be external function call.
-grid.vertices   = {{-grid_radius, grid_radius},
+local gridpoly	    = CreateElement "ceTexPoly" --this could be the text area on HUD
+gridpoly.name 		= create_guid_string() -- this must be external function call.
+gridpoly.vertices   = {{-grid_radius, grid_radius},
 				   { grid_radius, grid_radius},
 				   { grid_radius,-grid_radius},
 				   {-grid_radius,-grid_radius}}
-grid.indices	= {0,1,2,2,3,0}
-grid.tex_coords = {{0,0},{1,0},{1,1},{0,1}}
-grid.material   = GRID_	   
-grid.init_pos   = {0,grid_shift + shape_rotation} 
-grid.collimated = true
-grid.parent_element = grid_origin.name
-AddElement(grid)
+gridpoly.indices	= {0,1,2,2,3,0}
+gridpoly.tex_coords = {{0,0},{1,0},{1,1},{0,1}}
+gridpoly.material   = GRID_MAT
+gridpoly.init_pos   = {0,grid_shift + shape_rotation} 
+gridpoly.collimated = true
+gridpoly.parent_element = grid_origin.name
+AddElement(gridpoly)
 
-
-local FONT_         = MakeFont({used_DXUnicodeFontData = "FUI/Fonts/font_cockpit_rus_2"},BASE_COLOR,40,"test_font") --this is font object declaration. Mig-21 does not have fonts, therefore disabled.
-
+--this is font object declaration. 
+local FONT_MAT = MakeFont({used_DXUnicodeFontData = "FUI/Fonts/font_cockpit_usa"},BASE_COLOR,40,"test_font") 
 
 local indicated_airspeed           = CreateElement "ceStringPoly"
 indicated_airspeed.name            = create_guid_string()
-indicated_airspeed.material        = FONT_
+indicated_airspeed.material        = FONT_MAT
 indicated_airspeed.init_pos        = {-65,-10}
 indicated_airspeed.alignment       = "RightCenter"
 indicated_airspeed.stringdefs      = {0.01,0.75 * 0.01, 0, 0}
@@ -61,7 +66,7 @@ AddElement(indicated_airspeed)
 
 local mach_number                  = CreateElement "ceStringPoly"
 mach_number.name                   = create_guid_string()
-mach_number.material               = FONT_
+mach_number.material               = FONT_MAT
 mach_number.init_pos               = {-65,-21}
 mach_number.alignment       = "RightCenter"
 mach_number.stringdefs      = {0.01,0.75 * 0.01, 0, 0}
@@ -74,7 +79,7 @@ AddElement(mach_number)
 
 local magnetic_heading           = CreateElement "ceStringPoly"
 magnetic_heading.name            = create_guid_string()
-magnetic_heading.material        = FONT_
+magnetic_heading.material        = FONT_MAT
 magnetic_heading.init_pos        = {0,50}
 magnetic_heading.alignment       = "CenterCenter"
 magnetic_heading.stringdefs      = {0.01,0.75 * 0.01, 0, 0}
@@ -87,7 +92,7 @@ AddElement(magnetic_heading)
 
 local vertical_acceleration           = CreateElement "ceStringPoly"
 vertical_acceleration.name            = create_guid_string()
-vertical_acceleration.material        = FONT_
+vertical_acceleration.material        = FONT_MAT
 vertical_acceleration.init_pos        = {0,-93}
 vertical_acceleration.alignment       = "CenterCenter"
 vertical_acceleration.stringdefs      = {0.01,0.75 * 0.01, 0, 0}
@@ -100,7 +105,7 @@ AddElement(vertical_acceleration)
 
 local altitude_source           = CreateElement "ceStringPoly"
 altitude_source.name            = create_guid_string()
-altitude_source.material        = FONT_
+altitude_source.material        = FONT_MAT
 altitude_source.init_pos        = {90,1}
 altitude_source.alignment       = "RightCenter"
 altitude_source.stringdefs      = {0.01,0.75 * 0.01, 0, 0}
@@ -113,7 +118,7 @@ AddElement(altitude_source)
 
 local altitude           = CreateElement "ceStringPoly"
 altitude.name            = create_guid_string()
-altitude.material        = FONT_
+altitude.material        = FONT_MAT
 altitude.init_pos        = {90,-10}
 altitude.alignment       = "RightCenter"
 altitude.stringdefs      = {0.01,0.75 * 0.01, 0, 0}
@@ -126,7 +131,7 @@ AddElement(altitude)
 
 local vertical_velocity           = CreateElement "ceStringPoly"
 vertical_velocity.name            = create_guid_string()
-vertical_velocity.material        = FONT_
+vertical_velocity.material        = FONT_MAT
 vertical_velocity.init_pos        = {90,-21}
 vertical_velocity.alignment       = "RightCenter"
 vertical_velocity.stringdefs      = {0.01,0.75 * 0.01, 0, 0}

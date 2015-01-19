@@ -7,11 +7,11 @@ keyCommands = {
 
 axisCommands = {
 -- mouse axes
-{combos = {{key = 'MOUSE_X'}}, action = iCommandPlaneViewHorizontal, name = _('Camera Horizontal View (mouse)')},
-{combos = {{key = 'MOUSE_Y'}}, action = iCommandPlaneViewVertical, name = _('Camera Vertical View (mouse)')},
-{combos = {{key = 'MOUSE_Z'}}, action = iCommandPlaneZoomView, name = _('Camera Zoom View (mouse)')},
+{combos = {{key = 'MOUSE_X'}}, action = iCommandPlaneViewHorizontal, name = _('Camera Horizontal View')},
+{combos = {{key = 'MOUSE_Y'}}, action = iCommandPlaneViewVertical, name = _('Camera Vertical View')},
+{combos = {{key = 'MOUSE_Z'}}, action = iCommandPlaneZoomView, name = _('Camera Zoom View')},
 
-{action = iCommandPlaneSelecterHorizontal	, name = _('I-251 Slew Horizontal (mouse)')},
-{action = iCommandPlaneSelecterVertical		, name = _('I-251 Slew Vertical (mouse)')},
+{action = iCommandPlaneSelecterHorizontal, name = _('TDC Slew Horizontal (mouse)')},
+{action = iCommandPlaneSelecterVertical	, name = _('TDC Slew Vertical (mouse)')},
 },
 }

@@ -39,6 +39,7 @@ namespace F16
 		double		ambientTemperature_DegK;	// Ambient temperature (kelvon)
 		double		ambientDensity_KgPerM3;		// Ambient density (kg/m^3)
 		double		dynamicPressure_LBFT2;		// Dynamic pressure (lb/ft^2)
+		double		speed_of_sound;				// (meters/sec)
 		double		mach; // Well..Mach, yeah
 
 		double		altitude_FT;		// Absolute altitude MSL (ft)
@@ -54,6 +55,7 @@ namespace F16
 			, ambientTemperature_DegK(0)
 			, ambientDensity_KgPerM3(0)
 			, dynamicPressure_LBFT2(0)
+			, speed_of_sound(0)
 			, mach(0)
 			, altitude_FT(0)
 			, ps_LBFT2(0)
@@ -61,12 +63,13 @@ namespace F16
 		{}
 		~F16Atmosphere() {}
 
-		void setAtmosphere(const double temperature, const double density, const double altitude, const double pressure)
+		void setAtmosphere(const double temperature, const double density, const double soundspeed, const double altitude, const double pressure)
 		{
 			ambientTemperature_DegK = temperature;
 			ambientDensity_KgPerM3 = density; 
-			altitude_FT = altitude;
-			ps_LBFT2 = pressure;
+			altitude_FT = altitude * F16::meterToFoot; // meters to feet
+			ps_LBFT2 = pressure * 0.020885434273; // (N/m^2) to (lb/ft^2)
+			speed_of_sound = soundspeed;
 
 			// calculate some helpers already
 			temp = ambientTemperature_DegK * 1.8; // In Deg Rankine

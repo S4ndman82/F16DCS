@@ -16,8 +16,8 @@ join(res.keyCommands,{
 -- Systems
 {down = iCommandPlaneFuelOn, up = iCommandPlaneFuelOff, name = _('Fuel Dump'), category = _('Systems')},
 {down = iCommandPlaneJettisonFuelTanks, name = _('Jettison Fuel Tanks'), category = _('Systems')},
-{pressed = iCommandAltimeterPressureIncrease,	up = iCommandAltimeterPressureStop, name = _('Altimeter Pressure Increase Su-25T'), category = _('Systems')},
-{pressed = iCommandAltimeterPressureDecrease, up = iCommandAltimeterPressureStop, name = _('Altimeter Pressure Decrease Su-25T'), category = _('Systems')},
+{down = iCommandPlane_HOTAS_NoseWheelSteeringButton, up = iCommandPlane_HOTAS_NoseWheelSteeringButton, name = _('Nose Gear Maneuvering Range'), category = _('Systems')},
+{down = iCommandPlane_HOTAS_NoseWheelSteeringButtonOff, up = iCommandPlane_HOTAS_NoseWheelSteeringButtonOff, name = _('Nose Gear Steering Disengage'), category = _('Systems')},
 
 -- Modes
 {down = iCommandPlaneModeFI0, name = _('(6) Longitudinal Missile Aiming Mode'), category = _('Modes')},
@@ -51,18 +51,18 @@ join(res.keyCommands,{
 {down = iCommandPlaneSalvoOnOff, name = _('Salvo Mode'), category = _('Weapons')},
 --{combos = {{key = 'Space', reformers = {'RAlt'}}}, down = iCommandPlanePickleOn,	up = iCommandPlanePickleOff, name = _('Weapon Release'), category = _('Weapons')},
 {down = iCommandChangeGunRateOfFire, name = _('Cut Of Burst select'), category = _('Weapons')},
-{down = iCommandChangeRippleQuantity, name = _('Ripple Quantity Select/SPPU select'), category = _('Weapons')},
-{down = iCommandChangeRippleInterval, name = _('Ripple Interval Increase'), category = _('Weapons')},
-{down = iCommandChangeRippleIntervalDown, name = _('Ripple Interval Decrease'), category = _('Weapons')},
+--{down = iCommandChangeRippleQuantity, name = _('Ripple Quantity Select/SPPU select'), category = _('Weapons')},
+--{down = iCommandChangeRippleInterval, name = _('Ripple Interval Increase'), category = _('Weapons')},
+--{down = iCommandChangeRippleIntervalDown, name = _('Ripple Interval Decrease'), category = _('Weapons')},
 
 -- Countermeasures
 {down = iCommandActiveIRJamming, name = _('IR Jamming'), category = _('Countermeasures')},
 })
+
 -- joystick axes 
 join(res.axisCommands,{
-{action = iCommandPlaneSelecterHorizontalAbs, name = _('I-251 Slew Horizontal')},
-{action = iCommandPlaneSelecterVerticalAbs	, name = _('I-251 Slew Vertical')},
-{action = iCommandPlaneMFDZoomAbs 			, name = _('I-251 Zoom')},
-{action = iCommandPlaneBase_DistanceAbs 	, name = _('Target Box Size / Funnel target wing span / Gunpod Elevation')},
+{action = iCommandWheelBrake,		name = _('Wheel Brake')},
+{action = iCommandLeftWheelBrake,	name = _('Wheel Brake Left')},
+{action = iCommandRightWheelBrake,	name = _('Wheel Brake Right')},
 })
 return res

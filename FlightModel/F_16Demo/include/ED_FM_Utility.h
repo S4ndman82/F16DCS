@@ -35,6 +35,14 @@ inline void sum_vec3(Vec3 &dest, const Vec3 &src)
 	dest.z += src.z;
 }
 
+// TODO: replace with operator-=() in Vec3
+inline void dec_vec3(Vec3 &dest, const Vec3 &src)
+{
+	dest.x -= src.x;
+	dest.y -= src.y;
+	dest.z -= src.z;
+}
+
 
 struct Matrix33
 {
