@@ -1,5 +1,5 @@
 F-16 High Fidelity Flight Dynamics and Tech/Academic Initial Demonstration
-Build 11-29-2014-0-k
+Build 2014-12-13-k
 
 Update to: SkateZilla Build (version?)
 Update to: Cpt.Smileys v.3 Build
@@ -20,6 +20,11 @@ Changes since SkateZilla build:
 - some refactoring of code for easier changes and additions later
 - reduced few unnecessary memory allocations and memory copying
 - possible bugfix in inertia handling, testing needed
+- splitting code into new objects, reduce C-style "access globally"
+- preparations for adding fuel usage and resulting weight-change, speed brakes, wheel brakes, canopy control etc.
+- removed "GeneralFilter" since the library only works with VC++ 2010 compiler *without* Service Pack 1 and needs Windows 7.1 SDK
+ * in the place is currently "DummyFilter" which does nothing so we can work on the rest of it all
+ * better solution needs to be worked out sooner or later..
 
 
 Known Issues:
@@ -31,8 +36,14 @@ Known Issues:
  (Landing still feels a bit off, but is no longer a 100% chance of damaged gear)
 -Some Control Surface/Pylon Clipping issues.
 -No Speed Brake Systems.
+- rear elevator flutter in speeds over one mach:
+ depends on actual altitude and speed so you should see it in range of 1200km/h - 1700km/h
+ * we might need control actuator "dampening" calculations here?
+ * appears now due to removal of "GeneralFilter"
+
 
 To Install
 Extract Folder from RAR,
 Remove Any Previous Version,
 Copy /F-16A v2.0/ Folder to /DCS World/Mods/Aircrafts/ folder.
+

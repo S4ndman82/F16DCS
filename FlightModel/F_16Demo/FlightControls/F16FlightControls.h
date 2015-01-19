@@ -1,48 +1,110 @@
-#ifndef __F16FLIGHTCONTROLS__
-#define __F16FLIGHTCONTROLS__
+#ifndef _F16FLIGHTCONTROLS_H_
+#define _F16FLIGHTCONTROLS_H_
 
 #include "../stdafx.h"
-#include <stdio.h>
-#include <string>
+#include <memory.h>
 #include "../UtilityFunctions.h"
-#include "../include/general_filter.h"
+//#include "../include/general_filter.h"
+
+#include "DummyFilter.h"
 
 namespace F16
 {
-	namespace FLIGHTCONTROLS
+	class F16FlightControls
 	{
-		bool		simInitialized = false;
+	public:
+		bool		simInitialized;
 
-		double		leading_edge_flap_integral					= 0.0;
-		double		leading_edge_flap_integrated				= 0.0;
-		double		leading_edge_flap_rate						= 0.0;
-		double		leading_edge_flap_integrated_gained			= 0.0;
-		double		leading_edge_flap_integrated_gained_biased	= 0.0;
+		double		leadingEdgeFlap_PCT;	// Leading edge flap as a percent of maximum (0 to 1)
 
-		// Control filters (general filters to easily code up when compared to report block diagrams)
-		GeneralFilter	pitchRateWashout;
-		GeneralFilter	pitchIntegrator;
-		GeneralFilter	pitchPreActuatorFilter;
-		GeneralFilter	pitchActuatorDynamicsFilter;
-		GeneralFilter	accelFilter;
-		GeneralFilter	latStickForceFilter;
-		GeneralFilter	rollCommandFilter;
-		GeneralFilter	rollActuatorDynamicsFilter;
-		GeneralFilter	rollRateFilter1;
-		GeneralFilter	rollRateFilter2;
-		GeneralFilter	rudderCommandFilter;
-		GeneralFilter	yawRateWashout;
-		GeneralFilter	yawRateFilter;
-		GeneralFilter	yawServoFilter;
+	//protected:
+		double		leading_edge_flap_integral;
+		double		leading_edge_flap_integrated;
+		double		leading_edge_flap_rate;
+		double		leading_edge_flap_integrated_gained;
+		double		leading_edge_flap_integrated_gained_biased;
+
+		double airbrakeDown; // 0 = off
 
 		// Pitch controller variables
-		double		longStickInput			= 0.0;
+		double		longStickInput;
 		
-		double		stickCommandPosFiltered = 0.0;
-		double		azFiltered				= 0.0;
-		double		alphaFiltered			= 0.0;
-		double		longStickForce			= 0.0;
-		double		latStickInput			= 0.0;
+		double		stickCommandPosFiltered;
+		double		azFiltered;
+		double		alphaFiltered;
+		double		longStickForce;
+		double		latStickInput;
+
+		double		pedInput;		// Pedal input command normalized (-1 to 1)
+
+		// Control filters (general filters to easily code up when compared to report block diagrams)
+		DummyFilter	pitchRateWashout;
+		DummyFilter	pitchIntegrator;
+		DummyFilter	pitchPreActuatorFilter;
+		DummyFilter	pitchActuatorDynamicsFilter;
+		DummyFilter	accelFilter;
+		DummyFilter	latStickForceFilter;
+		DummyFilter	rollCommandFilter;
+		DummyFilter	rollActuatorDynamicsFilter;
+		DummyFilter	rollRateFilter1;
+		DummyFilter	rollRateFilter2;
+		DummyFilter	rudderCommandFilter;
+		DummyFilter	yawRateWashout;
+		DummyFilter	yawRateFilter;
+		DummyFilter	yawServoFilter;
+
+	public:
+		F16FlightControls() 
+			: simInitialized(false)
+			, leadingEdgeFlap_PCT(0)
+			, leading_edge_flap_integral(0)
+			, leading_edge_flap_integrated(0)
+			, leading_edge_flap_rate(0)
+			, leading_edge_flap_integrated_gained(0)
+			, leading_edge_flap_integrated_gained_biased(0)
+			, airbrakeDown(0)
+			, longStickInput(0)
+			, stickCommandPosFiltered(0)
+			, azFiltered(0)
+			, alphaFiltered(0)
+			, longStickForce(0)
+			, latStickInput(0)
+			, pedInput(0)
+			, pitchRateWashout()
+			, pitchIntegrator()
+			, pitchPreActuatorFilter()
+			, pitchActuatorDynamicsFilter()
+			, accelFilter()
+			, latStickForceFilter()
+			, rollCommandFilter()
+			, rollActuatorDynamicsFilter()
+			, rollRateFilter1()
+			, rollRateFilter2()
+			, rudderCommandFilter()
+			, yawRateWashout()
+			, yawRateFilter()
+			, yawServoFilter()
+		{}
+		~F16FlightControls() {}
+
+		void setPedInput(double value)
+		{
+			pedInput = value;
+		}
+		void setLatStickInput(double value) 
+		{
+			latStickInput = value;
+		}
+		void setLongStickInput(double value) 
+		{
+			longStickInput = value;
+		}
+		void setAirbrake(double value)
+		{
+			airbrakeDown = value;
+		}
+
+	//protected:
 
 		// Controller for the leading edge flaps
 		double leading_edge_flap_controller(double alpha_DEG, double dynamicPressure_FTLB, double staticPressure_FTLB, double frameTime)
@@ -400,7 +462,46 @@ namespace F16
 
 			return trailing_edge_flap_deflection;
 		}
-	}
+
+	public:
+
+		//---------------------------------------------
+		//-----CONTROL DYNAMICS------------------------
+		//---------------------------------------------
+		void updateFrame(double totalVelocity_FPS, double dynamicPressure_LBFT2, double ps_LBFT2, double dt)
+		{
+			/*
+			// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
+			// and is completely automatic
+			double leadingEdgeFlap_DEG = leading_edge_flap_controller(F16::alpha_DEG, dynamicPressure_LBFT2, ps_LBFT2, dt);	
+			leadingEdgeFlap_PCT = limit(leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);	
+
+			// Call the longitudinal (pitch) controller.  Takes the following inputs:
+			// -Normalize long stick input
+			// -Trimmed G offset
+			// -Angle of attack (deg)
+			// -Pitch rate (rad/sec)
+			// -Differential command (from roll controller, not quite implemented yet)
+			elevator_DEG_commanded   = -(fcs_pitch_controller(longStickInput, -0.3, F16::alpha_DEG, F16::pitchRate_RPS * F16::radiansToDegrees, (F16::accz/9.81), 0.0, dynamicPressure_LBFT2, dt));
+
+			// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
+			elevator_DEG	= F16::elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
+			elevator_DEG = limit(F16::elevator_DEG,-25.0,25.0);
+	
+			aileron_DEG_commanded = (fcs_roll_controller(latStickInput, longStickForce, F16::accy/9.81, F16::rollRate_RPS* F16::radiansToDegrees, 0.0, dynamicPressure_LBFT2, dt));
+			aileron_DEG	= F16::aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
+			aileron_DEG = limit(F16::aileron_DEG,-21.5,21.5);
+
+			rudder_DEG_commanded = fcs_yaw_controller(	pedInput, 0.0, F16::yawRate_RPS * (180.0/3.14159), F16::rollRate_RPS* F16::radiansToDegrees,
+															alphaFiltered, F16::aileron_DEG_commanded, F16::accy/9.81, dt);
+			rudder_DEG		= rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
+			rudder_DEG = limit(rudder_DEG,-30.0,30.0);
+
+			flap_DEG = fcs_flap_controller(totalVelocity_FPS);
+			*/
+		}
+
+	};
 }
 
-#endif
+#endif // ifndef _F16FLIGHTCONTROLS_H_

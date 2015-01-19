@@ -2,9 +2,11 @@
 
 mount_vfs_model_path	(current_mod_path.."/Shapes")
 mount_vfs_liveries_path (current_mod_path.."/Liveries")
+mount_vfs_texture_path  (current_mod_path.."/Textures/Avionics")
 mount_vfs_texture_path  (current_mod_path.."/Textures/Base_Textures")
 mount_vfs_texture_path  (current_mod_path.."/Textures/147thFW")
-mount_vfs_texture_path  (current_mod_path.."/Textures/Avionics")
+mount_vfs_texture_path  (current_mod_path.."/Textures/Blue_Digital")
+mount_vfs_texture_path  (current_mod_path.."/Textures/Digital")
 mount_vfs_texture_path  (current_mod_path.."/Cockpit/Textures")
 
 

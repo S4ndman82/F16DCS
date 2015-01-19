@@ -11,9 +11,11 @@
 // Windows Header Files:
 #include <windows.h>
 
-
 // Visual Studio is rather dumb at times..
 #define _USE_MATH_DEFINES
 #include <cmath>
+
+#include <malloc.h>
+#include <memory.h>
 
 // TODO: reference additional headers your program requires here

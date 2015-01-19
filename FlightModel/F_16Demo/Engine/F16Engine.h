@@ -1,7 +1,14 @@
+#ifndef _F16ENGINE_H_
+#define _F16ENGINE_H_
+
 #include "../stdafx.h"
 
 namespace F16
 {
+	// Engine: Pratt & Whitney F100-PW-129 or General Electric F110-GE-129
+	// Thrust: Pratt & Whitney: 65 kN, AB 106 kN; General Electric: 76 kN, AB 129 kN
+	// -> adapt to support either one?
+
 	// Coded from the simulator study document
 	class F16Engine
 	{
@@ -9,20 +16,42 @@ namespace F16
 		double m_power3;
 
 	public:
-		double m_thrust_N; // Engine thrust (N)
+		double		thrust_N; // Engine thrust (N)
+		double		throttleInput;	// Throttle input command normalized (-1 to 1)
+
+		double percentPower;
+		double afterburner;
+
+		double engineRPM; // rounds per minute: non-zero if shutdown in air?
+		//double drag; // amount of drag if not running while in air?
+		bool isIgnited; // if it is really running or just rotating from airflow? (out of fuel mid-air?)
 
 		F16Engine() 
 			: m_power3(0)
-			, m_thrust_N(0)
+			, thrust_N(0)
+			, throttleInput(0)
+			, percentPower(0)
+			, afterburner(0)
+			, engineRPM(0)
+			, isIgnited(false)
 		{}
 		~F16Engine() {}
 
-		void updateFrame(double throttleInput, double mach, double alt, double frameTime);
+		void setThrottleInput(double value)
+		{
+			throttleInput = value;
+		}
+		double getThrottleInput() const
+		{
+			return throttleInput;
+		}
+
+		void updateFrame(const double mach, double alt, double frameTime);
 	};
 
-	void F16Engine::updateFrame(double throttleInput, double mach, double alt, double frameTime)
+	void F16Engine::updateFrame(const double mach, double alt, double frameTime)
 	{
-		double percentPower = 0.0;
+		afterburner = (throttleInput - 80.0) / 20.0;
 
 		if(throttleInput < 78.0)
 		{
@@ -32,8 +61,8 @@ namespace F16
 		{
 			percentPower = throttleInput *4.5455 - 354.55;
 		}
-	
 		percentPower = limit(percentPower,0.0,100.0);
+
 		double power1 = percentPower;
 		double power2 = 0.0;
 		double power3rate = 0.0;
@@ -89,21 +118,25 @@ namespace F16
 
 		//From Simulator Study document (use 0 altitude values for now)
 		//TODO: This should really be a look-up table per the document reference but this is sufficient for now...
+		double altTemp = (alt/55000.0);
+		double altTemp2 = (alt/50000.0);
 		double machLimited = limit(mach,0.2,1.0);
-		double Tidle = (-24976.0 * machLimited + 9091.5) + ((alt/55000) * 12000.0);
-		double Tmil = (-25958.0 * pow(machLimited,3.0) + 34336.0 * pow(machLimited,2.0) - 14575.0 * machLimited + 58137.0) + ((alt/50000.0) * -42000.0);
-		double Tmax = (26702.0 * pow(machLimited,2.0) + 8661.4 * machLimited + 92756.0) + ((alt/50000.0) * -100000.0);
+		double Tidle = (-24976.0 * machLimited + 9091.5) + (altTemp * 12000.0);
+		double Tmil = (-25958.0 * pow(machLimited,3.0) + 34336.0 * pow(machLimited,2.0) - 14575.0 * machLimited + 58137.0) + (altTemp2 * -42000.0);
+		double Tmax = (26702.0 * pow(machLimited,2.0) + 8661.4 * machLimited + 92756.0) + (altTemp2 * -100000.0);
 
-		double thrust = 0.0;
+		double thrustTmp = 0.0;
 		if(m_power3 < 50.0)
 		{
-			thrust = Tidle + (Tmil-Tidle)*(m_power3/50.0);
+			thrustTmp = Tidle + (Tmil-Tidle)*(m_power3/50.0);
 		}
 		else
 		{
-			thrust = Tmil + (Tmax-Tmil)*(m_power3 - 50.0)/50.0;
+			thrustTmp = Tmil + (Tmax-Tmil)*(m_power3 - 50.0)/50.0;
 		}
 
-		m_thrust_N = limit(thrust,0.0,129000.0);
+		thrust_N = limit(thrustTmp,0.0,129000.0);
 	}
 }
+
+#endif // ifndef _F16ENGINE_H_

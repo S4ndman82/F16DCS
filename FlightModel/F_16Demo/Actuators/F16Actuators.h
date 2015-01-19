@@ -1,13 +1,14 @@
-#ifndef __F16ACTUATORS_H_
-#define __F16ACTUATORS_H_
+#ifndef _F16ACTUATORS_H_
+#define _F16ACTUATORS_H_
 
 #include "../stdafx.h"
-#include <stdio.h>
-#include <string>
+#include <memory.h>
 #include "../UtilityFunctions.h"
 
 namespace F16
 {
+	// TODO: speed brake handling..
+
 	class F16Actuators
 	{
 	public:
@@ -90,4 +91,4 @@ namespace F16
 	};
 }
 
-#endif // ifndef __F16ACTUATORS_H_
+#endif // ifndef _F16ACTUATORS_H_

@@ -8,7 +8,6 @@
   <ItemGroup>
     <ClInclude Include="F_16Demo.h" />
     <ClInclude Include="ED_FM_TemplateAPI.h" />
-    <ClInclude Include="ED_FM_Utility.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UtilityFunctions.h" />
@@ -36,6 +35,30 @@
     <ClInclude Include="Inputs\F16Inputs.h">
       <Filter>Inputs</Filter>
     </ClInclude>
+    <ClInclude Include="LandingGear\F16LandingGear.h">
+      <Filter>LandingGear</Filter>
+    </ClInclude>
+    <ClInclude Include="WeightBalanceInertia\F16WeightBalanceInertia.h">
+      <Filter>WeightBalanceInertia</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ED_FM_Utility.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FM\wHumanCustomPhysicsAPI.h">
+      <Filter>include\FM</Filter>
+    </ClInclude>
+    <ClInclude Include="PilotSupport\F16Oxygen.h">
+      <Filter>PilotSupport</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\F16FuelSystem.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\F16Constants.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="FlightControls\DummyFilter.h">
+      <Filter>FlightControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -61,6 +84,21 @@
     </Filter>
     <Filter Include="Inputs">
       <UniqueIdentifier>{a6f16d21-9208-4eca-98fd-bf413d528e4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{66f9c8b6-c5fe-45a4-8422-fdad2278c5c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LandingGear">
+      <UniqueIdentifier>{999f06f9-47d0-4ba9-a6f9-1bf8dab1d45e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WeightBalanceInertia">
+      <UniqueIdentifier>{10c2b0f0-4805-4d39-a45d-9fbda51563a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\FM">
+      <UniqueIdentifier>{b32eeedc-a414-4987-8e4b-eb5b5ab2fb46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PilotSupport">
+      <UniqueIdentifier>{29163abe-4f69-45d3-b184-3de938c9e430}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
