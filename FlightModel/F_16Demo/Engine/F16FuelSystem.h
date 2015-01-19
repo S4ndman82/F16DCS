@@ -12,6 +12,14 @@ namespace F16
 	// F100-PW-229
 	//Specific fuel consumption: Military thrust: 77.5 kg/(kN·h) (0.76 lb/(lbf·h)) Full afterburner: 197.8 kg/(kN·h) (1.94 lb/(lbf·h))
 
+	// three externals: wings and centerline station
+	// five internals: left and right wing tanks, two forward (F-1, F-2) and one aft (A-1) fuselage tank.
+	// fwd & aft reservoir
+
+	// total internal: [A] 6950 +- 300 (JP-4), 7290 +- 300 (JP-5/8) [B] 5650 +- 300, 5930 +- 300
+	// [A]: fwd fuselage: 3100 +- 100 / 3250 +- 100, 
+	// [B]: fwd fuselage: 1800 +- 100, 1890 +- 100
+
 	class F16FuelSystem
 	{
 	public:

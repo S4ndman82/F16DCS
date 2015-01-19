@@ -121,6 +121,7 @@ namespace F16
 
 	double		weight_N				= 0.0;			// Weight force of aircraft (N)
 	double		canopyAngle				= 0.0;			// Canopy status/angle
+	double		refuelingBoomAngle		= 0.0;			// Refueling boom status/angle (0=retracted;1=extended)
 
 	F16Atmosphere Atmos;
 	F16Aero Aero;
@@ -386,6 +387,8 @@ void ed_fm_set_current_state (double ax,//linear acceleration component in world
 							)
 {
 	F16::ay_world = ay;
+
+	// if in air, set engine running here?
 }
 
 void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration component in body coordinate system (meters/sec^2)
@@ -423,6 +426,8 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 
 	F16::accz = ay;
 	F16::accy = az;
+
+	// if in air, set engine running here?
 }
 
 void ed_fm_set_command(int command, float value)	// Command = Command Index (See Export.lua), Value = Signal Value (-1 to 1 for Joystick Axis)
@@ -447,6 +452,13 @@ void ed_fm_set_command(int command, float value)	// Command = Command Index (See
 
 	case JoystickThrottle:
 		F16::Engine.setThrottleInput(limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0));
+		break;
+
+	case EnginesStart:
+		F16::Engine.startEngine();
+		break;
+	case EnginesStop:
+		F16::Engine.stopEngine();
 		break;
 
 		/*
@@ -504,17 +516,6 @@ void ed_fm_set_command(int command, float value)	// Command = Command Index (See
 		F16::LandingGear.gearDownAngle = 1.0; // 1.0 = down (see drawargs)
 		break;
 		/**/
-
-		/*
-		// adjust drawargs with these?
-		// needs some support here?
-	case MouseCameraRotateLeftRight:
-		break;
-	case MouseCameraRotateUpDown:
-		break;
-	case MouseCameraZoom:
-		break;
-		*/
 
 	case Canopy:
 		// on/off toggle (needs some actuator support as well)
@@ -679,6 +680,8 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[17].f = (float) F16::rudder_PCT; // right rudder
 	drawargs[18].f = (float)-F16::rudder_PCT; // left rudder
 
+	//drawargs[22].f // refueling boom
+
 	drawargs[28].f   = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner right engine
 	drawargs[29].f   = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner left engine
 
@@ -710,13 +713,13 @@ double ed_fm_get_param(unsigned index)
 		return 0; // APU
 
 	case ED_FM_ENGINE_1_RPM:
-		return (F16::Engine.getThrottleInput()/100.0) * 3000;
+		return F16::Engine.getEngineRpm();
 	case ED_FM_ENGINE_1_RELATED_RPM:
-		return (F16::Engine.getThrottleInput()/100.0);
+		return F16::Engine.getEngineRelatedRpm();
 	case ED_FM_ENGINE_1_THRUST:
-		return (F16::Engine.getThrottleInput()/100.0) * 5000 * 9.81;
+		return F16::Engine.getEngineThrust();
 	case ED_FM_ENGINE_1_RELATED_THRUST:
-		return (F16::Engine.getThrottleInput()/100.0);
+		return F16::Engine.getEngineRelatedThrust();
 
 	default:
 		// silence compiler warning(s)

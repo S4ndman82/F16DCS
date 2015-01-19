@@ -197,13 +197,13 @@ int getLinIndex(int *indexVector, const ND_INFO &ndinfo)
 }
 
 // Linearly interpolate between two data values
-double linearInterpolate(const double *T, const double *V, double **Xmat, const ND_INFO &ndinfo)
+double linearInterpolate(UtilBuffer &Tbuf, const double *V, double **Xmat, const ND_INFO &ndinfo)
 {
  int *indexVector = intVector(ndinfo.nDimension);
  int nVertices = 1<<(ndinfo.nDimension);
 
  UtilBuffer oldTbuf(nVertices);
- oldTbuf.copyVec(nVertices, T);
+ oldTbuf.copyVec(nVertices, Tbuf.vec);
 
  // reuse buffer until done here
  UtilBuffer newTbuf;
@@ -290,7 +290,7 @@ double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO
 		Tbuf.vec[i] = Y[index];
 	}
 
-	double result = linearInterpolate(Tbuf.vec, xPar, xPoint, ndinfo);
+	double result = linearInterpolate(Tbuf, xPar, xPoint, ndinfo);
 
 	free(indexVector);
 	freeIntMat(indexMatrix, ndinfo.nDimension, 2);

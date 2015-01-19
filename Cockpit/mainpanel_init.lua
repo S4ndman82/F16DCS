@@ -1,4 +1,4 @@
-shape_name   	   = "Cockpit-Wunderluft"
+shape_name   	   = "Cockpit-Viper"
 is_EDM			   = true
 new_model_format   = true
 ambient_light    = {255,255,255}
@@ -13,7 +13,7 @@ draw_pilot					 = false
 external_model_canopy_arg	 = 38
 
 use_external_views = false 
-cockpit_local_point = {2.419, 0.818, 0.0}
+cockpit_local_point = {4.15, 1.15, 0.0} --F-16 New Model {4.8, 0.78, 0.0} -- 1.57 for Y
 
 day_texture_set_value   = 0.0
 night_texture_set_value = 0.1
@@ -101,8 +101,8 @@ IndicatedAirSpeed.output					= {0.0, 1.0}
 IndicatedAirSpeed.controller				= controllers.base_gauge_IndicatedAirSpeed
 
 TEST_PARAM_GAUGE      			  = CreateGauge("parameter")
-TEST_PARAM_GAUGE.parameter_name   = "TEST"
-TEST_PARAM_GAUGE.arg_number    	  = 113
+TEST_PARAM_GAUGE.parameter_name   = "TEST_PARAM4"
+TEST_PARAM_GAUGE.arg_number    	  = 2
 TEST_PARAM_GAUGE.input    		  = {0,100} 
 TEST_PARAM_GAUGE.output    		  = {0,1} 
 

@@ -36,23 +36,12 @@ creators[devices.CLOCK]			 = {"avAChS_1"			    ,LockOn_Options.script_path.."clo
 creators[devices.ADI]			 = {"avBaseIKP"			    ,LockOn_Options.script_path.."adi.lua"}
 creators[devices.ELECTRIC_SYSTEM]= {"avSimpleElectricSystem",LockOn_Options.script_path.."Systems/electric_system.lua"}
 creators[devices.RADAR]			 = {"avSimpleRadar"			,LockOn_Options.script_path.."RADAR/Device/init.lua"}
+creators[devices.LANDING_GEAR]	 = {"avLuaDevice"			,LockOn_Options.script_path.."Systems/landing_gear_system.lua"}
 
 -- Indicators
 indicators = {}
 indicators[#indicators + 1] = {"ccIndicator" ,LockOn_Options.script_path.."HUD/Indicator/init.lua"  ,nil,{{"PNT-HUD-CENTER","PNT-HUD-DOWN","PNT-HUD-RIGHT"},{sx_l = 0,sy_l = 0,sz_l = 0,sh = 0,sw = 0}}} --HUD
-indicators[#indicators + 1] = {"ccIndicator",LockOn_Options.script_path.."RADAR/Indicator/init.lua",--init script
-  nil,--id of parent device
-  {	
-	{}, -- initial geometry anchor , triple of connector names 
-	{sx_l =  0,  -- center position correction in meters (forward , backward)
-	 sy_l =  0,  -- center position correction in meters (up , down)
-	 sz_l =  0,  -- center position correction in meters (left , right)
-	 sh   =  0,  -- half height correction 
-	 sw   =  0,  -- half width correction 
-	 rz_l =  0,  -- rotation corrections  
-	 rx_l =  0,
-	 ry_l =  0}
-  }
-} --RADAR
+
+ --RADAR
 
 			 

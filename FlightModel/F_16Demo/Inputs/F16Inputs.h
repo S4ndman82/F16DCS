@@ -27,18 +27,21 @@ enum F16InputCommands
 	LandingGearUp		= 430, // Gear up			(doesn't work)	
 	LandingGearDown		= 431, // Gear down			(doesn't work)
 
-	EnginesStart		= 309, // Engines start 				
-	EnginesStop			= 310, // Engines stop 			
-	LeftEngineStart		= 311, // Left engine start 			
-	RightEngineStart	= 312, // Right engine start 			
-	LeftEngineStop		= 313, // Left engine stop 				
-	RightEngineStop		= 314, // Right engine stop 			
-	PowerOnOff			= 315, // Power on/off 					
+	EnginesStart		= 309, // Engines start // iCommandEnginesStart
+	EnginesStop			= 310, // Engines stop 	// iCommandEnginesStop
+	//LeftEngineStart		= 311, // Left engine start 			
+	//RightEngineStart	= 312, // Right engine start 			
+	//LeftEngineStop		= 313, // Left engine stop 				
+	//RightEngineStop		= 314, // Right engine stop 			
+	PowerOnOff			= 315, // Power on/off (electric, battery, APU?)
 
 	//WheelBrakeLeft = ;
 	//WheelBrakeRight = ;
 
 	//NoseWheelSteering
+	//RefuelingBoom
+
+	//DragChute
 
 	JoystickPitch		= 2001,	
 	JoystickRoll		= 2002,
@@ -47,9 +50,7 @@ enum F16InputCommands
 	JoystickLeftEngineThrottle = 2005,
 	JoystickRightEngineThrottle = 2006,
 
-	MouseCameraRotateLeftRight = 2007, // mouse camera rotate left/right  
-	MouseCameraRotateUpDown = 2008, // mouse camera rotate up/down
-	MouseCameraZoom = 2009 // mouse camera zoom 
+	Reserved // placeholder
 };
 
 // TODO: trivial container for values or hard-coded for efficiency?
