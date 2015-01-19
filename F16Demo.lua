@@ -2,9 +2,10 @@
 
 mount_vfs_model_path	(current_mod_path.."/Shapes")
 mount_vfs_liveries_path (current_mod_path.."/Liveries")
-mount_vfs_texture_path  (current_mod_path.."/Textures/F-16Demo")
+mount_vfs_texture_path  (current_mod_path.."/Textures/Base_Textures")
+mount_vfs_texture_path  (current_mod_path.."/Textures/147thFW")
 mount_vfs_texture_path  (current_mod_path.."/Textures/Avionics")
-mount_vfs_texture_path  (current_mod_path.."/Cockpit2/Textures")
+mount_vfs_texture_path  (current_mod_path.."/Cockpit/Textures")
 
 
 F16Demo =  {
@@ -13,11 +14,11 @@ F16Demo =  {
 	DisplayName			= _('F-16Demo'),
 	
 	HumanCockpit 		= true,
-	HumanCockpitPath    = current_mod_path..'/Cockpit2/',
+	HumanCockpitPath    = current_mod_path..'/Cockpit/',
 	
 	Picture 			= "F-16Demo.png",
 	Rate 				= 40, -- RewardPoint in Multiplayer
-	Shape 				= "F-16Demo",
+	Shape 				= "F-16DCS",
 	--Shape 				= "f-16",
 	
 	shape_table_data 	= 
@@ -66,8 +67,8 @@ F16Demo =  {
 
 	has_afteburner 				= true, -- AFB yes/no
 	has_speedbrake 				= true, -- Speedbrake yes/no
-	nose_gear_pos 				= {3.146,	-1.563,	0}, --F-16 New Model	{2.954,	-2.0,	0}, --	{2.954,	-1.881,	0},
-	main_gear_pos 				= {-0.846,	-1.579,	1.187}, --F-16 New Model {-1.041,	-2.0,	1.207}, --	{-1.041,	-1.869,	1.207},
+	nose_gear_pos 				= {3.133,	-1.6,	0}, --F-16 New Model	{2.954,	-2.0,	0}, --	{2.954,	-1.881,	0},
+	main_gear_pos 				= {-1.185,	-1.603,	1.185}, --F-16 New Model {-1.041,	-2.0,	1.207}, --	{-1.041,	-1.869,	1.207},
 	tand_gear_max 				= 0.577,
 	tanker_type 				= 1, -- Tanker type if the plane is airrefuel capable
 	wing_area 					= 28, -- wing area in m2
@@ -82,9 +83,9 @@ F16Demo =  {
 	RCS 						= 4, -- Radar Cross Section m2
 	IR_emission_coeff 			= 0.6, -- Normal engine -- IR_emission_coeff = 1 is Su-27 without afterburner. It is reference.
 	IR_emission_coeff_ab 		= 1.2, -- With afterburner
-	wing_tip_pos 				= {-2.704,	0.307,	4.649},--{1.004,	0.707,	1.249},
-	nose_gear_wheel_diameter	=	0.443,
-	main_gear_wheel_diameter	=	0.653,
+	wing_tip_pos 				= {-3.462,	0.319,	4.959},--{1.004,	0.707,	1.249},
+	nose_gear_wheel_diameter	=	0.479,
+	main_gear_wheel_diameter	=	0.68,
 	brakeshute_name 			= 0, -- Landing - brake chute visual shape after separation
 	is_tanker 					= false, -- Tanker yes/no
 	air_refuel_receptacle_pos 	= {-0.051,	0.911,	0},
@@ -93,11 +94,12 @@ F16Demo =  {
 	{
 		[1] = 
 		{
-			pos = 	{-6.003,	0.261,	0}, --F-16 New Model Values {-5.5,	0.0,	0},
+			pos = 	{-5.956,	0.272,	0}, --F-16 New Model Values {-5.5,	0.0,	0},
 			elevation	=	0,
-			diameter	=	1.12,
-			exhaust_length_ab	=	3,
+			diameter	=	0.998,
+			exhaust_length_ab	=	6,
 			exhaust_length_ab_K	=	0.76,
+			smokiness_level     = 	0.4; -- Level of Exhuast Smoke
 		}, -- end of [1]
 	}, -- end of engines_nozzles
 	crew_size	 = 1,
@@ -170,157 +172,201 @@ F16Demo =  {
 	},
 	
 	
-	Guns = {gun_mount("M_61", { count = 511 }, {muzzle_pos = {3.183,  0.404,-0.79}}) --F-16 New Model{muzzle_pos = {3.0,  0.2,-0.79}})
+	Guns = {gun_mount("M_61", { count = 511 }, {muzzle_pos = {3.183,  0.404,-0.716}}) --F-16 New Model{muzzle_pos = {3.0,  0.2,-0.79}})
 			},
 	
 	Pylons =     {
-        pylon(1, 0, -1.265000, 0.346000, -4.813000,
-            {
-                FiZ = -2,
-            },
-            {
-                { CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" },
+        pylon(1, 0, -1.455,0.259, -4.809,
+				{use_full_connector_position = true, connector = "PylonL1"},
+				{
+				{ CLSID ="{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" }, -- Single AIM-9
+				{ CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" }, -- 	AIM-120B
+				{ CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" }, --    AIM-120C
+				{ CLSID	="{A4BCC903-06C8-47bb-9937-A30FEDB4E743}"}, -- Blue Smokewinder
+				}	
+			),  --End Of Left Wingtip
+        
+			
+		pylon(2, 0, -1.785,0.051, -4.137, 
+				{use_full_connector_position = true, connector = "PylonL2"},
+				{
+				{ CLSID ="{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" }, -- Single AIM-9
+				{ CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" }, -- 	AIM-120B
+				{ CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" }, --    AIM-120C
+				}
+			), --End Of Left Air-to-Air Pyon
+			
+		pylon(3, 0, -0.563,-0.15, -3.062, 
+				{use_full_connector_position = true, connector = "PylonL3"},
+				{
+				{ CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" },
                 { CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" },
                 { CLSID = "{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" },
                 { CLSID = "{9BFD8C90-F7AE-4e90-833B-BFD0CED0E536}" },
-            }
-        ),
-        pylon(2, 0, -0.983000, -0.110000, -3.948000,
-            {
-                FiZ = -2,
-            },
-            {
-                { CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" },
-                { CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" },
-                { CLSID = "{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" },
-                { CLSID = "{9BFD8C90-F7AE-4e90-833B-BFD0CED0E536}" },
-            }
-        ),
-        pylon(3, 0, -1.115000, -0.161000, -3.050000,
-            {
-                FiZ = -2,
-            },
-            {
-                { CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" },
-                { CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" },
-                { CLSID = "{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" },
-                { CLSID = "{9BFD8C90-F7AE-4e90-833B-BFD0CED0E536}" },
-                { CLSID = "{9BCC2A2B-5708-4860-B1F1-053A18442067}" },
                 { CLSID = "{69DC8AE7-8F77-427B-B8AA-B19D3F478B66}" },
                 { CLSID = "{444BA8AE-82A7-4345-842E-76154EFCCA46}" },
-                { CLSID = "{F16A4DE0-116C-4A71-97F0-2CF85B0313EC}" },
-                { CLSID = "{B06DD79A-F21E-4EB9-BD9D-AB3844618C93}" },
                 { CLSID = "{907D835F-E650-4154-BAFD-C656882555C0}" },
                 { CLSID = "{DAC53A2F-79CA-42FF-A77A-F5649B601308}" },
-                { CLSID = "{71AAB9B8-81C1-4925-BE50-1EF8E9899271}" },
                 { CLSID = "{51F9AAE5-964F-4D21-83FB-502E3BFE5F8A}" },
                 { CLSID = "{DB769D48-67D7-42ED-A2BE-108D566C8B1E}" },
-                { CLSID = "{ADD3FAE1-EBF6-4EF9-8EFC-B36B5DDF1E6B}" },
-                { CLSID = "{0B9ABA77-93B8-45FC-9C63-82AFB2CB50A4}" },
                 { CLSID = "{AB8B8299-F1CC-4359-89B5-2172E0CF4A5A}" },
                 { CLSID = "{BCE4E030-38E9-423E-98ED-24BE3DA87C32}" },
                 { CLSID = "{60CC734F-0AFA-4E2E-82B8-93B941AB11CF}" },
-            }
-        ),
-        pylon(4, 0, -0.118000, -0.175000, -1.813000,
-            {
-                FiZ = -2.5,
-            },
-            {
+				{ CLSID = "LAU_117_AGM_65H" },  -- AGM-65H-LAU-117
+		        { CLSID = "LAU_88_AGM_65H_2_L" },  -- 2XAGM-65H-LAU-88
+				{ CLSID = "LAU_88_AGM_65H_3" },  -- 3XAGM-65H-LAU-88	
+				{ CLSID = "{444BA8AE-82A7-4345-842E-76154EFCCA46}" }, -- AGM-65D-LAU-117
+				{ CLSID = "{E6A6262A-CA08-4B3D-B030-E1A993B98452}" },  -- 2XAGM-65D-LAU-88	
+				{ CLSID = "LAU_117_AGM_65G" }, -- AGM-65G-LAU-117	
+				{ CLSID = "{69DC8AE7-8F77-427B-B8AA-B19D3F478B66}" }, -- AGM-65K-LAU-117
+				{ CLSID = "{Mk82AIR}" }, -- Mk-82AIR	
+				{ CLSID = "{BRU-42_3*Mk-82AIR}" }, -- Mk-82AIR-TER		
+				{ CLSID = "{GBU-38}" }, -- GBU-38	
+				{ CLSID = "{GBU-31}" }, -- GBU-31(V)1B
+				{ CLSID = "{GBU-31V3B}" }, -- GBU-31(V)3B
+				{ CLSID = "{CBU-87}" }, -- CBU-87
+				{ CLSID = "{5335D97A-35A5-4643-9D9B-026C75961E52}" }, -- CBU-97
+				{ CLSID = "{CBU_103}" }, -- CBU-103
+				{ CLSID = "{CBU_105}" }, -- CBU-105	
+				{ CLSID = "{89D000B0-0360-461A-AD83-FB727E2ABA98}",attach_point_position = {0.5, 0.02 ,0 } }, -- GBU-12-TER
+				{ CLSID = "{EF0A9419-01D6-473B-99A3-BEBDB923B14D}" }, -- GBU-27
+				{ CLSID = "{9BCC2A2B-5708-4860-B1F1-053A18442067}" }, -- AGM-154
+				{ CLSID = "{B06DD79A-F21E-4EB9-BD9D-AB3844618C93}" }, -- AGM-88C
+				}
+			), --End Of Left Outter Pylon	
+			
+		pylon(4, 0, -0.134,-0.115, -1.824, 
+				{use_full_connector_position = true, connector = "PylonL4"},
+				{
+				{ CLSID = "{51F9AAE5-964F-4D21-83FB-502E3BFE5F8A}" },
+                { CLSID = "{DB769D48-67D7-42ED-A2BE-108D566C8B1E}" },
+                { CLSID = "{AB8B8299-F1CC-4359-89B5-2172E0CF4A5A}" },
+                { CLSID = "{BCE4E030-38E9-423E-98ED-24BE3DA87C32}" },
+                { CLSID = "{60CC734F-0AFA-4E2E-82B8-93B941AB11CF}" },
                 { CLSID = "{F376DBEE-4CAE-41BA-ADD9-B2910AC95DEC}" },
-                { CLSID = "{9BCC2A2B-5708-4860-B1F1-053A18442067}" },
-                { CLSID = "{B06DD79A-F21E-4EB9-BD9D-AB3844618C93}" },
-                { CLSID = "{51F9AAE5-964F-4D21-83FB-502E3BFE5F8A}" },
+				{ CLSID = "LAU_117_AGM_65H" },  -- AGM-65H-LAU-117
+				{ CLSID = "{444BA8AE-82A7-4345-842E-76154EFCCA46}" }, -- AGM-65D-LAU-117
+				{ CLSID = "LAU_117_AGM_65G" }, -- AGM-65G-LAU-117	
+				{ CLSID = "{69DC8AE7-8F77-427B-B8AA-B19D3F478B66}" }, -- AGM-65K-LAU-117	
+				{ CLSID = "{Mk82AIR}" }, -- Mk-82AIR	
+				{ CLSID = "{BRU-42_3*Mk-82AIR}" }, -- Mk-82AIR-TER		
+				{ CLSID = "{GBU-38}" }, -- GBU-38	
+				{ CLSID = "{GBU-31}" }, -- GBU-31(V)1B
+				{ CLSID = "{GBU-31V3B}" }, -- GBU-31(V)3B
+				{ CLSID = "{CBU-87}" }, -- CBU-87
+				{ CLSID = "{5335D97A-35A5-4643-9D9B-026C75961E52}" }, -- CBU-97	
+				{ CLSID = "{CBU_103}" }, -- CBU-103
+				{ CLSID = "{CBU_105}" }, -- CBU-105	
+				{ CLSID = "{EF0A9419-01D6-473B-99A3-BEBDB923B14D}" }, -- GBU-27		
+				{ CLSID = "Fuel_Tank_FT600" }, -- FT600	
+				}
+			), --End Of Left Inner Pylon	
+
+
+		pylon(5, 0, -0.248,-0.682, -0.00, 
+				{use_full_connector_position = true, connector = "Pylon-ALQ"},
+				{
+				{ CLSID = "ALQ_184" }, -- ALQ-184
+				}
+			), --End Of Centerline Pylon
+
+		pylon(6, 0, 2.417,-0.639, 0.538, 
+				{use_full_connector_position = true, connector = "PylonTGP"},
+				{
+				{ CLSID = "{A111396E-D3E8-4b9c-8AC9-2432489304D5}" }, -- Litening
+				}
+			), --End Of TGP Pylon			
+			
+		pylon(7, 0, -0.134,-0.115, 1.824, 
+				{use_full_connector_position = true, connector = "PylonR4"},
+				{
+				{ CLSID = "{51F9AAE5-964F-4D21-83FB-502E3BFE5F8A}" },
                 { CLSID = "{DB769D48-67D7-42ED-A2BE-108D566C8B1E}" },
-                { CLSID = "{ADD3FAE1-EBF6-4EF9-8EFC-B36B5DDF1E6B}" },
-                { CLSID = "{B83CB620-5BBE-4BEA-910C-EB605A327EF9}" },
                 { CLSID = "{AB8B8299-F1CC-4359-89B5-2172E0CF4A5A}" },
                 { CLSID = "{BCE4E030-38E9-423E-98ED-24BE3DA87C32}" },
                 { CLSID = "{60CC734F-0AFA-4E2E-82B8-93B941AB11CF}" },
-            }
-        ),
-        pylon(5, 0, 0.000000, 0.100000, 0.000000,
-            {
-            },
-            {
-                { CLSID = "{CAAC1CFD-6745-416B-AFA4-CB57414856D0}" },
-            }
-        ),
-        pylon(6, 0, 0.231000, -0.829000, 0.000000,
-            {
-                FiZ = -1.5,
-            },
-            {
-                { CLSID = "{6D21ECEA-F85B-4E8D-9D51-31DC9B8AA4EF}" },
-                { CLSID = "{8A0BE8AE-58D4-4572-9263-3144C0D06364}" },
-            }
-        ),
-        pylon(7, 0, -0.118000, -0.175000, 1.813000,
-            {
-                FiZ = -2.5,
-            },
-            {
                 { CLSID = "{F376DBEE-4CAE-41BA-ADD9-B2910AC95DEC}" },
-                { CLSID = "{9BCC2A2B-5708-4860-B1F1-053A18442067}" },
-                { CLSID = "{B06DD79A-F21E-4EB9-BD9D-AB3844618C93}" },
-                { CLSID = "{51F9AAE5-964F-4D21-83FB-502E3BFE5F8A}" },
-                { CLSID = "{DB769D48-67D7-42ED-A2BE-108D566C8B1E}" },
-                { CLSID = "{ADD3FAE1-EBF6-4EF9-8EFC-B36B5DDF1E6B}" },
-                { CLSID = "{B83CB620-5BBE-4BEA-910C-EB605A327EF9}" },
-                { CLSID = "{AB8B8299-F1CC-4359-89B5-2172E0CF4A5A}" },
-                { CLSID = "{BCE4E030-38E9-423E-98ED-24BE3DA87C32}" },
-                { CLSID = "{60CC734F-0AFA-4E2E-82B8-93B941AB11CF}" },
-            }
-        ),
-        pylon(8, 0, -1.115000, -0.161000, 3.050000,
-            {
-                FiZ = -2,
-            },
-            {
-                { CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" },
+				{ CLSID = "LAU_117_AGM_65H" },  -- AGM-65H-LAU-117
+				{ CLSID = "{444BA8AE-82A7-4345-842E-76154EFCCA46}" }, -- AGM-65D-LAU-117
+				{ CLSID = "LAU_117_AGM_65G" }, -- AGM-65G-LAU-117	
+				{ CLSID = "{69DC8AE7-8F77-427B-B8AA-B19D3F478B66}" }, -- AGM-65K-LAU-117	
+				{ CLSID = "{Mk82AIR}" }, -- Mk-82AIR	
+				{ CLSID = "{BRU-42_3*Mk-82AIR}" }, -- Mk-82AIR-TER		
+				{ CLSID = "{GBU-38}" }, -- GBU-38	
+				{ CLSID = "{GBU-31}" }, -- GBU-31(V)1B
+				{ CLSID = "{GBU-31V3B}" }, -- GBU-31(V)3B
+				{ CLSID = "{CBU-87}" }, -- CBU-87
+				{ CLSID = "{5335D97A-35A5-4643-9D9B-026C75961E52}" }, -- CBU-97	
+				{ CLSID = "{CBU_103}" }, -- CBU-103
+				{ CLSID = "{CBU_105}" }, -- CBU-105	
+				{ CLSID = "{EF0A9419-01D6-473B-99A3-BEBDB923B14D}" }, -- GBU-27		
+				{ CLSID = "Fuel_Tank_FT600" }, -- FT600	
+				}
+			), --End Of Right Inner Pylon
+			
+		pylon(8, 0, -0.563,-0.15, 3.062, 
+				{use_full_connector_position = true, connector = "PylonR3"},
+				{
+				{ CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" },
                 { CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" },
                 { CLSID = "{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" },
                 { CLSID = "{9BFD8C90-F7AE-4e90-833B-BFD0CED0E536}" },
-                { CLSID = "{9BCC2A2B-5708-4860-B1F1-053A18442067}" },
                 { CLSID = "{69DC8AE7-8F77-427B-B8AA-B19D3F478B66}" },
                 { CLSID = "{444BA8AE-82A7-4345-842E-76154EFCCA46}" },
-                { CLSID = "{F16A4DE0-116C-4A71-97F0-2CF85B0313EC}" },
-                { CLSID = "{B06DD79A-F21E-4EB9-BD9D-AB3844618C93}" },
                 { CLSID = "{907D835F-E650-4154-BAFD-C656882555C0}" },
                 { CLSID = "{DAC53A2F-79CA-42FF-A77A-F5649B601308}" },
-                { CLSID = "{71AAB9B8-81C1-4925-BE50-1EF8E9899271}" },
                 { CLSID = "{51F9AAE5-964F-4D21-83FB-502E3BFE5F8A}" },
                 { CLSID = "{DB769D48-67D7-42ED-A2BE-108D566C8B1E}" },
-                { CLSID = "{ADD3FAE1-EBF6-4EF9-8EFC-B36B5DDF1E6B}" },
-                { CLSID = "{0B9ABA77-93B8-45FC-9C63-82AFB2CB50A4}" },
                 { CLSID = "{AB8B8299-F1CC-4359-89B5-2172E0CF4A5A}" },
                 { CLSID = "{BCE4E030-38E9-423E-98ED-24BE3DA87C32}" },
                 { CLSID = "{60CC734F-0AFA-4E2E-82B8-93B941AB11CF}" },
-            }
-        ),
-        pylon(9, 0, -0.983000, -0.110000, 3.948000,
-            {
-                FiZ = -2,
-            },
-            {
-                { CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" },
-                { CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" },
-                { CLSID = "{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" },
-                { CLSID = "{9BFD8C90-F7AE-4e90-833B-BFD0CED0E536}" },
-            }
-        ),
-        pylon(10, 0, -1.265000, 0.346000, 4.813000,
-            {
-                FiZ = -2,
-            },
-            {
-                { CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" },
-                { CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" },
-                { CLSID = "{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" },
-                { CLSID = "{9BFD8C90-F7AE-4e90-833B-BFD0CED0E536}" },
-            }
-        ),
-    },
+				{ CLSID = "LAU_117_AGM_65H" },  -- AGM-65H-LAU-117
+		        { CLSID = "LAU_88_AGM_65H_2_L" },  -- 2XAGM-65H-LAU-88
+				{ CLSID = "LAU_88_AGM_65H_3" },  -- 3XAGM-65H-LAU-88	
+				{ CLSID = "{444BA8AE-82A7-4345-842E-76154EFCCA46}" }, -- AGM-65D-LAU-117
+				{ CLSID = "{E6A6262A-CA08-4B3D-B030-E1A993B98452}" },  -- 2XAGM-65D-LAU-88	
+				{ CLSID = "LAU_117_AGM_65G" }, -- AGM-65G-LAU-117	
+				{ CLSID = "{69DC8AE7-8F77-427B-B8AA-B19D3F478B66}" }, -- AGM-65K-LAU-117
+				{ CLSID = "{Mk82AIR}" }, -- Mk-82AIR	
+				{ CLSID = "{BRU-42_3*Mk-82AIR}" }, -- Mk-82AIR-TER		
+				{ CLSID = "{GBU-38}" }, -- GBU-38	
+				{ CLSID = "{GBU-31}" }, -- GBU-31(V)1B
+				{ CLSID = "{GBU-31V3B}" }, -- GBU-31(V)3B
+				{ CLSID = "{CBU-87}" }, -- CBU-87
+				{ CLSID = "{5335D97A-35A5-4643-9D9B-026C75961E52}" }, -- CBU-97
+				{ CLSID = "{CBU_103}" }, -- CBU-103
+				{ CLSID = "{CBU_105}" }, -- CBU-105	
+				{ CLSID = "{89D000B0-0360-461A-AD83-FB727E2ABA98}",attach_point_position = {0.5, 0.02 ,0 } }, -- GBU-12-TER
+				{ CLSID = "{EF0A9419-01D6-473B-99A3-BEBDB923B14D}" }, -- GBU-27
+				{ CLSID = "{9BCC2A2B-5708-4860-B1F1-053A18442067}" }, -- AGM-154
+				{ CLSID = "{B06DD79A-F21E-4EB9-BD9D-AB3844618C93}" }, -- AGM-88C
+				}
+			), --End Of Right Outter Pylon	
+
+		pylon(9, 0, -1.785,0.051, 4.137, 
+				{use_full_connector_position = true, connector = "PylonR2"},
+				{
+				{ CLSID ="{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" }, -- Single AIM-9
+				{ CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" }, -- 	AIM-120B
+				{ CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" }, --    AIM-120C
+				}
+			), --End Of Right Air-to-Air Pyon		
+
+        pylon(10, 0, -1.455,0.259, 4.809,
+				{use_full_connector_position = true, connector = "PylonR1"},
+				{
+				{ CLSID ="{6CEB49FC-DED8-4DED-B053-E1F033FF72D3}" }, -- Single AIM-9
+				{ CLSID = "{C8E06185-7CD6-4C90-959F-044679E90751}" }, -- 	AIM-120B
+				{ CLSID = "{40EF17B7-F508-45de-8566-6FFECC0C1AB8}" }, --    AIM-120C
+				{ CLSID	="{A4BCC903-06C8-47bb-9937-A30FEDB4E743}"}, -- Blue Smokewinder
+				}	
+			),  --End Of Right Wingtip			
+
+
+
+
+			
+       },
 	
 	Tasks = {
         aircraft_task(GroundAttack),
@@ -475,22 +521,22 @@ F16Demo =  {
     [1] = { typename = "collection",
 						lights = {-- Left Anticollision Light
 								  {typename = "natostrobelight",
-								   connector = "WHITE_BEACON L",
-								   argument_1 = 195,
+								   connector = "Position_Light_002",
+								   argument_1 = 203,
 								   period = 1.2,
 								   phase_shift = 0
 								  },
 								  -- Right Anticollision Light
 								  {typename = "natostrobelight",
-								   connector = "WHITE_BEACON R",
-								   argument_1 = 196,
+								   connector = "Position_Light_005",
+								   argument_1 = 203,
 								   period = 1.2,
 								   phase_shift = 0
 								  },
 								  -- Tail Anticollision Light
 								  {typename = "natostrobelight",
-								   connector = "BANO_0_BACK",
-								   argument_1 = 192,
+								   connector = "Tail_Position_Light_01",
+								   argument_1 = 203,
 								   period = 1.2,
 								   phase_shift = 0
 								  }
@@ -513,7 +559,7 @@ F16Demo =  {
 						},
     [3]	= {	typename = "collection",
 						lights = {-- Left Position Light (red)
-								  {typename = "omnilight",
+								  {typename = "Wing_Light_Left_001",
 								   connector = "BANO_1",
 								   color = {0.99, 0.11, 0.3},
 								   pos_correction  = {0, 0, -0.2},
@@ -521,17 +567,17 @@ F16Demo =  {
 								  },
 								  -- Right Position Light (green)
 								  {typename = "omnilight",
-								   connector = "BANO_2",
+								   connector = "Wing_Light_Right_001",
 								   color = {0, 0.894, 0.6},
 								   pos_correction = {0, 0, 0.2},
-								   argument  = 191
+								   argument  = 190
 								  },
 								  -- Tail Position Light (white)
 								  {typename = "omnilight",
 								   connector = "BANO_0_BACK",
 								   color = {1, 1, 1},
 								   pos_correction  = {0, 0, 0},
-								   argument  = 203
+								   argument  = 190
 								  }}
 									},
     [4] = {	typename = "collection",

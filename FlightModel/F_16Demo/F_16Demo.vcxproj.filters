@@ -33,6 +33,9 @@
     <ClInclude Include="FlightControls\F16FlightControls.h">
       <Filter>FlightControls</Filter>
     </ClInclude>
+    <ClInclude Include="Inputs\F16Inputs.h">
+      <Filter>Inputs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -55,6 +58,9 @@
     </Filter>
     <Filter Include="FlightControls">
       <UniqueIdentifier>{a631e22a-a48d-4b68-8446-701e99146567}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inputs">
+      <UniqueIdentifier>{a6f16d21-9208-4eca-98fd-bf413d528e4a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

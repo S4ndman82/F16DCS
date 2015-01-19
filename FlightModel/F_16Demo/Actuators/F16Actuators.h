@@ -1,24 +1,35 @@
-#ifndef __F16ACTUATORS__
-#define __F16ACTUATORS__
+#ifndef __F16ACTUATORS_H_
+#define __F16ACTUATORS_H_
 
 #include "../stdafx.h"
 #include <stdio.h>
 #include <string>
-#include <math.h>
 #include "../UtilityFunctions.h"
 
 namespace F16
 {
-	namespace ACTUATORS
+	class F16Actuators
 	{
-		double	elevatorPosition_DEG	= 0.0;
-		double	elevatorRate_DEGPERSEC	= 0.0;
-		double	aileronPosition_DEG		= 0.0;
-		double	aileronRate_DEGPERSEC	= 0.0;
-		double	rudderPosition_DEG		= 0.0;
-		double	rudderRate_DEGPERSEC	= 0.0;
+	public:
+		bool	simInitialized;
 
-		bool	simInitialized			= false;
+		double	elevatorPosition_DEG;
+		double	elevatorRate_DEGPERSEC;
+		double	aileronPosition_DEG;
+		double	aileronRate_DEGPERSEC;
+		double	rudderPosition_DEG;
+		double	rudderRate_DEGPERSEC;
+
+		F16Actuators() 
+			: simInitialized(false)
+			, elevatorPosition_DEG(0)
+			, elevatorRate_DEGPERSEC(0)
+			, aileronPosition_DEG(0)
+			, aileronRate_DEGPERSEC(0)
+			, rudderPosition_DEG(0)
+			, rudderRate_DEGPERSEC(0)
+		{}
+		~F16Actuators() {}
 
 		double  elevator_actuator(double elevatorCommanded_DEG, double frameTime)
 		{
@@ -76,6 +87,7 @@ namespace F16
 
 			return rudderPosition_DEG;
 		}
-	}
+	};
 }
-#endif
+
+#endif // ifndef __F16ACTUATORS_H_

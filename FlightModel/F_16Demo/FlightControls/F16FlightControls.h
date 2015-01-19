@@ -4,7 +4,6 @@
 #include "../stdafx.h"
 #include <stdio.h>
 #include <string>
-#include <math.h>
 #include "../UtilityFunctions.h"
 #include "../include/general_filter.h"
 
@@ -403,4 +402,5 @@ namespace F16
 		}
 	}
 }
+
 #endif

@@ -70,11 +70,11 @@
 #include "stdafx.h"
 #include "F_16Demo.h"
 #include "ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
-#include <Math.h>
 #include <stdio.h>
 #include <string>
-#include <math.h>
 #include "UtilityFunctions.h"	// Utility help functions 
+
+#include "Inputs/F16Inputs.h" // just list of inputs: can get potentially long list
 
 // Model headers
 #include "Actuators/F16Actuators.h"				//Actuators model functions
@@ -131,6 +131,10 @@ Vec3	wind;
 //-----------------------------------------------------------------
 Vec3	velocity_world_cs;
 //-----------------------------------------------------------------
+// Get the total absolute velocity acting on the aircraft with wind included
+// using english units so airspeed is in feet/second here
+Vec3	airspeed;
+//-----------------------------------------------------------------
 // Internal fuel as calculated by the EFM fuel system modeling
 // (taken out and not used in the F-16)
 //-----------------------------------------------------------------
@@ -144,27 +148,29 @@ double  internal_fuel;
 //-------------------------------------------------------
 namespace F16
 {
-	double		ambientTemperature_DegK = 0.0;			// Ambient temperature (kelvon)
-	double		ambientDensity_KgPerM3	= 0.0;			// Ambient density (kg/m^3)
-	double		wingSpan_FT				= 32.667;		// F-16 wing-span (ft)
-	double		wingArea_FT2			= 300.0;		// F-16 wing area (ft^2)
-	double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft)
-	double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord
-	double		actualCG_PCT			= 0.30;			// Actual CG as a % of wing chord
-	double		pi						= acos(-1.0);	// Pi (3.14159....)
-	double		radiansToDegrees		= 180.0/pi;		// Conversion factor from radians to degrees
-	double		inertia_Ix_KGM2			= 12874.0;		// Reference moment of inertia (kg/m^2)
-	double		inertia_Iy_KGM2			= 75673.6;		// Reference moment of inertia (kg/m^2)
-	double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2)
-	double		temp[9];								// Temporary array for holding look-up table results
-	double		altitude_FT				= 0.0;			// Absolute altitude MSL (ft)
+	const double		wingSpan_FT				= 32.667;		// F-16 wing-span (ft)
+	const double		wingArea_FT2			= 300.0;		// F-16 wing area (ft^2)
+	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft)
+	const double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord
+	const double		actualCG_PCT			= 0.30;			// Actual CG as a % of wing chord
+	const double		pi						= M_PI;			// Pi (3.14159....) - use value from math.h
+	const double		radiansToDegrees		= 180.0/M_PI;		// Conversion factor from radians to degrees - use value from math.h
+	const double		inertia_Ix_KGM2			= 12874.0;		// Reference moment of inertia (kg/m^2)
+	const double		inertia_Iy_KGM2			= 75673.6;		// Reference moment of inertia (kg/m^2)
+	const double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2)
+	const double		meterToFoot				= 3.28084;		// Meter to foot conversion factor
+
+	//double		ambientTemperature_DegK = 0.0;			// Ambient temperature (kelvon)
+	//double		ambientDensity_KgPerM3	= 0.0;			// Ambient density (kg/m^3)
+
+	//double		altitude_FT				= 0.0;			// Absolute altitude MSL (ft)
 	double		totalVelocity_FPS		= 0.0;			// Total velocity (always positive) (ft/s)
 	double		alpha_DEG				= 0.0;			// Angle of attack (deg)
 	double		beta_DEG				= 0.0;			// Slideslip angle (deg)
 	double		rollRate_RPS			= 0.0;			// Body roll rate (rad/sec)
 	double		pitchRate_RPS			= 0.0;			// Body pitch rate (rad/sec)
 	double		yawRate_RPS				= 0.0;			// Body yaw rate (rad/sec)
-	double		thrust_N				= 0.0;			// Engine thrust (N)
+	//double		thrust_N				= 0.0;			// Engine thrust (N)
 	double		elevator_DEG			= 0.0;			// Elevator deflection (deg)
 	double		aileron_DEG				= 0.0;			// Aileron deflection (deg)
 	double		rudder_DEG				= 0.0;			// Rudder  deflection (deg)
@@ -176,11 +182,10 @@ namespace F16
 	double		elevator_PCT			= 0.0;			// Elevator deflection as a percent of maximum (-1 to 1)
 	double		leadingEdgeFlap_DEG		= 0.0;			// Leading edge flap deflection (deg)
 	double		leadingEdgeFlap_PCT		= 0.0;			// Leading edge flap as a percent of maximum (0 to 1)
-	double		dynamicPressure_LBFT2	= 0.0;			// Dynamic pressure (lb/ft^2)
-	double		mach					= 0.0;			// Well..Mach, yeah
-	double		ps_LBFT2				= 0.0;			// Ambient calculated pressure (lb/ft^2)
-	double		meterToFoot				= 3.28084;		// Meter to foot conversion factor
-	bool		simInitialized			= false;		// Has the simulation gone through it's first run frame?
+	//double		dynamicPressure_LBFT2	= 0.0;			// Dynamic pressure (lb/ft^2)
+	//double		mach					= 0.0;			// Well..Mach, yeah
+	//double		ps_LBFT2				= 0.0;			// Ambient calculated pressure (lb/ft^2)
+	//bool		simInitialized			= false;		// Has the simulation gone through it's first run frame?
 	double		gearDown				= 0.0;			// Is the gear currently down?
 	double		az						= 0.0;			// Az (per normal direction convention) out the bottom of the a/c (m/s^2)
 	double		ay						= 0.0;			// Ay (per normal direction convention) out the right wing (m/s^2)
@@ -192,33 +197,19 @@ namespace F16
 	double		ay_world				= 0.0;			// World referenced up/down acceleration (m/s^2)
 	double		weight_on_wheels		= 0.0;			// Weight on wheels flag (not used right now)
 	double		rolling_friction		= 0.03;			// Rolling friction amount (not use right now)
-	double		WheelBrakeCommand		= 0.0;			// Commanded wheel brake
-	double		GearCommand				= 0.0;			// Commanded gear lever
-	double		DeltaTime				= 0.0;			// Delta time of the simulation, in seconds
-}
 
-// These are taken from Export.lua
-enum inputCommandsEnum
-{
-	LandingGearUp		= 430, // Gear up	(doesn't work)	
-	LandingGearDown		= 431, // Gear down	(doesn't work)
-	JoystickPitch		= 2001,	
-	JoystickRoll		= 2002,
-	JoystickYaw			= 2003,
-	JoystickThrottle	= 2004,
-	JoystickLeftEngineThrottle = 2005,
-	JoystickRightEngineThrottle = 2006
+	F16Engine Engine;
+	F16Atmosphere Atmos;
+	F16Actuators Actuators;
+	F16Aero Aero;
 }
-F16inputs;
 
 // Very important! This function sum up all the forces acting on
 // the aircraft for this run frame.  It currently assume the force
 // is acting at the CG
 void add_local_force(const Vec3 & Force, const Vec3 & Force_pos)
 {
-	common_force.x += Force.x;
-	common_force.y += Force.y;
-	common_force.z += Force.z;
+	sum_vec3(common_force, Force);
 }
 
 // Very important! This function sums up all the moments acting
@@ -226,9 +217,7 @@ void add_local_force(const Vec3 & Force, const Vec3 & Force_pos)
 // moment is acting at the CG
 void add_local_moment(const Vec3 & Moment)
 {
-	common_moment.x += Moment.x;
-	common_moment.y += Moment.y;
-	common_moment.z += Moment.z;
+	sum_vec3(common_moment, Moment);
 }
 
 // Not used but left in, it was part of the example
@@ -285,17 +274,6 @@ void ed_fm_add_local_moment(double & x,double &y,double &z)
 //-----------------------------------------------------------------------
 void ed_fm_simulate(double dt)
 {
-	F16::DeltaTime = dt;
-
-	/* Gear animation */
-	if (F16::gearDown > F16::GearCommand)
-	{
-		F16::gearDown = limit(F16::gearDown - dt/2, 0.0, 1.0);
-	} else if (F16::gearDown < F16::GearCommand)
-	{
-		F16::gearDown = limit(F16::gearDown + dt/2, 0.0 ,1.0);
-	}; 
-
 	/* CJS - Removed hack to filter out flight controller if on ground
 	if(F16::weight_on_wheels)
 	{
@@ -306,12 +284,11 @@ void ed_fm_simulate(double dt)
 
 	// Very important! clear out the forces and moments before you start calculated
 	// a new set for this run frame
-	common_force  = Vec3();
-	common_moment = Vec3();
+	clear_vec3(common_force);
+	clear_vec3(common_moment);
 
 	// Get the total absolute velocity acting on the aircraft with wind included
 	// using english units so airspeed is in feet/second here
-	Vec3 airspeed;
 	airspeed.x = velocity_world_cs.x - wind.x;
 	airspeed.y = velocity_world_cs.y - wind.y;
 	airspeed.z = velocity_world_cs.z - wind.z;
@@ -324,11 +301,7 @@ void ed_fm_simulate(double dt)
 
 	// Call the atmosphere model to get mach and dynamic pressure
 	// I'm used to english units so I am using LB/FT^2 for the pressures
-	double *temp;
-	temp = (double *)malloc(9*sizeof(double));
-	F16::ATMOS::atmos(F16::ambientTemperature_DegK,F16::ambientDensity_KgPerM3,F16::totalVelocity_FPS,temp);		
-	F16::dynamicPressure_LBFT2	= temp[0];
-	F16::mach = temp[1];
+	F16::Atmos.updateFrame(F16::totalVelocity_FPS);
 
 	//---------------------------------------------
 	//-----CONTROL DYNAMICS------------------------
@@ -336,7 +309,7 @@ void ed_fm_simulate(double dt)
 
 	// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 	// and is completely automatic
-	F16::leadingEdgeFlap_DEG = F16::FLIGHTCONTROLS::leading_edge_flap_controller(F16::alpha_DEG,F16::dynamicPressure_LBFT2,F16::ps_LBFT2,dt);	
+	F16::leadingEdgeFlap_DEG = F16::FLIGHTCONTROLS::leading_edge_flap_controller(F16::alpha_DEG,F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2,dt);	
 	F16::leadingEdgeFlap_PCT = limit(F16::leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);	
 
 	// Call the longitudinal (pitch) controller.  Takes the following inputs:
@@ -345,12 +318,12 @@ void ed_fm_simulate(double dt)
 	// -Angle of attack (deg)
 	// -Pitch rate (rad/sec)
 	// -Differential command (from roll controller, not quite implemented yet)
-	F16::elevator_DEG_commanded   = -(F16::FLIGHTCONTROLS::fcs_pitch_controller(F16::FLIGHTCONTROLS::longStickInput,-0.3,F16::alpha_DEG,F16::pitchRate_RPS * F16::radiansToDegrees,(F16::az/9.81),0.0,F16::dynamicPressure_LBFT2,dt));
+	F16::elevator_DEG_commanded   = -(F16::FLIGHTCONTROLS::fcs_pitch_controller(F16::FLIGHTCONTROLS::longStickInput,-0.3,F16::alpha_DEG,F16::pitchRate_RPS * F16::radiansToDegrees,(F16::az/9.81),0.0,F16::Atmos.dynamicPressure_LBFT2,dt));
 	// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 	F16::elevator_DEG	= F16::elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 	F16::elevator_DEG = limit(F16::elevator_DEG,-25.0,25.0);
 	
-	F16::aileron_DEG_commanded = (F16::FLIGHTCONTROLS::fcs_roll_controller(F16::FLIGHTCONTROLS::latStickInput,F16::FLIGHTCONTROLS::longStickForce,F16::ay/9.81,F16::rollRate_RPS* F16::radiansToDegrees,0.0,F16::dynamicPressure_LBFT2,dt));
+	F16::aileron_DEG_commanded = (F16::FLIGHTCONTROLS::fcs_roll_controller(F16::FLIGHTCONTROLS::latStickInput,F16::FLIGHTCONTROLS::longStickForce,F16::ay/9.81,F16::rollRate_RPS* F16::radiansToDegrees,0.0,F16::Atmos.dynamicPressure_LBFT2,dt));
 	F16::aileron_DEG	= F16::aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 	F16::aileron_DEG = limit(F16::aileron_DEG,-21.5,21.5);
 
@@ -361,7 +334,8 @@ void ed_fm_simulate(double dt)
 
 	F16::flap_DEG = F16::FLIGHTCONTROLS::fcs_flap_controller(F16::totalVelocity_FPS);
 	
-	F16::thrust_N		= F16::ENGINE::engine_dynamics(F16::throttleInput,F16::mach,F16::altitude_FT,dt);	
+	// update thrust
+	F16::Engine.updateFrame(F16::throttleInput, F16::Atmos.mach, F16::Atmos.altitude_FT, dt);
 
 	F16::aileron_PCT = F16::aileron_DEG / 21.5;
 	F16::elevator_PCT = F16::elevator_DEG / 25.0;
@@ -404,64 +378,13 @@ void ed_fm_simulate(double dt)
 	add_local_force(cy_wheel_friction_force,cy_wheel_friction_pos);
 	*/
 
-	F16::AERO::hifi_C(alpha1_DEG_Limited,beta1_DEG_Limited,F16::elevator_DEG,temp);
-		F16::AERO::Cx = temp[0];
-		F16::AERO::Cz = temp[1];
-		F16::AERO::Cm = temp[2];
-		F16::AERO::Cy = temp[3];
-		F16::AERO::Cn = temp[4];
-		F16::AERO::Cl = temp[5];
-
-	
-	F16::AERO::hifi_damping(alpha1_DEG_Limited,temp);
-        F16::AERO::Cxq = temp[0];
-        F16::AERO::Cyr = temp[1];
-        F16::AERO::Cyp = temp[2];
-        F16::AERO::Czq = temp[3];
-        F16::AERO::Clr = temp[4];
-        F16::AERO::Clp = temp[5];
-        F16::AERO::Cmq = temp[6];
-        F16::AERO::Cnr = temp[7];
-        F16::AERO::Cnp = temp[8];
-	
-    F16::AERO::hifi_C_lef(alpha1_DEG_Limited,beta1_DEG_Limited,temp);
-        F16::AERO::Cx_delta_lef = temp[0];
-        F16::AERO::Cz_delta_lef = temp[1];
-        F16::AERO::Cm_delta_lef = temp[2];
-        F16::AERO::Cy_delta_lef = temp[3];
-        F16::AERO::Cn_delta_lef = temp[4];
-        F16::AERO::Cl_delta_lef = temp[5];
-	
-    F16::AERO::hifi_damping_lef(alpha1_DEG_Limited,temp);
-        F16::AERO::Cxq_delta_lef = temp[0];
-        F16::AERO::Cyr_delta_lef = temp[1];
-        F16::AERO::Cyp_delta_lef = temp[2];
-        F16::AERO::Czq_delta_lef = temp[3];
-        F16::AERO::Clr_delta_lef = temp[4];
-        F16::AERO::Clp_delta_lef = temp[5];
-        F16::AERO::Cmq_delta_lef = temp[6];
-        F16::AERO::Cnr_delta_lef = temp[7];
-        F16::AERO::Cnp_delta_lef = temp[8];
-	
-    F16::AERO::hifi_rudder(alpha1_DEG_Limited,beta1_DEG_Limited,temp);
-        F16::AERO::Cy_delta_r30 = temp[0];
-        F16::AERO::Cn_delta_r30 = temp[1];
-        F16::AERO::Cl_delta_r30 = temp[2];
-
-    F16::AERO::hifi_ailerons(alpha1_DEG_Limited,beta1_DEG_Limited,temp);
-        F16::AERO::Cy_delta_a20     = temp[0];
-        F16::AERO::Cy_delta_a20_lef = temp[1];
-        F16::AERO::Cn_delta_a20     = temp[2];
-        F16::AERO::Cn_delta_a20_lef = temp[3];
-        F16::AERO::Cl_delta_a20     = temp[4];
-        F16::AERO::Cl_delta_a20_lef = temp[5];
-
-	F16::AERO::hifi_other_coeffs(alpha1_DEG_Limited,F16::elevator_DEG,temp);
-        F16::AERO::Cn_delta_beta = temp[0];
-        F16::AERO::Cl_delta_beta = temp[1];
-        F16::AERO::Cm_delta      = temp[2];
-        F16::AERO::eta_el        = temp[3];
-        F16::AERO::Cm_delta_ds   = 0;        /* ignore deep-stall effect */
+	F16::Aero.hifi_C(alpha1_DEG_Limited, beta1_DEG_Limited, F16::elevator_DEG);
+	F16::Aero.hifi_damping(alpha1_DEG_Limited);
+    F16::Aero.hifi_C_lef(alpha1_DEG_Limited, beta1_DEG_Limited);
+    F16::Aero.hifi_damping_lef(alpha1_DEG_Limited);
+    F16::Aero.hifi_rudder(alpha1_DEG_Limited, beta1_DEG_Limited);
+    F16::Aero.hifi_ailerons(alpha1_DEG_Limited, beta1_DEG_Limited);
+	F16::Aero.hifi_other_coeffs(alpha1_DEG_Limited, F16::elevator_DEG);
 
 	/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
@@ -469,53 +392,36 @@ void ed_fm_simulate(double dt)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
 	/* XXXXXXXX Cx_tot XXXXXXXX */
+	F16::Aero.dXdQ = (F16::meanChord_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Cxq + F16::Aero.Cxq_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.Cx_total = F16::Aero.Cx + F16::Aero.Cx_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dXdQ*F16::pitchRate_RPS;
+	F16::Aero.Cx_total += CxFlaps + CxGear;
 
-	F16::AERO::dXdQ = (F16::meanChord_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Cxq + F16::AERO::Cxq_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::Cx_total = F16::AERO::Cx + F16::AERO::Cx_delta_lef*F16::leadingEdgeFlap_PCT + F16::AERO::dXdQ*F16::pitchRate_RPS;
-	F16::AERO::Cx_total += CxFlaps + CxGear;
 	/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
+	F16::Aero.dZdQ = (F16::meanChord_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Czq + F16::Aero.Cz_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.Cz_total = F16::Aero.Cz + F16::Aero.Cz_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dZdQ*F16::pitchRate_RPS;
+	F16::Aero.Cz_total += CzFlaps + CzGear;
 
-	F16::AERO::dZdQ = (F16::meanChord_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Czq + F16::AERO::Cz_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::Cz_total = F16::AERO::Cz + F16::AERO::Cz_delta_lef*F16::leadingEdgeFlap_PCT + F16::AERO::dZdQ*F16::pitchRate_RPS;
-	F16::AERO::Cz_total += CzFlaps + CzGear;
 	/* MMMMMMMM Cm_tot MMMMMMMM */ 
-
-	F16::AERO::dMdQ = (F16::meanChord_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Cmq + F16::AERO::Cmq_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::Cm_total = F16::AERO::Cm*F16::AERO::eta_el + F16::AERO::Cz_total*(F16::referenceCG_PCT-F16::actualCG_PCT) + F16::AERO::Cm_delta_lef*F16::leadingEdgeFlap_PCT + F16::AERO::dMdQ*F16::pitchRate_RPS + F16::AERO::Cm_delta + F16::AERO::Cm_delta_ds;
+	F16::Aero.dMdQ = (F16::meanChord_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Cmq + F16::Aero.Cmq_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.Cm_total = F16::Aero.Cm*F16::Aero.eta_el + F16::Aero.Cz_total*(F16::referenceCG_PCT-F16::actualCG_PCT) + F16::Aero.Cm_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dMdQ*F16::pitchRate_RPS + F16::Aero.Cm_delta + F16::Aero.Cm_delta_ds;
 
 	/* YYYYYYYY Cy_tot YYYYYYYY */
-
-
-	F16::AERO::dYdail = F16::AERO::Cy_delta_a20 + F16::AERO::Cy_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-
-	F16::AERO::dYdR = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Cyr + F16::AERO::Cyr_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::dYdP = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Cyp + F16::AERO::Cyp_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::Cy_total = F16::AERO::Cy + F16::AERO::Cy_delta_lef*F16::leadingEdgeFlap_PCT + F16::AERO::dYdail*F16::aileron_PCT + F16::AERO::Cy_delta_r30*F16::rudder_PCT + F16::AERO::dYdR*F16::yawRate_RPS + F16::AERO::dYdP*F16::rollRate_RPS;
+	F16::Aero.dYdail = F16::Aero.Cy_delta_a20 + F16::Aero.Cy_delta_a20_lef*F16::leadingEdgeFlap_PCT;
+	F16::Aero.dYdR = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Cyr + F16::Aero.Cyr_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.dYdP = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Cyp + F16::Aero.Cyp_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.Cy_total = F16::Aero.Cy + F16::Aero.Cy_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dYdail*F16::aileron_PCT + F16::Aero.Cy_delta_r30*F16::rudder_PCT + F16::Aero.dYdR*F16::yawRate_RPS + F16::Aero.dYdP*F16::rollRate_RPS;
 	
 	/* NNNNNNNN Cn_tot NNNNNNNN */ 
-
-	F16::AERO::dNdail = F16::AERO::Cn_delta_a20 + F16::AERO::Cn_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-
-	F16::AERO::dNdR = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Cnr + F16::AERO::Cnr_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::dNdP = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Cnp + F16::AERO::Cnp_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::Cn_total = F16::AERO::Cn + F16::AERO::Cn_delta_lef*F16::leadingEdgeFlap_PCT - F16::AERO::Cy_total*(F16::referenceCG_PCT-F16::actualCG_PCT)*(F16::meanChord_FT/F16::wingSpan_FT) + F16::AERO::dNdail*F16::aileron_PCT + F16::AERO::Cn_delta_r30*F16::rudder_PCT + F16::AERO::dNdR*F16::yawRate_RPS + F16::AERO::dNdP*F16::rollRate_RPS + F16::AERO::Cn_delta_beta*F16::beta_DEG;
+	F16::Aero.dNdail = F16::Aero.Cn_delta_a20 + F16::Aero.Cn_delta_a20_lef*F16::leadingEdgeFlap_PCT;
+	F16::Aero.dNdR = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Cnr + F16::Aero.Cnr_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.dNdP = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Cnp + F16::Aero.Cnp_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.Cn_total = F16::Aero.Cn + F16::Aero.Cn_delta_lef*F16::leadingEdgeFlap_PCT - F16::Aero.Cy_total*(F16::referenceCG_PCT-F16::actualCG_PCT)*(F16::meanChord_FT/F16::wingSpan_FT) + F16::Aero.dNdail*F16::aileron_PCT + F16::Aero.Cn_delta_r30*F16::rudder_PCT + F16::Aero.dNdR*F16::yawRate_RPS + F16::Aero.dNdP*F16::rollRate_RPS + F16::Aero.Cn_delta_beta*F16::beta_DEG;
 
 	/* LLLLLLLL Cl_total LLLLLLLL */
-
-	F16::AERO::dLdail = F16::AERO::Cl_delta_a20 + F16::AERO::Cl_delta_a20_lef*F16::leadingEdgeFlap_PCT;
-
-	F16::AERO::dLdR = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Clr + F16::AERO::Clr_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::dLdP = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::AERO::Clp + F16::AERO::Clp_delta_lef*F16::leadingEdgeFlap_PCT);
-
-	F16::AERO::Cl_total = F16::AERO::Cl + F16::AERO::Cl_delta_lef*F16::leadingEdgeFlap_PCT + F16::AERO::dLdail*F16::aileron_PCT + F16::AERO::Cl_delta_r30*F16::rudder_PCT + F16::AERO::dLdR*F16::yawRate_RPS + F16::AERO::dLdP*F16::rollRate_RPS + F16::AERO::Cl_delta_beta*F16::beta_DEG;
+	F16::Aero.dLdail = F16::Aero.Cl_delta_a20 + F16::Aero.Cl_delta_a20_lef*F16::leadingEdgeFlap_PCT;
+	F16::Aero.dLdR = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Clr + F16::Aero.Clr_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.dLdP = (F16::wingSpan_FT/(2*F16::totalVelocity_FPS))*(F16::Aero.Clp + F16::Aero.Clp_delta_lef*F16::leadingEdgeFlap_PCT);
+	F16::Aero.Cl_total = F16::Aero.Cl + F16::Aero.Cl_delta_lef*F16::leadingEdgeFlap_PCT + F16::Aero.dLdail*F16::aileron_PCT + F16::Aero.Cl_delta_r30*F16::rudder_PCT + F16::Aero.dLdR*F16::yawRate_RPS + F16::Aero.dLdP*F16::rollRate_RPS + F16::Aero.Cl_delta_beta*F16::beta_DEG;
 
 	//----------------------------------------------------------------
 	// All prior forces calculated in lbs, needs to be converted
@@ -524,40 +430,40 @@ void ed_fm_simulate(double dt)
 	//----------------------------------------------------------------
 
 	// Cy	(force out the right wing)
-	Vec3 cy_force(0.0, 0.0 , F16::AERO::Cy_total * F16::wingArea_FT2 * F16::dynamicPressure_LBFT2 * 4.44822162825  );		// Output force in Newtons
+	Vec3 cy_force(0.0, 0.0 , F16::Aero.Cy_total * F16::wingArea_FT2 * F16::Atmos.dynamicPressure_LBFT2 * 4.44822162825  );		// Output force in Newtons
 	Vec3 cy_force_pos(0.0,0,0); //0.01437
 	add_local_force(cy_force,cy_force_pos);	
 
 	// Cx (force out the nose)
-	Vec3 cx_force(F16::AERO::Cx_total * F16::wingArea_FT2 * F16::dynamicPressure_LBFT2 * 4.44822162825  , 0 , 0 );		// Output force in Newtons
+	Vec3 cx_force(F16::Aero.Cx_total * F16::wingArea_FT2 * F16::Atmos.dynamicPressure_LBFT2 * 4.44822162825  , 0 , 0 );		// Output force in Newtons
 	Vec3 cx_force_pos(0, 0.0,0.0);
 	add_local_force(cx_force,cx_force_pos);
 
 	// Cz (force down the bottom of the aircraft)
-	Vec3 cz_force(0.0,  -F16::AERO::Cz_total * F16::wingArea_FT2 * F16::dynamicPressure_LBFT2 * 4.44822162825 , 0.0 );	// Output force in Newtons
+	Vec3 cz_force(0.0,  -F16::Aero.Cz_total * F16::wingArea_FT2 * F16::Atmos.dynamicPressure_LBFT2 * 4.44822162825 , 0.0 );	// Output force in Newtons
 	Vec3 cz_force_pos(0,0,0);
 	add_local_force(cz_force,cz_force_pos);
 
 	// Cl	(Output force in N/m)
-	Vec3 cl_moment( F16::AERO::Cl_total * F16::wingArea_FT2 * F16::dynamicPressure_LBFT2 * F16::wingSpan_FT *1.35581795 , 0.0 ,  0.0  );
+	Vec3 cl_moment( F16::Aero.Cl_total * F16::wingArea_FT2 * F16::Atmos.dynamicPressure_LBFT2 * F16::wingSpan_FT *1.35581795 , 0.0 ,  0.0  );
 	add_local_moment(cl_moment);
 	
 	// Cm	(Output force in N/m)
-	Vec3 cm_moment(0.0, 0.0 ,  F16::AERO::Cm_total * F16::wingArea_FT2 * F16::dynamicPressure_LBFT2 * 1.35581795 * F16::meanChord_FT );
+	Vec3 cm_moment(0.0, 0.0 ,  F16::Aero.Cm_total * F16::wingArea_FT2 * F16::Atmos.dynamicPressure_LBFT2 * 1.35581795 * F16::meanChord_FT );
 	add_local_moment(cm_moment);
 
 	// Cn	(Output force in N/m)
-	Vec3 cn_moment(0.0, -F16::AERO::Cn_total * F16::wingArea_FT2 * F16::dynamicPressure_LBFT2 * F16::wingSpan_FT *1.35581795 ,  0.0   );
+	Vec3 cn_moment(0.0, -F16::Aero.Cn_total * F16::wingArea_FT2 * F16::Atmos.dynamicPressure_LBFT2 * F16::wingSpan_FT *1.35581795 ,  0.0   );
 	add_local_moment(cn_moment);	
 
 	// Thrust	
-	Vec3 thrust_force(F16::thrust_N , 0.0, 0.0);	// Output force in Newtons
+	Vec3 thrust_force(F16::Engine.m_thrust_N , 0.0, 0.0);	// Output force in Newtons
 	Vec3 thrust_force_pos(0,0,0);
-	add_local_force(thrust_force,thrust_force_pos);	
+	add_local_force(thrust_force, thrust_force_pos);	
 
 	// Tell the simulation that it has gone through the first frame
-	F16::simInitialized = true;
-	F16::ACTUATORS::simInitialized = true;
+	//F16::simInitialized = true;
+	F16::Actuators.simInitialized = true;
 	F16::FLIGHTCONTROLS::simInitialized = true;
 
 	/*
@@ -580,10 +486,7 @@ void ed_fm_set_atmosphere(	double h,//altitude above sea level			(meters)
 							double wind_vz //components of velocity vector, including turbulence in world coordinate system (meters/sec)
 						)
 {
-	F16::ambientTemperature_DegK = t;
-	F16::ambientDensity_KgPerM3 = ro;
-	F16::altitude_FT = h * F16::meterToFoot;
-	F16::ps_LBFT2 = p * 0.020885434273;
+	F16::Atmos.setAtmosphere(t, ro, h * F16::meterToFoot, p * 0.020885434273);
 }
 
 void ed_fm_set_current_mass_state ( double mass,
@@ -605,6 +508,7 @@ void ed_fm_set_current_mass_state ( double mass,
 
 	F16::weight_N = mass * 9.80665002864;
 }
+
 /*
 called before simulation to set up your environment for the next step
 */
@@ -654,7 +558,7 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 										double common_angle_of_attack, //AoA  (rad)
 										double common_angle_of_slide   //AoS  (rad)
 	)
-{	
+{
 	velocity_world_cs.x = vx;
 	velocity_world_cs.y = vy;
 	velocity_world_cs.z = vz;
@@ -682,26 +586,40 @@ void ed_fm_set_command (int command, float value)	// Command = Command Index (Se
 	//----------------------------------
 	// Set F-16 Raw Inputs
 	//----------------------------------
-	if(command == JoystickRoll)
-	{
-		F16::FLIGHTCONTROLS::latStickInput = limit(value,-1.0,1.0);
-	}
-	
-	if(command == JoystickPitch)
-	{
-		F16::FLIGHTCONTROLS::longStickInput = limit(-value,-1.0,1.0);
-	}
 
-	if(command == JoystickYaw)
+	switch (command)
 	{
-		F16::pedInput = limit(-value,-1.0,1.0);
-	}
-	
-	if(command == JoystickThrottle)
-	{
-		F16::throttleInput = limit(((-value + 1.0)/2.0) * 100.0,0.0,100.0);
+	case JoystickRoll:
+		F16::FLIGHTCONTROLS::latStickInput = limit(value, -1.0, 1.0);
+		break;
+
+	case JoystickPitch:
+		F16::FLIGHTCONTROLS::longStickInput = limit(-value, -1.0, 1.0);
+		break;
+
+	case JoystickYaw:
+		F16::pedInput = limit(-value, -1.0, 1.0);
+		break;
+
+	case JoystickThrottle:
+		F16::throttleInput = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
+		break;
+
+		/*
+	case LandingGearUp:
+		F16::gearDown = 0.0; // what is it when up?
+		break;
+	case LandingGearDown:
+		F16::gearDown = 1.0; // 1.0 = down (see drawargs)
+		break;
+		*/
+
+	default:
+		// do nothing
+		break;
 	}
 }
+
 /*
 	Mass handling 
 
@@ -739,9 +657,14 @@ bool ed_fm_change_mass  (double & delta_mass,
 		delta_mass_pos_x = 0.0;
 		delta_mass_pos_y = 0.0;
 		delta_mass_pos_z = 0.0;
+
+		// shouldn't you use Ix, Iz and Iy here in calculation also..? -- IPr
+		//delta_mass_moment_of_inertia_x = F16::inertia_Ix_KGM2 - inertia.x;
+		//delta_mass_moment_of_inertia_y = F16::inertia_Ix_KGM2 - inertia.z;
+		//delta_mass_moment_of_inertia_z = F16::inertia_Ix_KGM2 - inertia.y;
 		delta_mass_moment_of_inertia_x = F16::inertia_Ix_KGM2 - inertia.x;
-		delta_mass_moment_of_inertia_y = F16::inertia_Ix_KGM2 - inertia.z;
-		delta_mass_moment_of_inertia_z = F16::inertia_Ix_KGM2 - inertia.y;
+		delta_mass_moment_of_inertia_y = F16::inertia_Iy_KGM2 - inertia.y;
+		delta_mass_moment_of_inertia_z = F16::inertia_Iz_KGM2 - inertia.z;
 
 		// Can't set to true...crashing right now :(
 		return false;
@@ -772,14 +695,16 @@ bool ed_fm_change_mass  (double & delta_mass,
 	}
 	*/
 }
+
 /*
 	set internal fuel volume , init function, called on object creation and for refueling , 
 	you should distribute it inside at different fuel tanks
 */
-void   ed_fm_set_internal_fuel(double fuel)
+void ed_fm_set_internal_fuel(double fuel)
 {
 	internal_fuel = fuel;
 }
+
 /*
 	get internal fuel volume 
 */
@@ -787,10 +712,11 @@ double ed_fm_get_internal_fuel()
 {
 	return internal_fuel;
 }
+
 /*
 	set external fuel volume for each payload station , called for weapon init and on reload
 */
-void  ed_fm_set_external_fuel (int	 station,
+void ed_fm_set_external_fuel(int station,
 								double fuel,
 								double x,
 								double y,
@@ -798,6 +724,7 @@ void  ed_fm_set_external_fuel (int	 station,
 {
 
 }
+
 /*
 	get external fuel volume 
 */
@@ -806,7 +733,7 @@ double ed_fm_get_external_fuel ()
 	return 0;
 }
 
-void ed_fm_set_draw_args (EdDrawArgument * drawargs,size_t size)
+void ed_fm_set_draw_args (EdDrawArgument * drawargs, size_t size)
 {
 	/* F-16 New Model Values Because I Am Back at Keeping Standards 
 	double aileron_DrawPCT = 0.0;
@@ -839,16 +766,9 @@ void ed_fm_set_draw_args (EdDrawArgument * drawargs,size_t size)
 	drawargs[28].f   = (float)limit(((F16::throttleInput-80.0)/20.0),0.0,1.0);
 	drawargs[29].f   = (float)limit(((F16::throttleInput-80.0)/20.0),0.0,1.0);
 	*/
-	if (F16::simInitialized)
-	{
-		F16::GearCommand = drawargs[500].f;
-	} else {
-		drawargs[500].f = (float)F16::GearCommand;
-	}
-	F16::WheelBrakeCommand = drawargs[501].f;	
-	F16::weight_on_wheels = limit(drawargs[504].f + drawargs[505].f + drawargs[506].f, 0.0, 1.0);
-	// Just going to use wheight on any wheel...
-
+	
+	F16::gearDown = (float)drawargs[0].f;  // 1.0 = down;
+	
 	//Flaps
 	drawargs[9].f = (float)F16::flap_PCT;
 	drawargs[10].f = (float)F16::flap_PCT;
@@ -865,6 +785,8 @@ void ed_fm_set_draw_args (EdDrawArgument * drawargs,size_t size)
 	drawargs[17].f = (float) F16::rudder_PCT;
 	drawargs[18].f = (float)-F16::rudder_PCT;
 
+	//Nose Gear Steering
+	drawargs[2].f = (float) F16::rudder_PCT;
 
 	drawargs[28].f   = (float)limit(((F16::throttleInput-80.0)/20.0),0.0,1.0);
 	drawargs[29].f   = (float)limit(((F16::throttleInput-80.0)/20.0),0.0,1.0);
@@ -877,67 +799,31 @@ void ed_fm_configure(const char * cfg_path)
 
 double ed_fm_get_param(unsigned index)
 {	
-	/* Gear positions */
-	if (index == ED_FM_SUSPENSION_0_GEAR_POST_STATE)
+	if (index > ED_FM_END_ENGINE_BLOCK)
 	{
-		return F16::gearDown;
-	}
-	if (index == ED_FM_SUSPENSION_1_GEAR_POST_STATE)
-	{
-		return F16::gearDown;
-	}
-	if (index == ED_FM_SUSPENSION_2_GEAR_POST_STATE)
-	{
-		return F16::gearDown;
-	}
-	if (index == ED_FM_SUSPENSION_0_DOWN_LOCK)
-	{
-		return F16::gearDown;
-	}
-	if (index == ED_FM_SUSPENSION_1_DOWN_LOCK)
-	{
-		return F16::gearDown;
-	}
-	if (index == ED_FM_SUSPENSION_2_DOWN_LOCK)
-	{
-		return F16::gearDown;
+		// unlikely case?
+		return 0;
 	}
 
-	/* Gear brakes */
-	if (index == ED_FM_SUSPENSION_1_RELATIVE_BRAKE_MOMENT)
+	switch (index)
 	{
-		return F16::WheelBrakeCommand * 1;
-	}
-	if (index == ED_FM_SUSPENSION_2_RELATIVE_BRAKE_MOMENT)
-	{
-		return F16::WheelBrakeCommand * 1;
-	}
+	case ED_FM_ENGINE_0_RPM:			
+	case ED_FM_ENGINE_0_RELATED_RPM:	
+	case ED_FM_ENGINE_0_THRUST:			
+	case ED_FM_ENGINE_0_RELATED_THRUST:	
+		return 0; // APU
+	case ED_FM_ENGINE_1_RPM:
+		return (F16::throttleInput/100.0) * 3000;
+	case ED_FM_ENGINE_1_RELATED_RPM:
+		return (F16::throttleInput/100.0);
+	case ED_FM_ENGINE_1_THRUST:
+		return (F16::throttleInput/100.0) * 5000 * 9.81;
+	case ED_FM_ENGINE_1_RELATED_THRUST:
+		return (F16::throttleInput/100.0);
 
-
-	/* Nosewheel steering */
-	if (index == ED_FM_SUSPENSION_0_WHEEL_YAW)
-	{
-		return limit(F16::rudder_DEG * 0.012,-1.0,1.0);
-	}
-
-	if (index <= ED_FM_END_ENGINE_BLOCK)
-	{
-		switch (index)
-		{
-		case ED_FM_ENGINE_0_RPM:			
-		case ED_FM_ENGINE_0_RELATED_RPM:	
-		case ED_FM_ENGINE_0_THRUST:			
-		case ED_FM_ENGINE_0_RELATED_THRUST:	
-			return 0; // APU
-		case ED_FM_ENGINE_1_RPM:
-			return (F16::throttleInput/100.0) * 3000;
-		case ED_FM_ENGINE_1_RELATED_RPM:
-			return (F16::throttleInput/100.0);
-		case ED_FM_ENGINE_1_THRUST:
-			return (F16::throttleInput/100.0) * 5000 * 9.81;
-		case ED_FM_ENGINE_1_RELATED_THRUST:
-			return (F16::throttleInput/100.0);
-		}
+	default:
+		// silence compiler warning(s)
+		break;
 	}
 	return 0;	
 }
@@ -945,14 +831,12 @@ double ed_fm_get_param(unsigned index)
 
 void ed_fm_cold_start()
 {
-	//F16::gearDown = 1;
-	//F16::GearCommand = 1;
+
 }
 
 void ed_fm_hot_start()
 {
-	//F16::gearDown = 1;
-	//F16::GearCommand = 1;
+
 }
 
 void ed_fm_hot_start_in_air()
@@ -964,6 +848,4 @@ double test()
 {
 	return 10.0;
 }
-
-
 

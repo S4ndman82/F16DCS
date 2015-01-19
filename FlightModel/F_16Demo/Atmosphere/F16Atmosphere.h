@@ -1,21 +1,53 @@
 #include "../stdafx.h"
+#include <math.h>
 
 namespace F16
 {
-	namespace ATMOS
+	// Simple atmospheric calculations
+	class F16Atmosphere
 	{
-		// Simple atmospheric calculations
-		void atmos(double temperature, double density, double vt, double *coeff )
+	protected:
+		// internally used temporary values
+		double temp;
+		double rho;
+
+	public:
+		double		ambientTemperature_DegK;	// Ambient temperature (kelvon)
+		double		ambientDensity_KgPerM3;		// Ambient density (kg/m^3)
+		double		dynamicPressure_LBFT2;		// Dynamic pressure (lb/ft^2)
+		double		mach; // Well..Mach, yeah
+
+		double		altitude_FT;			// Absolute altitude MSL (ft)
+		double		ps_LBFT2;			// Ambient calculated pressure (lb/ft^2)
+
+		F16Atmosphere() 
+			: temp(0)
+			, rho(0)
+			, ambientTemperature_DegK(0)
+			, ambientDensity_KgPerM3(0)
+			, dynamicPressure_LBFT2(0)
+			, mach(0)
+			, altitude_FT(0)
+			, ps_LBFT2(0)
+		{}
+		~F16Atmosphere() {}
+
+		void setAtmosphere(const double temperature, const double density, const double altitude, const double pressure)
 		{
-			double temp, rho, mach, qbar;
-			
-			temp = temperature * 1.8; // In Deg Rankine
-			rho = density * 0.00194032033;
-			mach = (vt)/sqrt(1.4*1716.3*temp);
-			qbar = .5*rho*pow(vt,2);
-			
-			coeff[0] = qbar;
-			coeff[1] = mach;
-		}	
-	}
+			ambientTemperature_DegK = temperature;
+			ambientDensity_KgPerM3 = density; 
+			altitude_FT = altitude;
+			ps_LBFT2 = pressure;
+
+			// calculate some helpers already
+			temp = ambientTemperature_DegK * 1.8; // In Deg Rankine
+			rho = ambientDensity_KgPerM3 * 0.00194032033;
+		}
+
+		void updateFrame(const double vt)
+		{
+			mach = (vt) / sqrt(1.4*1716.3*temp);
+			dynamicPressure_LBFT2 = .5*rho*pow(vt, 2);
+		}
+	};
 }

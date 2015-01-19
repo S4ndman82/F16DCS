@@ -1,8 +1,11 @@
+#ifndef _ED_FM_UTILITY_H_
+#define _ED_FM_UTILITY_H_
+
 #pragma once
 
 struct Vec3 
 {
-	Vec3(double x_ = 0,double y_ = 0,double z_ = 0) :x(x_),y(y_),z(z_){}
+	Vec3(double x_ = 0, double y_ = 0, double z_ = 0) :x(x_),y(y_),z(z_) {}
 	double x;
 	double y;
 	double z;
@@ -14,6 +17,22 @@ inline Vec3 cross(const Vec3 & a, const Vec3 & b)
 	return Vec3 (a.y * b.z - a.z * b.y,
 				 a.z * b.x - a.x * b.z,
 				 a.x * b.y - a.y * b.x);
+}
+
+// only slightly faster than struct construct&copy when inlined
+inline void clear_vec3(Vec3 &dest)
+{
+	dest.x = 0;
+	dest.y = 0;
+	dest.z = 0;
+}
+
+// TODO: replace with operator+=() in Vec3
+inline void sum_vec3(Vec3 &dest, const Vec3 &src)
+{
+	dest.x += src.x;
+	dest.y += src.y;
+	dest.z += src.z;
 }
 
 
@@ -78,3 +97,5 @@ double lerp(double * x,double * f, unsigned sz, double t)
 	}
 	return f[sz-1];
 }
+
+#endif // ifndef _ED_FM_UTILITY_H_
