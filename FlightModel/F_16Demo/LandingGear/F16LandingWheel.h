@@ -81,20 +81,6 @@ namespace F16
 			return false;
 		}
 
-		// TODO: amount of weight per wheel instead?
-		// also weight balance? wheel size?
-		// TODO: nose-gear steering angle etc.
-		double rollingFrictionCx(const double weightN) const
-		{
-			return (-wheel_roll_friction_factor * weightN);
-		}
-
-		double rollingFrictionCy(const double weightN) const
-		{
-			// should have wheel_side_friction_factor ?
-			return 0.18 * weightN;
-		}
-
 		void wheelBrake()
 		{
 			if (strutCompression == 0)
@@ -175,14 +161,22 @@ namespace F16
 
 			if (isWoW() == true && groundSpeed > 0)
 			{
-				CxWheelFriction = rollingFrictionCx(weightN);
-				CyWheelFriction = rollingFrictionCy(weightN);
+				// TODO: amount of weight per wheel instead?
+				// also weight balance? wheel size?
+				// TODO: nose-gear steering angle etc.
+				CxWheelFriction = (-wheel_roll_friction_factor * weightN);
+
+				// should have wheel_side_friction_factor ?
+				//CyWheelFriction = 0.18 * weightN;
+				//CyWheelFriction = wheel_side_friction_factor;
 			}
+			/*
 			else if (isWoW() == true && groundSpeed == 0)
 			{
 				CxWheelFriction = wheel_static_friction_factor;
 				CyWheelFriction = wheel_side_friction_factor;
 			}
+			*/
 			else
 			{
 				// no weight on wheels

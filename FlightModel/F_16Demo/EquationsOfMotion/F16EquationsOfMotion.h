@@ -295,12 +295,13 @@ namespace F16
 		{
 			// TODO: must have support for static friction: engine power needed to overcome and transfer to rolling
 
-			Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0,0.0);
+			//Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0,0.0);
 			//Vec3 cx_wheel_friction_pos(0.0,0.0,0.0);
 			//add_local_force_cg(cx_wheel_friction_force /*,cx_wheel_friction_pos*/);
 
 			// test, skip some things for now
-			sum_vec3(common_force, cx_wheel_friction_force);
+			//--Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0,0.0);
+			//--sum_vec3(common_force, cx_wheel_friction_force);
 			// -> actually need to reduce this from _moment_ not add opposite force?
 
 
@@ -335,8 +336,8 @@ namespace F16
 			}
 			*/
 
-			Vec3 cxr_wheel_friction_force(-rightCxWheelFriction, 0.0,0.0);
-			Vec3 cxl_wheel_friction_force(-leftCxWheelFriction, 0.0,0.0);
+			//Vec3 cxr_wheel_friction_force(-rightCxWheelFriction, 0.0,0.0);
+			//Vec3 cxl_wheel_friction_force(-leftCxWheelFriction, 0.0,0.0);
 
 			// TODO: check wheel offset from cg!
 			// reversed axis? 
@@ -346,6 +347,7 @@ namespace F16
 			// TODO: find better limiter here! we can't exceed forward force
 			// -> we should decrement from momentum instead and note the cg there!
 
+			/*
 			if (common_force.x < rightCxWheelFriction)
 			{
 				// silly hack, remove this
@@ -363,6 +365,7 @@ namespace F16
 
 			Vec3 cxl_wheel_friction_pos(0.0,0.0,5.0); // TODO: check offset!
 			add_local_force(cxl_wheel_friction_force, cxl_wheel_friction_pos);
+			*/
 		}
 
 		// something like this to handle when nosewheel is turned?

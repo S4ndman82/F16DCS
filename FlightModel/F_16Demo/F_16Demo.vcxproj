@@ -168,6 +168,7 @@
     <ClInclude Include="Engine\F16Engine.h" />
     <ClInclude Include="Engine\F16EngineManagementSystem.h" />
     <ClInclude Include="Engine\F16FuelSystem.h" />
+    <ClInclude Include="Engine\F16Gearbox.h" />
     <ClInclude Include="Engine\F16JFS.h" />
     <ClInclude Include="EnvironmentalSystem\F16AirConditioning.h" />
     <ClInclude Include="EnvironmentalSystem\F16OxygenSystem.h" />

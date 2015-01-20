@@ -1,9 +1,16 @@
+--local cockpit = folder.."../../../Cockpit/Scripts/"
+--dofile(cockpit.."devices.lua")
+--dofile(cockpit.."command_defs.lua")
+
 local res = external_profile("Config/Input/Aircrafts/base_joystick_binding.lua")
 join(res.keyCommands,{
 
+--return {
+--keyCommands = {
+
 -- example
 --{down = 3010, up = 3011, cockpit_device_id = 49, value_down = 1.0,	value_up = -1.0, name = _('Anti-Collision Lights switch'), category = _('Lighting Panel')},
-{down = 3010, up = 3011, value_down = 1.0,	value_up = -1.0, name = _('Anti-Collision Lights switch'), category = _('Lighting Panel')},
+--{down = 3010, up = 3011, value_down = 1.0,	value_up = -1.0, name = _('Anti-Collision Lights switch'), category = _('Lighting Panel')},
 
 -- Autopilot
 {down = iCommandPlaneAutopilot, name = _('Autopilot'), category = _('Autopilot')},
@@ -77,12 +84,28 @@ join(res.keyCommands,{
 
 -- Countermeasures
 {down = iCommandActiveIRJamming, name = _('IR Jamming'), category = _('Countermeasures')},
-})
+
+}) -- join()
+
+--},
+--axisCommands = {
 
 -- joystick axes 
 join(res.axisCommands,{
 {action = iCommandWheelBrake,		name = _('Wheel Brake')},
 {action = iCommandLeftWheelBrake,	name = _('Wheel Brake Left')},
 {action = iCommandRightWheelBrake,	name = _('Wheel Brake Right')},
-})
+
+{action = iCommandPlaneRoll, name = _('Roll')},
+{action = iCommandPlanePitch, name = _('Pitch')},
+{action = iCommandPlaneRudder, name = _('Rudder')},
+--{action = device_commands.Button_3, cockpit_device_id  = devices.ENGINE_SYSTEM, name = _('Throttle')},
+
+--{combos = defaultDeviceAssignmentFor("roll")	, action = iCommandPlaneRoll, name = _('Roll')},
+--{combos = defaultDeviceAssignmentFor("pitch")	, action = iCommandPlanePitch, name = _('Pitch')},
+--{combos = defaultDeviceAssignmentFor("rudder")	, action = iCommandPlaneRudder, name = _('Rudder')},
+--{combos = defaultDeviceAssignmentFor("thrust"), action = device_commands.Button_3, cockpit_device_id  = devices.ENGINE_SYSTEM, name = _('Throttle')},
+}) -- join()
+
+--}}
 return res

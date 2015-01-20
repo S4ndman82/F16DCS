@@ -107,6 +107,9 @@
     <ClInclude Include="EnvironmentalSystem\F16AirConditioning.h">
       <Filter>EnvironmentalSystem</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\F16Gearbox.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

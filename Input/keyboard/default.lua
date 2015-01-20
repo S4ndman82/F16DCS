@@ -1,9 +1,16 @@
+--local cockpit = folder.."../../../Cockpit/Scripts/"
+--dofile(cockpit.."devices.lua")
+--dofile(cockpit.."command_defs.lua")
+
 local res = external_profile("Config/Input/Aircrafts/base_keyboard_binding.lua")
 join(res.keyCommands,{
 
+--return {
+--keyCommands = {
+
 -- example
 --{down = 3010, up = 3011, cockpit_device_id = 49, value_down = 1.0,	value_up = -1.0, name = _('Anti-Collision Lights switch'), category = _('Lighting Panel')},
-{down = 3010, up = 3011, value_down = 1.0,	value_up = -1.0, name = _('Anti-Collision Lights switch'), category = _('Lighting Panel')},
+--{down = 3010, up = 3011, value_down = 1.0,	value_up = -1.0, name = _('Anti-Collision Lights switch'), category = _('Lighting Panel')},
 
 -- Autopilot
 {combos = {{key = 'A'}, {key = '1', reformers = {'LAlt'}}}, down = iCommandPlaneAutopilot, name = _('Autopilot - Attitude Hold'), category = _('Autopilot')},
@@ -114,4 +121,6 @@ join(res.keyCommands,{
 {combos = {{key = 'Space', reformers = {'RAlt'}}}, down = iCommandPlanePickleOn,	up = iCommandPlanePickleOff, name = _('Weapon Release'), category = _('Weapons')},
 --{combos = {{key = 'C', reformers = {'LShift'}}}, down = iCommandChangeGunRateOfFire, name = _('Cannon Rate Of Fire / Cut Of Burst select'), category = _('Weapons')},
 })
+
+--}}
 return res
