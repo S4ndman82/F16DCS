@@ -29,7 +29,7 @@ namespace F16
 		const double gearYcos = cos(F16::degtorad);
 
 	public:
-		double	gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
+		double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
 
 		bool nosewheelSteering; // is active/not
 		double noseGearTurnAngle; // steering angle {-1=CW max;1=CCW max}

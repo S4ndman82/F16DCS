@@ -301,6 +301,7 @@ void ed_fm_simulate(double dt)
 	F16::Motion.updateAeroForces(F16::Aero.getCyTotal(), F16::Aero.getCxTotal(), F16::Aero.getCzTotal(), 
 								F16::Aero.getClTotal(), F16::Aero.getCmTotal(), F16::Aero.getCnTotal(), 
 								F16::Atmos.dynamicPressure_LBFT2);
+
 	F16::Motion.updateEngineForces(F16::Engine.getThrustN());
 	F16::Motion.updateFuelUsageMass(F16::Fuel.getUsageSinceLastFrame(), 0, 0, 0);
 	F16::Fuel.clearUsageSinceLastFrame();
@@ -328,9 +329,8 @@ void ed_fm_simulate(double dt)
 		F16::Motion.updateBrakingFriction(F16::LandingGear.wheelLeft.brakeForce, F16::LandingGear.wheelRight.brakeForce);
 	}
 
+	// TODO: remove
 	// Tell the simulation that it has gone through the first frame
-	//F16::simInitialized = true;
-	//F16::Actuators.simInitialized = true;
 	F16::FlightControls.simInitialized = true;
 
 	/*
@@ -937,6 +937,7 @@ double ed_fm_get_param(unsigned param_enum)
 		return 0;
 
 	case ED_FM_CAN_ACCEPT_FUEL_FROM_TANKER: // return positive value if all conditions are matched to connect to tanker and get fuel
+		// TODO: refueling door handling, collision box reduction
 		return 0;
 
 	// Groups for fuel indicator

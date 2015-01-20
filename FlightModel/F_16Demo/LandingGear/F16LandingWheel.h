@@ -99,14 +99,13 @@ namespace F16
 			// TODO: find out some reasonable values,
 			// do we need to have brake fading support as well?
 			// TODO: also switch calculation to reduction in kinectic energy in motion handling
-
+			// -> should calculate proper moment here
 			brakeForce = abs(brakeInput) * 5000; // guess, find out reasonable value for this!!
 			brakeForce = limit(brakeForce, 0, wheel_brake_moment_max);
 
 			// just add it to rolling friction
 			//CxWheelFriction += (rolling_friction * brakeFriction * weightN);
 			//CyWheelFriction = 0.18 * weightN;
-
 		}
 
 		void setActingForce(double x, double y, double z)
@@ -136,21 +135,6 @@ namespace F16
 		{
 			strutCompression = compression;
 		}
-
-		/*
-		void setStrutRetracted()
-		{
-			strutCompression = 1;
-		}
-		void setStrutParking()
-		{
-			strutCompression = 0.5;
-		}
-		void setStrutExtended()
-		{
-			strutCompression = 0;
-		}
-		*/
 
 		// calculate new direction of force and if it exceeds friction (begins sliding)
 		// TODO: need ground speed here for rolling/static friction

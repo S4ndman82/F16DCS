@@ -297,11 +297,10 @@ namespace F16
 
 			//Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0,0.0);
 			//Vec3 cx_wheel_friction_pos(0.0,0.0,0.0);
-			//add_local_force_cg(cx_wheel_friction_force /*,cx_wheel_friction_pos*/);
+			//add_local_force_cg(cx_wheel_friction_force, cx_wheel_friction_pos);
 
 			// test, skip some things for now
-			//--Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0,0.0);
-			//--sum_vec3(common_force, cx_wheel_friction_force);
+			//sum_vec3(common_force, Vec3(CxWheelFriction, 0.0,0.0));
 			// -> actually need to reduce this from _moment_ not add opposite force?
 
 
