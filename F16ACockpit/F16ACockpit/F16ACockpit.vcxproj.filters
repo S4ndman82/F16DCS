@@ -120,6 +120,12 @@
     <ClInclude Include="Instruments\F16RpmIndicator.h">
       <Filter>Instruments</Filter>
     </ClInclude>
+    <ClInclude Include="Instruments\F16HSI.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16ThreatIndicator.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

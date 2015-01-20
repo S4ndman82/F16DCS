@@ -159,12 +159,14 @@
     <ClInclude Include="Instruments\F16Compass.h" />
     <ClInclude Include="Instruments\F16EPUFuelQuantity.h" />
     <ClInclude Include="Instruments\F16FuelFlowIndicator.h" />
+    <ClInclude Include="Instruments\F16HSI.h" />
     <ClInclude Include="Instruments\F16HydraulicPressureIndicator.h" />
     <ClInclude Include="Instruments\F16LiquidOxygenQuantity.h" />
     <ClInclude Include="Instruments\F16NozzlePosition.h" />
     <ClInclude Include="Instruments\F16OilPressure.h" />
     <ClInclude Include="Instruments\F16OxygenFlowIndicator.h" />
     <ClInclude Include="Instruments\F16RpmIndicator.h" />
+    <ClInclude Include="Instruments\F16ThreatIndicator.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
