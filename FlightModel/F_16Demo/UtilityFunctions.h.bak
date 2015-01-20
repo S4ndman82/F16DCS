@@ -19,6 +19,7 @@ private: // disallow copying
 	UtilBuffer& operator=(const UtilBuffer &other) {return *this;};
 
 public:
+
 	double *vec; // array
 	int capacity; // amount of elements in array
 	//int used; // amount of elements in use
@@ -63,49 +64,65 @@ public:
 	}
 };
 
-// Start of Utility Functions
+// TODO: reduce duplication
+//class Matrix
+
+class DoubleMatrix
+{
+private: // disallow copying
+	DoubleMatrix(const DoubleMatrix &other) {};
+	DoubleMatrix& operator=(const DoubleMatrix &other) {return *this;};
+
+public:
+	int n, m;
+	double **mat;
+
+	DoubleMatrix(const int _n, const int _m) 
+		: n(_n), m(_m), mat(NULL)
+	{
+		mat = (double**) malloc(n*sizeof(double*));
+		for(int i=0;i<n;i++)
+			mat[i] = (double*) malloc(m*sizeof(double));
+	}
+	~DoubleMatrix() 
+	{
+		for(int i=0;i<n;i++)
+			free(mat[i]);
+		free(mat);
+	}
+};
+
+class IntMatrix
+{
+private: // disallow copying
+	IntMatrix(const IntMatrix &other) {};
+	IntMatrix& operator=(const IntMatrix &other) {return *this;};
+
+public:
+	int n, m;
+	int **mat;
+
+	IntMatrix(const int _n, const int _m) 
+		: n(_n), m(_m), mat(NULL)
+	{
+		mat = (int**) malloc(n*sizeof(int*));
+		for(int i=0;i<n;i++)
+			mat[i] = (int*) malloc(m*sizeof(int));
+	}
+	~IntMatrix() 
+	{
+		for(int i=0;i<n;i++)
+			free(mat[i]);
+		free(mat);
+	}
+};
+
 
 // Struct to define a set of data with a given number of dimenions and points
 typedef struct {
 		int nDimension;
 		int *nPoints;   
 		} ND_INFO;
-
-// Matrix of all integers
-int **intMatrix(int n,int m){
-	int **mat = (int**) malloc(n*sizeof(int*));
-	for(int i=0;i<n;i++)
-		mat[i] = (int*) malloc(m*sizeof(int));
-	return(mat);
-	}
-
-// Matrix of all doubles
-double **doubleMatrix(int n,int m){
-	double **mat = (double**) malloc(n*sizeof(double*));
-	for(int i=0;i<n;i++)
-		mat[i] = (double*) malloc(m*sizeof(double));
-	return(mat);
-	}
-
-// Clear out the provided integer matrix
-void freeIntMat(int **mat,int n,int m){
-	/* the column size is not used but is required only
-		for debugging purpose
-	*/
-	for(int i=0;i<n;i++)
-		free(mat[i]);
-	free(mat);
-	}
-
-// Clear out the providced double matrix
-void freeDoubleMat(double **mat,int n,int m){
-	/* the column size is not used but is required only
-		for debugging purpose
-	*/
-	for(int i=0;i<n;i++)
-		free(mat[i]);
-	free(mat);
-	}
 
 // Error Call Helper Function
 void ErrMsg(char *m){
@@ -115,16 +132,16 @@ void ErrMsg(char *m){
 /*    Get the indices of the hyper cube in the  */
 /*    grid in which the point lies              */
 /************************************************/
-int **getHyperCube(double **Xmat, const double *V, const ND_INFO &ndinfo)
+void getHyperCube(const DoubleMatrix &Xmat, const double *V, IntMatrix &indexMat, const ND_INFO &ndinfo)
 {
-	int **indexMatrix = intMatrix(ndinfo.nDimension,2);
+	//int **indexMatrix = intMatrix(ndinfo.nDimension,2);
                      /*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
 
 	for(int i=0; i<ndinfo.nDimension; i++)
 	{
 		int indexMax = ndinfo.nPoints[i]; /* Get the total # of points in this dimension */
-		double xmax = Xmat[i][indexMax-1];	 /* Get the upper bound along this axis */
-		double xmin = Xmat[i][0];			/* Get the lower bound along this axis */
+		double xmax = Xmat.mat[i][indexMax-1];	 /* Get the upper bound along this axis */
+		double xmin = Xmat.mat[i][0];			/* Get the lower bound along this axis */
 
 		/**************************************************************************** 
 			It has been assumed that the gridpoints are monotonically increasing
@@ -146,34 +163,34 @@ int **getHyperCube(double **Xmat, const double *V, const ND_INFO &ndinfo)
 		{
 			for(int j=0; j<indexMax-1; j++)
 			{
-				if(x==Xmat[i][j])
+				if(x == Xmat.mat[i][j])
 				{
-					indexMatrix[i][0] = indexMatrix[i][1] = j;
+					indexMat.mat[i][0] = indexMat.mat[i][1] = j;
 					break;
 				}
-				if(x==Xmat[i][j+1])
+				if(x == Xmat.mat[i][j+1])
 				{
-					indexMatrix[i][0] = indexMatrix[i][1] = j+1;
+					indexMat.mat[i][0] = indexMat.mat[i][1] = j+1;
 					break;
 				}
-				if(x > Xmat[i][j] && x < Xmat[i][j+1] )
+				if(x > Xmat.mat[i][j] && x < Xmat.mat[i][j+1])
 				{
-					indexMatrix[i][0] = j;
-					indexMatrix[i][1] = j+1;
+					indexMat.mat[i][0] = j;
+					indexMat.mat[i][1] = j+1;
 					break;
 				}
 			}/*End of for(j=...) */
 		}/*End of if-else */
 	}/* End of for(i= ...) */
 
-	return(indexMatrix);
+	//return(indexMatrix);
 } // getHyperCube()
 
 /*********************************************************************************
  indexVector contains the co-ordinate of a point in the ndimensional grid
  the indices along each axis are assumed to begin from zero
  *********************************************************************************/
-int getLinIndex(const int *indexVector, const ND_INFO &ndinfo)
+int getLinIndex(int *indexVector, const ND_INFO &ndinfo)
 {
 	int linIndex=0;
 	for(int i=0; i<ndinfo.nDimension; i++)
@@ -189,9 +206,9 @@ int getLinIndex(const int *indexVector, const ND_INFO &ndinfo)
 }
 
 // Linearly interpolate between two data values
-double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat, const ND_INFO &ndinfo)
+double linearInterpolate(const UtilBuffer &Tbuf, const double *V, DoubleMatrix &Xmat, const ND_INFO &ndinfo)
 {
-	int *indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
+	int *indexVector = (int*)malloc(ndinfo.nDimension*sizeof(int));
 	int nVertices = 1<<(ndinfo.nDimension);
 
 	UtilBuffer oldTbuf(nVertices);
@@ -226,9 +243,9 @@ double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat,
 
 			double f1 = oldTbuf.vec[index1];
 			double f2 = oldTbuf.vec[index1+1];
-			if(Xmat[dimNum][0] != Xmat[dimNum][1])
+			if(Xmat.mat[dimNum][0] != Xmat.mat[dimNum][1])
 			{
-				double lambda = (V[dimNum] - Xmat[dimNum][0]) / (Xmat[dimNum][1] - Xmat[dimNum][0]);
+				double lambda = (V[dimNum] - Xmat.mat[dimNum][0]) / (Xmat.mat[dimNum][1] - Xmat.mat[dimNum][0]);
 
 				newTbuf.vec[index2] = lambda*f2 + (1-lambda)*f1;
 			}
@@ -250,21 +267,22 @@ double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat,
 
 double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO &ndinfo, UtilBuffer &Tbuf)
 {
-	const int nVertices = (1<<ndinfo.nDimension);
+	int nVertices = (1<<ndinfo.nDimension);
 
-	int *indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
-	double **xPoint = doubleMatrix(ndinfo.nDimension,2);
+	int *indexVector = (int*)malloc(ndinfo.nDimension*sizeof(int));
+	DoubleMatrix xPoint(ndinfo.nDimension,2);
 
 	/* Get the indices of the hypercube containing the point in argument */
-	int **indexMatrix = getHyperCube(Xmat, xPar, ndinfo);
+	IntMatrix indexMat(ndinfo.nDimension,2);
+	getHyperCube(xPoint, xPar, indexMat, ndinfo);
 
 	/* Get the co-ordinates of the hyper cube */
 	for(int i=0; i<ndinfo.nDimension; i++)
 	{
-		int low  = indexMatrix[i][0];
-		int high = indexMatrix[i][1];
-		xPoint[i][0] = Xmat[i][low];
-		xPoint[i][1] = Xmat[i][high];
+		int low  = indexMat.mat[i][0];
+		int high = indexMat.mat[i][1];
+		xPoint.mat[i][0] = Xmat[i][low];
+		xPoint.mat[i][1] = Xmat[i][high];
 	}
 
 	for(int i=0; i<nVertices; i++)
@@ -273,7 +291,7 @@ double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO
 		{
 			int mask = 1<<j;
 			int val = (mask & i) >> j;
-			indexVector[j] = indexMatrix[j][val];
+			indexVector[j] = indexMat.mat[j][val];
 		}
 
 		int index = getLinIndex(indexVector, ndinfo);
@@ -283,8 +301,6 @@ double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO
 	double result = linearInterpolate(Tbuf, xPar, xPoint, ndinfo);
 
 	free(indexVector);
-	freeIntMat(indexMatrix, ndinfo.nDimension, 2);
-	freeDoubleMat(xPoint, ndinfo.nDimension, 2);
 	return(result);
 }
 // End of Utility Functions

@@ -1,3 +1,7 @@
+/*
+	physics integrator
+*/
+
 #ifndef _F16EQUATIONSOFMOTION_H_
 #define _F16EQUATIONSOFMOTION_H_
 
@@ -73,9 +77,6 @@ namespace F16
 		// is acting at the CG
 		void add_local_force(const Vec3 & Force, const Vec3 & Force_pos)
 		{
-			// TODO:! force position
-			//sum_vec3(common_force, Force);
-
 			common_force.x += Force.x;
 			common_force.y += Force.y;
 			common_force.z += Force.z;
@@ -92,7 +93,7 @@ namespace F16
 		}
 		void add_local_force_cg(const Vec3 & Force)
 		{
-			// old for comparison
+			// old plain sum for comparison
 			//sum_vec3(common_force, Force);
 
 			Vec3 force_pos(0,0,0); // cg
@@ -223,33 +224,37 @@ namespace F16
 		// to units.  All prior forces calculated in lb*ft, needs
 		// to be converted into N*m
 		//----------------------------------------------------------------
-		void updateAeroForces(double Cy_total, double Cx_total, double Cz_total, double Cl_total, double Cm_total, double Cn_total, double dynamicPressure_LBFT2)
+		void updateAeroForces(const double Cy_total, const double Cx_total, const double Cz_total, const double Cl_total, const double Cm_total, const double Cn_total, const double dynamicPressure_LBFT2)
 		{
+			// precalculate some terms
+			const double wingPressureN = F16::wingArea_FT2 * dynamicPressure_LBFT2 * 4.44822162825;
+			const double wingPressureNm = F16::wingArea_FT2 * dynamicPressure_LBFT2 * 1.35581795;
+
 			// Cy	(force out the right wing)
-			Vec3 cy_force(0.0, 0.0, Cy_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * 4.44822162825  );		// Output force in Newtons
+			Vec3 cy_force(0.0, 0.0, Cy_total * wingPressureN);		// Output force in Newtons
 			Vec3 cy_force_pos(0.0,0,0); //0.01437
 			add_local_force_cg(cy_force /*,cy_force_pos*/);	
 
 			// Cx (force out the nose)
-			Vec3 cx_force(Cx_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * 4.44822162825, 0, 0 );		// Output force in Newtons
+			Vec3 cx_force(Cx_total * wingPressureN, 0, 0 );		// Output force in Newtons
 			Vec3 cx_force_pos(0, 0.0,0.0);
 			add_local_force_cg(cx_force /*,cx_force_pos*/);
 
 			// Cz (force down the bottom of the aircraft)
-			Vec3 cz_force(0.0,  -Cz_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * 4.44822162825, 0.0 );	// Output force in Newtons
+			Vec3 cz_force(0.0,  -Cz_total * wingPressureN, 0.0 );	// Output force in Newtons
 			Vec3 cz_force_pos(0,0,0);
 			add_local_force_cg(cz_force /*,cz_force_pos*/);
 
 			// Cl	(Output force in N/m)
-			Vec3 cl_moment(Cl_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * F16::wingSpan_FT * 1.35581795, 0.0,  0.0  );
+			Vec3 cl_moment(Cl_total * wingPressureNm * F16::wingSpan_FT, 0.0,  0.0);
 			add_local_moment(cl_moment);
 
 			// Cm	(Output force in N/m)
-			Vec3 cm_moment(0.0, 0.0,  Cm_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * 1.35581795 * F16::meanChord_FT );
+			Vec3 cm_moment(0.0, 0.0,  Cm_total * wingPressureNm * F16::meanChord_FT);
 			add_local_moment(cm_moment);
 
 			// Cn	(Output force in N/m)
-			Vec3 cn_moment(0.0, -Cn_total * F16::wingArea_FT2 * dynamicPressure_LBFT2 * F16::wingSpan_FT * 1.35581795 ,  0.0   );
+			Vec3 cn_moment(0.0, -Cn_total * wingPressureNm * F16::wingSpan_FT,  0.0);
 			add_local_moment(cn_moment);	
 		}
 
@@ -259,9 +264,11 @@ namespace F16
 			Vec3 thrust_force(thrust_N , 0.0, 0.0);	// Output force in Newtons
 			Vec3 thrust_force_pos(0,0,0);
 			add_local_force_cg(thrust_force /*, thrust_force_pos*/);	
+			//add_local_force(thrust_force, thrust_force_pos);	
 		}
 
 		// TODO: left, right and nose wheel forces
+		// TODO: nose-wheel steering angle, braking forces
 		void updateWheelForces(double leftWheelXFriction, double leftWheelYFriction, double rightWheelXFriction, double rightWheelYFriction, double noseWheelXFriction, double noseWheelYFriction)
 		{
 			// TODO: offset pos of each wheel,
@@ -270,16 +277,99 @@ namespace F16
 			// TODO: nose wheel turn
 
 			// TODO: debug: check force direction!
-
 			// check reduction in kinetic energy per wheel
 			// and check that we don't underflow..
-			add_local_force_cg(Vec3(leftWheelXFriction, 0.0,0.0) /*, Vec3(0.0,0.0,0.0)*/);
+			//add_local_force_cg(Vec3(leftWheelXFriction, 0.0,0.0) /*, Vec3(0.0,0.0,0.0)*/);
+			//add_local_force_cg(Vec3(0.0, 0.0, leftWheelYFriction) /*, Vec3(0.0,0.0,0.0)*/);
+			//add_local_force_cg(Vec3(rightWheelXFriction, 0.0,0.0) /*, Vec3(0.0,0.0,0.0)*/);
+			//add_local_force_cg(Vec3(0.0, 0.0, rightWheelYFriction) /*, Vec3(0.0,0.0,0.0)*/);
+		}
 
-			add_local_force_cg(Vec3(0.0, 0.0, leftWheelYFriction) /*, Vec3(0.0,0.0,0.0)*/);
+		/* TODO: handling for skidding friction? (maybe sliding sideways..)
+		void updateSlippingFriction()
+		{}
+		*/
 
-			add_local_force_cg(Vec3(rightWheelXFriction, 0.0,0.0) /*, Vec3(0.0,0.0,0.0)*/);
+		// free-rolling friction
+		void updateRollingFriction(const double CxWheelFriction, const double CyWheelFriction)
+		{
+			// TODO: must have support for static friction: engine power needed to overcome and transfer to rolling
 
-			add_local_force_cg(Vec3(0.0, 0.0, rightWheelYFriction) /*, Vec3(0.0,0.0,0.0)*/);
+			Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0,0.0);
+			//Vec3 cx_wheel_friction_pos(0.0,0.0,0.0);
+			//add_local_force_cg(cx_wheel_friction_force /*,cx_wheel_friction_pos*/);
+
+			// test, skip some things for now
+			sum_vec3(common_force, cx_wheel_friction_force);
+			// -> actually need to reduce this from _moment_ not add opposite force?
+
+
+			// note: applying this causes "steering" while rolling, is the axis now correct ?
+			// -> if not turning this should be zero since the angle is same as rolling direction
+			// -> skip this if cx vector is aligned with direction of traveling?
+			//
+			//Vec3 cy_wheel_friction_force(0.0, 0.0,CyWheelFriction);
+			//Vec3 cy_wheel_friction_pos(0.0,0.0,0.0);
+			//add_local_force_cg(cy_wheel_friction_force /*,cy_wheel_friction_pos*/);
+			// test, skip some things for now
+			//sum_vec3(common_force, cy_wheel_friction_force);
+		}
+
+		// handle brake input (differential support)
+		void updateBrakingFriction(const double leftCxWheelFriction, const double rightCxWheelFriction)
+		{
+			// TODO: lua has this definition, check our values in calculations 
+			//wheel_brake_moment_max = 15000.0, -- maximum value of braking moment  , N*m 
+
+			// TODO: verify values are negative now?
+			// TODO: should decrement from moment or verify that brake force does not exceed forward force (or we would go backwards..)
+
+			/*
+			// both sides equal amount -> just reduce it in cg?
+			if (leftCxWheelFriction == rightCxWheelFriction)
+			{
+			}
+			else
+			{
+				// differential -> separate moment vectoring
+			}
+			*/
+
+			Vec3 cxr_wheel_friction_force(-rightCxWheelFriction, 0.0,0.0);
+			Vec3 cxl_wheel_friction_force(-leftCxWheelFriction, 0.0,0.0);
+
+			// TODO: check wheel offset from cg!
+			// reversed axis? 
+			// in DCS Zbody out of right wing?
+			// Xbody out of nose -> force must be negative here
+
+			// TODO: find better limiter here! we can't exceed forward force
+			// -> we should decrement from momentum instead and note the cg there!
+
+			if (common_force.x < rightCxWheelFriction)
+			{
+				// silly hack, remove this
+				cxr_wheel_friction_force.x = -common_force.x;
+			}
+
+			Vec3 cxr_wheel_friction_pos(0.0,0.0,-5.0); // TODO: check offset!
+			add_local_force(cxr_wheel_friction_force, cxr_wheel_friction_pos);
+
+			if (common_force.x < leftCxWheelFriction)
+			{
+				// silly hack, remove this
+				cxl_wheel_friction_force.x = -common_force.x;
+			}
+
+			Vec3 cxl_wheel_friction_pos(0.0,0.0,5.0); // TODO: check offset!
+			add_local_force(cxl_wheel_friction_force, cxl_wheel_friction_pos);
+		}
+
+		// something like this to handle when nosewheel is turned?
+		void updateNoseWheelTurn(const Vec3 &nosewheelDirection, const double turnAngle)
+		{
+			Vec3 cx_wheel_pos(5.0,0.0,0.0); // TODO: check offset!
+			add_local_force(nosewheelDirection, cx_wheel_pos);
 		}
 
 		// 

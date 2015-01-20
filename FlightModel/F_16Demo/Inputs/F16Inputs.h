@@ -11,6 +11,10 @@
 //
 // Used in ed_fm_set_command() and ed_fm_get_param()
 //
+// Note: flaps are controlled with landing gear lever as well,
+// gears go down -> trailing edge flaps go down
+// gear go up -> trailing edge flaps go up
+//
 enum F16InputCommands
 {
 	//{down = iCommandPlaneGear, name = _('Landing Gear Up/Down'), category = _('Systems')},
@@ -27,7 +31,7 @@ enum F16InputCommands
 	//{combos = {{key = 'F'}}, down = iCommandPlaneFlaps, name = _('Flaps Up/Down'), category = _('Systems')},
 	//{combos = {{key = 'F', reformers = {'LShift'}}}, down = iCommandPlaneFlapsOn, name = _('Flaps Landing Position'), category = _('Systems')},
 	//{combos = {{key = 'F', reformers = {'LCtrl'}}}, down = iCommandPlaneFlapsOff, name = _('Flaps Up'), category = _('Systems')},
-	Flaps				= 72, // Flaps up/down (toggle)		(doesn't work)
+	//Flaps				= 72, // Flaps up/down (toggle)		(doesn't work)
 	AirBrake			= 73, // Air brake (toggle)	(doesn't work)
 
 	//{down = iCommandPlaneWheelBrakeOn, up = iCommandPlaneWheelBrakeOff, name = _('Wheel Brake On'), category = _('Systems')},
@@ -38,8 +42,8 @@ enum F16InputCommands
 	//{down = iCommandPlaneFlaps, name = _('Flaps Up/Down'), category = _('Systems')},
 	//{down = iCommandPlaneFlapsOn, name = _('Flaps Landing Position'), category = _('Systems')},
 	//{down = iCommandPlaneFlapsOff, name = _('Flaps Up'), category = _('Systems')},
-	FlapsOn				= 145, // Flaps on			(doesn't work)
-	FlapsOff			= 146, // Flaps off			(doesn't work)
+	//FlapsOn				= 145, // Flaps on			(doesn't work)
+	//FlapsOff			= 146, // Flaps off			(doesn't work)
 
 	//{combos = {{key = 'B', reformers = {'LShift'}}}, down = iCommandPlaneAirBrakeOn, name = _('Airbrake On'), category = _('Systems')},
 	//{combos = {{key = 'B', reformers = {'LCtrl'}}}, down = iCommandPlaneAirBrakeOff, name = _('Airbrake Off'), category = _('Systems')},
@@ -56,8 +60,15 @@ enum F16InputCommands
 	EnginesStart		= 309, // Engines start // iCommandEnginesStart
 	EnginesStop			= 310, // Engines stop 	// iCommandEnginesStop
 
+	//ApuStart,
+	//ApuStop,
+
 	//{combos = {{key = 'L', reformers = {'RShift'}}}, down = iCommandPowerOnOff, name = _('Electric Power Switch'), category = _('Systems')},
-	PowerOnOff			= 315, // Electric power switch
+	PowerOnOff			= 315, // Electric power switch (FC3 style)
+
+	//NavigationLights;
+	//FormationLights;
+	//LandingLights;
 
 	// joystick axis commands
 	//{action = iCommandWheelBrake,		name = _('Wheel Brake')},

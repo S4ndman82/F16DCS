@@ -11,15 +11,38 @@ namespace F16
 	// F100-PW-229
 	//Specific fuel consumption: Military thrust: 77.5 kg/(kN·h) (0.76 lb/(lbf·h)) Full afterburner: 197.8 kg/(kN·h) (1.94 lb/(lbf·h))
 
+	/*
+	For example: 
+	49,000 PPH would be 7,000 gal/hr, 117 gal/min or 3 gal/sec 'roughly'. (Using 7 lbs/gal) 
+	49,000 PPH would be 7,368 gal/hr, 123 gal/min or 2 gal/sec 'roughly'. (Using 6.65 lbs/gal) 
+	*/
+
 	// three externals: wings and centerline station
 	// five internals: left and right wing tanks, two forward (F-1, F-2) and one aft (A-1) fuselage tank.
 	// fwd & aft reservoir
 	// total internal: [A] 6950 +- 300 (JP-4), 7290 +- 300 (JP-5/8) [B] 5650 +- 300, 5930 +- 300
 
+	// JP8 weight 6.65lbs/gal ?
+
+	// main fuel pump or AB fuel pump
+	class F16FuelPump
+	{
+		// gearbox mounted on engine -> torque from engine to power fuel feeding?
+	public:
+
+		double fuel_flow;
+
+		F16FuelPump() 
+			: fuel_flow(0)
+		{}
+		~F16FuelPump() {}
+	};
+
+
 	// add:
 	// - currently used (selected) station
 	// - support for internal tanks and external (pylons)
-	class F16Fuel_Tank
+	class F16FuelTank
 	{
 	public:
 		int station; // do we need this here or not?
@@ -31,7 +54,7 @@ namespace F16
 		double y;
 		double z;
 
-		F16Fuel_Tank(double _volume = 0, double _fuel = 0)
+		F16FuelTank(double _volume = 0, double _fuel = 0)
 			: station(0)
 			, volume(_volume)
 			, fuel(_fuel)
@@ -39,7 +62,7 @@ namespace F16
 			, y(0)
 			, z(0)
 		{}
-		~F16Fuel_Tank() {}
+		~F16FuelTank() {}
 
 		// add what is possible, return remaining if full
 		double addFuel(const double addition)
@@ -72,6 +95,8 @@ namespace F16
 		}
 	};
 
+	// TODO: fuel transfer between internal tanks etc.
+
 	class F16FuelSystem
 	{
 	protected:
@@ -80,30 +105,37 @@ namespace F16
 		double previous_usage;
 
 		// Internal fuel as calculated by the EFM fuel system modeling
-		F16Fuel_Tank FwdFus1; // foward fuselage 1
-		F16Fuel_Tank FwdFus2; // forward fuselage 2
-		F16Fuel_Tank AftFus1; // aft fuselage
-		F16Fuel_Tank LeftWing; // wing internal
-		F16Fuel_Tank RightWing; // wing internal
+		//F16FuelTank FwdFus1; // foward fuselage 1
+		//F16FuelTank FwdFus2; // forward fuselage 2
+		//F16FuelTank FwdRes; // forward reservoir
+		//F16FuelTank AftFus1; // aft fuselage
+		//F16FuelTank AftRes; // aft reservoir
+
+		F16FuelTank FwdFus; // forward combined
+		F16FuelTank AftFus; // aft combined
+
+		F16FuelTank LeftWing; // wing internal
+		F16FuelTank RightWing; // wing internal
 
 		// externals: one per wing plus centerline (if equipped)
-		F16Fuel_Tank ext_Center;
-		F16Fuel_Tank ext_LWing;
-		F16Fuel_Tank ext_RWing;
+		F16FuelTank ext_Center;
+		F16FuelTank ext_LWing;
+		F16FuelTank ext_RWing;
 
 	public:
-		// TODO: check units
+		// TODO: check units !! (pounds)
+		// 0.45359237 (1/2.2046)
+
 		F16FuelSystem() 
 			: is_unlimited_fuel(false)
 			, previous_usage(0)
-			, FwdFus1(3100)
-			, FwdFus2(3100)
-			, AftFus1(2800)
-			, LeftWing(525)
-			, RightWing(525)
-			, ext_Center(1800)
-			, ext_LWing(2300)
-			, ext_RWing(2300)
+			, FwdFus(3100 / 2.2046) // lb to kg
+			, AftFus(2800 / 2.2046) 
+			, LeftWing(525 / 2.2046)
+			, RightWing(525 / 2.2046)
+			, ext_Center(1800 / 2.2046)
+			, ext_LWing(2300 / 2.2046)
+			, ext_RWing(2300 / 2.2046)
 		{}
 		~F16FuelSystem() {}
 
@@ -112,6 +144,7 @@ namespace F16
 		// we need amount of fuel in each tank and position
 		double getFuelMass()
 		{
+			// JP8 weight 6.65lbs/gal ?
 			//return getInternalFuel() * weightconstant;
 			return 0;
 		}
@@ -128,23 +161,23 @@ namespace F16
 			return false;
 		}
 
-		// TODO: check units
 		// called on initialization and on refueling
-		void setInternalFuel(const double fuel)
+		void setInternalFuel(const double fuel) // <- in kg
 		{
 			// distribute fuel to each tank for weight balance
 			double addition = fuel;
 
-			addition = AftFus1.addFuel(addition);
-			addition = FwdFus2.addFuel(addition);
-			addition = FwdFus1.addFuel(addition);
+			// TODO: transfer of fuel
+
+			addition = AftFus.addFuel(addition);
+			addition = FwdFus.addFuel(addition);
 
 			addition = LeftWing.addFuel(addition);
 			addition = RightWing.addFuel(addition);
 		}
 		double getInternalFuel() const
 		{
-			return (FwdFus1.fuel + FwdFus2.fuel + AftFus1.fuel + LeftWing.fuel + RightWing.fuel);
+			return (FwdFus.fuel + AftFus.fuel + LeftWing.fuel + RightWing.fuel);
 		}
 
 		// not ready yet
@@ -157,15 +190,18 @@ namespace F16
 			return 0;
 		}
 
-		// TODO: check units
-		void refuelAdd(const double fuel)
+		void refuelAdd(const double fuel) // <- in kg
 		{
+			// TODO: transfer of fuel
+
 			// aerial refuel support: add given amount of fuel
 			setInternalFuel(fuel);
 		}
 
 		void dumpFuel(const double frameTime)
 		{
+			// TODO: transfer of fuel
+
 			// amount of fuel dumped from tanks within frame,
 			// decrement from tanks
 		}
@@ -184,7 +220,6 @@ namespace F16
 			previous_usage = 0;
 		}
 
-		// TODO: check units
 		void updateFrame(const double fuelPerFrame, const double frameTime)
 		{
 			// TODO: decrement from tanks by order of usage
@@ -203,12 +238,21 @@ namespace F16
 
 			double fueltmp = fuelPerFrame;
 
+			// TODO: transfer of fuel between tanks
+
 			fueltmp = RightWing.decFuel(fueltmp);
 			fueltmp = LeftWing.decFuel(fueltmp);
 
-			fueltmp = FwdFus1.decFuel(fueltmp);
-			fueltmp = FwdFus2.decFuel(fueltmp);
-			fueltmp = AftFus1.decFuel(fueltmp);
+			fueltmp = FwdFus.decFuel(fueltmp);
+			fueltmp = AftFus.decFuel(fueltmp);
+		}
+
+		// internal fuel transfer
+		void transferFuel()
+		{
+			// transfer from external tanks to wings and fuselage tanks when consuming
+
+			// transfer from wings to fuselage tanks when consuming
 		}
 	};
 }

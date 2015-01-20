@@ -3,6 +3,49 @@
 
 #include "../stdafx.h"
 
+/*
+		engine = 
+		{
+			Nmg	=	62, -- RPM at idle
+			MinRUD	=	0, -- Min state of the throttle
+			MaxRUD	=	1, -- Max state of the throttle
+			MaksRUD	=	0.85, -- Military power state of the throttle
+			ForsRUD	=	0.91, -- Afterburner state of the throttle
+			typeng	=	E_TURBOJET_AB,
+			
+			hMaxEng	=	19, -- Max altitude for safe engine operation in km
+			dcx_eng	=	0.0124, -- Engine drag coeficient
+			cemax	=	1.24, -- not used for fuel calulation , only for AI routines to check flight time ( fuel calculation algorithm is built in )
+			cefor	=	2.56, -- not used for fuel calulation , only for AI routines to check flight time ( fuel calculation algorithm is built in )
+			dpdh_m	=	2000, --  altitude coefficient for max thrust
+			dpdh_f	=	4200,  --  altitude coefficient for AB thrust
+
+			-- M - Mach number
+			-- Pmax - Engine thrust at military power
+			-- Pfor - Engine thrust at AFB
+			table_data = 
+			{		--   M		Pmax		 Pfor	
+				[1] = 	{0,	88000,	141000},
+				[2] = 	{0.2,	80000,	143000},
+				[3] = 	{0.4,	79000,	150000},
+				[4] = 	{0.6,	82000,	165000},
+				[5] = 	{0.7,	90000,	177000},
+				[6] = 	{0.8,	94000,	193000},
+				[7] = 	{0.9,	96000,	200000},
+				[8] = 	{1,	100000,	205000},
+				[9] = 	{1.1,	100000,	214000},
+				[10] = 	{1.2,	98000,	222000},
+				[11] = 	{1.3,	100000,	235000},
+				[12] = 	{1.5,	98000,	258000},
+				[13] = 	{1.8,	94000,	276000},
+				[14] = 	{2,	88000,	283000},
+				[15] = 	{2.2,	82000,	285000},
+				[16] = 	{2.5,	80000,	287000},
+				[17] = 	{3.9,	50000,	200000},
+			}, -- end of table_data
+		}, -- end of engine
+*/
+
 namespace F16
 {
 	// Engine: Pratt & Whitney F100-PW-129 or General Electric F110-GE-129
@@ -10,7 +53,6 @@ namespace F16
 	// -> adapt to support either one?
 	// Turbine inlet temperature: 1,350 °C (2,460 °F)
 
-	// Coded from the simulator study document
 	class F16Engine
 	{
 	protected:
@@ -145,6 +187,17 @@ namespace F16
 			fuelPerFrame = 0;
 		}
 
+		double getLowPressureBleedAir() const
+		{
+			// just a function of engine RPM?
+			return 0;
+		}
+		double getHighPressureBleedAir() const
+		{
+			// just a function of engine RPM?
+			return 0;
+		}
+
 		// fuel use per frame in current conditions
 		double getFuelPerFrame() const
 		{
@@ -158,6 +211,7 @@ namespace F16
 		void updateFrame(const double mach, double alt, double frameTime);
 	};
 
+	// Coded from the simulator study document
 	void F16Engine::updateFrame(const double mach, double alt, double frameTime)
 	{
 		/*
@@ -278,6 +332,16 @@ namespace F16
 		//fuelPerFrame =  10 * throttleInput * frameTime; //10 kg persecond
 		fuelPerFrame =  10 * frameTime; //10 kg persecond
 	}
+
+	/*
+	A table I read said that the F-16 C expended 415 kg of fuel per minute at mach .5 at sea level, 
+	310 kg/min at mach .8 at 15,000 feet, 
+	and was at peak fuel efficiency of 260 kg/min at mach 1.4 at 36,000 feet
+
+	//if (afterburner -> 23 gallons per minute?
+
+	-> speed, altitude, throttle -> fuel usage?
+	*/
 }
 
 #endif // ifndef _F16ENGINE_H_

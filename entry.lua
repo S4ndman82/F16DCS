@@ -4,7 +4,7 @@ declare_plugin(self_ID,
 {
 installed 	 = true, -- if false that will be place holder , or advertising
 dirName	  	 = current_mod_path,
-version		 = "1.2.14-141231",		 
+version		 = "1.2.14-150110",		 
 state		 = "installed",
 info		 = _("F-16 Technology Demonstration.  High Fidelity Flight Dynamics Model"),
 binaries	= { 'F_16Demo', },  -- The DLL of the external flight model 
@@ -253,9 +253,10 @@ local FM =
 }
 
 --make_flyable(obj_name,optional_cockpit path,optional_fm = {mod_of_fm_origin,dll_with_fm})
---current_mod_path..'/Cockpit/Scripts/'
-----local support_cockpit = current_mod_path..'/Cockpit/'
-make_flyable('F-16Demo', nil, FM, nil)
+--make_flyable('F-16Demo', nil, FM, nil)
+local support_cockpit = current_mod_path..'/Cockpit/'
+make_flyable('F-16Demo', support_cockpit, FM, nil)
+
 ----------------------------------------------------------------------------------------
 
 plugin_done()-- finish declaration , clear temporal data

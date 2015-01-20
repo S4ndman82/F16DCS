@@ -9,6 +9,8 @@ namespace F16
 	// oxygen tanks
 	// valve open/not
 
+	// 5-liter liquid oxygen -> diluter (0..100 percent O2)
+
 	class F16Oxygen
 	{
 	protected:

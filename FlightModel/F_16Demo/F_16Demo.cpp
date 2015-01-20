@@ -82,17 +82,19 @@
 #include "Inputs/F16Inputs.h"			// just list of inputs: can get potentially long list
 
 // Model headers
-#include "Actuators/F16Actuators.h"				//Actuators model functions
+#include "Hydraulics/F16HydraulicSystem.h"
 #include "Atmosphere/F16Atmosphere.h"			//Atmosphere model functions
 #include "Aerodynamics/F16Aero.h"				//Aerodynamic model functions
 #include "FlightControls/F16FlightControls.h"	//Flight Controls model functions
+#include "Engine/F16JFS.h"						//APU
 #include "Engine/F16Engine.h"					//Engine model functions
 #include "Engine/F16FuelSystem.h"				//Fuel usage and tank usage functions
 #include "LandingGear/F16LandingGear.h"			//Landing gear actuators, aerodynamic drag, wheelbrake function
 #include "Airframe/F16Airframe.h"				//Canopy, dragging chute, refuel slot, section damages..
-#include "Electrics/F16ElectricBus.h"			//Generators, battery etc.
-#include "PilotSupport/F16Oxygen.h"				//Oxygen system
+#include "Electrics/F16ElectricSystem.h"		//Generators, battery etc.
+#include "EnvironmentalSystem/F16OxygenSystem.h"	//Oxygen system, heating/cooling
 
+// physics integration
 #include "EquationsOfMotion/F16EquationsOfMotion.h"
 
 wchar_t dbgmsg[255] = {0};
@@ -131,15 +133,16 @@ namespace F16
 
 	F16Atmosphere Atmos;
 	F16Aero Aero;
+	F16JFS Apu;
 	F16Engine Engine;
-	F16Actuators Actuators;
+	F16HydraulicSystem Hydraulics; 
 	F16FlightControls FlightControls;
 	F16FuelSystem Fuel;
 	F16LandingGear LandingGear;
 	F16Airframe Airframe;
 	F16Motion Motion;
-	F16ElectricBus Electrics;
-	F16Oxygen Oxygen;
+	F16ElectricSystem Electrics;
+	F16OxygenSystem Oxygen;
 }
 
 // This is where the simulation send the accumulated forces to the DCS Simulation
@@ -229,7 +232,11 @@ void ed_fm_simulate(double dt)
 	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), dt);
 
 	// update oxygen provided to pilot: tanks, bleed air from engine etc.
-	F16::Oxygen.updateFrame(dt);
+	F16::Oxygen.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.altitude_FT, dt);
+
+	// use RPM for now 
+	// TODO: switch to torque if/when necessary/available
+	F16::Hydraulics.updateFrame(F16::Engine.getEngineRpm(), dt);
 
 	F16::Electrics.updateFrame(dt);
 	F16::Airframe.updateFrame(dt);
@@ -273,14 +280,17 @@ void ed_fm_simulate(double dt)
 	F16::rudder_PCT = F16::rudder_DEG / 30.0;
 	F16::flap_PCT = F16::flap_DEG / 20.0;
 
-	F16::LandingGear.updateFrame(F16::Motion.getWeightN(), dt);
+	// TODO:! give ground speed to calculate wheel slip/grip!
+	// we use total velocity for now..
+	F16::LandingGear.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Motion.getWeightN(), dt);
 
 	F16::Aero.updateFrame(F16::alpha_DEG, F16::beta_DEG, F16::elevator_DEG, dt);
 	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
 		F16::flap_PCT, F16::leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
 		F16::pitchRate_RPS, F16::rollRate_RPS, F16::yawRate_RPS, 
 		F16::alpha_DEG, F16::beta_DEG, 
-		F16::LandingGear.CxGearAero, F16::LandingGear.CzGearAero);
+		F16::LandingGear.CxGearAero, 
+		F16::LandingGear.CzGearAero);
 
 	//----------------------------------------------------------------
 	// All prior forces calculated in lbs, needs to be converted
@@ -298,17 +308,29 @@ void ed_fm_simulate(double dt)
 	// TODO: weight-on-wheels detection does not work currently, need to figure out landing gears properly..
 	if (F16::LandingGear.isWoW() == true)
 	{
+		// TODO: this is not working correctly at the moment, disabled for now
+		/*
 		F16::Motion.updateWheelForces(F16::LandingGear.wheelLeft.CxWheelFriction,
 									F16::LandingGear.wheelLeft.CyWheelFriction,
 									F16::LandingGear.wheelRight.CxWheelFriction,
 									F16::LandingGear.wheelRight.CyWheelFriction,
 									F16::LandingGear.wheelNose.CxWheelFriction,
 									F16::LandingGear.wheelNose.CyWheelFriction);
+									*/
+		// use free-rolling friction as single unit for now
+		// TODO: nose-wheel steering, braking forces etc.
+		F16::Motion.updateNoseWheelTurn(F16::LandingGear.getNoseTurnDirection(), F16::LandingGear.getNosegearAngle());
+
+		// combined rolling friction currently, not per-wheel as it should perhaps..
+		F16::Motion.updateRollingFriction(F16::LandingGear.CxRollingFriction, F16::LandingGear.CyRollingFriction);
+
+		// just braking force, needs refining
+		F16::Motion.updateBrakingFriction(F16::LandingGear.wheelLeft.brakeForce, F16::LandingGear.wheelRight.brakeForce);
 	}
 
 	// Tell the simulation that it has gone through the first frame
 	//F16::simInitialized = true;
-	F16::Actuators.simInitialized = true;
+	//F16::Actuators.simInitialized = true;
 	F16::FlightControls.simInitialized = true;
 
 	/*
@@ -318,7 +340,6 @@ void ed_fm_simulate(double dt)
 		F16::weight_on_wheels = true;
 	}
 	*/
-	
 }
 
 /*
@@ -333,6 +354,13 @@ void ed_fm_set_surface (double		h,//surface height under the center of aircraft
 						double		normal_z//components of normal vector to surface
 						)
 {
+	// TODO: check height, set for ground effect simulation?
+	// also if weight on wheels?
+	if (F16::wingSpan_FT >= (F16::meterToFoot*h) && F16::LandingGear.isWoW() == false)
+	{
+		// in ground effect with the surface?
+		// flying above ground, no weight on wheels?
+	}
 }
 
 void ed_fm_set_atmosphere(	double h,//altitude above sea level			(meters)
@@ -387,8 +415,6 @@ void ed_fm_set_current_state (double ax,//linear acceleration component in world
 							)
 {
 	F16::ay_world = ay;
-
-	// if in air, set engine running here?
 }
 
 void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration component in body coordinate system (meters/sec^2)
@@ -411,7 +437,7 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 										double roll, //radians (rad/sec)
 										double common_angle_of_attack, //AoA  (rad)
 										double common_angle_of_slide   //AoS  (rad)
-	)
+										)
 {
 	F16::Atmos.setAirspeed(vx, vy, vz, wind_vx, wind_vy, wind_vz);
 
@@ -426,8 +452,6 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 
 	F16::accz = ay;
 	F16::accy = az;
-
-	// if in air, set engine running here?
 }
 
 // list of input enums kept in separate header for easier documenting..
@@ -454,9 +478,10 @@ void ed_fm_set_command(int command, float value)
 	case JoystickYaw:
 		{
 			F16::FlightControls.pedInputRaw = value;
-			double limited = limit(-value, -1.0, 1.0);
-			F16::FlightControls.setPedInput(limited);
-			F16::LandingGear.nosewheelTurn(limited); // <- does nothing if not enabled or no weight on wheels
+			F16::FlightControls.setPedInput(limit(-value, -1.0, 1.0));
+
+			// use raw input for nosewheel now
+			F16::LandingGear.nosewheelTurn(value); // <- does nothing if not enabled or no weight on wheels
 		}
 		break;
 
@@ -468,16 +493,27 @@ void ed_fm_set_command(int command, float value)
 		break;
 
 		/*
+	case ApuStart:
+		F16::Apu.start();
+		break;
+	case ApuStop:
+		F16::Apu.stop();
+		break;
+		*/
+
+		/*
 	case EnginesStart:
 		F16::Engine.startEngine();
 		break;
 	case EnginesStop:
 		F16::Engine.stopEngine();
 		break;
+		*/
+
 	case PowerOnOff:
 		// electric system
+		F16::Electrics.toggleElectrics();
 		break;
-		*/
 
 	case AirBrake:
 		F16::FlightControls.switchAirbrake();
@@ -497,14 +533,14 @@ void ed_fm_set_command(int command, float value)
 
 		// analog input (axis)
 	case WheelBrake:
-		F16::LandingGear.setWheelBrakeLeft(limit(value, -1.0, 1.0));
-		F16::LandingGear.setWheelBrakeRight(limit(value, -1.0, 1.0));
+		F16::LandingGear.setWheelBrakeLeft(limit(value, 0, 1.0));
+		F16::LandingGear.setWheelBrakeRight(limit(value, 0, 1.0));
 		break;
 	case WheelBrakeLeft:
-		F16::LandingGear.setWheelBrakeLeft(limit(value, -1.0, 1.0));
+		F16::LandingGear.setWheelBrakeLeft(limit(value, 0, 1.0));
 		break;
 	case WheelBrakeRight:
-		F16::LandingGear.setWheelBrakeRight(limit(value, -1.0, 1.0));
+		F16::LandingGear.setWheelBrakeRight(limit(value, 0, 1.0));
 		break;
 
 		// switch/button input
@@ -517,18 +553,21 @@ void ed_fm_set_command(int command, float value)
 
 	case Gear:
 		F16::LandingGear.switchGearUpDown();
+		// also switch trailing-edge flaps position
 
 		swprintf(dbgmsg, 255, L" F16::Gear: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
 		break;
 	case LandingGearUp:
 		F16::LandingGear.setGearUp();
+		// also switch trailing-edge flaps position
 
 		swprintf(dbgmsg, 255, L" F16::GearUp: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
 		break;
 	case LandingGearDown:
 		F16::LandingGear.setGearDown();
+		// also switch trailing-edge flaps position
 
 		swprintf(dbgmsg, 255, L" F16::GearDown: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
@@ -626,6 +665,11 @@ bool ed_fm_change_mass(double & delta_mass,
 */
 void ed_fm_set_internal_fuel(double fuel)
 {
+	/*
+	swprintf(dbgmsg, 255, L" F16::set internal fuel: %f \r\n", fuel);
+	::OutputDebugString(dbgmsg);
+	*/
+
 	F16::Fuel.setInternalFuel(fuel);
 }
 
@@ -646,6 +690,11 @@ void ed_fm_set_external_fuel(int station,
 								double y,
 								double z)
 {
+	/*
+	swprintf(dbgmsg, 255, L" F16::set external fuel: %f station: %d \r\n", fuel, station);
+	::OutputDebugString(dbgmsg);
+	*/
+
 	F16::Fuel.setExternalFuel(station, fuel, x, y, z);
 }
 
@@ -662,6 +711,11 @@ double ed_fm_get_external_fuel ()
 */
 void ed_fm_refueling_add_fuel(double fuel)
 {
+	/*
+	swprintf(dbgmsg, 255, L" F16::add fuel: %f \r\n", fuel);
+	::OutputDebugString(dbgmsg);
+	*/
+
 	return F16::Fuel.refuelAdd(fuel);
 }
 
@@ -675,7 +729,8 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[1].f = (float)F16::LandingGear.wheelNose.getStrutCompression(); // strut compression {0=extended;0.5=parking;1=retracted}
 
 	//Nose Gear Steering
-	drawargs[2].f = (float)F16::LandingGear.getNosegearTurn(); // nose gear turn angle {-1=CW max;1=CCW max}
+	// note: not active animation on the 3D model right now
+	drawargs[2].f = F16::LandingGear.getNosegearTurn(); // nose gear turn angle {-1=CW max;1=CCW max}
 
 	// right gear
 	drawargs[3].f = (float)F16::LandingGear.getRightGearDown(); // gear angle {0;1}
@@ -685,14 +740,14 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[5].f = (float)F16::LandingGear.getLeftGearDown(); // gear angle {0;1}
 	drawargs[6].f = (float)F16::LandingGear.wheelLeft.getStrutCompression(); // strut compression {0;0.5;1}
 
-	drawargs[9].f = (float)F16::flap_PCT; // right flap
-	drawargs[10].f = (float)F16::flap_PCT; // left flap
+	drawargs[9].f = (float)F16::flap_PCT; // right flap (trailing edge surface)
+	drawargs[10].f = (float)F16::flap_PCT; // left flap (trailing edge surface)
 
-	drawargs[11].f = (float)-F16::aileron_PCT; // right aileron
-	drawargs[12].f = (float) F16::aileron_PCT; // left aileron
+	drawargs[11].f = (float)-F16::aileron_PCT; // right aileron (trailing edge surface) (in 3D model anim also on elevator)
+	drawargs[12].f = (float) F16::aileron_PCT; // left aileron (trailing edge surface) (in 3D model anim also on elevator)
 
-	drawargs[13].f   = (float)F16::leadingEdgeFlap_PCT; // right slat
-	drawargs[14].f   = (float)F16::leadingEdgeFlap_PCT; // left slat
+	drawargs[13].f = (float)F16::leadingEdgeFlap_PCT; // right slat (leading edge)
+	drawargs[14].f = (float)F16::leadingEdgeFlap_PCT; // left slat (leading edge)
 
 	drawargs[15].f = (float)-F16::elevator_PCT; // right elevator
 	drawargs[16].f = (float)-F16::elevator_PCT; // left elevator
@@ -702,23 +757,43 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 
 	//drawargs[22].f // refueling door (not implemented)
 
-	drawargs[28].f   = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner right engine
-	drawargs[29].f   = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner left engine
+	drawargs[28].f = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner right engine
+	drawargs[29].f = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner left engine
 
 	drawargs[38].f = (float)F16::Airframe.getCanopyAngle(); // draw angle of canopy {0=closed;0.9=elevated;1=no draw}
 
+	//drawargs[50].f // ejecting seat
 
 	//drawargs[182].f // right-side brake flaps 0..1
 	//drawargs[186].f // left-side brake flaps 0..1
 	drawargs[182].f = F16::FlightControls.getAirbrake();
 	drawargs[186].f = F16::FlightControls.getAirbrake();
 
-	//drawargs[49].f // nav lights
-	//drawargs[51].f // landing lights
+	// navigation lights
+	drawargs[49].f = F16::Airframe.isNavigationLight();
+
+	// formation lights
+	drawargs[88].f = F16::Airframe.isFormationLight();
+
+	// landing lights
+	drawargs[51].f = F16::Airframe.isLandingLight();
+
+	// strobe lights
+	drawargs[83].f = F16::Airframe.isStrobeLight();
+
+	// note: current 3D model has three "lamps" implemented:
+	// 190 left
+	// 196 right
+	// 203 tail (back)
+	drawargs[190].f = F16::Airframe.getLeftLight();
+	drawargs[196].f = F16::Airframe.getRightLight();
+	drawargs[203].f = F16::Airframe.getBackLight();
 
 	//drawargs[190..199].f // nav light #1..10
 	//drawargs[200..207].f // formation light #1..8
 	//drawargs[208..212].f // landing lamp #1..5
+
+	//drawargs[336].f // cap of brake parachute (not implemented)
 
 	/*
 	// !! template has this addition, what are those values really for?
@@ -753,48 +828,9 @@ void ed_fm_set_fc3_cockpit_draw_args (EdDrawArgument * drawargs,size_t size)
 		StickBank.controller			= controllers.base_gauge_StickRollPosition
 	*/
 	// yay! this seems to work ok!
+	// TODO: movement is really small in real-life -> limit movements (1/4 inches both axes)
 	drawargs[2].f = (float)F16::FlightControls.longStickInputRaw;
 	drawargs[3].f = (float)F16::FlightControls.latStickInputRaw;
-
-	/*
-		Engine_TEMP.arg_number				= 51
-		Engine_TEMP.input					= {300, 900} 
-		Engine_TEMP.output					= {0.0, 1.00}
-		Engine_TEMP.controller				= controllers.base_gauge_EngineLeftTemperatureBeforeTurbine
-	*/
-	/* does not exist in the 3d model currently?
-	if (size > 51)
-	{
-		drawargs[51].f = (float)F16::Engine.getEngineTemperature();
-	}
-	*/
-
-	/*
-		Engine_RPM.arg_number				= 50
-		Engine_RPM.input					= {0.0, 110.0} 
-		Engine_RPM.output					= {0.0, 1.0}
-		Engine_RPM.controller				= controllers.base_gauge_EngineLeftRPM
-	*/
-	/* does not work
-	if (size > 50)
-	{
-		drawargs[50].f = (float)limit(F16::Engine.getEngineRelatedRpm(), 0, 100);
-	}
-	*/
-
-	/*
-		IndicatedAirSpeed.arg_number				= 100
-		IndicatedAirSpeed.input						= {0.0, 600}  --m/s
-		IndicatedAirSpeed.output					= {0.0, 1.0}
-		IndicatedAirSpeed.controller				= controllers.base_gauge_IndicatedAirSpeed
-	*/
-	/* does not work
-	if (size > 100)
-	{
-		// now gives value in ft/s, not m/s but enough to test..
-		drawargs[100].f = (float)limit(F16::Atmos.totalVelocity_FPS, 0, 600);
-	}
-	*/
 
 }
 
@@ -829,19 +865,23 @@ double ed_fm_get_param(unsigned param_enum)
 	{
 		// APU parameters at engine index 0
 	case ED_FM_ENGINE_0_RPM:
+		return F16::Apu.getRpm();
 	case ED_FM_ENGINE_0_RELATED_RPM:
+		return F16::Apu.getRelatedRpm();
 	case ED_FM_ENGINE_0_CORE_RPM:
 	case ED_FM_ENGINE_0_CORE_RELATED_RPM:
 	case ED_FM_ENGINE_0_THRUST:
 	case ED_FM_ENGINE_0_RELATED_THRUST:
 	case ED_FM_ENGINE_0_CORE_THRUST:
 	case ED_FM_ENGINE_0_CORE_RELATED_THRUST:
+		// not implemented now
 		return 0;
 	case ED_FM_ENGINE_0_TEMPERATURE:
+		return F16::Apu.getTemperature();
 	case ED_FM_ENGINE_0_OIL_PRESSURE:
+		return F16::Apu.getOilPressure();
 	case ED_FM_ENGINE_0_FUEL_FLOW:
-		// add these for APU ?
-		return 0;
+		return F16::Apu.getFuelFlow();
 
 	case ED_FM_ENGINE_1_RPM:
 		return F16::Engine.getEngineRpm();
@@ -869,7 +909,7 @@ double ed_fm_get_param(unsigned param_enum)
 	case ED_FM_SUSPENSION_0_RELATIVE_BRAKE_MOMENT:
 	case ED_FM_SUSPENSION_0_UP_LOCK:
 	case ED_FM_SUSPENSION_0_DOWN_LOCK:
-	case ED_FM_SUSPENSION_0_WHEEL_YAW:
+	case ED_FM_SUSPENSION_0_WHEEL_YAW: // steering angle? or strut sideways movement?
 	case ED_FM_SUSPENSION_0_WHEEL_SELF_ATTITUDE:
 		return 0;
 
@@ -1088,22 +1128,32 @@ void ed_fm_on_planned_failure(const char * data)
 // callback when damage occurs for airframe element 
 void ed_fm_on_damage(int Element, double element_integrity_factor)
 {
+	/*
+	TODO: check what is needed to get these
+	swprintf(dbgmsg, 255, L" F16::Damage: element: %d factor: %f \r\n", Element, element_integrity_factor);
+	::OutputDebugString(dbgmsg);
+	*/
+
+	// keep integrity information in airframe
+	F16::Airframe.onAirframeDamage(Element, element_integrity_factor);
 }
 
 // called in case of repair routine 
 void ed_fm_repair()
 {
+	F16::Airframe.onRepair();
 }
 
 // in case of some internal damages or system failures this function return true , to switch on repair process
 bool ed_fm_need_to_be_repaired()
 {
-	return false;
+	return F16::Airframe.isRepairNeeded();
 }
 
 // inform about  invulnerability settings
 void ed_fm_set_immortal(bool value)
 {
+	F16::Airframe.setImmortal(value);
 }
 
 // inform about  unlimited fuel
@@ -1120,11 +1170,21 @@ void ed_fm_set_easy_flight(bool value)
 // custom properties sheet 
 void ed_fm_set_property_numeric(const char * property_name,float value)
 {
+	/*
+	// TODO: do we set these somewhere in lua?
+	swprintf(dbgmsg, 255, L" F16::property numeric: %s value: %f \r\n", property_name, value);
+	::OutputDebugString(dbgmsg);
+	*/
 }
 
 // custom properties sheet 
 void ed_fm_set_property_string(const char * property_name,const char * value)
 {
+	/*
+	// TODO: do we set these somewhere in lua?
+	swprintf(dbgmsg, 255, L" F16::property string: %s value: %s \r\n", property_name, value);
+	::OutputDebugString(dbgmsg);
+	*/
 }
 
 /*
@@ -1164,14 +1224,23 @@ void ed_fm_suspension_feedback(int idx,const ed_fm_suspension_info * info)
 	switch (idx)
 	{
 	case 0:
+		F16::LandingGear.wheelNose.setActingForce(info->acting_force[0], info->acting_force[1], info->acting_force[2]);
+		F16::LandingGear.wheelNose.setActingForcePoint(info->acting_force_point[0], info->acting_force_point[1], info->acting_force_point[2]);
+		F16::LandingGear.wheelNose.setIntegrityFactor(info->integrity_factor);
 		// 0.231
 		F16::LandingGear.wheelNose.setStrutCompression(info->struct_compression);
 		break;
 	case 1:
+		F16::LandingGear.wheelRight.setActingForce(info->acting_force[0], info->acting_force[1], info->acting_force[2]);
+		F16::LandingGear.wheelRight.setActingForcePoint(info->acting_force_point[0], info->acting_force_point[1], info->acting_force_point[2]);
+		F16::LandingGear.wheelRight.setIntegrityFactor(info->integrity_factor);
 		// 0.750
 		F16::LandingGear.wheelRight.setStrutCompression(info->struct_compression);
 		break;
 	case 2:
+		F16::LandingGear.wheelLeft.setActingForce(info->acting_force[0], info->acting_force[1], info->acting_force[2]);
+		F16::LandingGear.wheelLeft.setActingForcePoint(info->acting_force_point[0], info->acting_force_point[1], info->acting_force_point[2]);
+		F16::LandingGear.wheelLeft.setIntegrityFactor(info->integrity_factor);
 		// 0.750
 		F16::LandingGear.wheelLeft.setStrutCompression(info->struct_compression);
 		break;

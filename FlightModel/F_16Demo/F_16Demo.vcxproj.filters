@@ -16,9 +16,6 @@
     <ClInclude Include="Aerodynamics\F16AeroData.h">
       <Filter>Aerodynamics</Filter>
     </ClInclude>
-    <ClInclude Include="Actuators\F16Actuators.h">
-      <Filter>Actuators</Filter>
-    </ClInclude>
     <ClInclude Include="EquationsOfMotion\F16EquationsOfMotion.h">
       <Filter>EquationsOfMotion</Filter>
     </ClInclude>
@@ -37,17 +34,11 @@
     <ClInclude Include="LandingGear\F16LandingGear.h">
       <Filter>LandingGear</Filter>
     </ClInclude>
-    <ClInclude Include="WeightBalanceInertia\F16WeightBalanceInertia.h">
-      <Filter>WeightBalanceInertia</Filter>
-    </ClInclude>
     <ClInclude Include="include\ED_FM_Utility.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\FM\wHumanCustomPhysicsAPI.h">
       <Filter>include\FM</Filter>
-    </ClInclude>
-    <ClInclude Include="PilotSupport\F16Oxygen.h">
-      <Filter>PilotSupport</Filter>
     </ClInclude>
     <ClInclude Include="Engine\F16FuelSystem.h">
       <Filter>Engine</Filter>
@@ -65,6 +56,57 @@
       <Filter>Airframe</Filter>
     </ClInclude>
     <ClInclude Include="ED_FM_API.h" />
+    <ClInclude Include="Hydraulics\F16HydraulicSystem.h">
+      <Filter>Hydraulics</Filter>
+    </ClInclude>
+    <ClInclude Include="Electrics\F16Battery.h">
+      <Filter>Electrics</Filter>
+    </ClInclude>
+    <ClInclude Include="Hydraulics\F16Actuators.h">
+      <Filter>Hydraulics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\F16EngineManagementSystem.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="LandingGear\F16LandingWheel.h">
+      <Filter>LandingGear</Filter>
+    </ClInclude>
+    <ClInclude Include="Hydraulics\AbstractHydraulicDevice.h">
+      <Filter>Hydraulics</Filter>
+    </ClInclude>
+    <ClInclude Include="Hydraulics\F16HydraulicPump.h">
+      <Filter>Hydraulics</Filter>
+    </ClInclude>
+    <ClInclude Include="Electrics\AbstractElectricDevice.h">
+      <Filter>Electrics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\F16JFS.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Electrics\F16ElectricSystem.h">
+      <Filter>Electrics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\F16BleedAirSystem.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Electrics\F16AcDcConverter.h">
+      <Filter>Electrics</Filter>
+    </ClInclude>
+    <ClInclude Include="Electrics\F16EPU.h">
+      <Filter>Electrics</Filter>
+    </ClInclude>
+    <ClInclude Include="Electrics\F16MainGenerator.h">
+      <Filter>Electrics</Filter>
+    </ClInclude>
+    <ClInclude Include="Electrics\F16PMG.h">
+      <Filter>Electrics</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvironmentalSystem\F16OxygenSystem.h">
+      <Filter>EnvironmentalSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvironmentalSystem\F16AirConditioning.h">
+      <Filter>EnvironmentalSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -72,9 +114,6 @@
   <ItemGroup>
     <Filter Include="Aerodynamics">
       <UniqueIdentifier>{85cac936-532d-42ee-bb93-fa92a9082ee1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Actuators">
-      <UniqueIdentifier>{dafa3bf6-16fb-48d7-ae7b-e1f7cf8938b5}</UniqueIdentifier>
     </Filter>
     <Filter Include="EquationsOfMotion">
       <UniqueIdentifier>{10b1275e-62af-4fa4-a24e-f6622d5e1a71}</UniqueIdentifier>
@@ -97,20 +136,20 @@
     <Filter Include="LandingGear">
       <UniqueIdentifier>{999f06f9-47d0-4ba9-a6f9-1bf8dab1d45e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="WeightBalanceInertia">
-      <UniqueIdentifier>{10c2b0f0-4805-4d39-a45d-9fbda51563a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\FM">
       <UniqueIdentifier>{b32eeedc-a414-4987-8e4b-eb5b5ab2fb46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PilotSupport">
-      <UniqueIdentifier>{29163abe-4f69-45d3-b184-3de938c9e430}</UniqueIdentifier>
     </Filter>
     <Filter Include="Electrics">
       <UniqueIdentifier>{8d2233c9-616b-4f2c-8565-6c5b6a73949d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Airframe">
       <UniqueIdentifier>{8c166f06-b752-4c2f-bc8a-34cd95f66da4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hydraulics">
+      <UniqueIdentifier>{291bd64d-dfda-4d93-bea3-5f26bc7296a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EnvironmentalSystem">
+      <UniqueIdentifier>{29163abe-4f69-45d3-b184-3de938c9e430}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

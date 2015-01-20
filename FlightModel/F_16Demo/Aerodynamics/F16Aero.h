@@ -10,17 +10,17 @@ namespace F16
 	class AERO_Function
 	{
 	public:
-		double **X; // pointers to static arrays of data (X matrix)
-
 		ND_INFO ndinfo; // dimensions descriptor
+
+		double **X; // pointers to static arrays of data (X matrix)
 
 		double *data; // pointer to static array of related data (Y)
 
 		UtilBuffer buf; // reusable buffer to reduce malloc()/free()
 
 		AERO_Function()
-			: X(NULL)
-			, ndinfo()
+			: ndinfo()
+			, X(NULL)
 			, data(NULL)
 			, buf()
 		{
@@ -29,6 +29,11 @@ namespace F16
 
 		~AERO_Function()
 		{
+			if (ndinfo.nPoints != NULL)
+			{
+				free(ndinfo.nPoints);
+				ndinfo.nPoints = NULL;
+			}
 			if (X != NULL)
 			{
 				free(X);
@@ -39,7 +44,7 @@ namespace F16
 		void init(const int nDimension)
 		{
 			ndinfo.nDimension = nDimension;
-			ndinfo.nPoints = intVector(ndinfo.nDimension);
+			ndinfo.nPoints = (int*)malloc(ndinfo.nDimension*sizeof(int));
 			X = (double **) malloc(ndinfo.nDimension*sizeof(double*));
 
 			int nVertices = (1<<nDimension);

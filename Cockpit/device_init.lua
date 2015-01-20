@@ -30,13 +30,14 @@ MainPanel = {"ccMainPanel",LockOn_Options.script_path.."mainpanel_init.lua"}
 --						  <{{"NAME_OF_INDICATOR_CLASS", "INDICATOR_SCRIPT_FILE"}, ...}>
 --						 }
 creators    = {}
-creators[devices.TEST]			 = {"avLuaDevice"		    ,LockOn_Options.script_path.."test_device.lua"}
+creators[devices.TEST]			 = {"avLuaDevice"		    ,LockOn_Options.script_path.."Systems/test_device.lua"}
 creators[devices.WEAPON_SYSTEM]	 = {"avSimpleWeaponSystem"  ,LockOn_Options.script_path.."Systems/weapon_system.lua"}
-creators[devices.CLOCK]			 = {"avAChS_1"			    ,LockOn_Options.script_path.."clock.lua"}
-creators[devices.ADI]			 = {"avBaseIKP"			    ,LockOn_Options.script_path.."adi.lua"}
 creators[devices.ELECTRIC_SYSTEM]= {"avSimpleElectricSystem",LockOn_Options.script_path.."Systems/electric_system.lua"}
-creators[devices.RADAR]			 = {"avSimpleRadar"			,LockOn_Options.script_path.."RADAR/Device/init.lua"}
-creators[devices.LANDING_GEAR]	 = {"avLuaDevice"			,LockOn_Options.script_path.."Systems/landing_gear_system.lua"}
+--creators[devices.CLOCK]			 = {"avAChS_1"			    ,LockOn_Options.script_path.."clock.lua"}
+--creators[devices.ADI]			 = {"avBaseIKP"			    ,LockOn_Options.script_path.."adi.lua"}
+--creators[devices.RADAR]			 = {"avSimpleRadar"			,LockOn_Options.script_path.."RADAR/Device/init.lua"}
+--creators[devices.LANDING_GEAR]	 = {"avLuaDevice"			,LockOn_Options.script_path.."Systems/landing_gear_system.lua"}
+
 
 -- Indicators
 indicators = {}
@@ -64,4 +65,3 @@ indicators[#indicators + 1] = {"ccRadarIndicator",LockOn_Options.script_path.."R
   }
 } --RADAR
 --]]
-			 

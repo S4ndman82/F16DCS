@@ -1,5 +1,5 @@
 F-16 High Fidelity Flight Dynamics and Tech/Academic Initial Demonstration
-Build 2014-12-31-k
+Build 2015-01-06-k
 
 Update to: SkateZilla Build (version?)
 Update to: Cpt.Smileys v.3 Build
@@ -35,6 +35,8 @@ Changes since SkateZilla build:
  * TODO: wheel brakes forces, use proper calculation with kinetic energy
 - cockpit stick should move according to pitch/bank input
  * controlled from the DLL, binding in the lua-script to "gauge"
+- early support for nosewheel steering with rudder input
+- early experimental support for differential wheel brakes with toe-brakes
 
 
 Known Issues:

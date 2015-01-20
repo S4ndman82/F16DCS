@@ -1,6 +1,10 @@
 local res = external_profile("Config/Input/Aircrafts/base_joystick_binding.lua")
 join(res.keyCommands,{
 
+-- example
+--{down = 3010, up = 3011, cockpit_device_id = 49, value_down = 1.0,	value_up = -1.0, name = _('Anti-Collision Lights switch'), category = _('Lighting Panel')},
+{down = 3010, up = 3011, value_down = 1.0,	value_up = -1.0, name = _('Anti-Collision Lights switch'), category = _('Lighting Panel')},
+
 -- Autopilot
 {down = iCommandPlaneAutopilot, name = _('Autopilot'), category = _('Autopilot')},
 {down = iCommandPlaneSAUHBarometric, name = _('Autopilot - Barometric Altitude Hold \'H\''), category = _('Autopilot')},
@@ -12,6 +16,22 @@ join(res.keyCommands,{
 {down = iCommandPlaneStabHrad, name = _('Autopilot - Radar Altitude Hold'), category = _('Autopilot')},
 {down = iCommandPlaneRouteAutopilot, name = _('Autopilot - \'Route following\''), category = _('Autopilot')},
 {down = iCommandPlaneStabCancel, name = _('Autopilot Disengage'), category = _('Autopilot')},
+
+-- Engine Control Panel
+{down = iCommandPlane_APU_Start														, name = _('APU Start')							, category = _('Engine Control Panel')},
+{down = iCommandPlane_APU_Off														, name = _('APU Off')								, category = _('Engine Control Panel')},
+{down = iCommandAPUGeneratorPower								, name = _('APU generator power'), category = _('Electrical power control panel')},
+{down = iCommandBatteryPower									, name = _('Battery power'), category = _('Electrical power control panel')},
+--{down = iCommandPowerGeneratorLeft								, name = _('AC generator power left'), category = _('Electrical power control panel')},
+--{down = iCommandPowerGeneratorRight								, name = _('AC generator power right'), category = _('Electrical power control panel')},
+
+--Landing gear panel
+{down = iCommandPlaneGear, 			name = _('Landing Gear Up/Down'), category = _('Landing gear panel')},
+{down = iCommandPlaneGearUp, 		name = _('Landing Gear Up'), category = _('Landing gear panel')},
+{down = iCommandPlaneGearDown, 		name = _('Landing Gear Down'), category = _('Landing gear panel')},
+--{down = iCommandEmergencyGear, 		name = _('Auxiliary gear handle'), category = _('Landing gear panel')},
+--{down = iCommandEmergencyGearCover, name = _('Auxiliary gear handle lock button'), category = _('Landing gear panel')},
+--{down = iCommandPlaneLGPAntiSkid, 								name = _('Anti-Skid ON/OFF'), category = _('Landing gear panel')},
 
 -- Systems
 {down = iCommandPlaneFuelOn, up = iCommandPlaneFuelOff, name = _('Fuel Dump'), category = _('Systems')},

@@ -10,6 +10,16 @@
 
 namespace F16
 {
+	// TODO! real actuator support
+
+	class F16FcsController
+	{
+	public:
+		F16FcsController() {}
+		~F16FcsController() {}
+	};
+
+
 	class F16FlightControls
 	{
 	public:
@@ -294,8 +304,8 @@ namespace F16
 		// Angle of attack limiter logic
 		double angle_of_attack_limiter(double alphaFiltered, double pitchRateCommand)
 		{
-			double topLimit = limit((alphaFiltered - 22.5) * 0.69,0.0,99999.0);
-			double bottomLimit = limit((alphaFiltered - 15.0 + pitchRateCommand) * 0.322,0.0,99999.0);
+			double topLimit = limit((alphaFiltered - 22.5) * 0.69, 0.0, 99999.0);
+			double bottomLimit = limit((alphaFiltered - 15.0 + pitchRateCommand) * 0.322, 0.0, 99999.0);
 
 			return (topLimit + bottomLimit);
 		}

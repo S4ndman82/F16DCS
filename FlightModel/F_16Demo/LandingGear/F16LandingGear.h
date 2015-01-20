@@ -3,6 +3,8 @@
 
 #include "../stdafx.h"
 
+#include "F16LandingWheel.h"
+
 namespace F16
 {
 	// nosewheel steering (NWS) limited to 32 degrees in each direction
@@ -14,92 +16,10 @@ namespace F16
 	// wheelbrake deceleration
 	// parking brake
 
-	class F16WheelFriction
-	{
-	public:
-		const double rolling_friction;			// Rolling friction amount (constant now)
+	// anti-skid system
 
-		double strutCompression;
-
-		double CxWheelFriction;
-		double CyWheelFriction;
-
-		double brakeForce;
-
-		F16WheelFriction() 
-			: rolling_friction(0.03)
-			, strutCompression(0)
-			, CxWheelFriction(0)
-			, CyWheelFriction(0)
-			, brakeForce(0)
-		{}
-		~F16WheelFriction() {}
-
-		// TODO: amount of weight per wheel instead?
-		void wheelFriction(const double weightN, bool weight_on_wheel)
-		{
-			// TODO: if wheel brakes ON -> braking power multiplier
-
-			if (weight_on_wheel)
-			{
-				//CxWheelFriction = -rolling_friction * weightN;
-				CxWheelFriction = rolling_friction * weightN;
-				CyWheelFriction = 0.18 * weightN;
-			}
-			else
-			{
-				CxWheelFriction = 0.0;
-				CyWheelFriction = 0.0;
-			}
-		}
-
-		void wheelBrake(const double weightN, bool weight_on_wheel)
-		{
-			if (weight_on_wheel == false)
-			{
-				return;
-			}
-			if (brakeForce <= 0)
-			{
-				return;
-			}
-
-			// TODO: find out some reasonable values,
-			// do we need to have brake fading support as well?
-			// TODO: also switch calculation to reduction in kinectic energy in motion handling
-
-			double brakeFriction = brakeForce * 10; // guess
-
-			// just add it to rolling friction
-			CxWheelFriction += (rolling_friction * brakeFriction * weightN);
-			//CyWheelFriction = 0.18 * weightN;
-
-		}
-
-		double getStrutCompression() const
-		{
-			return strutCompression;
-		}
-
-		// we might get this directly at initialization so set here
-		void setStrutCompression(const double compression)
-		{
-			strutCompression = compression;
-		}
-
-		void setStrutRetracted()
-		{
-			strutCompression = 1;
-		}
-		void setStrutParking()
-		{
-			strutCompression = 0.5;
-		}
-		void setStrutExtended()
-		{
-			strutCompression = 0;
-		}
-	};
+	// TODO: different friction coefficient on each surface?
+	// (tarmac, concrete, grass, mud...)
 
 	class F16LandingGear
 	{
@@ -109,35 +29,39 @@ namespace F16
 		const double gearYcos = cos(F16::degtorad);
 
 	public:
-		// 
-		double	weight_on_wheels;			// Weight on wheels flag (not used right now)
-
 		double	gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
 
 		bool nosewheelSteering; // is active/not
 		double noseGearTurnAngle; // steering angle {-1=CW max;1=CCW max}
 
+		// aerodynamic drag when gears are not fully up
 		double CDGearAero;
 		double CzGearAero;
 		double CxGearAero;
 
-		F16WheelFriction wheelNose;
-		F16WheelFriction wheelLeft;
-		F16WheelFriction wheelRight;
+		// free-rolling friction of all wheels combined
+		// TODO: need to fix per-wheel friction and nose-wheel steering angle handling
+		double CxRollingFriction;
+		double CyRollingFriction;
+
+		F16LandingWheel wheelNose;
+		F16LandingWheel wheelLeft;
+		F16LandingWheel wheelRight;
 
 		bool parkingBreakOn;
 
 		F16LandingGear() 
-			: weight_on_wheels(0)
-			, gearDownAngle(0)
-			, nosewheelSteering(false)
+			: gearDownAngle(0)
+			, nosewheelSteering(true) // <- enable by default until button mapping works
 			, noseGearTurnAngle(0)
 			, CDGearAero(0)
 			, CzGearAero(0)
 			, CxGearAero(0)
-			, wheelNose()
-			, wheelLeft()
-			, wheelRight()
+			, CxRollingFriction(0)
+			, CyRollingFriction(0)
+			, wheelNose(0.479)
+			, wheelLeft(0.68)
+			, wheelRight(0.68)
 			, parkingBreakOn(false)
 		{
 		}
@@ -145,7 +69,13 @@ namespace F16
 
 		bool isWoW()
 		{
-			return (weight_on_wheels > 0);
+			if (wheelNose.isWoW()
+				|| wheelLeft.isWoW()
+				|| wheelRight.isWoW())
+			{
+				return true;
+			}
+			return false;
 		}
 
 		void setParkingBreak(bool OnOff)
@@ -157,26 +87,26 @@ namespace F16
 		void setWheelBrakeLeft(double value)
 		{
 			// 0..1 from input
-			wheelLeft.brakeForce = value;
+			wheelLeft.brakeInput = value;
 		}
 		// joystick axis
 		void setWheelBrakeRight(double value)
 		{
 			// 0..1 from input
-			wheelRight.brakeForce = value;
+			wheelRight.brakeInput = value;
 		}
 
 		// key press DOWN
 		void setWheelBrakesON()
 		{
-			wheelLeft.brakeForce = 1;
-			wheelRight.brakeForce = 1;
+			wheelLeft.brakeInput = 1;
+			wheelRight.brakeInput = 1;
 		}
 		// key press UP
 		void setWheelBrakesOFF()
 		{
-			wheelLeft.brakeForce = 0;
-			wheelRight.brakeForce = 0;
+			wheelLeft.brakeInput = 0;
+			wheelRight.brakeInput = 0;
 		}
 
 		void setNosewheelSteeringON()
@@ -188,23 +118,63 @@ namespace F16
 			nosewheelSteering = false;
 		}
 
-		void nosewheelTurn(double value)
+		// TODO: joystick input is usually -100..100
+		// and we have limit of 32 degrees each way
+		// -> calculate correct nosewheel angle by input amount
+		// or just "cut" out excess input?
+		void nosewheelTurn(const double value)
 		{
+			/* skip for now until button mapping works for it
 			if (nosewheelSteering == false)
 			{
 				return;
 			}
+			*/
 			if (isWoW() == false)
 			{
 				return;
 			}
 			// TODO: check value
-			noseGearTurnAngle = value;
+			//noseGearTurnAngle = value;
+
+			// for now, just cut input to allowed range in degrees
+			noseGearTurnAngle = limit(value, -32, 32);
 		}
-		double getNosegearTurn()
+
+		// in case of nose wheel: 
+		// calculate direction vector based on the turn angle
+		// (polar to cartesian coordinates)
+		Vec3 getNoseTurnDirection()
+		{
+			// in DCS body coordinates, (x,z) plane vector instead of (x,y) ?
+			double x = cos(noseGearTurnAngle);
+			double z = cos(noseGearTurnAngle);
+
+			return Vec3(x, 0, z); // test!
+
+			//Vec3 direction(1, 0, 0); // <- start with aligned to body direction
+			// ..vector multiply by radians?
+			// translation matrix?
+			//return direction;
+		}
+
+		// nosegear turn -1..1 for drawargs
+		float getNosegearTurn()
 		{
 			/*
-			if (!weight_on_wheels)
+			if (isWoW() == false)
+			{
+				return 0;
+			}
+			*/
+			return (float)limit(noseGearTurnAngle, -1, 1);
+		}
+
+		// actual nosegear turn angle
+		double getNosegearAngle()
+		{
+			/*
+			if (isWoW() == false)
 			{
 				return 0;
 			}
@@ -253,7 +223,20 @@ namespace F16
 			//weight_on_wheels = 0;
 		}
 
-		void updateFrame(const double weightN, double frameTime);
+		// need current weight of the whole aircraft
+		// and speed relative to ground (static, sliding or rolling friction of each wheel)
+		void updateFrame(const double groundSpeed, const double weightN, double frameTime)
+		{
+			gearAeroDrag();
+
+			wheelNose.updateForceFriction(groundSpeed, weightN);
+			wheelLeft.updateForceFriction(groundSpeed, weightN);
+			wheelRight.updateForceFriction(groundSpeed, weightN);
+
+			wheelFriction();
+
+			wheelBrakeEffect(weightN);
+		}
 
 	protected:
 
@@ -265,26 +248,28 @@ namespace F16
 			CxGearAero = - (CDGearAero * gearYcos);
 		}
 
-		void wheelFriction(const double weightN)
+		void wheelFriction()
 		{
-			// TODO: if wheel brakes ON -> braking power multiplier
+			// TODO: can we just add together like this?
 
-			bool WoW = isWoW();
+			CxRollingFriction += wheelNose.CxWheelFriction;
+			CxRollingFriction += wheelLeft.CxWheelFriction;
+			CxRollingFriction += wheelRight.CxWheelFriction;
 
-			wheelNose.wheelFriction(weightN, WoW);
-			wheelLeft.wheelFriction(weightN, WoW);
-			wheelRight.wheelFriction(weightN, WoW);
+			CyRollingFriction += wheelNose.CyWheelFriction;
+			CyRollingFriction += wheelLeft.CyWheelFriction;
+			CyRollingFriction += wheelRight.CyWheelFriction;
 		}
 
 		void wheelBrakeEffect(const double weightN)
 		{
 			// TODO: also anti-skid system, wheel locking without it etc.
 
-			bool WoW = isWoW();
+			// also include hydraulic system pressure for effective braking force (not just indicated)
 
-			wheelNose.wheelBrake(weightN, WoW);
-			wheelLeft.wheelBrake(weightN, WoW);
-			wheelRight.wheelBrake(weightN, WoW);
+			//wheelNose.wheelBrake();
+			wheelLeft.wheelBrake();
+			wheelRight.wheelBrake();
 		}
 
 		void brakeFluidUsage(double frameTime)
@@ -293,6 +278,7 @@ namespace F16
 			// parking brake usage does not deplete fluid
 		}
 
+		/*
 		void updateStrutCompression()
 		{
 			// TODO: actual calculations of weight on each wheel,
@@ -305,7 +291,7 @@ namespace F16
 				wheelLeft.setStrutRetracted();
 				wheelRight.setStrutRetracted();
 			}
-			else if (weight_on_wheels)
+			else if (isWoW() == true)
 			{
 				// parking
 				wheelNose.setStrutParking();
@@ -320,15 +306,8 @@ namespace F16
 				wheelRight.setStrutExtended();
 			}
 		}
+		*/
 	};
-
-	void F16LandingGear::updateFrame(const double weightN, double frameTime)
-	{
-		gearAeroDrag();
-		wheelFriction(weightN);
-		wheelBrakeEffect(weightN);
-		updateStrutCompression();
-	}
 }
 
 #endif // ifndef _F16LANDINGGEAR_H_
