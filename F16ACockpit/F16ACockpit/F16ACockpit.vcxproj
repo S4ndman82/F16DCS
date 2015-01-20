@@ -139,10 +139,32 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Controls\F16Pedals.h" />
+    <ClInclude Include="Controls\F16Stick.h" />
+    <ClInclude Include="Controls\F16Throttle.h" />
+    <ClInclude Include="Displays\BaseDisplay.h" />
+    <ClInclude Include="Displays\F16HUD.h" />
+    <ClInclude Include="Displays\F16MFD.h" />
+    <ClInclude Include="Displays\F16Radar.h" />
+    <ClInclude Include="Displays\F16StoresManagement.h" />
     <ClInclude Include="ED_Cockpit_Defs.h" />
     <ClInclude Include="F16ACockpit.h" />
     <ClInclude Include="include\Cockpit\ccParametersAPI.h" />
     <ClInclude Include="Inputs\F16Inputs.h" />
+    <ClInclude Include="Instruments\BaseInstrument.h" />
+    <ClInclude Include="Instruments\F16ADI.h" />
+    <ClInclude Include="Instruments\F16Altimeter.h" />
+    <ClInclude Include="Instruments\F16Clock.h" />
+    <ClInclude Include="Instruments\F16CockpitPressureIndicator.h" />
+    <ClInclude Include="Instruments\F16Compass.h" />
+    <ClInclude Include="Instruments\F16EPUFuelQuantity.h" />
+    <ClInclude Include="Instruments\F16FuelFlowIndicator.h" />
+    <ClInclude Include="Instruments\F16HydraulicPressureIndicator.h" />
+    <ClInclude Include="Instruments\F16LiquidOxygenQuantity.h" />
+    <ClInclude Include="Instruments\F16NozzlePosition.h" />
+    <ClInclude Include="Instruments\F16OilPressure.h" />
+    <ClInclude Include="Instruments\F16OxygenFlowIndicator.h" />
+    <ClInclude Include="Instruments\F16RpmIndicator.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

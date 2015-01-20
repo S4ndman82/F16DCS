@@ -4,6 +4,14 @@
 #include "stdafx.h"
 #include <windows.h>
 
+// create handlers for controls (stick, throttle, pedals)
+
+// create handlers for "passive" instruments (clock, ADI, engine RPM)
+
+// create handlers for displays (active instruments)
+
+// bind handlers to inputs, animation items
+
 /*
 void * ed_cockpit_get_parameter_handle			  (const char * name)
 {

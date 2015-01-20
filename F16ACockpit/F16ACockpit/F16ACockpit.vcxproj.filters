@@ -22,6 +22,15 @@
     <Filter Include="Inputs">
       <UniqueIdentifier>{e9845518-0204-493b-943e-a562d9088fb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Controls">
+      <UniqueIdentifier>{ccb4d809-b385-4c29-8b8d-40341703013a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Instruments">
+      <UniqueIdentifier>{b6c94bb3-278f-4f90-952b-b905e926f187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Displays">
+      <UniqueIdentifier>{1492a145-f054-40b6-8d60-85dbbc2fefa4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -44,6 +53,72 @@
     </ClInclude>
     <ClInclude Include="ED_Cockpit_Defs.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Controls\F16Pedals.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Controls\F16Stick.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Controls\F16Throttle.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\BaseInstrument.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16ADI.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16Clock.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16Altimeter.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16FuelFlowIndicator.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16Compass.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16HydraulicPressureIndicator.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Displays\BaseDisplay.h">
+      <Filter>Displays</Filter>
+    </ClInclude>
+    <ClInclude Include="Displays\F16HUD.h">
+      <Filter>Displays</Filter>
+    </ClInclude>
+    <ClInclude Include="Displays\F16MFD.h">
+      <Filter>Displays</Filter>
+    </ClInclude>
+    <ClInclude Include="Displays\F16Radar.h">
+      <Filter>Displays</Filter>
+    </ClInclude>
+    <ClInclude Include="Displays\F16StoresManagement.h">
+      <Filter>Displays</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16OxygenFlowIndicator.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16CockpitPressureIndicator.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16EPUFuelQuantity.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16LiquidOxygenQuantity.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16NozzlePosition.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16OilPressure.h">
+      <Filter>Instruments</Filter>
+    </ClInclude>
+    <ClInclude Include="Instruments\F16RpmIndicator.h">
+      <Filter>Instruments</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
