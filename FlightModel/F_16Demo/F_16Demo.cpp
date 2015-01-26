@@ -100,6 +100,9 @@
 wchar_t dbgmsg[255] = {0};
 //dbgmsg[0] = 0;
 
+// prototype for later..
+bool locateCockpitDll();
+
 //-------------------------------------------------------
 // Start of F-16 Simulation Variables
 // Probably doesn't need it's own namespace or anything
@@ -1001,6 +1004,15 @@ void ed_fm_cold_start()
 	F16::Airframe.setCanopyClosed();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
+
+	if (locateCockpitDll() == true)
+	{
+		::OutputDebugString(L"F16::F16Cockpit.dll found \r\n");
+	}
+	else
+	{
+		::OutputDebugString(L"F16::F16Cockpit.dll NOT found \r\n");
+	}
 }
 
 void ed_fm_hot_start()
@@ -1013,6 +1025,15 @@ void ed_fm_hot_start()
 	F16::Airframe.setCanopyClosed();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
+
+	if (locateCockpitDll() == true)
+	{
+		::OutputDebugString(L"F16::F16Cockpit.dll found \r\n");
+	}
+	else
+	{
+		::OutputDebugString(L"F16::F16Cockpit.dll NOT found \r\n");
+	}
 }
 
 void ed_fm_hot_start_in_air()
@@ -1025,6 +1046,15 @@ void ed_fm_hot_start_in_air()
 	F16::Airframe.setCanopyClosed();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
+
+	if (locateCockpitDll() == true)
+	{
+		::OutputDebugString(L"F16::F16Cockpit.dll found \r\n");
+	}
+	else
+	{
+		::OutputDebugString(L"F16::F16Cockpit.dll NOT found \r\n");
+	}
 }
 
 /* 
@@ -1256,3 +1286,25 @@ double test()
 	return 10.0;
 }
 
+bool locateCockpitDll()
+{
+	// function prototype for function exported from cockpit dll
+	typedef double test(double in);
+
+	HMODULE	cockpit_dll = GetModuleHandle(L"F16ACockpit.dll"); //assume that we work inside same process
+	if (cockpit_dll == NULL)
+	{
+		return false;
+	}
+
+	test *pfnTest = (test*)GetProcAddress(cockpit_dll, "test");
+	if (pfnTest == NULL)
+	{
+		return false;
+	}
+
+	double res = (double)(*pfnTest)(10.0);
+
+	// all successful
+	return true;
+}
