@@ -217,17 +217,26 @@ bool ed_fm_add_global_moment_component (double & x,double &y,double &z)
 // "dt" (delta time).  This can be used to help time certain features such
 // as filters and lags
 //-----------------------------------------------------------------------
-double last_frame_time = 0;
-clock_t last_tick(0);
+// NOTE! dt is actually slice-length DCS wants code to limit itself to,
+// not actually time passed since last frame - it is constant 0.006000 seconds.
+// So we calculate the true change in time since last frame.
+//
+//double last_dt = 0;
+clock_t end_tick(0);
 void ed_fm_simulate(double dt)
 {
-	/* CJS - Removed hack to filter out flight controller if on ground
-	if(F16::weight_on_wheels)
+	clock_t start_tick = clock();
+	double frametime = dt; // initialize only
+	if (end_tick > 0)
 	{
-		F16::alpha_DEG = 0.0;
-		F16::az = 0.0;
+		// we have been initialized -> start using true time change
+		double temp = (double)(start_tick - end_tick);
+		// check clock is sane (no tick wraparound and non-zero)
+		if (temp > 0)
+		{
+			frametime = temp / CLOCKS_PER_SEC; 
+		}
 	}
-	*/
 
 	// Very important! clear out the forces and moments before you start calculated
 	// a new set for this run frame
@@ -235,33 +244,33 @@ void ed_fm_simulate(double dt)
 
 	// Get the total absolute velocity acting on the aircraft with wind included
 	// using english units so airspeed is in feet/second here
-	F16::Atmos.updateFrame(dt);
+	F16::Atmos.updateFrame(frametime);
 
 	// update thrust
-	F16::Engine.updateFrame(F16::Atmos.mach, F16::Atmos.altitude_FT, dt);
+	F16::Engine.updateFrame(F16::Atmos.mach, F16::Atmos.altitude_FT, frametime);
 
 	// update amount of fuel used and change in mass
-	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), dt);
+	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);
 
 	// update oxygen provided to pilot: tanks, bleed air from engine etc.
-	F16::Oxygen.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.altitude_FT, dt);
+	F16::Oxygen.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.altitude_FT, frametime);
 
 	// use RPM for now 
 	// TODO: switch to torque if/when necessary/available
-	F16::Hydraulics.updateFrame(F16::Engine.getEngineRpm(), dt);
+	F16::Hydraulics.updateFrame(F16::Engine.getEngineRpm(), frametime);
 
-	F16::Electrics.updateFrame(dt);
-	F16::Airframe.updateFrame(dt);
+	F16::Electrics.updateFrame(frametime);
+	F16::Airframe.updateFrame(frametime);
 
 	//---------------------------------------------
 	//-----CONTROL DYNAMICS------------------------
 	//---------------------------------------------
 
-	F16::FlightControls.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, dt);
+	F16::FlightControls.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);
 
 	// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 	// and is completely automatic
-	F16::leadingEdgeFlap_DEG = F16::FlightControls.leading_edge_flap_controller(F16::alpha_DEG,F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2,dt);	
+	F16::leadingEdgeFlap_DEG = F16::FlightControls.leading_edge_flap_controller(F16::alpha_DEG,F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);	
 	F16::leadingEdgeFlap_PCT = limit(F16::leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);	
 
 	// Call the longitudinal (pitch) controller.  Takes the following inputs:
@@ -270,17 +279,17 @@ void ed_fm_simulate(double dt)
 	// -Angle of attack (deg)
 	// -Pitch rate (rad/sec)
 	// -Differential command (from roll controller, not quite implemented yet)
-	F16::elevator_DEG_commanded   = -(F16::FlightControls.fcs_pitch_controller(F16::FlightControls.longStickInput,-0.3,F16::alpha_DEG,F16::pitchRate_RPS * F16::radiansToDegrees,(F16::accz/9.81),0.0,F16::Atmos.dynamicPressure_LBFT2,dt));
+	F16::elevator_DEG_commanded   = -(F16::FlightControls.fcs_pitch_controller(F16::FlightControls.longStickInput,-0.3,F16::alpha_DEG,F16::pitchRate_RPS * F16::radiansToDegrees,(F16::accz/9.81),0.0,F16::Atmos.dynamicPressure_LBFT2, frametime));
 	// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 	F16::elevator_DEG	= F16::elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 	F16::elevator_DEG = limit(F16::elevator_DEG,-25.0,25.0);
 	
-	F16::aileron_DEG_commanded = (F16::FlightControls.fcs_roll_controller(F16::FlightControls.latStickInput,F16::FlightControls.longStickForce,F16::accy/9.81,F16::rollRate_RPS* F16::radiansToDegrees,0.0,F16::Atmos.dynamicPressure_LBFT2,dt));
+	F16::aileron_DEG_commanded = (F16::FlightControls.fcs_roll_controller(F16::FlightControls.latStickInput,F16::FlightControls.longStickForce,F16::accy/9.81,F16::rollRate_RPS* F16::radiansToDegrees,0.0,F16::Atmos.dynamicPressure_LBFT2, frametime));
 	F16::aileron_DEG	= F16::aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 	F16::aileron_DEG = limit(F16::aileron_DEG,-21.5,21.5);
 
 	F16::rudder_DEG_commanded = F16::FlightControls.fcs_yaw_controller(	F16::FlightControls.pedInput, 0.0, F16::yawRate_RPS * (180.0/3.14159), F16::rollRate_RPS* F16::radiansToDegrees,
-													F16::FlightControls.alphaFiltered,F16::aileron_DEG_commanded,F16::accy/9.81,dt);
+													F16::FlightControls.alphaFiltered,F16::aileron_DEG_commanded,F16::accy/9.81, frametime);
 	F16::rudder_DEG		= F16::rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 	F16::rudder_DEG = limit(F16::rudder_DEG,-30.0,30.0);
 
@@ -294,9 +303,9 @@ void ed_fm_simulate(double dt)
 
 	// TODO:! give ground speed to calculate wheel slip/grip!
 	// we use total velocity for now..
-	F16::LandingGear.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Motion.getWeightN(), dt);
+	F16::LandingGear.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Motion.getWeightN(), frametime);
 
-	F16::Aero.updateFrame(F16::alpha_DEG, F16::beta_DEG, F16::elevator_DEG, dt);
+	F16::Aero.updateFrame(F16::alpha_DEG, F16::beta_DEG, F16::elevator_DEG, frametime);
 	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
 		F16::flap_PCT, F16::leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
 		F16::pitchRate_RPS, F16::rollRate_RPS, F16::yawRate_RPS, 
@@ -345,36 +354,9 @@ void ed_fm_simulate(double dt)
 	// Tell the simulation that it has gone through the first frame
 	F16::FlightControls.simInitialized = true;
 
-	/*
-	F16::weight_on_wheels = false;
-	if((F16::Motion.getWeightN() > cz_force.y) && (abs(F16::ay_world) >= -0.5) && (F16::gearDown == 1.0))
-	{
-		F16::weight_on_wheels = true;
-	}
-	*/
-
-	/*
-	clock_t now = clock();
-	if (last_tick > 0)
-	{
-		clock_t diff = now - last_tick;
-		swprintf(dbgmsg, 255, L" F16::clockdiff %d \r\n", diff);
-		::OutputDebugString(dbgmsg);
-	}
-	last_tick = clock();
-	*/
-
-	/*
-	swprintf(dbgmsg, 255, L" F16::frametime %f \r\n", dt);
-	if (last_frame_time != dt)
-	{
-		::OutputDebugString(dbgmsg);
-		last_frame_time = dt;
-	}
-	*/
-
 	// testing only
 	//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	end_tick = clock();
 }
 
 /*
