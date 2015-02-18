@@ -7,7 +7,8 @@ dirName	  	 = current_mod_path,
 version		 = "1.2.14-150110",		 
 state		 = "installed",
 info		 = _("F-16 Technology Demonstration.  High Fidelity Flight Dynamics Model"),
-binaries	= { 'F_16Demo', },  -- The DLL of the external flight model 
+--binaries	= { 'F_16Demo', },  -- The DLL of the external flight model 
+binaries	= { 'F_16Demo', 'F16ACockpit.dll', },  -- EFM + cockpit?
 Skins	= 
 	{
 		{

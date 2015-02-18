@@ -48,9 +48,6 @@
     <ClInclude Include="Inputs\F16Inputs.h">
       <Filter>Inputs</Filter>
     </ClInclude>
-    <ClInclude Include="F16ACockpit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ED_Cockpit_Defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -126,16 +123,15 @@
     <ClInclude Include="Instruments\F16ThreatIndicator.h">
       <Filter>Instruments</Filter>
     </ClInclude>
+    <ClInclude Include="F16ACockpit.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="F16ACockpit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="F16ACockpit.cpp" />
   </ItemGroup>
 </Project>

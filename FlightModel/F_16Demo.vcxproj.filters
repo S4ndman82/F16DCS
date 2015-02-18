@@ -55,7 +55,6 @@
     <ClInclude Include="Airframe\F16Airframe.h">
       <Filter>Airframe</Filter>
     </ClInclude>
-    <ClInclude Include="ED_FM_API.h" />
     <ClInclude Include="Hydraulics\F16HydraulicSystem.h">
       <Filter>Hydraulics</Filter>
     </ClInclude>

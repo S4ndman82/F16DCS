@@ -73,6 +73,9 @@
 // for debug use
 #include <wchar.h>
 #include <stdio.h>
+#include <chrono>
+#include <thread>
+#include <ctime>
 
 #include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "UtilityFunctions.h"			// Utility help functions 
@@ -96,6 +99,10 @@
 
 // physics integration
 #include "EquationsOfMotion/F16EquationsOfMotion.h"
+
+// integrate with cockpit DLL
+#include "../F16ACockpit/F16ACockpit.h"
+
 
 wchar_t dbgmsg[255] = {0};
 //dbgmsg[0] = 0;
@@ -210,6 +217,8 @@ bool ed_fm_add_global_moment_component (double & x,double &y,double &z)
 // "dt" (delta time).  This can be used to help time certain features such
 // as filters and lags
 //-----------------------------------------------------------------------
+double last_frame_time = 0;
+clock_t last_tick(0);
 void ed_fm_simulate(double dt)
 {
 	/* CJS - Removed hack to filter out flight controller if on ground
@@ -343,6 +352,29 @@ void ed_fm_simulate(double dt)
 		F16::weight_on_wheels = true;
 	}
 	*/
+
+	/*
+	clock_t now = clock();
+	if (last_tick > 0)
+	{
+		clock_t diff = now - last_tick;
+		swprintf(dbgmsg, 255, L" F16::clockdiff %d \r\n", diff);
+		::OutputDebugString(dbgmsg);
+	}
+	last_tick = clock();
+	*/
+
+	/*
+	swprintf(dbgmsg, 255, L" F16::frametime %f \r\n", dt);
+	if (last_frame_time != dt)
+	{
+		::OutputDebugString(dbgmsg);
+		last_frame_time = dt;
+	}
+	*/
+
+	// testing only
+	//std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
 /*
