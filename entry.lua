@@ -7,8 +7,8 @@ dirName	  	 = current_mod_path,
 version		 = "1.2.14-150110",		 
 state		 = "installed",
 info		 = _("F-16 Technology Demonstration.  High Fidelity Flight Dynamics Model"),
---binaries	= { 'F_16Demo', },  -- The DLL of the external flight model 
-binaries	= { 'F_16Demo', 'F16ACockpit.dll', },  -- EFM + cockpit?
+binaries	= { 'F16DemoFM', },  -- The DLL of the external flight model 
+--binaries	= { 'F16DemoFM', 'F16ACockpit.dll', },  -- EFM + cockpit?
 Skins	= 
 	{
 		{
@@ -247,7 +247,7 @@ suspension =
 local FM = 
 {
 	[1] = self_ID,
-	[2] = "F_16Demo", -- DLL binarires for FM
+	[2] = "F16DemoFM", -- DLL binarires for FM
 	center_of_mass		=	{ 0.183 , 0.261 , 0.0},		-- center of mass position relative to object 3d model center for empty aircraft
 	moment_of_inertia  	= 	{12874.0, 85552.1, 75673.6},   	-- moment of inertia of empty aircraft
 	suspension   		= suspension, -- gear posts initialization
