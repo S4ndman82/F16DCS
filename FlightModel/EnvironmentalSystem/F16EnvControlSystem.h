@@ -17,19 +17,37 @@ namespace F16
 
 	class F16EnvControlSystem
 	{
+	protected:
+		double lowpressure;
+		double highpressure;
+
 	public:
 		F16AirConditioning AirCond;
 		F16OxygenSystem Oxy;
 
 	public:
 		F16EnvControlSystem()
-			: AirCond()
+			: lowpressure(0)
+			, highpressure(0)
+			, AirCond()
 			, Oxy()
 		{}
 		~F16EnvControlSystem() {}
 
 		void updateFrame(const double frameTime)
 		{
+			// logic of using high/low pressure of bleed air?
+
+		}
+
+		// there's "high" and "low" pressure from the engine
+		void setLowPressureBleedAir(const double value)
+		{
+			lowpressure = value;
+		}
+		void setHighPressureBleedAir(const double value)
+		{
+			highpressure = value;
 		}
 	};
 }
