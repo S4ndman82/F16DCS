@@ -21,12 +21,16 @@ namespace F16
 	// TODO: different friction coefficient on each surface?
 	// (tarmac, concrete, grass, mud...)
 
+	// amount of braking fluid (liquid) in system? (limited amount available)
+
 	class F16LandingGear
 	{
 	protected:
 		// precalculate some things
 		const double gearZsin = sin(F16::degtorad);
 		const double gearYcos = cos(F16::degtorad);
+
+		bool gearLevelUp; // gear lever up/down (note runway/air start)
 
 	public:
 		double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
@@ -51,7 +55,8 @@ namespace F16
 		bool parkingBreakOn;
 
 		F16LandingGear() 
-			: gearDownAngle(0)
+			: gearLevelUp(false)
+			, gearDownAngle(0)
 			, nosewheelSteering(true) // <- enable by default until button mapping works
 			, noseGearTurnAngle(0)
 			, CDGearAero(0)
@@ -227,6 +232,9 @@ namespace F16
 		// and speed relative to ground (static, sliding or rolling friction of each wheel)
 		void updateFrame(const double groundSpeed, const double weightN, double frameTime)
 		{
+			//if status != gearLevelUp
+			// -> actuator movement up/down by frame step
+
 			gearAeroDrag();
 
 			wheelNose.updateForceFriction(groundSpeed, weightN);

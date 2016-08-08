@@ -37,6 +37,7 @@ namespace F16
 		// TODO: just use as boolean or use this as angle?
 		//double airbrake; // 0 = off
 		bool airbrakeExtended;
+		bool airbrakeSwitch; // switch status
 
 		// Pitch controller variables
 		double		longStickInput; // pitch normalized
@@ -79,6 +80,7 @@ namespace F16
 			, leading_edge_flap_integrated_gained_biased(0)
 			//, airbrake(0)
 			, airbrakeExtended(false)
+			, airbrakeSwitch(false)
 			, longStickInput(0)
 			, latStickInput(0)
 			, longStickInputRaw(0)
@@ -508,6 +510,9 @@ namespace F16
 		//---------------------------------------------
 		void updateFrame(double totalVelocity_FPS, double dynamicPressure_LBFT2, double ps_LBFT2, double dt)
 		{
+			//if (airbrakeExtended != airbrakeSwitch)
+			// -> actuator movement by frame step
+
 			/*
 			// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 			// and is completely automatic
