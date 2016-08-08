@@ -189,12 +189,18 @@ namespace F16
 
 		double getLowPressureBleedAir() const
 		{
-			// just a function of engine RPM?
+			// output pressure 
+			// as a simple function of engine RPM?
+			// (seventh-stage)
+			// -> fan duct, inlet anti-icing
 			return 0;
 		}
 		double getHighPressureBleedAir() const
 		{
-			// just a function of engine RPM?
+			// output pressure 
+			// as a simple function of engine RPM?
+			// (thirteenth-stage)
+			// -> EPU
 			return 0;
 		}
 

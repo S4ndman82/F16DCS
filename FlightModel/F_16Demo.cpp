@@ -89,9 +89,12 @@
 #include "Atmosphere/F16Atmosphere.h"			//Atmosphere model functions
 #include "Aerodynamics/F16Aero.h"				//Aerodynamic model functions
 #include "FlightControls/F16FlightControls.h"	//Flight Controls model functions
+
+#include "Engine/F16EPU.h"						//Emergency Power Unit (electric&hydraulic power)
 #include "Engine/F16JFS.h"						//APU
 #include "Engine/F16Engine.h"					//Engine model functions
 #include "Engine/F16FuelSystem.h"				//Fuel usage and tank usage functions
+
 #include "LandingGear/F16LandingGear.h"			//Landing gear actuators, aerodynamic drag, wheelbrake function
 #include "Airframe/F16Airframe.h"				//Canopy, dragging chute, refuel slot, section damages..
 #include "Electrics/F16ElectricSystem.h"		//Generators, battery etc.

@@ -453,6 +453,9 @@ enum ed_fm_param_enum
 	ED_FM_FC3_PEDAL_L_LIMITER,		//ограничение левой педали (0 .. 1, 1 - не ограничивает)
 	ED_FM_FC3_PEDAL_R_LIMITER,		//ограничение правой педали (0 .. 1, 1 - не ограничивает)
 
+	ED_FM_FC3_BREAKE_CHUTE_STATUS,
+	ED_FM_FC3_BREAKE_CHUTE_VALUE,
+
 	ED_FM_FC3_RESERVED_SPACE_END = 11000,
 };
 

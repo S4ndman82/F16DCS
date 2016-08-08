@@ -91,9 +91,6 @@
     <ClInclude Include="Electrics\F16AcDcConverter.h">
       <Filter>Electrics</Filter>
     </ClInclude>
-    <ClInclude Include="Electrics\F16EPU.h">
-      <Filter>Electrics</Filter>
-    </ClInclude>
     <ClInclude Include="Electrics\F16MainGenerator.h">
       <Filter>Electrics</Filter>
     </ClInclude>
@@ -107,6 +104,9 @@
       <Filter>EnvironmentalSystem</Filter>
     </ClInclude>
     <ClInclude Include="Engine\F16Gearbox.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\F16EPU.h">
       <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
