@@ -223,14 +223,18 @@ bool ed_fm_add_global_moment_component (double & x,double &y,double &z)
 //-----------------------------------------------------------------------
 // NOTE! dt is actually slice-length DCS wants code to limit itself to,
 // not actually time passed since last frame - it is constant 0.006000 seconds.
-// So we calculate the true change in time since last frame.
+//
+// Simulation step/slice/frame should take care of syncing over network (hopefully)
+// and it should take care of pausing the simulation: we can't calculate those cases here
+// and can only trust DCS to give suitable value.
 //
 //double last_dt = 0;
-clock_t end_tick(0);
+//clock_t end_tick(0);
 void ed_fm_simulate(double dt)
 {
-	clock_t start_tick = clock();
+	//clock_t start_tick = clock();
 	double frametime = dt; // initialize only
+	/*
 	if (end_tick > 0)
 	{
 		// we have been initialized -> start using true time change
@@ -241,6 +245,7 @@ void ed_fm_simulate(double dt)
 			frametime = temp / CLOCKS_PER_SEC; 
 		}
 	}
+	*/
 
 	// Very important! clear out the forces and moments before you start calculated
 	// a new set for this run frame
@@ -360,7 +365,7 @@ void ed_fm_simulate(double dt)
 
 	// testing only
 	//std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	end_tick = clock();
+	//end_tick = clock();
 }
 
 /*
