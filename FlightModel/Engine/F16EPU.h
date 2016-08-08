@@ -31,7 +31,7 @@ namespace F16
 		bool hydrazineLight; 
 
 	public:
-		F16EPU(void *_parentSystem) 
+		F16EPU() 
 			: testSwitch(false)
 			, highBleedAir(0)
 			, hydrPress(0)
