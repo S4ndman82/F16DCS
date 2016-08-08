@@ -109,6 +109,9 @@
     <ClInclude Include="Engine\F16EPU.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="EnvironmentalSystem\F16EnvControlSystem.h">
+      <Filter>EnvironmentalSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

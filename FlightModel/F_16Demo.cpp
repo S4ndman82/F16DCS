@@ -98,7 +98,7 @@
 #include "LandingGear/F16LandingGear.h"			//Landing gear actuators, aerodynamic drag, wheelbrake function
 #include "Airframe/F16Airframe.h"				//Canopy, dragging chute, refuel slot, section damages..
 #include "Electrics/F16ElectricSystem.h"		//Generators, battery etc.
-#include "EnvironmentalSystem/F16OxygenSystem.h"	//Oxygen system, heating/cooling
+#include "EnvironmentalSystem/F16EnvControlSystem.h"	//Oxygen system, heating/cooling, G-suit, canopy sealing..
 
 // physics integration
 #include "EquationsOfMotion/F16EquationsOfMotion.h"
@@ -156,7 +156,7 @@ namespace F16
 	F16Airframe Airframe;
 	F16Motion Motion;
 	F16ElectricSystem Electrics;
-	F16OxygenSystem Oxygen;
+	F16EnvControlSystem EnvCS;
 }
 
 // This is where the simulation send the accumulated forces to the DCS Simulation
@@ -257,7 +257,7 @@ void ed_fm_simulate(double dt)
 	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);
 
 	// update oxygen provided to pilot: tanks, bleed air from engine etc.
-	F16::Oxygen.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.altitude_FT, frametime);
+	F16::EnvCS.Oxy.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.altitude_FT, frametime);
 
 	// use RPM for now 
 	// TODO: switch to torque if/when necessary/available
@@ -953,7 +953,7 @@ double ed_fm_get_param(unsigned param_enum)
 		return 0;
 
 	case ED_FM_OXYGEN_SUPPLY: // oxygen provided from on board oxygen system, pressure - pascal
-		return F16::Oxygen.getPressure();
+		return F16::EnvCS.Oxy.getPressure();
 	case ED_FM_FLOW_VELOCITY:
 		return 0;
 

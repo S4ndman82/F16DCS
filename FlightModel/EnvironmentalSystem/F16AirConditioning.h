@@ -3,15 +3,11 @@
 
 #include "../stdafx.h"
 
-// ENVIRONMENTAL CONTROL SYSTEM (ECS)
-// cockpit pressure, temperature, sealing, defogging, G-suit pressure, fuel tank pressure, equipment cooling
 
 namespace F16
 {
 	// heating/cooling temperature control
 	// electric operated
-
-	// bleed air pressure from engine?
 
 	class F16AirConditioning
 	{

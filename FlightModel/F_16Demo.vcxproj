@@ -108,6 +108,7 @@
     <ClInclude Include="Engine\F16Gearbox.h" />
     <ClInclude Include="Engine\F16JFS.h" />
     <ClInclude Include="EnvironmentalSystem\F16AirConditioning.h" />
+    <ClInclude Include="EnvironmentalSystem\F16EnvControlSystem.h" />
     <ClInclude Include="EnvironmentalSystem\F16OxygenSystem.h" />
     <ClInclude Include="EquationsOfMotion\F16EquationsOfMotion.h" />
     <ClInclude Include="FlightControls\DummyFilter.h" />
