@@ -200,40 +200,66 @@ namespace F16
 			return limit(gearDownAngle, 0, 1);
 		}
 
+		void initGearsDown()
+		{
+			gearLevelUp = false;
+			gearDownAngle = 1.0;
+		}
+		void initGearsUp()
+		{
+			gearLevelUp = true;
+			gearDownAngle = 0;
+		}
+
+		// user "lever" action
 		void switchGearUpDown()
 		{
-			if (gearDownAngle > 0)
-			{
-				// down -> up
-				setGearUp();
-			}
-			else
-			{
-				// up -> down
-				setGearDown();
-			}
+			gearLevelUp = !gearLevelUp;
 		}
 		void setGearDown()
 		{
-			gearDownAngle = 1.0;
-
-			// !! disabled for now
-			//weight_on_wheels = 1;
+			gearLevelUp = false;
 		}
 		void setGearUp()
 		{
-			gearDownAngle = 0;
-
-			// !! disabled for now
-			//weight_on_wheels = 0;
+			gearLevelUp = true;
 		}
 
 		// need current weight of the whole aircraft
 		// and speed relative to ground (static, sliding or rolling friction of each wheel)
 		void updateFrame(const double groundSpeed, const double weightN, double frameTime)
 		{
-			//if status != gearLevelUp
-			// -> actuator movement up/down by frame step
+			// if there is weight on wheels -> do nothing
+			if (isWoW() == false)
+			{
+				//if status != gearLevelUp
+				// -> actuator movement up/down by frame step
+				if (gearLevelUp == true && gearDownAngle > 0)
+				{
+					// reduce angle by actuator movement
+					// -> simple hack for now
+					gearDownAngle -= (frameTime / 10);
+
+					// check we don't go over limit
+					if (gearDownAngle < 0)
+					{
+						gearDownAngle = 0.0;
+					}
+				}
+				else if (gearLevelUp == false && gearDownAngle < 1.0)
+				{
+					// increase angle by actuator movement
+					// -> simple hack for now
+					gearDownAngle += (frameTime / 10);
+
+
+					// check we don't go over limit
+					if (gearDownAngle > 1.0)
+					{
+						gearDownAngle = 1.0;
+					}
+				}
+			}
 
 			gearAeroDrag();
 

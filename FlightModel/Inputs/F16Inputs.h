@@ -20,7 +20,7 @@ enum F16InputCommands
 	//{down = iCommandPlaneGear, name = _('Landing Gear Up/Down'), category = _('Systems')},
 	//{down = iCommandPlaneGearUp, name = _('Landing Gear Up'), category = _('Systems')},
 	//{down = iCommandPlaneGearDown, name = _('Landing Gear Down'), category = _('Systems')},
-	Gear				= 68, // Gear (toggle)		(doesn't work) 
+	Gear				= 68, // Gear (toggle)		(works in 1.5.4) 
 
 	//{down = iCommandPlaneFonar, name = _('Canopy Open/Close'), category = _('Systems')},
 	//{combos = {{key = 'C', reformers = {'LCtrl'}}}, down = iCommandPlaneFonar, name = _('Canopy Open/Close'), category = _('Systems')},
@@ -32,7 +32,7 @@ enum F16InputCommands
 	//{combos = {{key = 'F', reformers = {'LShift'}}}, down = iCommandPlaneFlapsOn, name = _('Flaps Landing Position'), category = _('Systems')},
 	//{combos = {{key = 'F', reformers = {'LCtrl'}}}, down = iCommandPlaneFlapsOff, name = _('Flaps Up'), category = _('Systems')},
 	//Flaps				= 72, // Flaps up/down (toggle)		(doesn't work)
-	AirBrake			= 73, // Air brake (toggle)	(doesn't work)
+	AirBrake			= 73, // Air brake (toggle)		(works in 1.5.4)
 
 	//{down = iCommandPlaneWheelBrakeOn, up = iCommandPlaneWheelBrakeOff, name = _('Wheel Brake On'), category = _('Systems')},
 	//{combos = {{key = 'W'}}, down = iCommandPlaneWheelBrakeOn, up = iCommandPlaneWheelBrakeOff, name = _('Wheel Brake On'), category = _('Systems')},
@@ -47,8 +47,8 @@ enum F16InputCommands
 
 	//{combos = {{key = 'B', reformers = {'LShift'}}}, down = iCommandPlaneAirBrakeOn, name = _('Airbrake On'), category = _('Systems')},
 	//{combos = {{key = 'B', reformers = {'LCtrl'}}}, down = iCommandPlaneAirBrakeOff, name = _('Airbrake Off'), category = _('Systems')},
-	AirBrakeOn			= 147, // Air brake on		(doesn't work)
-	AirBrakeOff			= 148, // Air brake off		(doesn't work)
+	AirBrakeOn			= 147, // Air brake on		(works in 1.5.4)
+	AirBrakeOff			= 148, // Air brake off		(works in 1.5.4)
 
 	LandingGearUp		= 430, // Gear up			(doesn't work)	
 	LandingGearDown		= 431, // Gear down			(doesn't work)

@@ -581,8 +581,8 @@ void ed_fm_set_command(int command, float value)
 		F16::LandingGear.switchGearUpDown();
 		// also switch trailing-edge flaps position
 
-		swprintf(dbgmsg, 255, L" F16::Gear: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
+		//swprintf(dbgmsg, 255, L" F16::Gear: %d value: %f \r\n", command, value);
+		//::OutputDebugString(dbgmsg);
 		break;
 	case LandingGearUp:
 		F16::LandingGear.setGearUp();
@@ -1023,7 +1023,7 @@ void ed_fm_cold_start()
 	*/
 
 	// input does not work correctly yet
-	F16::LandingGear.setGearDown();
+	F16::LandingGear.initGearsDown();
 	F16::Airframe.setCanopyClosed();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
@@ -1044,7 +1044,7 @@ void ed_fm_hot_start()
 	// canopy closed
 	// electrics on
 	// engine on
-	F16::LandingGear.setGearDown();
+	F16::LandingGear.initGearsDown();
 	F16::Airframe.setCanopyClosed();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
@@ -1065,7 +1065,7 @@ void ed_fm_hot_start_in_air()
 	// canopy closed
 	// electrics on
 	// engine on
-	F16::LandingGear.setGearUp();
+	F16::LandingGear.initGearsUp();
 	F16::Airframe.setCanopyClosed();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
