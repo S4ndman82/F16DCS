@@ -20,6 +20,7 @@ namespace F16
 	protected:
 		double canopyAngle;		// Canopy status/angle {0=closed;0.9=elevated;1=no draw}
 		bool canopySwitchDown; // up/down
+		bool canopyGone; // simplify some code
 
 		// TODO: cockpit pressure in pascals over external (get update from oxygen system also)
 		double cockpitPressure;
@@ -50,6 +51,7 @@ namespace F16
 		F16Airframe()
 			: canopyAngle(0)
 			, canopySwitchDown(false)
+			, canopyGone(false)
 			, cockpitPressure(0)
 			, leftWingLamp(0)
 			, rightWingLamp(0)
@@ -70,11 +72,13 @@ namespace F16
 		{
 			canopySwitchDown = false;
 			canopyAngle = 0.9; // up
+			canopyGone = false;
 		}
 		void initCanopyClosed()
 		{
 			canopySwitchDown = true;
 			canopyAngle = 0; // down
+			canopyGone = false;
 		}
 
 		// canopy open/close toggle
@@ -94,6 +98,16 @@ namespace F16
 		void canopyJettison() // <- no binding yet
 		{
 			canopyAngle = 1.0; // gone
+			canopyGone = true;
+		}
+
+		// damage to canopy (in case open in flight, failure on sealing..)
+		void canopyDamage(int integrityfactor)
+		{
+			// just set it gone for now
+			// -> pressure to ambient pressure
+			canopyAngle = 1.0; // gone
+			canopyGone = true;
 		}
 
 		// draw angle of canopy {0=closed;0.9=elevated;1=no draw}
@@ -102,17 +116,25 @@ namespace F16
 			return (float)canopyAngle;
 		}
 
+		// TODO:
+		// get cockpit pressure in pascals over external (get update from oxygen system also)
+		// -> set to ambient pressure when canopy gone or failure in ECS
+		double getCockpitPressure() const
+		{
+			return cockpitPressure;
+		}
+
+		// update aero drag from canopy when gone
+		// (on taxiing does not matter if halfway?)
+		void updateCanopyDrag(const double frameTime)
+		{
+		}
+
+		// animation support for refueling door at the back
 		float getRefuelingDoorAngle() const
 		{
 			// not yet implemented
 			return 0;
-		}
-
-		// TODO:
-		// get cockpit pressure in pascals over external (get update from oxygen system also)
-		double getCockpitPressure() const
-		{
-			return cockpitPressure;
 		}
 
 		float isNavigationLight() const
@@ -166,6 +188,8 @@ namespace F16
 			// TODO: check values, size (how many we need)
 			// is zero "no fault" or "fully broken"? 
 			::memset(elementIntegrity, 0, 336*sizeof(double));
+			canopyGone = false;
+			canopyAngle = 0;
 		}
 
 		bool isRepairNeeded() const
@@ -191,30 +215,40 @@ namespace F16
 		// update pressure?
 		void updateFrame(const double frameTime)
 		{
-			if (canopySwitchDown == false && canopyAngle < 0.9)
+			if (canopyGone == false)
 			{
-				// move up -> increase angle
-				canopyAngle += (frameTime / 10);
-				if (canopyAngle > 0.9)
+				if (canopySwitchDown == false && canopyAngle < 0.9)
 				{
-					canopyAngle = 0.9; // check we don't exceed limit
+					// move up -> increase angle
+					canopyAngle += (frameTime / 10);
+					if (canopyAngle > 0.9)
+					{
+						canopyAngle = 0.9; // check we don't exceed limit
+					}
+				}
+				else if (canopySwitchDown == true && canopyAngle > 0)
+				{
+					// move down -> decrease angle
+					canopyAngle -= (frameTime / 10);
+					if (canopyAngle < 0)
+					{
+						canopyAngle = 0; // check we don't exceed limit
+					}
 				}
 			}
-			else if (canopySwitchDown == true && canopyAngle > 0)
-			{
-				// move down -> decrease angle
-				canopyAngle -= (frameTime / 10);
-				if (canopyAngle < 0)
-				{
-					canopyAngle = 0; // check we don't exceed limit
-				}
-			}
+
+			// aero drag in case canopy is gone
+			updateCanopyDrag(frameTime);
+
+			// TODO: update cockpit pressure from env system
+			// -> set to ambient pressure if canopy is gone
+
+
 			// TODO: if in flight and canopy open -> canopy gone
 			// also, if sealing is not working and internal pressure exceeds external -> canopy gone
 
 			// TODO: some light switching logic on/off?
 
-			// TODO: update cockpit pressure from oxygen system?
 
 		}
 	};
