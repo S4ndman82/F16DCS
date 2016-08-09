@@ -36,8 +36,8 @@ enum F16InputCommands
 
 	//{down = iCommandPlaneWheelBrakeOn, up = iCommandPlaneWheelBrakeOff, name = _('Wheel Brake On'), category = _('Systems')},
 	//{combos = {{key = 'W'}}, down = iCommandPlaneWheelBrakeOn, up = iCommandPlaneWheelBrakeOff, name = _('Wheel Brake On'), category = _('Systems')},
-	WheelBrakesOn		= 74, // Wheel brakes on	(doesn't work)
-	WheelBrakesOff		= 75, // Wheel brakes off	(doesn't work)
+	WheelBrakesOn		= 74, // Wheel brakes on	(works in 1.5.4) when button down (pressed)
+	WheelBrakesOff		= 75, // Wheel brakes off	(works in 1.5.4) when button up (released)
 
 	//{down = iCommandPlaneFlaps, name = _('Flaps Up/Down'), category = _('Systems')},
 	//{down = iCommandPlaneFlapsOn, name = _('Flaps Landing Position'), category = _('Systems')},

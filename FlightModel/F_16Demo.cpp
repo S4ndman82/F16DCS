@@ -570,9 +570,11 @@ void ed_fm_set_command(int command, float value)
 		// switch/button input (keyboard)
 	case WheelBrakesOn:
 		F16::LandingGear.setWheelBrakesON();
+		// when button pressed (down)
 		break;
 	case WheelBrakesOff:
 		F16::LandingGear.setWheelBrakesOFF();
+		// when button released (up)
 		break;
 
 	case Gear:
