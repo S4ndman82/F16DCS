@@ -262,7 +262,7 @@ void ed_fm_simulate(double dt)
 	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);
 
 	// update oxygen provided to pilot: tanks, bleed air from engine etc.
-	F16::EnvCS.Oxy.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.altitude_FT, frametime);
+	F16::EnvCS.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.altitude_FT, frametime);
 
 	// use RPM for now 
 	// TODO: switch to torque if/when necessary/available
@@ -956,7 +956,7 @@ double ed_fm_get_param(unsigned param_enum)
 		return 0;
 
 	case ED_FM_OXYGEN_SUPPLY: // oxygen provided from on board oxygen system, pressure - pascal
-		return F16::EnvCS.Oxy.getPressure();
+		return F16::EnvCS.getCockpitPressure();
 	case ED_FM_FLOW_VELOCITY:
 		return 0;
 

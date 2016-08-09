@@ -46,9 +46,14 @@ namespace F16
 			return cockpitPressure;
 		}
 
-		void updateFrame(const double frameTime)
+		void updateFrame(const double ambientPressure, const double altitude, const double frameTime)
 		{
 			// logic of using high/low pressure of bleed air?
+			
+			Oxy.updateFrame(ambientPressure, altitude, frameTime);
+
+			// just use oxygen system pressure directly?
+			cockpitPressure = Oxy.getPressure();
 
 		}
 

@@ -53,8 +53,6 @@ enum F16InputCommands
 	LandingGearUp		= 430, // Gear up			(works in 1.5.4)	
 	LandingGearDown		= 431, // Gear down			(works in 1.5.4)
 
-	//{down = iCommandEnginesStart, name = _('Engines Start'), category = _('Systems')},
-	//{down = iCommandEnginesStop, name = _('Engines Stop'), category = _('Systems')},
 	//{combos = {{key = 'Home', reformers = {'RShift'}}}, down = iCommandEnginesStart, name = _('Engines Start'), category = _('Systems')},
 	//{combos = {{key = 'End', reformers = {'RShift'}}}, down = iCommandEnginesStop, name = _('Engines Stop'), category = _('Systems')},
 	EnginesStart		= 309, // iCommandEnginesStart Engines start (works in 1.5.4)
