@@ -114,13 +114,9 @@ namespace F16
 			wheelRight.brakeInput = 0;
 		}
 
-		void setNosewheelSteeringON()
+		void toggleNosewheelSteering()
 		{
-			nosewheelSteering = true;
-		}
-		void setNosewheelSteeringOFF()
-		{
-			nosewheelSteering = false;
+			nosewheelSteering = !nosewheelSteering;
 		}
 
 		// TODO: joystick input is usually -100..100
@@ -129,16 +125,15 @@ namespace F16
 		// or just "cut" out excess input?
 		void nosewheelTurn(const double value)
 		{
-			/* skip for now until button mapping works for it
-			if (nosewheelSteering == false)
-			{
-				return;
-			}
-			*/
 			if (isWoW() == false)
 			{
 				return;
 			}
+			if (nosewheelSteering == false)
+			{
+				return;
+			}
+
 			// TODO: check value
 			//noseGearTurnAngle = value;
 

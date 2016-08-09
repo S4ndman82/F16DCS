@@ -81,7 +81,7 @@ enum F16InputCommands
 	//GearHandleRelease
 	//AltGearHandle
 
-	//NoseWheelSteering
+	NoseWheelSteering = 1609, // named as "NWS disenage"?
 	//RefuelingBoom 
 
 	//{down = iCommandPlaneParachute, name = _('Dragging Chute'), category = _('Systems')},

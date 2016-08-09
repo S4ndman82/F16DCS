@@ -600,12 +600,23 @@ void ed_fm_set_command(int command, float value)
 		break;
 		/**/
 
+	case NoseWheelSteering:
+		// value includes status of it?
+		F16::LandingGear.toggleNosewheelSteering();
+		/*
+		swprintf(dbgmsg, 255, L" F16::nosewheelsteering: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+		*/
+		break;
+
 	case Canopy:
 		// on/off toggle (needs some actuator support as well)
 		F16::Airframe.canopyToggle();
 
+		/*
 		swprintf(dbgmsg, 255, L" F16::canopy: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
+		*/
 		break;
 
 	default:
@@ -781,7 +792,7 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[17].f = (float) F16::rudder_PCT; // right rudder
 	drawargs[18].f = (float)-F16::rudder_PCT; // left rudder
 
-	//drawargs[22].f // refueling door (not implemented)
+	drawargs[22].f = (float)F16::Airframe.getRefuelingDoorAngle(); // refueling door (not implemented)
 
 	drawargs[28].f = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner right engine
 	drawargs[29].f = (float)limit(F16::Engine.afterburner, 0.0, 1.0); // afterburner left engine
@@ -1024,7 +1035,7 @@ void ed_fm_cold_start()
 
 	// input does not work correctly yet
 	F16::LandingGear.initGearsDown();
-	F16::Airframe.setCanopyClosed();
+	F16::Airframe.initCanopyOpen();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
 
@@ -1045,7 +1056,7 @@ void ed_fm_hot_start()
 	// electrics on
 	// engine on
 	F16::LandingGear.initGearsDown();
-	F16::Airframe.setCanopyClosed();
+	F16::Airframe.initCanopyClosed();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
 
@@ -1066,7 +1077,7 @@ void ed_fm_hot_start_in_air()
 	// electrics on
 	// engine on
 	F16::LandingGear.initGearsUp();
-	F16::Airframe.setCanopyClosed();
+	F16::Airframe.initCanopyClosed();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
 
