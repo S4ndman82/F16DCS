@@ -24,7 +24,7 @@ enum F16InputCommands
 
 	//{down = iCommandPlaneFonar, name = _('Canopy Open/Close'), category = _('Systems')},
 	//{combos = {{key = 'C', reformers = {'LCtrl'}}}, down = iCommandPlaneFonar, name = _('Canopy Open/Close'), category = _('Systems')},
-	Canopy				= 71, // Canopy				(doesn't work)
+	Canopy				= 71, // Canopy				(works in 1.5.4)
 
 	//CanopyJettison
 
@@ -50,18 +50,20 @@ enum F16InputCommands
 	AirBrakeOn			= 147, // Air brake on		(works in 1.5.4)
 	AirBrakeOff			= 148, // Air brake off		(works in 1.5.4)
 
-	LandingGearUp		= 430, // Gear up			(doesn't work)	
-	LandingGearDown		= 431, // Gear down			(doesn't work)
+	LandingGearUp		= 430, // Gear up			(works in 1.5.4)	
+	LandingGearDown		= 431, // Gear down			(works in 1.5.4)
 
 	//{down = iCommandEnginesStart, name = _('Engines Start'), category = _('Systems')},
 	//{down = iCommandEnginesStop, name = _('Engines Stop'), category = _('Systems')},
 	//{combos = {{key = 'Home', reformers = {'RShift'}}}, down = iCommandEnginesStart, name = _('Engines Start'), category = _('Systems')},
 	//{combos = {{key = 'End', reformers = {'RShift'}}}, down = iCommandEnginesStop, name = _('Engines Stop'), category = _('Systems')},
-	EnginesStart		= 309, // Engines start // iCommandEnginesStart
-	EnginesStop			= 310, // Engines stop 	// iCommandEnginesStop
+	EnginesStart		= 309, // iCommandEnginesStart Engines start (works in 1.5.4)
+	EnginesStop			= 310, // iCommandEnginesStop Engines stop 	(works in 1.5.4)
 
-	//ApuStart,
-	//ApuStop,
+	ApuStart		= 1055, // (works in 1.5.4)
+	ApuStop			= 1056, // (works in 1.5.4)
+
+	BatteryPower = 1073, // iCommandBatteryPower
 
 	//{combos = {{key = 'L', reformers = {'RShift'}}}, down = iCommandPowerOnOff, name = _('Electric Power Switch'), category = _('Systems')},
 	PowerOnOff			= 315, // Electric power switch (FC3 style)
@@ -81,7 +83,7 @@ enum F16InputCommands
 	//GearHandleRelease
 	//AltGearHandle
 
-	NoseWheelSteering = 1609, // named as "NWS disenage"?
+	NoseWheelSteering = 1609, // named as "NWS disengage"?
 	//RefuelingBoom 
 
 	//{down = iCommandPlaneParachute, name = _('Dragging Chute'), category = _('Systems')},

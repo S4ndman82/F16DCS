@@ -518,49 +518,41 @@ void ed_fm_set_command(int command, float value)
 		}
 		break;
 
-		/*
 	case ApuStart:
+		swprintf(dbgmsg, 255, L" F16::APU start: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+
 		F16::Apu.start();
 		break;
 	case ApuStop:
+		swprintf(dbgmsg, 255, L" F16::APU stop: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+
 		F16::Apu.stop();
 		break;
-		*/
 
-		/*
 	case EnginesStart:
 		F16::Engine.startEngine();
 		break;
 	case EnginesStop:
 		F16::Engine.stopEngine();
 		break;
-		*/
 
 	case PowerOnOff:
 		// electric system
 		F16::Electrics.toggleElectrics();
 		break;
+	case BatteryPower:
+		break;
 
 	case AirBrake:
 		F16::FlightControls.switchAirbrake();
-		/*
-		swprintf(dbgmsg, 255, L" F16::Airbrake (toggle): %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
-		*/
 		break;
 	case AirBrakeOn:
 		F16::FlightControls.setAirbrakeON();
-		/*
-		swprintf(dbgmsg, 255, L" F16::Airbrake ON: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
-		*/
 		break;
 	case AirBrakeOff:
 		F16::FlightControls.setAirbrakeOFF();
-		/*
-		swprintf(dbgmsg, 255, L" F16::Airbrake OFF: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
-		*/
 		break;
 
 		// analog input (axis)
@@ -1192,7 +1184,7 @@ void ed_fm_on_planned_failure(const char * data)
 void ed_fm_on_damage(int Element, double element_integrity_factor)
 {
 	/*
-	TODO: check what is needed to get these
+	//TODO: check what is needed to get these
 	swprintf(dbgmsg, 255, L" F16::Damage: element: %d factor: %f \r\n", Element, element_integrity_factor);
 	::OutputDebugString(dbgmsg);
 	*/
