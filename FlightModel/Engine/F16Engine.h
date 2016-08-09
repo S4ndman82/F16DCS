@@ -128,6 +128,20 @@ namespace F16
 			return fuelPerFrame;
 		}
 
+		// torque from engine can be used
+		// on gearbox-connected equipment:
+		// some threshold must be exceeded for them to function
+		double getEngineTorque() const
+		{
+			if (isIgnited == false) // ignore throttle setting if engine is not running
+			{
+				return 0;
+			}
+
+			// no idea of the value currently, just have non-zero value for now
+			return 1;
+		}
+
 		double getEngineRpm() const
 		{
 			if (isIgnited == false) // ignore throttle setting if engine is not running
