@@ -21,6 +21,9 @@ namespace F16
 		double lowpressure;
 		double highpressure;
 
+		// TODO: cockpit pressure in pascals over external (get update from oxygen system also)
+		double cockpitPressure;
+
 	public:
 		F16AirConditioning AirCond;
 		F16OxygenSystem Oxy;
@@ -29,10 +32,19 @@ namespace F16
 		F16EnvControlSystem()
 			: lowpressure(0)
 			, highpressure(0)
+			, cockpitPressure(0)
 			, AirCond()
 			, Oxy()
 		{}
 		~F16EnvControlSystem() {}
+
+		// TODO:
+		// get cockpit pressure in pascals over external (get update from oxygen system also)
+		// -> set to ambient pressure when canopy gone or failure in ECS
+		double getCockpitPressure() const
+		{
+			return cockpitPressure;
+		}
 
 		void updateFrame(const double frameTime)
 		{

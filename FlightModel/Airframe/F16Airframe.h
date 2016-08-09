@@ -22,8 +22,6 @@ namespace F16
 		bool canopySwitchDown; // up/down
 		bool canopyGone; // simplify some code
 
-		// TODO: cockpit pressure in pascals over external (get update from oxygen system also)
-		double cockpitPressure;
 
 		// TODO: support for each lamp in lights?
 		//bool navigationLight[10];
@@ -52,7 +50,6 @@ namespace F16
 			: canopyAngle(0)
 			, canopySwitchDown(false)
 			, canopyGone(false)
-			, cockpitPressure(0)
 			, leftWingLamp(0)
 			, rightWingLamp(0)
 			, backTailLamp(0)
@@ -114,14 +111,6 @@ namespace F16
 		float getCanopyAngle() const
 		{
 			return (float)canopyAngle;
-		}
-
-		// TODO:
-		// get cockpit pressure in pascals over external (get update from oxygen system also)
-		// -> set to ambient pressure when canopy gone or failure in ECS
-		double getCockpitPressure() const
-		{
-			return cockpitPressure;
 		}
 
 		// update aero drag from canopy when gone

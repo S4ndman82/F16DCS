@@ -998,7 +998,7 @@ double ed_fm_get_param(unsigned param_enum)
 
 	case ED_FM_COCKPIT_PRESSURIZATION_OVER_EXTERNAL: 
 		// additional pressure from pressurization system , pascal , actual cabin pressure will be AtmoPressure + COCKPIT_PRESSURIZATION_OVER_EXTERNAL
-		return F16::Airframe.getCockpitPressure();
+		return F16::EnvCS.getCockpitPressure();
 
 	default:
 		// silence compiler warning(s)
