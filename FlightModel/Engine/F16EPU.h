@@ -30,6 +30,9 @@ namespace F16
 		// warning light status
 		bool hydrazineLight; 
 
+		//F16ElectricSystem *pElecSys;
+		//F16HydraulicSystem *pHydSys;
+
 	public:
 		F16EPU() 
 			: testSwitch(false)

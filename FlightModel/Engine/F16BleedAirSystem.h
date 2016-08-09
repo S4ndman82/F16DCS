@@ -38,6 +38,11 @@ namespace F16
 		double lowpressure;
 		double highpressure;
 
+		// TODO:
+		//F16FuelPump *pABFuelPump;
+		//F16EnvControlSystem *pEnvSystem;
+		//F16EPU *pEpu;
+
 	public:
 		F16BleedAirSystem() 
 			: lowpressure(0)

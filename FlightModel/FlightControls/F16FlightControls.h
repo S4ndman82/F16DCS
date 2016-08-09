@@ -34,9 +34,7 @@ namespace F16
 		double		leading_edge_flap_integrated_gained;
 		double		leading_edge_flap_integrated_gained_biased;
 
-		// TODO: just use as boolean or use this as angle?
-		//double airbrake; // 0 = off
-		bool airbrakeExtended;
+		double airbrakeAngle; // 0 = off
 		bool airbrakeSwitch; // switch status
 
 		// Pitch controller variables
@@ -78,8 +76,7 @@ namespace F16
 			, leading_edge_flap_rate(0)
 			, leading_edge_flap_integrated_gained(0)
 			, leading_edge_flap_integrated_gained_biased(0)
-			//, airbrake(0)
-			, airbrakeExtended(false)
+			, airbrakeAngle(0)
 			, airbrakeSwitch(false)
 			, longStickInput(0)
 			, latStickInput(0)
@@ -120,28 +117,47 @@ namespace F16
 		{
 			longStickInput = value;
 		}
+
+		void initAirBrakeOff()
+		{
+			airbrakeSwitch = false;
+			airbrakeAngle = 0.0;
+		}
 		void setAirbrakeON()
 		{
-			//airbrake = value;
-			airbrakeExtended = true;
+			airbrakeSwitch = true;
 		}
 		void setAirbrakeOFF()
 		{
-			//airbrake = value;
-			airbrakeExtended = false;
+			airbrakeSwitch = false;
 		}
 		void switchAirbrake()
 		{
-			airbrakeExtended = !airbrakeExtended;
+			airbrakeSwitch = !airbrakeSwitch;
 		}
 
-		float getAirbrake()
+		// right-side
+		float getAirbrakeRSAngle() const
 		{
-			if (airbrakeExtended == true)
+			return (float)airbrakeAngle;
+		}
+		// left-side
+		float getAirbrakeLSAngle() const
+		{
+			return (float)airbrakeAngle;
+		}
+
+		void updateAirBrake(const double frameTime)
+		{
+			if (airbrakeSwitch == true && airbrakeAngle < 1.0)
 			{
-				return 1.0;
+				airbrakeAngle += (frameTime);
 			}
-			return 0.0;
+			else if (airbrakeSwitch == false && airbrakeAngle > 0)
+			{
+				airbrakeAngle -= (frameTime);
+			}
+			airbrakeAngle = limit(airbrakeAngle, 0, 1);
 		}
 
 	//protected:
@@ -512,6 +528,7 @@ namespace F16
 		{
 			//if (airbrakeExtended != airbrakeSwitch)
 			// -> actuator movement by frame step
+			updateAirBrake(dt);
 
 			/*
 			// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack

@@ -795,8 +795,8 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 
 	//drawargs[182].f // right-side brake flaps 0..1
 	//drawargs[186].f // left-side brake flaps 0..1
-	drawargs[182].f = F16::FlightControls.getAirbrake();
-	drawargs[186].f = F16::FlightControls.getAirbrake();
+	drawargs[182].f = F16::FlightControls.getAirbrakeRSAngle();
+	drawargs[186].f = F16::FlightControls.getAirbrakeLSAngle();
 
 	// navigation lights
 	drawargs[49].f = F16::Airframe.isNavigationLight();
