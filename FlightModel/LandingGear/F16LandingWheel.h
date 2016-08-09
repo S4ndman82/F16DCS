@@ -37,6 +37,7 @@ namespace F16
 
 	public:
 		double strutCompression;
+		double wheelStrutDownAngle; // angle of strut (suspension, up/down)
 
 		// current frictions applied on wheel
 		double CxWheelFriction;
@@ -62,6 +63,7 @@ namespace F16
 			, wheel_moment_of_inertia(3.6) // <- should be different for nose wheel? (smaller wheel)
 			, wheel_brake_moment_max(15000.0)
 			, strutCompression(0)
+			, wheelStrutDownAngle(0)
 			, CxWheelFriction(0)
 			, CyWheelFriction(0)
 			, brakeInput(0)
@@ -134,6 +136,16 @@ namespace F16
 		void setStrutCompression(const double compression)
 		{
 			strutCompression = compression;
+		}
+
+		double getStrutAngle() const
+		{
+			return wheelStrutDownAngle;
+		}
+
+		void setStrutAngle(const double angle)
+		{
+			wheelStrutDownAngle = limit(angle, 0, 1);
 		}
 
 		// calculate new direction of force and if it exceeds friction (begins sliding)

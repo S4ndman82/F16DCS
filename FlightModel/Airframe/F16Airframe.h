@@ -62,7 +62,7 @@ namespace F16
 		{
 			// TODO: check values, size (how many we need)
 			// is zero "no fault" or "fully broken"? 
-			::memset(elementIntegrity, 0, 336 * sizeof(double));
+			::memset(elementIntegrity, 0, 336*sizeof(double));
 		}
 		~F16Airframe() {}
 

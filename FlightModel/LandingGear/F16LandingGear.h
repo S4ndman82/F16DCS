@@ -31,9 +31,9 @@ namespace F16
 		const double gearYcos = cos(F16::degtorad);
 
 		bool gearLevelUp; // gear lever up/down (note runway/air start)
+		double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
 
 	public:
-		double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
 
 		bool nosewheelSteering; // is active/not
 		double noseGearTurnAngle; // steering angle {-1=CW max;1=CCW max}
@@ -184,26 +184,32 @@ namespace F16
 
 		double getNoseGearDown()
 		{
-			return limit(gearDownAngle, 0, 1);
+			return wheelNose.getStrutAngle();
 		}
 		double getLeftGearDown()
 		{
-			return limit(gearDownAngle, 0, 1);
+			return wheelLeft.getStrutAngle();
 		}
 		double getRightGearDown()
 		{
-			return limit(gearDownAngle, 0, 1);
+			return wheelRight.getStrutAngle();
 		}
 
 		void initGearsDown()
 		{
 			gearLevelUp = false;
 			gearDownAngle = 1.0;
+			wheelNose.setStrutAngle(gearDownAngle);
+			wheelLeft.setStrutAngle(gearDownAngle);
+			wheelRight.setStrutAngle(gearDownAngle);
 		}
 		void initGearsUp()
 		{
 			gearLevelUp = true;
 			gearDownAngle = 0;
+			wheelNose.setStrutAngle(gearDownAngle);
+			wheelLeft.setStrutAngle(gearDownAngle);
+			wheelRight.setStrutAngle(gearDownAngle);
 		}
 
 		// user "lever" action
@@ -224,6 +230,8 @@ namespace F16
 		// and speed relative to ground (static, sliding or rolling friction of each wheel)
 		void updateFrame(const double groundSpeed, const double weightN, double frameTime)
 		{
+			// TODO: angle for each wheel individually
+
 			// if there is weight on wheels -> do nothing
 			if (isWoW() == false)
 			{
@@ -240,6 +248,9 @@ namespace F16
 					{
 						gearDownAngle = 0.0;
 					}
+					wheelNose.setStrutAngle(gearDownAngle);
+					wheelLeft.setStrutAngle(gearDownAngle);
+					wheelRight.setStrutAngle(gearDownAngle);
 				}
 				else if (gearLevelUp == false && gearDownAngle < 1.0)
 				{
@@ -247,12 +258,14 @@ namespace F16
 					// -> simple hack for now
 					gearDownAngle += (frameTime / 10);
 
-
 					// check we don't go over limit
 					if (gearDownAngle > 1.0)
 					{
 						gearDownAngle = 1.0;
 					}
+					wheelNose.setStrutAngle(gearDownAngle);
+					wheelLeft.setStrutAngle(gearDownAngle);
+					wheelRight.setStrutAngle(gearDownAngle);
 				}
 			}
 

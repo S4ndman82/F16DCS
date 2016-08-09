@@ -543,18 +543,24 @@ void ed_fm_set_command(int command, float value)
 
 	case AirBrake:
 		F16::FlightControls.switchAirbrake();
+		/*
 		swprintf(dbgmsg, 255, L" F16::Airbrake (toggle): %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
+		*/
 		break;
 	case AirBrakeOn:
 		F16::FlightControls.setAirbrakeON();
+		/*
 		swprintf(dbgmsg, 255, L" F16::Airbrake ON: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
+		*/
 		break;
 	case AirBrakeOff:
 		F16::FlightControls.setAirbrakeOFF();
+		/*
 		swprintf(dbgmsg, 255, L" F16::Airbrake OFF: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
+		*/
 		break;
 
 		// analog input (axis)
@@ -569,7 +575,7 @@ void ed_fm_set_command(int command, float value)
 		F16::LandingGear.setWheelBrakeRight(limit(value, 0, 1.0));
 		break;
 
-		// switch/button input
+		// switch/button input (keyboard)
 	case WheelBrakesOn:
 		F16::LandingGear.setWheelBrakesON();
 		break;
@@ -580,29 +586,20 @@ void ed_fm_set_command(int command, float value)
 	case Gear:
 		F16::LandingGear.switchGearUpDown();
 		// also switch trailing-edge flaps position
-
-		//swprintf(dbgmsg, 255, L" F16::Gear: %d value: %f \r\n", command, value);
-		//::OutputDebugString(dbgmsg);
 		break;
 	case LandingGearUp:
 		F16::LandingGear.setGearUp();
 		// also switch trailing-edge flaps position
-
-		swprintf(dbgmsg, 255, L" F16::GearUp: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
 		break;
 	case LandingGearDown:
 		F16::LandingGear.setGearDown();
 		// also switch trailing-edge flaps position
-
-		swprintf(dbgmsg, 255, L" F16::GearDown: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
 		break;
-		/**/
 
 	case NoseWheelSteering:
 		// value includes status of it?
 		F16::LandingGear.toggleNosewheelSteering();
+		// no animation for nosewheel yet?
 		/*
 		swprintf(dbgmsg, 255, L" F16::nosewheelsteering: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
@@ -612,11 +609,6 @@ void ed_fm_set_command(int command, float value)
 	case Canopy:
 		// on/off toggle (needs some actuator support as well)
 		F16::Airframe.canopyToggle();
-
-		/*
-		swprintf(dbgmsg, 255, L" F16::canopy: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
-		*/
 		break;
 
 	default:
@@ -940,6 +932,9 @@ double ed_fm_get_param(unsigned param_enum)
 		return F16::Engine.getOilPressure();
 	case ED_FM_ENGINE_1_FUEL_FLOW:
 		return F16::Engine.getFuelFlow();
+	case ED_FM_ENGINE_1_COMBUSTION:
+		// not implemented now
+		return 0;
 
 	case ED_FM_SUSPENSION_0_GEAR_POST_STATE: // from 0 to 1 : from fully retracted to full released
 		return limit(F16::LandingGear.getNoseGearDown(), 0, 1);
@@ -1036,6 +1031,7 @@ void ed_fm_cold_start()
 	// input does not work correctly yet
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyOpen();
+	F16::Electrics.setElectricsOn();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
 
@@ -1057,6 +1053,7 @@ void ed_fm_hot_start()
 	// engine on
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyClosed();
+	F16::Electrics.setElectricsOn();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
 
@@ -1078,6 +1075,7 @@ void ed_fm_hot_start_in_air()
 	// engine on
 	F16::LandingGear.initGearsUp();
 	F16::Airframe.initCanopyClosed();
+	F16::Electrics.setElectricsOn();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
 
