@@ -54,6 +54,9 @@ namespace F16
 		// and power consumption
 		void updateFrame(const double frameTime)
 		{
+			// add logic to system control:
+			// valves open/close etc. in various conditions
+
 		}
 
 		/*
