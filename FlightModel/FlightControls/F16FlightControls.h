@@ -653,19 +653,17 @@ namespace F16
 		//---------------------------------------------
 		//-----CONTROL DYNAMICS------------------------
 		//---------------------------------------------
-		void updateFrame(double totalVelocity_FPS, double dynamicPressure_LBFT2, double ps_LBFT2, double dt)
+		void updateFrame(double totalVelocity_FPS, double dynamicPressure_LBFT2, double ps_LBFT2, double frametime)
 		{
 			//if (airbrakeExtended != airbrakeSwitch)
 			// -> actuator movement by frame step
-			updateAirBrake(dt);
+			updateAirBrake(frametime);
 
 			// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 			// and is completely automatic
 			// Leading edge flap deflection (deg)
-			flightSurface.leadingEdgeFlap_DEG = leading_edge_flap_controller(dynamicPressure_LBFT2, ps_LBFT2, dt);
+			flightSurface.leadingEdgeFlap_DEG = leading_edge_flap_controller(dynamicPressure_LBFT2, ps_LBFT2, frametime);
 			flightSurface.leadingEdgeFlap_PCT = limit(flightSurface.leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
-
-			/*
 
 			// Call the longitudinal (pitch) controller.  Takes the following inputs:
 			// -Normalize long stick input
@@ -673,22 +671,23 @@ namespace F16
 			// -Angle of attack (deg)
 			// -Pitch rate (rad/sec)
 			// -Differential command (from roll controller, not quite implemented yet)
-			elevator_DEG_commanded   = -(fcs_pitch_controller(longStickInput, -0.3, F16::alpha_DEG, F16::pitchRate_RPS * F16::radiansToDegrees, (F16::accz/9.81), 0.0, dynamicPressure_LBFT2, dt));
-
+			double elevator_DEG_commanded = -(fcs_pitch_controller(longStickInput, -0.3, 0.0, dynamicPressure_LBFT2, frametime));
 			// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
-			elevator_DEG	= F16::elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
-			elevator_DEG = limit(F16::elevator_DEG,-25.0,25.0);
-	
-			aileron_DEG_commanded = (fcs_roll_controller(latStickInput, longStickForce, F16::accy/9.81, F16::rollRate_RPS* F16::radiansToDegrees, 0.0, dynamicPressure_LBFT2, dt));
-			aileron_DEG	= F16::aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
-			aileron_DEG = limit(F16::aileron_DEG,-21.5,21.5);
+			flightSurface.elevator_DEG = elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
+			flightSurface.elevator_DEG = limit(flightSurface.elevator_DEG, -25.0, 25.0);
 
-			rudder_DEG_commanded = fcs_yaw_controller(	pedInput, 0.0, F16::yawRate_RPS * (180.0/3.14159), F16::rollRate_RPS* F16::radiansToDegrees,
-															alphaFiltered, F16::aileron_DEG_commanded, F16::accy/9.81, dt);
-			rudder_DEG		= rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
-			rudder_DEG = limit(rudder_DEG,-30.0,30.0);
+			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput, longStickForce, 0.0, dynamicPressure_LBFT2, frametime));
+			flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
+			flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 
-			*/
+			double rudder_DEG_commanded = fcs_yaw_controller(pedInput, 0.0, aileron_DEG_commanded, frametime);
+			flightSurface.rudder_DEG = rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
+			flightSurface.rudder_DEG = limit(flightSurface.rudder_DEG, -30.0, 30.0);
+
+			// reuse in drawargs
+			flightSurface.aileron_PCT = flightSurface.aileron_DEG / 21.5;
+			flightSurface.elevator_PCT = flightSurface.elevator_DEG / 25.0;
+			flightSurface.rudder_PCT = flightSurface.rudder_DEG / 30.0;
 
 			// Trailing edge flap deflection (deg)
 			flightSurface.flap_DEG = fcs_flap_controller(totalVelocity_FPS);
