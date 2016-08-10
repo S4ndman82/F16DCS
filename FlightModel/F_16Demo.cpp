@@ -146,7 +146,7 @@ namespace F16
 
 	F16Atmosphere Atmos;
 	F16Aero Aero;
-	F16JFS Apu;
+	F16JFS JFS;
 	F16EPU Epu;
 	F16Engine Engine;
 	F16HydraulicSystem Hydraulics; 
@@ -157,6 +157,9 @@ namespace F16
 	F16Motion Motion;
 	F16ElectricSystem Electrics;
 	F16EnvControlSystem EnvCS;
+
+	//F16BleedAirSystem BleedAir;
+	//BleedAir.pEpu = &Epu;
 }
 
 // This is where the simulation send the accumulated forces to the DCS Simulation
@@ -522,13 +525,13 @@ void ed_fm_set_command(int command, float value)
 		swprintf(dbgmsg, 255, L" F16::APU start: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
 
-		F16::Apu.start();
+		F16::JFS.start();
 		break;
 	case ApuStop:
 		swprintf(dbgmsg, 255, L" F16::APU stop: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
 
-		F16::Apu.stop();
+		F16::JFS.stop();
 		break;
 
 	case EnginesStart:
@@ -888,9 +891,9 @@ double ed_fm_get_param(unsigned param_enum)
 	{
 		// APU parameters at engine index 0
 	case ED_FM_ENGINE_0_RPM:
-		return F16::Apu.getRpm();
+		return F16::JFS.getRpm();
 	case ED_FM_ENGINE_0_RELATED_RPM:
-		return F16::Apu.getRelatedRpm();
+		return F16::JFS.getRelatedRpm();
 	case ED_FM_ENGINE_0_CORE_RPM:
 	case ED_FM_ENGINE_0_CORE_RELATED_RPM:
 	case ED_FM_ENGINE_0_THRUST:
@@ -900,11 +903,11 @@ double ed_fm_get_param(unsigned param_enum)
 		// not implemented now
 		return 0;
 	case ED_FM_ENGINE_0_TEMPERATURE:
-		return F16::Apu.getTemperature();
+		return F16::JFS.getTemperature();
 	case ED_FM_ENGINE_0_OIL_PRESSURE:
-		return F16::Apu.getOilPressure();
+		return F16::JFS.getOilPressure();
 	case ED_FM_ENGINE_0_FUEL_FLOW:
-		return F16::Apu.getFuelFlow();
+		return F16::JFS.getFuelFlow();
 
 	case ED_FM_ENGINE_1_RPM:
 		return F16::Engine.getEngineRpm();
