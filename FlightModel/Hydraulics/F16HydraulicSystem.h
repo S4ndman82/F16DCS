@@ -33,6 +33,8 @@ namespace F16
 
 		//F16Actuator *landing_gear;
 
+		//F16LandingGear *landingGear;
+
 		F16HydraulicSystem() 
 		{
 			pumpA = new F16HydraulicPump(this);

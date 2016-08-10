@@ -23,7 +23,7 @@ namespace F16
 
 	// amount of braking fluid (liquid) in system? (limited amount available)
 
-	class F16LandingGear
+	class F16LandingGear //: public AbstractHydraulicDevice
 	{
 	protected:
 		// precalculate some things
@@ -53,6 +53,8 @@ namespace F16
 		F16LandingWheel wheelRight;
 
 		bool parkingBreakOn;
+
+		//F16HydraulicSystem *pHydSys; // parent system providing force
 
 		F16LandingGear() 
 			: gearLevelUp(false)

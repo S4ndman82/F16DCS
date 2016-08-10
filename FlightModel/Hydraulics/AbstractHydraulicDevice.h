@@ -18,13 +18,24 @@ public:
 	{}
 	~AbstractHydraulicDevice() {}
 
+	// amount of pressure required by device
+	virtual double getRequiredPressure() const
+	{
+		return 0;
+	}
+
+	// amount of pressure provided by system
+	virtual void setAvailablePressure(const double pressure)
+	{
+	}
+
 	/*
 	void updateFrame(const double frameTime)
 	{
 	}
 	*/
 
-	void updateFrame(const double force, const double command, const double frameTime)
+	virtual void updateFrame(const double force, const double command, const double frameTime)
 	{
 	}
 };
