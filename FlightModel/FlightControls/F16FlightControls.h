@@ -38,6 +38,7 @@ namespace F16
 	public:
 		double		alpha_DEG = 0.0;			// Angle of attack (deg)
 		double		beta_DEG = 0.0;			// Slideslip angle (deg)
+
 		double		rollRate_RPS = 0.0;			// Body roll rate (rad/sec)
 		double		pitchRate_RPS = 0.0;			// Body pitch rate (rad/sec)
 		double		yawRate_RPS = 0.0;			// Body yaw rate (rad/sec)
@@ -50,6 +51,19 @@ namespace F16
 		F16BodyState() {}
 		~F16BodyState() {}
 
+		double getRollRateDegs() const
+		{
+			return rollRate_RPS * F16::radiansToDegrees;
+		}
+		double getPitchRateDegs() const
+		{
+			return pitchRate_RPS * F16::radiansToDegrees;
+		}
+		double getYawRateDegs() const
+		{
+			return yawRate_RPS * F16::radiansToDegrees;
+		}
+
 		double getAccZPerG() const
 		{
 			return accz / 9.81;
@@ -60,13 +74,46 @@ namespace F16
 		}
 	};
 
+	// keep flight surface positions in one place
+	class F16FlightSurface
+	{
+	public:
+		double		leadingEdgeFlap_DEG = 0.0;			// Leading edge flap deflection (deg)
+		double		leadingEdgeFlap_PCT = 0.0;			// Leading edge flap as a percent of maximum (0 to 1)
+
+		double		flap_DEG = 0.0;			// Trailing edge flap deflection (deg)
+		double		flap_PCT = 0.0;			// Trailing edge flap deflection (0 to 1)
+
+		double		elevator_DEG = 0.0;			// Elevator deflection (deg)
+		double		elevator_PCT = 0.0;			// Elevator deflection as a percent of maximum (-1 to 1)
+
+		double		aileron_DEG = 0.0;			// Aileron deflection (deg)
+		double		aileron_PCT = 0.0;			// Aileron deflection as a percent of maximum (-1 to 1)
+
+		double		rudder_DEG = 0.0;			// Rudder  deflection (deg)
+		double		rudder_PCT = 0.0;			// Rudder deflection as a percent of maximum (-1 to 1)
+
+	public:
+		F16FlightSurface() 
+			: leadingEdgeFlap_DEG(0)
+			, leadingEdgeFlap_PCT(0)
+			, flap_DEG(0)
+			, flap_PCT(0)
+			, elevator_DEG(0)
+			, elevator_PCT(0)
+			, aileron_DEG(0)
+			, aileron_PCT(0)
+			, rudder_DEG(0)
+			, rudder_PCT(0)
+		{}
+		~F16FlightSurface() {}
+	};
+
+
 	class F16FlightControls
 	{
 	public:
 		bool		simInitialized;
-
-		double		leadingEdgeFlap_PCT = 0.0;			// Leading edge flap as a percent of maximum (0 to 1)
-		double		flap_PCT = 0.0;			// Trailing edge flap deflection (0 to 1)
 
 	//protected:
 		double		leading_edge_flap_integral;
@@ -75,7 +122,7 @@ namespace F16
 		double		leading_edge_flap_integrated_gained;
 		double		leading_edge_flap_integrated_gained_biased;
 
-		double airbrakeAngle; // 0 = off
+		double airbrakeAngle; // 0 = off (in percentage)
 		bool airbrakeSwitch; // switch status
 
 		// Pitch controller variables
@@ -109,12 +156,11 @@ namespace F16
 		DummyFilter	yawServoFilter;
 
 		F16BodyState bodyState;
+		F16FlightSurface flightSurface;
 
 	public:
 		F16FlightControls() 
 			: simInitialized(false)
-			, leadingEdgeFlap_PCT(0)
-			, flap_PCT(0)
 			, leading_edge_flap_integral(0)
 			, leading_edge_flap_integrated(0)
 			, leading_edge_flap_rate(0)
@@ -147,6 +193,7 @@ namespace F16
 			, yawRateFilter()
 			, yawServoFilter()
 			, bodyState()
+			, flightSurface()
 		{}
 		~F16FlightControls() {}
 
@@ -231,8 +278,10 @@ namespace F16
 
 		// Controller for yaw
 		// (pedTrim hard-coded to zero in caller)
-		double fcs_yaw_controller(double pedInput, double pedTrim, double yaw_rate, double roll_rate, double aoa_filtered, double aileron_commanded, double dt)
+		double fcs_yaw_controller(double pedInput, double pedTrim, double aileron_commanded, double dt)
 		{
+			const double roll_rate = bodyState.getRollRateDegs();
+			const double yaw_rate = bodyState.getYawRateDegs();
 			double ay = bodyState.getAccYPerG();
 
 			if(!(simInitialized))
@@ -274,7 +323,7 @@ namespace F16
 			double rudderCommandFiltered = rudderCommandFilter.Filter(!(simInitialized),dt,rudderCommand);
 			double rudderCommandFilteredWTrim = pedTrim - rudderCommandFiltered;
 
-			double alphaGained = aoa_filtered * (1.0/57.3);
+			double alphaGained = alphaFiltered * (1.0 / 57.3);
 			double rollRateWithAlpha = roll_rate * alphaGained;
 			double yawRateWithRoll = yaw_rate - rollRateWithAlpha;
 
@@ -283,7 +332,7 @@ namespace F16
 
 			double yawRateFilteredWithSideAccel = yawRateWithRollFiltered;// + (ay * 19.3);
 
-			double aileronGained = limit(0.05 * aoa_filtered, 0.0, 1.5) * aileron_commanded;
+			double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * aileron_commanded;
 
 			double finalRudderCommand = aileronGained + yawRateFilteredWithSideAccel + rudderCommandFilteredWTrim;
 
@@ -368,7 +417,7 @@ namespace F16
 		}
 
 		// Angle of attack limiter logic
-		double angle_of_attack_limiter(double alphaFiltered, double pitchRateCommand)
+		double angle_of_attack_limiter(double alphaFiltered, double pitchRateCommand) const
 		{
 			double topLimit = limit((alphaFiltered - 22.5) * 0.69, 0.0, 99999.0);
 			double bottomLimit = limit((alphaFiltered - 15.0 + pitchRateCommand) * 0.322, 0.0, 99999.0);
@@ -378,8 +427,9 @@ namespace F16
 
 		// Controller for pitch
 		// (differentialCommand is hard-coded to 0 in caller)
-		double fcs_pitch_controller(double longStickInput, double pitchTrim, double pitch_rate, double differentialCommand, double dynPressure_LBFT2, double dt)
+		double fcs_pitch_controller(double longStickInput, double pitchTrim, double differentialCommand, double dynPressure_LBFT2, double dt)
 		{
+			const double pitch_rate = bodyState.getPitchRateDegs();
 			const double az = bodyState.getAccZPerG();
 
 			if(!(simInitialized))
@@ -439,8 +489,9 @@ namespace F16
 
 		// Controller for roll
 		// (roll_rate_trim is hard-coded to 0 in caller)
-		double fcs_roll_controller(double latStickInput, double longStickForce, double roll_rate, double roll_rate_trim, double dynPressure_LBFT2, double dt)
+		double fcs_roll_controller(double latStickInput, double longStickForce, double roll_rate_trim, double dynPressure_LBFT2, double dt)
 		{
+			const double roll_rate = bodyState.getRollRateDegs();
 			double ay = bodyState.getAccYPerG();
 
 			if(!(simInitialized))
@@ -611,8 +662,8 @@ namespace F16
 			// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 			// and is completely automatic
 			// Leading edge flap deflection (deg)
-			double leadingEdgeFlap_DEG = leading_edge_flap_controller(dynamicPressure_LBFT2, ps_LBFT2, dt);
-			leadingEdgeFlap_PCT = limit(leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
+			flightSurface.leadingEdgeFlap_DEG = leading_edge_flap_controller(dynamicPressure_LBFT2, ps_LBFT2, dt);
+			flightSurface.leadingEdgeFlap_PCT = limit(flightSurface.leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
 
 			/*
 
@@ -640,8 +691,8 @@ namespace F16
 			*/
 
 			// Trailing edge flap deflection (deg)
-			double flap_DEG = fcs_flap_controller(totalVelocity_FPS);
-			flap_PCT = flap_DEG / 20.0;
+			flightSurface.flap_DEG = fcs_flap_controller(totalVelocity_FPS);
+			flightSurface.flap_PCT = flightSurface.flap_DEG / 20.0;
 		}
 
 	};

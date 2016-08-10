@@ -261,17 +261,16 @@ void ed_fm_simulate(double dt)
 	// -Angle of attack (deg)
 	// -Pitch rate (rad/sec)
 	// -Differential command (from roll controller, not quite implemented yet)
-	F16::elevator_DEG_commanded   = -(F16::FlightControls.fcs_pitch_controller(F16::FlightControls.longStickInput, -0.3, F16::pitchRate_RPS * F16::radiansToDegrees, 0.0, F16::Atmos.dynamicPressure_LBFT2, frametime));
+	F16::elevator_DEG_commanded   = -(F16::FlightControls.fcs_pitch_controller(F16::FlightControls.longStickInput, -0.3, 0.0, F16::Atmos.dynamicPressure_LBFT2, frametime));
 	// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 	F16::elevator_DEG	= F16::elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 	F16::elevator_DEG = limit(F16::elevator_DEG,-25.0,25.0);
 	
-	F16::aileron_DEG_commanded = (F16::FlightControls.fcs_roll_controller(F16::FlightControls.latStickInput,F16::FlightControls.longStickForce, F16::rollRate_RPS* F16::radiansToDegrees, 0.0, F16::Atmos.dynamicPressure_LBFT2, frametime));
+	F16::aileron_DEG_commanded = (F16::FlightControls.fcs_roll_controller(F16::FlightControls.latStickInput, F16::FlightControls.longStickForce, 0.0, F16::Atmos.dynamicPressure_LBFT2, frametime));
 	F16::aileron_DEG	= F16::aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 	F16::aileron_DEG = limit(F16::aileron_DEG,-21.5,21.5);
 
-	F16::rudder_DEG_commanded = F16::FlightControls.fcs_yaw_controller(	F16::FlightControls.pedInput, 0.0, F16::yawRate_RPS * (180.0/3.14159), F16::rollRate_RPS* F16::radiansToDegrees,
-													F16::FlightControls.alphaFiltered,F16::aileron_DEG_commanded,frametime);
+	F16::rudder_DEG_commanded = F16::FlightControls.fcs_yaw_controller(	F16::FlightControls.pedInput, 0.0, F16::aileron_DEG_commanded, frametime);
 	F16::rudder_DEG		= F16::rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 	F16::rudder_DEG = limit(F16::rudder_DEG,-30.0,30.0);
 
@@ -286,7 +285,7 @@ void ed_fm_simulate(double dt)
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::elevator_DEG, frametime);
 	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
-		F16::FlightControls.flap_PCT, F16::FlightControls.leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
+		F16::FlightControls.flightSurface.flap_PCT, F16::FlightControls.flightSurface.leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
 		F16::pitchRate_RPS, F16::rollRate_RPS, F16::yawRate_RPS, 
 		F16::FlightControls.bodyState.alpha_DEG, 
 		F16::FlightControls.bodyState.beta_DEG,
@@ -436,13 +435,6 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 
 	// set values for later
 	F16::FlightControls.setBodyAxisState(common_angle_of_attack, common_angle_of_slide, omegax, omegay, omegaz, ax, ay, az);
-
-	//-------------------------------
-	// Start of setting F-16 states
-	//-------------------------------
-	F16::rollRate_RPS	= omegax;
-	F16::pitchRate_RPS	= omegaz;
-	F16::yawRate_RPS	= -omegay;
 }
 
 // list of input enums kept in separate header for easier documenting..
@@ -728,14 +720,14 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[5].f = (float)F16::LandingGear.getLeftGearDown(); // gear angle {0;1}
 	drawargs[6].f = (float)F16::LandingGear.wheelLeft.getStrutCompression(); // strut compression {0;0.5;1}
 
-	drawargs[9].f = (float)F16::FlightControls.flap_PCT; // right flap (trailing edge surface)
-	drawargs[10].f = (float)F16::FlightControls.flap_PCT; // left flap (trailing edge surface)
+	drawargs[9].f = (float)F16::FlightControls.flightSurface.flap_PCT; // right flap (trailing edge surface)
+	drawargs[10].f = (float)F16::FlightControls.flightSurface.flap_PCT; // left flap (trailing edge surface)
 
 	drawargs[11].f = (float)-F16::aileron_PCT; // right aileron (trailing edge surface) (in 3D model anim also on elevator)
 	drawargs[12].f = (float) F16::aileron_PCT; // left aileron (trailing edge surface) (in 3D model anim also on elevator)
 
-	drawargs[13].f = (float)F16::FlightControls.leadingEdgeFlap_PCT; // right slat (leading edge)
-	drawargs[14].f = (float)F16::FlightControls.leadingEdgeFlap_PCT; // left slat (leading edge)
+	drawargs[13].f = (float)F16::FlightControls.flightSurface.leadingEdgeFlap_PCT; // right slat (leading edge)
+	drawargs[14].f = (float)F16::FlightControls.flightSurface.leadingEdgeFlap_PCT; // left slat (leading edge)
 
 	drawargs[15].f = (float)-F16::elevator_PCT; // right elevator
 	drawargs[16].f = (float)-F16::elevator_PCT; // left elevator
