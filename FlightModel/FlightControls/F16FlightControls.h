@@ -65,7 +65,8 @@ namespace F16
 	public:
 		bool		simInitialized;
 
-		double		leadingEdgeFlap_PCT;	// Leading edge flap as a percent of maximum (0 to 1)
+		double		leadingEdgeFlap_PCT = 0.0;			// Leading edge flap as a percent of maximum (0 to 1)
+		double		flap_PCT = 0.0;			// Trailing edge flap deflection (0 to 1)
 
 	//protected:
 		double		leading_edge_flap_integral;
@@ -113,6 +114,7 @@ namespace F16
 		F16FlightControls() 
 			: simInitialized(false)
 			, leadingEdgeFlap_PCT(0)
+			, flap_PCT(0)
 			, leading_edge_flap_integral(0)
 			, leading_edge_flap_integrated(0)
 			, leading_edge_flap_rate(0)
@@ -606,11 +608,13 @@ namespace F16
 			// -> actuator movement by frame step
 			updateAirBrake(dt);
 
-			/*
 			// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 			// and is completely automatic
-			double leadingEdgeFlap_DEG = leading_edge_flap_controller(F16::alpha_DEG, dynamicPressure_LBFT2, ps_LBFT2, dt);	
-			leadingEdgeFlap_PCT = limit(leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);	
+			// Leading edge flap deflection (deg)
+			double leadingEdgeFlap_DEG = leading_edge_flap_controller(dynamicPressure_LBFT2, ps_LBFT2, dt);
+			leadingEdgeFlap_PCT = limit(leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
+
+			/*
 
 			// Call the longitudinal (pitch) controller.  Takes the following inputs:
 			// -Normalize long stick input
@@ -633,8 +637,11 @@ namespace F16
 			rudder_DEG		= rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 			rudder_DEG = limit(rudder_DEG,-30.0,30.0);
 
-			flap_DEG = fcs_flap_controller(totalVelocity_FPS);
 			*/
+
+			// Trailing edge flap deflection (deg)
+			double flap_DEG = fcs_flap_controller(totalVelocity_FPS);
+			flap_PCT = flap_DEG / 20.0;
 		}
 
 	};

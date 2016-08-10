@@ -133,10 +133,6 @@ namespace F16
 	double		aileron_PCT				= 0.0;			// Aileron deflection as a percent of maximum (-1 to 1)
 	double		rudder_PCT				= 0.0;			// Rudder deflection as a percent of maximum (-1 to 1)
 	double		elevator_PCT			= 0.0;			// Elevator deflection as a percent of maximum (-1 to 1)
-	double		leadingEdgeFlap_DEG		= 0.0;			// Leading edge flap deflection (deg)
-	double		leadingEdgeFlap_PCT		= 0.0;			// Leading edge flap as a percent of maximum (0 to 1)
-	double		flap_DEG				= 0.0;			// Trailing edge flap deflection (deg)
-	double		flap_PCT				= 0.0;			// Trailing edge flap deflection (0 to 1)
 
 	F16Atmosphere Atmos;
 	F16Aero Aero;
@@ -259,11 +255,6 @@ void ed_fm_simulate(double dt)
 
 	F16::FlightControls.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);
 
-	// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
-	// and is completely automatic
-	F16::leadingEdgeFlap_DEG = F16::FlightControls.leading_edge_flap_controller(F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);	
-	F16::leadingEdgeFlap_PCT = limit(F16::leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);	
-
 	// Call the longitudinal (pitch) controller.  Takes the following inputs:
 	// -Normalize long stick input
 	// -Trimmed G offset
@@ -284,13 +275,10 @@ void ed_fm_simulate(double dt)
 	F16::rudder_DEG		= F16::rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 	F16::rudder_DEG = limit(F16::rudder_DEG,-30.0,30.0);
 
-	F16::flap_DEG = F16::FlightControls.fcs_flap_controller(F16::Atmos.totalVelocity_FPS);
-	
 	// reuse in drawargs
 	F16::aileron_PCT = F16::aileron_DEG / 21.5;
 	F16::elevator_PCT = F16::elevator_DEG / 25.0;
 	F16::rudder_PCT = F16::rudder_DEG / 30.0;
-	F16::flap_PCT = F16::flap_DEG / 20.0;
 
 	// TODO:! give ground speed to calculate wheel slip/grip!
 	// we use total velocity for now..
@@ -298,9 +286,10 @@ void ed_fm_simulate(double dt)
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::elevator_DEG, frametime);
 	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
-		F16::flap_PCT, F16::leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
+		F16::FlightControls.flap_PCT, F16::FlightControls.leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
 		F16::pitchRate_RPS, F16::rollRate_RPS, F16::yawRate_RPS, 
-		F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG,
+		F16::FlightControls.bodyState.alpha_DEG, 
+		F16::FlightControls.bodyState.beta_DEG,
 		F16::LandingGear.CxGearAero, 
 		F16::LandingGear.CzGearAero);
 
@@ -739,14 +728,14 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[5].f = (float)F16::LandingGear.getLeftGearDown(); // gear angle {0;1}
 	drawargs[6].f = (float)F16::LandingGear.wheelLeft.getStrutCompression(); // strut compression {0;0.5;1}
 
-	drawargs[9].f = (float)F16::flap_PCT; // right flap (trailing edge surface)
-	drawargs[10].f = (float)F16::flap_PCT; // left flap (trailing edge surface)
+	drawargs[9].f = (float)F16::FlightControls.flap_PCT; // right flap (trailing edge surface)
+	drawargs[10].f = (float)F16::FlightControls.flap_PCT; // left flap (trailing edge surface)
 
 	drawargs[11].f = (float)-F16::aileron_PCT; // right aileron (trailing edge surface) (in 3D model anim also on elevator)
 	drawargs[12].f = (float) F16::aileron_PCT; // left aileron (trailing edge surface) (in 3D model anim also on elevator)
 
-	drawargs[13].f = (float)F16::leadingEdgeFlap_PCT; // right slat (leading edge)
-	drawargs[14].f = (float)F16::leadingEdgeFlap_PCT; // left slat (leading edge)
+	drawargs[13].f = (float)F16::FlightControls.leadingEdgeFlap_PCT; // right slat (leading edge)
+	drawargs[14].f = (float)F16::FlightControls.leadingEdgeFlap_PCT; // left slat (leading edge)
 
 	drawargs[15].f = (float)-F16::elevator_PCT; // right elevator
 	drawargs[16].f = (float)-F16::elevator_PCT; // left elevator
