@@ -22,9 +22,6 @@ namespace F16
 		//F16MainGenerator *pGenerator;
 		//F16HydraulicSystem *pHydrPump;
 
-		// APU (JFS) torque -> to engine for starting
-		// without APU, engine -> auxiliary systems
-
 	public:
 		F16Gearbox() {}
 		~F16Gearbox() {}
@@ -33,6 +30,10 @@ namespace F16
 		// and power consumption
 		void updateFrame(const double engineRPM, const double frameTime)
 		{
+			// APU (JFS) torque -> to engine for starting
+			// without APU, engine -> auxiliary systems
+			// airstart when engine rotating? (disconnect aux systems?)
+
 			/*
 			if (engineTorque > threshold)
 			{
