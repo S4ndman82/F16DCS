@@ -121,9 +121,6 @@ bool locateCockpitDll();
 //-------------------------------------------------------
 namespace F16
 {
-	double		rollRate_RPS			= 0.0;			// Body roll rate (rad/sec)
-	double		pitchRate_RPS			= 0.0;			// Body pitch rate (rad/sec)
-	double		yawRate_RPS				= 0.0;			// Body yaw rate (rad/sec)
 	double		elevator_DEG_commanded	= 0.0;			// Commanded elevator deflection from control system (deg)
 	double		aileron_DEG_commanded	= 0.0;			// Commanded aileron deflection from control system (deg)
 	double		rudder_DEG_commanded	= 0.0;			// Commanded rudder deflection from control system (deg)
@@ -286,7 +283,9 @@ void ed_fm_simulate(double dt)
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::elevator_DEG, frametime);
 	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
 		F16::FlightControls.flightSurface.flap_PCT, F16::FlightControls.flightSurface.leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
-		F16::pitchRate_RPS, F16::rollRate_RPS, F16::yawRate_RPS, 
+		F16::FlightControls.bodyState.pitchRate_RPS, 
+		F16::FlightControls.bodyState.rollRate_RPS, 
+		F16::FlightControls.bodyState.yawRate_RPS,
 		F16::FlightControls.bodyState.alpha_DEG, 
 		F16::FlightControls.bodyState.beta_DEG,
 		F16::LandingGear.CxGearAero, 
