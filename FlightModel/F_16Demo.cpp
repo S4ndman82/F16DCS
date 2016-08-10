@@ -121,8 +121,6 @@ bool locateCockpitDll();
 //-------------------------------------------------------
 namespace F16
 {
-	double		alpha_DEG				= 0.0;			// Angle of attack (deg)
-	double		beta_DEG				= 0.0;			// Slideslip angle (deg)
 	double		rollRate_RPS			= 0.0;			// Body roll rate (rad/sec)
 	double		pitchRate_RPS			= 0.0;			// Body pitch rate (rad/sec)
 	double		yawRate_RPS				= 0.0;			// Body yaw rate (rad/sec)
@@ -263,7 +261,7 @@ void ed_fm_simulate(double dt)
 
 	// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 	// and is completely automatic
-	F16::leadingEdgeFlap_DEG = F16::FlightControls.leading_edge_flap_controller(F16::alpha_DEG,F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);	
+	F16::leadingEdgeFlap_DEG = F16::FlightControls.leading_edge_flap_controller(F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);	
 	F16::leadingEdgeFlap_PCT = limit(F16::leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);	
 
 	// Call the longitudinal (pitch) controller.  Takes the following inputs:
@@ -272,7 +270,7 @@ void ed_fm_simulate(double dt)
 	// -Angle of attack (deg)
 	// -Pitch rate (rad/sec)
 	// -Differential command (from roll controller, not quite implemented yet)
-	F16::elevator_DEG_commanded   = -(F16::FlightControls.fcs_pitch_controller(F16::FlightControls.longStickInput,-0.3, F16::alpha_DEG, F16::pitchRate_RPS * F16::radiansToDegrees, 0.0, F16::Atmos.dynamicPressure_LBFT2, frametime));
+	F16::elevator_DEG_commanded   = -(F16::FlightControls.fcs_pitch_controller(F16::FlightControls.longStickInput, -0.3, F16::pitchRate_RPS * F16::radiansToDegrees, 0.0, F16::Atmos.dynamicPressure_LBFT2, frametime));
 	// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 	F16::elevator_DEG	= F16::elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 	F16::elevator_DEG = limit(F16::elevator_DEG,-25.0,25.0);
@@ -298,11 +296,11 @@ void ed_fm_simulate(double dt)
 	// we use total velocity for now..
 	F16::LandingGear.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Motion.getWeightN(), frametime);
 
-	F16::Aero.updateFrame(F16::alpha_DEG, F16::beta_DEG, F16::elevator_DEG, frametime);
+	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::elevator_DEG, frametime);
 	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
 		F16::flap_PCT, F16::leadingEdgeFlap_PCT, F16::aileron_PCT, F16::rudder_PCT,
 		F16::pitchRate_RPS, F16::rollRate_RPS, F16::yawRate_RPS, 
-		F16::alpha_DEG, F16::beta_DEG, 
+		F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG,
 		F16::LandingGear.CxGearAero, 
 		F16::LandingGear.CzGearAero);
 
@@ -453,8 +451,6 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 	//-------------------------------
 	// Start of setting F-16 states
 	//-------------------------------
-	F16::alpha_DEG		= common_angle_of_attack * F16::radiansToDegrees;
-	F16::beta_DEG		= common_angle_of_slide * F16::radiansToDegrees;
 	F16::rollRate_RPS	= omegax;
 	F16::pitchRate_RPS	= omegaz;
 	F16::yawRate_RPS	= -omegay;

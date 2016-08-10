@@ -19,6 +19,19 @@ namespace F16
 		~F16FcsController() {}
 	};
 
+	// if/when trimming support is needed,
+	// keep settings in one place.
+	class F16TrimState
+	{
+	public:
+		double trimPitch = 0.0;
+		double trimRoll = 0.0;
+		double trimYaw = 0.0;
+	public:
+		F16TrimState() {}
+		~F16TrimState() {}
+	};
+
 	// just keep some things together in easily accessible way
 	class F16BodyState
 	{
@@ -193,21 +206,21 @@ namespace F16
 	//protected:
 
 		// Controller for the leading edge flaps
-		double leading_edge_flap_controller(double alpha_DEG, double dynamicPressure_FTLB, double staticPressure_FTLB, double frameTime)
+		double leading_edge_flap_controller(double dynamicPressure_FTLB, double staticPressure_FTLB, double frameTime)
 		{
 			double qbarOverPs = dynamicPressure_FTLB/staticPressure_FTLB;
 
 			if(!(simInitialized))
 			{
-				leading_edge_flap_integral = -alpha_DEG;
-				leading_edge_flap_integrated = leading_edge_flap_integral + 2*alpha_DEG;
+				leading_edge_flap_integral = -bodyState.alpha_DEG;
+				leading_edge_flap_integrated = leading_edge_flap_integral + 2 * bodyState.alpha_DEG;
 				return leading_edge_flap_integral;
 			}
 
-			leading_edge_flap_rate = (alpha_DEG - leading_edge_flap_integrated) * 7.25;
+			leading_edge_flap_rate = (bodyState.alpha_DEG - leading_edge_flap_integrated) * 7.25;
 			leading_edge_flap_integral += (leading_edge_flap_rate * frameTime);
 
-			leading_edge_flap_integrated = leading_edge_flap_integral + alpha_DEG * 2.0;
+			leading_edge_flap_integrated = leading_edge_flap_integral + bodyState.alpha_DEG * 2.0;
 			leading_edge_flap_integrated_gained = leading_edge_flap_integrated * 1.38;
 			leading_edge_flap_integrated_gained_biased = leading_edge_flap_integrated_gained + 1.45 - (9.05 * qbarOverPs);	
 
@@ -363,9 +376,9 @@ namespace F16
 
 		// Controller for pitch
 		// (differentialCommand is hard-coded to 0 in caller)
-		double fcs_pitch_controller(double longStickInput, double pitchTrim, double angle_of_attack_ind, double pitch_rate, double differentialCommand, double dynPressure_LBFT2, double dt)
+		double fcs_pitch_controller(double longStickInput, double pitchTrim, double pitch_rate, double differentialCommand, double dynPressure_LBFT2, double dt)
 		{
-			double az = bodyState.getAccZPerG();
+			const double az = bodyState.getAccZPerG();
 
 			if(!(simInitialized))
 			{
@@ -394,9 +407,9 @@ namespace F16
 
 			double dynamicPressureScheduled = dynamic_pressure_schedule(dynPressure_LBFT2);	
 
-			azFiltered = accelFilter.Filter(!(simInitialized),dt,az-1.0);
+			azFiltered = accelFilter.Filter(!(simInitialized), dt, az-1.0);
 
-			double alphaLimited = limit(angle_of_attack_ind,-5.0, 30.0);
+			double alphaLimited = limit(bodyState.alpha_DEG, -5.0, 30.0);
 			double alphaLimitedRate = 10.0 * (alphaLimited - alphaFiltered);
 			alphaFiltered += (alphaLimitedRate * dt);
 
