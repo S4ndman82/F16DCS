@@ -7,6 +7,9 @@
 
 #include "Hydraulics/F16HydraulicPump.h"
 
+// two systems: system A and B
+// have both in same or different instances?
+
 namespace F16
 {
 	//class F16HydraulicReservoir

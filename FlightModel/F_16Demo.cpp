@@ -140,10 +140,6 @@ namespace F16
 	double		flap_DEG				= 0.0;			// Trailing edge flap deflection (deg)
 	double		flap_PCT				= 0.0;			// Trailing edge flap deflection (0 to 1)
 
-	double		ay_world				= 0.0;			// World referenced up/down acceleration (m/s^2)
-	double		accz					= 0.0;			// Az (per normal direction convention) out the bottom of the a/c (m/s^2)
-	double		accy					= 0.0;			// Ay (per normal direction convention) out the right wing (m/s^2)
-
 	F16Atmosphere Atmos;
 	F16Aero Aero;
 	F16JFS JFS;
@@ -231,24 +227,9 @@ bool ed_fm_add_global_moment_component (double & x,double &y,double &z)
 // and it should take care of pausing the simulation: we can't calculate those cases here
 // and can only trust DCS to give suitable value.
 //
-//double last_dt = 0;
-//clock_t end_tick(0);
 void ed_fm_simulate(double dt)
 {
-	//clock_t start_tick = clock();
 	double frametime = dt; // initialize only
-	/*
-	if (end_tick > 0)
-	{
-		// we have been initialized -> start using true time change
-		double temp = (double)(start_tick - end_tick);
-		// check clock is sane (no tick wraparound and non-zero)
-		if (temp > 0)
-		{
-			frametime = temp / CLOCKS_PER_SEC; 
-		}
-	}
-	*/
 
 	// Very important! clear out the forces and moments before you start calculated
 	// a new set for this run frame
@@ -291,17 +272,17 @@ void ed_fm_simulate(double dt)
 	// -Angle of attack (deg)
 	// -Pitch rate (rad/sec)
 	// -Differential command (from roll controller, not quite implemented yet)
-	F16::elevator_DEG_commanded   = -(F16::FlightControls.fcs_pitch_controller(F16::FlightControls.longStickInput,-0.3,F16::alpha_DEG,F16::pitchRate_RPS * F16::radiansToDegrees,(F16::accz/9.81),0.0,F16::Atmos.dynamicPressure_LBFT2, frametime));
+	F16::elevator_DEG_commanded   = -(F16::FlightControls.fcs_pitch_controller(F16::FlightControls.longStickInput,-0.3, F16::alpha_DEG, F16::pitchRate_RPS * F16::radiansToDegrees, 0.0, F16::Atmos.dynamicPressure_LBFT2, frametime));
 	// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 	F16::elevator_DEG	= F16::elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 	F16::elevator_DEG = limit(F16::elevator_DEG,-25.0,25.0);
 	
-	F16::aileron_DEG_commanded = (F16::FlightControls.fcs_roll_controller(F16::FlightControls.latStickInput,F16::FlightControls.longStickForce,F16::accy/9.81,F16::rollRate_RPS* F16::radiansToDegrees,0.0,F16::Atmos.dynamicPressure_LBFT2, frametime));
+	F16::aileron_DEG_commanded = (F16::FlightControls.fcs_roll_controller(F16::FlightControls.latStickInput,F16::FlightControls.longStickForce, F16::rollRate_RPS* F16::radiansToDegrees, 0.0, F16::Atmos.dynamicPressure_LBFT2, frametime));
 	F16::aileron_DEG	= F16::aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 	F16::aileron_DEG = limit(F16::aileron_DEG,-21.5,21.5);
 
 	F16::rudder_DEG_commanded = F16::FlightControls.fcs_yaw_controller(	F16::FlightControls.pedInput, 0.0, F16::yawRate_RPS * (180.0/3.14159), F16::rollRate_RPS* F16::radiansToDegrees,
-													F16::FlightControls.alphaFiltered,F16::aileron_DEG_commanded,F16::accy/9.81, frametime);
+													F16::FlightControls.alphaFiltered,F16::aileron_DEG_commanded,frametime);
 	F16::rudder_DEG		= F16::rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 	F16::rudder_DEG = limit(F16::rudder_DEG,-30.0,30.0);
 
@@ -365,10 +346,6 @@ void ed_fm_simulate(double dt)
 	// TODO: remove
 	// Tell the simulation that it has gone through the first frame
 	F16::FlightControls.simInitialized = true;
-
-	// testing only
-	//std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	//end_tick = clock();
 }
 
 /*
@@ -443,7 +420,7 @@ void ed_fm_set_current_state (double ax,//linear acceleration component in world
 							double quaternion_w //orientation quaternion components in world coordinate system
 							)
 {
-	F16::ay_world = ay;
+	F16::FlightControls.setCurrentState(ax, ay, az);
 }
 
 void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration component in body coordinate system (meters/sec^2)
@@ -470,6 +447,9 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 {
 	F16::Atmos.setAirspeed(vx, vy, vz, wind_vx, wind_vy, wind_vz);
 
+	// set values for later
+	F16::FlightControls.setBodyAxisState(common_angle_of_attack, common_angle_of_slide, omegax, omegay, omegaz, ax, ay, az);
+
 	//-------------------------------
 	// Start of setting F-16 states
 	//-------------------------------
@@ -478,9 +458,6 @@ void ed_fm_set_current_state_body_axis(	double ax,//linear acceleration componen
 	F16::rollRate_RPS	= omegax;
 	F16::pitchRate_RPS	= omegaz;
 	F16::yawRate_RPS	= -omegay;
-
-	F16::accz = ay;
-	F16::accy = az;
 }
 
 // list of input enums kept in separate header for easier documenting..

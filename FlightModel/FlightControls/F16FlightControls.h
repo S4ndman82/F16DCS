@@ -19,6 +19,33 @@ namespace F16
 		~F16FcsController() {}
 	};
 
+	// just keep some things together in easily accessible way
+	class F16BodyState
+	{
+	public:
+		double		alpha_DEG = 0.0;			// Angle of attack (deg)
+		double		beta_DEG = 0.0;			// Slideslip angle (deg)
+		double		rollRate_RPS = 0.0;			// Body roll rate (rad/sec)
+		double		pitchRate_RPS = 0.0;			// Body pitch rate (rad/sec)
+		double		yawRate_RPS = 0.0;			// Body yaw rate (rad/sec)
+
+		double		ay_world = 0.0;			// World referenced up/down acceleration (m/s^2)
+		double		accz = 0.0;			// Az (per normal direction convention) out the bottom of the a/c (m/s^2)
+		double		accy = 0.0;			// Ay (per normal direction convention) out the right wing (m/s^2)
+
+	public:
+		F16BodyState() {}
+		~F16BodyState() {}
+
+		double getAccZPerG() const
+		{
+			return accz / 9.81;
+		}
+		double getAccYPerG() const
+		{
+			return accy / 9.81;
+		}
+	};
 
 	class F16FlightControls
 	{
@@ -67,6 +94,8 @@ namespace F16
 		DummyFilter	yawRateFilter;
 		DummyFilter	yawServoFilter;
 
+		F16BodyState bodyState;
+
 	public:
 		F16FlightControls() 
 			: simInitialized(false)
@@ -102,6 +131,7 @@ namespace F16
 			, yawRateWashout()
 			, yawRateFilter()
 			, yawServoFilter()
+			, bodyState()
 		{}
 		~F16FlightControls() {}
 
@@ -185,8 +215,11 @@ namespace F16
 		}
 
 		// Controller for yaw
-		double fcs_yaw_controller(double pedInput, double pedTrim, double yaw_rate, double roll_rate, double aoa_filtered, double aileron_commanded, double ay, double dt)
+		// (pedTrim hard-coded to zero in caller)
+		double fcs_yaw_controller(double pedInput, double pedTrim, double yaw_rate, double roll_rate, double aoa_filtered, double aileron_commanded, double dt)
 		{
+			double ay = bodyState.getAccYPerG();
+
 			if(!(simInitialized))
 			{
 				double numerators[2] = {0.0,4.0};
@@ -329,8 +362,11 @@ namespace F16
 		}
 
 		// Controller for pitch
-		double fcs_pitch_controller(double longStickInput, double pitchTrim, double angle_of_attack_ind, double pitch_rate, double az, double differentialCommand, double dynPressure_LBFT2, double dt)
+		// (differentialCommand is hard-coded to 0 in caller)
+		double fcs_pitch_controller(double longStickInput, double pitchTrim, double angle_of_attack_ind, double pitch_rate, double differentialCommand, double dynPressure_LBFT2, double dt)
 		{
+			double az = bodyState.getAccZPerG();
+
 			if(!(simInitialized))
 			{
 				double numerators[2] = {1.0,0.0};
@@ -387,8 +423,11 @@ namespace F16
 		}
 
 		// Controller for roll
-		double fcs_roll_controller(double latStickInput, double longStickForce, double ay, double roll_rate, double roll_rate_trim,double dynPressure_LBFT2, double dt)
+		// (roll_rate_trim is hard-coded to 0 in caller)
+		double fcs_roll_controller(double latStickInput, double longStickForce, double roll_rate, double roll_rate_trim, double dynPressure_LBFT2, double dt)
 		{
+			double ay = bodyState.getAccYPerG();
+
 			if(!(simInitialized))
 			{
 				double numerators[2] = {0.0,60.0};
@@ -520,6 +559,30 @@ namespace F16
 		}
 
 	public:
+
+		// before simulation starts
+		void setCurrentState(double ax, double ay, double az)
+		{
+			bodyState.ay_world = ay;
+		}
+
+
+		// gather some values for use later
+		void setBodyAxisState(double common_angle_of_attack, double common_angle_of_slide, double omegax, double omegay, double omegaz, double ax, double ay, double az)
+		{
+			//-------------------------------
+			// Start of setting F-16 states
+			//-------------------------------
+			bodyState.alpha_DEG = common_angle_of_attack * F16::radiansToDegrees;
+			bodyState.beta_DEG = common_angle_of_slide * F16::radiansToDegrees;
+			bodyState.rollRate_RPS = omegax;
+			bodyState.pitchRate_RPS = omegaz;
+			bodyState.yawRate_RPS = -omegay;
+
+			bodyState.accz = ay;
+			bodyState.accy = az;
+
+		}
 
 		//---------------------------------------------
 		//-----CONTROL DYNAMICS------------------------
