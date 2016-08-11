@@ -85,9 +85,11 @@
 #include "Inputs/F16Inputs.h"			// just list of inputs: can get potentially long list
 
 // Model headers
-#include "Hydraulics/F16HydraulicSystem.h"
 #include "Atmosphere/F16Atmosphere.h"			//Atmosphere model functions
+#include "Atmosphere/F16GroundSurface.h"
 #include "Aerodynamics/F16Aero.h"				//Aerodynamic model functions
+
+#include "Hydraulics/F16HydraulicSystem.h"
 #include "FlightControls/F16FlightControls.h"	//Flight Controls model functions
 
 #include "Engine/F16EPU.h"						//Emergency Power Unit (electric&hydraulic power)
@@ -122,6 +124,7 @@ bool locateCockpitDll();
 namespace F16
 {
 	F16Atmosphere Atmos;
+	F16GroundSurface Ground(&Atmos);
 	F16Aero Aero;
 	F16JFS JFS;
 	F16EPU Epu;
@@ -219,6 +222,7 @@ void ed_fm_simulate(double dt)
 	// Get the total absolute velocity acting on the aircraft with wind included
 	// using english units so airspeed is in feet/second here
 	F16::Atmos.updateFrame(frametime);
+	F16::Ground.updateFrame(frametime);
 
 	// update thrust
 	F16::Engine.updateFrame(F16::Atmos.mach, F16::Atmos.altitude_FT, frametime);
@@ -296,21 +300,15 @@ void ed_fm_simulate(double dt)
 called before simulation to set up your environment for the next step
 give parameters of surface under your aircraft usefull for ground effect
 */
-void ed_fm_set_surface (double		h,//surface height under the center of aircraft
-						double		h_obj,//surface height with objects
+void ed_fm_set_surface (double		h, //surface height under the center of aircraft
+						double		h_obj, //surface height with objects
 						unsigned		surface_type,
-						double		normal_x,//components of normal vector to surface
-						double		normal_y,//components of normal vector to surface
-						double		normal_z//components of normal vector to surface
+						double		normal_x, //components of normal vector to surface
+						double		normal_y, //components of normal vector to surface
+						double		normal_z //components of normal vector to surface
 						)
 {
-	// TODO: check height, set for ground effect simulation?
-	// also if weight on wheels?
-	if (F16::wingSpan_FT >= (F16::meterToFoot*h) && F16::LandingGear.isWoW() == false)
-	{
-		// in ground effect with the surface?
-		// flying above ground, no weight on wheels?
-	}
+	F16::Ground.setSurface(h, h_obj, surface_type, Vec3(normal_x, normal_y, normal_z));
 }
 
 void ed_fm_set_atmosphere(	double h,//altitude above sea level			(meters)

@@ -33,7 +33,7 @@ namespace F16
 		//-----------------------------------------------------------------
 		// Get the total absolute velocity acting on the aircraft with wind included
 		// using english units so airspeed is in feet/second here
-		Vec3	airspeed;
+		Vec3	m_airspeed;
 
 	public:
 		double		ambientTemperature_DegK;	// Ambient temperature (kelvon)
@@ -51,7 +51,7 @@ namespace F16
 			, rho(0)
 			, wind()
 			, velocity_world_cs()
-			, airspeed()
+			, m_airspeed()
 			, ambientTemperature_DegK(0)
 			, ambientDensity_KgPerM3(0)
 			, dynamicPressure_LBFT2(0)
@@ -88,14 +88,14 @@ namespace F16
 
 			// Get the total absolute velocity acting on the aircraft with wind included
 			// using english units so airspeed is in feet/second here
-			airspeed.x = velocity_world_cs.x - wind.x;
-			airspeed.y = velocity_world_cs.y - wind.y;
-			airspeed.z = velocity_world_cs.z - wind.z;
+			m_airspeed.x = velocity_world_cs.x - wind.x;
+			m_airspeed.y = velocity_world_cs.y - wind.y;
+			m_airspeed.z = velocity_world_cs.z - wind.z;
 		}
 
 		void updateFrame(double frameTime)
 		{
-			totalVelocity_FPS = sqrt(airspeed.x * airspeed.x + airspeed.y * airspeed.y + airspeed.z * airspeed.z) * F16::meterToFoot;
+			totalVelocity_FPS = sqrt(m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z) * F16::meterToFoot;
 			if (totalVelocity_FPS < 0.01)
 			{
 				totalVelocity_FPS = 0.01;
@@ -105,6 +105,11 @@ namespace F16
 			// I'm used to english units so I am using LB/FT^2 for the pressures
 			mach = (totalVelocity_FPS) / sqrt(1.4 * 1716.3 * temp);
 			dynamicPressure_LBFT2 = .5 * rho * pow(totalVelocity_FPS, 2);
+		}
+
+		void getAirspeed(Vec3 &airSpeed) const
+		{
+			airSpeed = m_airspeed;
 		}
 	};
 }

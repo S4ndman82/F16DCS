@@ -112,6 +112,9 @@
     <ClInclude Include="EnvironmentalSystem\F16EnvControlSystem.h">
       <Filter>EnvironmentalSystem</Filter>
     </ClInclude>
+    <ClInclude Include="Atmosphere\F16GroundSurface.h">
+      <Filter>Atmosphere</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

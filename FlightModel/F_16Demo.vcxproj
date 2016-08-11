@@ -93,6 +93,7 @@
     <ClInclude Include="Aerodynamics\F16AeroData.h" />
     <ClInclude Include="Airframe\F16Airframe.h" />
     <ClInclude Include="Atmosphere\F16Atmosphere.h" />
+    <ClInclude Include="Atmosphere\F16GroundSurface.h" />
     <ClInclude Include="Electrics\AbstractElectricDevice.h" />
     <ClInclude Include="Electrics\F16AcDcConverter.h" />
     <ClInclude Include="Electrics\F16Battery.h" />
