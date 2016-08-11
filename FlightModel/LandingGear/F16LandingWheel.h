@@ -51,7 +51,7 @@ namespace F16
 		Vec3 actingForcePoint;
 		double integrityFactor;
 
-		F16LandingWheel(const double wheelRadius) 
+		F16LandingWheel(const double wheelRadius, const double wheelInertia)
 			//: rolling_friction(0.03)
 			: wheel_radius(wheelRadius) // all other same on each wheel? (check)
 			, wheel_static_friction_factor(0.65)
@@ -60,7 +60,7 @@ namespace F16
 			, wheel_glide_friction_factor(0.28)
 			, wheel_damage_force_factor(250.0)
 			, wheel_damage_speed(150.0)
-			, wheel_moment_of_inertia(3.6) // <- should be different for nose wheel? (smaller wheel)
+			, wheel_moment_of_inertia(wheelInertia) // <- should be different for nose wheel? (smaller wheel)
 			, wheel_brake_moment_max(15000.0)
 			, strutCompression(0)
 			, wheelStrutDownAngle(0)
@@ -143,10 +143,20 @@ namespace F16
 			return wheelStrutDownAngle;
 		}
 
+		// expecting to be within limits,
+		// change if something else is needed
 		void setStrutAngle(const double angle)
 		{
-			wheelStrutDownAngle = limit(angle, 0, 1);
+			//wheelStrutDownAngle = limit(angle, 0, 1);
+			wheelStrutDownAngle = angle;
 		}
+
+		/*
+		double getUpLock() const
+		{}
+		double getDownLock() const
+		{}
+		*/
 
 		// calculate new direction of force and if it exceeds friction (begins sliding)
 		// TODO: need ground speed here for rolling/static friction

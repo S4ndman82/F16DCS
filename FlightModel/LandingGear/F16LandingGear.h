@@ -54,6 +54,7 @@ namespace F16
 		F16LandingWheel wheelRight;
 
 		bool parkingBreakOn;
+		bool antiSkidOn;
 
 		//F16HydraulicSystem *pHydSys; // parent system providing force
 
@@ -67,10 +68,11 @@ namespace F16
 			, CxGearAero(0)
 			, CxRollingFriction(0)
 			, CyRollingFriction(0)
-			, wheelNose(0.479)
-			, wheelLeft(0.68)
-			, wheelRight(0.68)
+			, wheelNose(0.479, 3.6) // <- inertia should be different for nose wheel? (smaller wheel)
+			, wheelLeft(0.68, 3.6)
+			, wheelRight(0.68, 3.6)
 			, parkingBreakOn(false)
+			, antiSkidOn(false)
 		{
 		}
 		~F16LandingGear() {}
@@ -185,19 +187,6 @@ namespace F16
 			return noseGearTurnAngle;
 		}
 
-		double getNoseGearDown()
-		{
-			return wheelNose.getStrutAngle();
-		}
-		double getLeftGearDown()
-		{
-			return wheelLeft.getStrutAngle();
-		}
-		double getRightGearDown()
-		{
-			return wheelRight.getStrutAngle();
-		}
-
 		void initGearsDown()
 		{
 			gearLevelUp = false;
@@ -257,31 +246,20 @@ namespace F16
 					// reduce angle by actuator movement
 					// -> simple hack for now
 					gearDownAngle -= (frameTime / 10);
-
-					// check we don't go over limit
-					if (gearDownAngle < 0)
-					{
-						gearDownAngle = 0.0;
-					}
-					wheelNose.setStrutAngle(gearDownAngle);
-					wheelLeft.setStrutAngle(gearDownAngle);
-					wheelRight.setStrutAngle(gearDownAngle);
 				}
 				else if (gearLevelUp == false && gearDownAngle < 1.0)
 				{
 					// increase angle by actuator movement
 					// -> simple hack for now
 					gearDownAngle += (frameTime / 10);
-
-					// check we don't go over limit
-					if (gearDownAngle > 1.0)
-					{
-						gearDownAngle = 1.0;
-					}
-					wheelNose.setStrutAngle(gearDownAngle);
-					wheelLeft.setStrutAngle(gearDownAngle);
-					wheelRight.setStrutAngle(gearDownAngle);
 				}
+
+				// check we don't go over limit
+				gearDownAngle = limit(gearDownAngle, 0, 1.0);
+
+				wheelNose.setStrutAngle(gearDownAngle);
+				wheelLeft.setStrutAngle(gearDownAngle);
+				wheelRight.setStrutAngle(gearDownAngle);
 			}
 
 			gearAeroDrag();
@@ -294,6 +272,23 @@ namespace F16
 
 			wheelBrakeEffect(weightN);
 		}
+
+		// let's see.. 
+		// total static friction should be amount of friction required (by engine thrust)
+		// to be exceeded before we start rolling
+		/* 
+		void getTotalStaticFriction(const double weightN, double &Cx, double &Cy)
+		{
+			if (isWoW() == false)
+			{
+				Cx = Cy = 0;
+				return;
+			}
+
+			Cx = weightN * wheelNose.wheel_static_friction_factor;
+			Cy = weightN * wheelNose.wheel_side_friction_factor;
+		}
+		*/
 
 	protected:
 
@@ -323,6 +318,10 @@ namespace F16
 			// TODO: also anti-skid system, wheel locking without it etc.
 
 			// also include hydraulic system pressure for effective braking force (not just indicated)
+			// also check if there is electric power?
+
+			if (antiSkidOn == true)
+			{}
 
 			//wheelNose.wheelBrake();
 			wheelLeft.wheelBrake();

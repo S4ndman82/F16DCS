@@ -276,6 +276,9 @@ namespace F16
 
 			// TODO: nose wheel turn
 
+			//double CxWheelFriction = leftWheelXFriction + rightWheelXFriction + noseWheelXFriction;
+			//double CyWheelFriction = leftWheelYFriction + rightWheelYFriction + noseWheelYFriction;
+
 			// TODO: debug: check force direction!
 			// check reduction in kinetic energy per wheel
 			// and check that we don't underflow..
@@ -297,7 +300,7 @@ namespace F16
 
 			//Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0,0.0);
 			//Vec3 cx_wheel_friction_pos(0.0,0.0,0.0);
-			//add_local_force_cg(cx_wheel_friction_force, cx_wheel_friction_pos);
+			//add_local_force(cx_wheel_friction_force, cx_wheel_friction_pos);
 
 			// test, skip some things for now
 			//sum_vec3(common_force, Vec3(CxWheelFriction, 0.0,0.0));
@@ -370,6 +373,7 @@ namespace F16
 		// something like this to handle when nosewheel is turned?
 		void updateNoseWheelTurn(const Vec3 &nosewheelDirection, const double turnAngle)
 		{
+			// nosewheel pos in lua ? {3.133, -1.6, 0}
 			Vec3 cx_wheel_pos(5.0,0.0,0.0); // TODO: check offset!
 			add_local_force(nosewheelDirection, cx_wheel_pos);
 		}

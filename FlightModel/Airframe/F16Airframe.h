@@ -210,20 +210,13 @@ namespace F16
 				{
 					// move up -> increase angle
 					canopyAngle += (frameTime / 10);
-					if (canopyAngle > 0.9)
-					{
-						canopyAngle = 0.9; // check we don't exceed limit
-					}
 				}
 				else if (canopySwitchDown == true && canopyAngle > 0)
 				{
 					// move down -> decrease angle
 					canopyAngle -= (frameTime / 10);
-					if (canopyAngle < 0)
-					{
-						canopyAngle = 0; // check we don't exceed limit
-					}
 				}
+				canopyAngle = limit(canopyAngle, 0, 0.9);
 			}
 
 			// aero drag in case canopy is gone

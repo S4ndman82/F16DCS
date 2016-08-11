@@ -273,7 +273,6 @@ void ed_fm_simulate(double dt)
 	F16::Motion.updateFuelUsageMass(F16::Fuel.getUsageSinceLastFrame(), 0, 0, 0);
 	F16::Fuel.clearUsageSinceLastFrame();
 
-	// TODO: weight-on-wheels detection does not work currently, need to figure out landing gears properly..
 	if (F16::LandingGear.isWoW() == true)
 	{
 		// TODO: this is not working correctly at the moment, disabled for now
@@ -437,20 +436,26 @@ void ed_fm_set_command(int command, float value)
 
 	case JoystickThrottle:
 		{
+			// MaksRUD	=	0.85, -- Military power state of the throttle
+			// ForsRUD	=	0.91, -- Afterburner state of the throttle
 			double limited = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
 			F16::Engine.setThrottleInput(limited);
 		}
 		break;
 
 	case ApuStart:
+		/*
 		swprintf(dbgmsg, 255, L" F16::APU start: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
+		*/
 
 		F16::JFS.start();
 		break;
 	case ApuStop:
+		/*
 		swprintf(dbgmsg, 255, L" F16::APU stop: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
+		*/
 
 		F16::JFS.stop();
 		break;
@@ -672,7 +677,7 @@ void ed_fm_refueling_add_fuel(double fuel)
 void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 {
 	// nose gear
-	drawargs[0].f = (float)F16::LandingGear.getNoseGearDown(); // gear angle {0=retracted;1=extended}
+	drawargs[0].f = (float)F16::LandingGear.wheelNose.getStrutAngle(); // gear angle {0=retracted;1=extended}
 	drawargs[1].f = (float)F16::LandingGear.wheelNose.getStrutCompression(); // strut compression {0=extended;0.5=parking;1=retracted}
 
 	//Nose Gear Steering
@@ -680,11 +685,11 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[2].f = F16::LandingGear.getNosegearTurn(); // nose gear turn angle {-1=CW max;1=CCW max}
 
 	// right gear
-	drawargs[3].f = (float)F16::LandingGear.getRightGearDown(); // gear angle {0;1}
+	drawargs[3].f = (float)F16::LandingGear.wheelRight.getStrutAngle(); // gear angle {0;1}
 	drawargs[4].f = (float)F16::LandingGear.wheelRight.getStrutCompression(); // strut compression {0;0.5;1}
 
 	// left gear
-	drawargs[5].f = (float)F16::LandingGear.getLeftGearDown(); // gear angle {0;1}
+	drawargs[5].f = (float)F16::LandingGear.wheelLeft.getStrutAngle(); // gear angle {0;1}
 	drawargs[6].f = (float)F16::LandingGear.wheelLeft.getStrutCompression(); // strut compression {0;0.5;1}
 
 	drawargs[9].f = (float)F16::FlightControls.flightSurface.flap_PCT; // right flap (trailing edge surface)
@@ -855,7 +860,7 @@ double ed_fm_get_param(unsigned param_enum)
 		return 0;
 
 	case ED_FM_SUSPENSION_0_GEAR_POST_STATE: // from 0 to 1 : from fully retracted to full released
-		return limit(F16::LandingGear.getNoseGearDown(), 0, 1);
+		return F16::LandingGear.wheelNose.getStrutAngle(); // <- already has limit
 	case ED_FM_SUSPENSION_0_RELATIVE_BRAKE_MOMENT:
 	case ED_FM_SUSPENSION_0_UP_LOCK:
 	case ED_FM_SUSPENSION_0_DOWN_LOCK:
@@ -864,7 +869,7 @@ double ed_fm_get_param(unsigned param_enum)
 		return 0;
 
 	case ED_FM_SUSPENSION_1_GEAR_POST_STATE: // from 0 to 1 : from fully retracted to full released
-		return limit(F16::LandingGear.getRightGearDown(), 0, 1);
+		return F16::LandingGear.wheelRight.getStrutAngle(); // <- already has limit
 	case ED_FM_SUSPENSION_1_RELATIVE_BRAKE_MOMENT:
 	case ED_FM_SUSPENSION_1_UP_LOCK:
 	case ED_FM_SUSPENSION_1_DOWN_LOCK:
@@ -873,7 +878,7 @@ double ed_fm_get_param(unsigned param_enum)
 		return 0;
 
 	case ED_FM_SUSPENSION_2_GEAR_POST_STATE: // from 0 to 1 : from fully retracted to full released
-		return limit(F16::LandingGear.getLeftGearDown(), 0, 1);
+		return F16::LandingGear.wheelLeft.getStrutAngle(); // <- already has limit
 	case ED_FM_SUSPENSION_2_RELATIVE_BRAKE_MOMENT:
 	case ED_FM_SUSPENSION_2_UP_LOCK:
 	case ED_FM_SUSPENSION_2_DOWN_LOCK:
@@ -940,17 +945,14 @@ void ed_fm_cold_start()
 	// electrics off
 	// engine off
 	/*
-	F16::LandingGear.setGearDown();
-	F16::canopyAngle = 0.9;
 	F16::Engine.stopEngine();
-	F16::FlightControls.setAirbrakeON();
 	*/
 
 	// input does not work correctly yet
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyOpen();
-	F16::Electrics.setElectricsOn();
-	F16::Engine.startEngine();
+	F16::Electrics.setElectricsOn(); // <- off
+	F16::Engine.startEngine(); // <- stop
 	F16::FlightControls.setAirbrakeOFF();
 	F16::FlightControls.setIsGearDown(true);
 

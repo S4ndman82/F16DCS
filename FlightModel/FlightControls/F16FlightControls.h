@@ -123,6 +123,7 @@ namespace F16
 		double		leading_edge_flap_integrated_gained_biased;
 
 		// note: airbrake limit different when landing gear down (prevent strike to runway)
+		// cx_brk = 0.08, --coefficient, drag, breaks <- for airbrake?
 		double airbrakeAngle; // 0 = off (in percentage)
 		bool airbrakeSwitch; // switch status
 
