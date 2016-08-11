@@ -268,9 +268,8 @@ namespace F16
 			wheelLeft.updateForceFriction(groundSpeed, weightN);
 			wheelRight.updateForceFriction(groundSpeed, weightN);
 
-			wheelFriction();
-
-			wheelBrakeEffect(weightN);
+			//wheelFriction();
+			//wheelBrakeEffect(weightN);
 		}
 
 		// let's see.. 
@@ -300,6 +299,7 @@ namespace F16
 			CxGearAero = - (CDGearAero * gearYcos);
 		}
 
+		/*
 		void wheelFriction()
 		{
 			// TODO: can we just add together like this?
@@ -312,7 +312,9 @@ namespace F16
 			CyRollingFriction += wheelLeft.CyWheelFriction;
 			CyRollingFriction += wheelRight.CyWheelFriction;
 		}
+		*/
 
+		/*
 		void wheelBrakeEffect(const double weightN)
 		{
 			// TODO: also anti-skid system, wheel locking without it etc.
@@ -327,6 +329,7 @@ namespace F16
 			wheelLeft.wheelBrake();
 			wheelRight.wheelBrake();
 		}
+		*/
 
 		void brakeFluidUsage(double frameTime)
 		{

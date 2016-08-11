@@ -52,7 +52,6 @@ namespace F16
 		double integrityFactor;
 
 		F16LandingWheel(const double wheelRadius, const double wheelInertia)
-			//: rolling_friction(0.03)
 			: wheel_radius(wheelRadius) // all other same on each wheel? (check)
 			, wheel_static_friction_factor(0.65)
 			, wheel_side_friction_factor(0.65)
@@ -91,23 +90,11 @@ namespace F16
 				brakeForce = 0;
 				return;
 			}
-			/*
-			if (brakeInput <= 0)
-			{
-				return;
-			}
-			*/
 
-			// TODO: find out some reasonable values,
-			// do we need to have brake fading support as well?
-			// TODO: also switch calculation to reduction in kinectic energy in motion handling
-			// -> should calculate proper moment here
-			brakeForce = abs(brakeInput) * 5000; // guess, find out reasonable value for this!!
-			brakeForce = limit(brakeForce, 0, wheel_brake_moment_max);
+			// just percentage of max according to input 0..1, right?
+			brakeForce = abs(brakeInput) * wheel_brake_moment_max;
 
-			// just add it to rolling friction
-			//CxWheelFriction += (rolling_friction * brakeFriction * weightN);
-			//CyWheelFriction = 0.18 * weightN;
+			// if anti-skid is enabled -> check for locking
 		}
 
 		void setActingForce(double x, double y, double z)
@@ -147,7 +134,6 @@ namespace F16
 		// change if something else is needed
 		void setStrutAngle(const double angle)
 		{
-			//wheelStrutDownAngle = limit(angle, 0, 1);
 			wheelStrutDownAngle = angle;
 		}
 
@@ -160,10 +146,20 @@ namespace F16
 
 		// calculate new direction of force and if it exceeds friction (begins sliding)
 		// TODO: need ground speed here for rolling/static friction
+		// also, depending on how many wheels the weight is distributed on
 		void updateForceFriction(const double groundSpeed, const double weightN)
 		{
+			if (isWoW() == false)
+			{
+				CxWheelFriction = 0;
+				CyWheelFriction = 0;
+				brakeForce = 0;
+				return;
+			}
+
 			// TODO: also if wheel rotation is slower than speed relative to ground
 			// -> apply sliding friction factor
+			//if (braking && wheel locked (anti-skid==false) -> glide-factor?)
 
 			if (isWoW() == true && groundSpeed > 0)
 			{
@@ -189,6 +185,7 @@ namespace F16
 				CxWheelFriction = 0.0;
 				CyWheelFriction = 0.0;
 			}
+
 		}
 	};
 
