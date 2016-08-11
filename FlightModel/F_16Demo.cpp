@@ -275,24 +275,16 @@ void ed_fm_simulate(double dt)
 
 	if (F16::LandingGear.isWoW() == true)
 	{
-		// TODO: this is not working correctly at the moment, disabled for now
-		/*
 		F16::Motion.updateWheelForces(F16::LandingGear.wheelLeft.CxWheelFriction,
-									F16::LandingGear.wheelLeft.CyWheelFriction,
+									F16::LandingGear.wheelLeft.CzWheelFriction,
 									F16::LandingGear.wheelRight.CxWheelFriction,
-									F16::LandingGear.wheelRight.CyWheelFriction,
+									F16::LandingGear.wheelRight.CzWheelFriction,
 									F16::LandingGear.wheelNose.CxWheelFriction,
-									F16::LandingGear.wheelNose.CyWheelFriction);
-									*/
+									F16::LandingGear.wheelNose.CzWheelFriction);
+
 		// use free-rolling friction as single unit for now
 		// TODO: nose-wheel steering, braking forces etc.
 		F16::Motion.updateNoseWheelTurn(F16::LandingGear.getNoseTurnDirection(), F16::LandingGear.getNosegearAngle());
-
-		// combined rolling friction currently, not per-wheel as it should perhaps..
-		F16::Motion.updateRollingFriction(F16::LandingGear.CxRollingFriction, F16::LandingGear.CzRollingFriction);
-
-		// just braking force, needs refining
-		F16::Motion.updateBrakingFriction(F16::LandingGear.wheelLeft.brakeForce, F16::LandingGear.wheelRight.brakeForce);
 	}
 
 	// TODO: remove
@@ -532,6 +524,12 @@ void ed_fm_set_command(int command, float value)
 	case Canopy:
 		// on/off toggle (needs some actuator support as well)
 		F16::Airframe.canopyToggle();
+		break;
+
+	case 2142:
+	case 2143:
+		// ignore these, they are noisy
+		// (mouse x & y?)
 		break;
 
 	default:

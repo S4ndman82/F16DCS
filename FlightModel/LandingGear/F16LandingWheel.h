@@ -129,16 +129,21 @@ namespace F16
 		{}
 		*/
 
+		void clearForceTotal()
+		{
+			CxWheelFriction = 0;
+			CzWheelFriction = 0;
+			brakeForce = 0;
+		}
+
 		// calculate new direction of force and if it exceeds friction (begins sliding)
 		// TODO: need ground speed here for rolling/static friction
 		// also, depending on how many wheels the weight is distributed on
 		void updateForceFriction(const double groundSpeed, const double weightN)
 		{
+			clearForceTotal();
 			if (isWoW() == false) // strut is not compressed -> no weight on wheel
 			{
-				CxWheelFriction = 0;
-				CzWheelFriction = 0;
-				brakeForce = 0;
 				return;
 			}
 
@@ -154,6 +159,8 @@ namespace F16
 				// if anti-skid is enabled -> check for locking
 				// rotation speed of the wheel related to linear ground speed
 				//weightN * wheel_glide_friction_factor if locking?
+
+				// TODO: also consider wheel rotational inertia
 			}
 
 			// note: DCS has "left-hand notation" so side-slip is Z-axis?

@@ -44,11 +44,6 @@ namespace F16
 		double CzGearAero;
 		double CxGearAero;
 
-		// free-rolling friction of all wheels combined
-		// TODO: need to fix per-wheel friction and nose-wheel steering angle handling
-		double CxRollingFriction;
-		double CzRollingFriction;
-
 		F16LandingWheel wheelNose;
 		F16LandingWheel wheelLeft;
 		F16LandingWheel wheelRight;
@@ -66,8 +61,6 @@ namespace F16
 			, CDGearAero(0)
 			, CzGearAero(0)
 			, CxGearAero(0)
-			, CxRollingFriction(0)
-			, CzRollingFriction(0)
 			, wheelNose(0.479, 3.6) // <- inertia should be different for nose wheel? (smaller wheel)
 			, wheelLeft(0.68, 3.6)
 			, wheelRight(0.68, 3.6)
@@ -245,8 +238,9 @@ namespace F16
 		// and speed relative to ground (static, sliding or rolling friction of each wheel)
 		void updateFrame(const double groundSpeed, const double weightN, double frameTime)
 		{
-			// recount for each frame
-			CxRollingFriction = CzRollingFriction = 0;
+			wheelNose.clearForceTotal();
+			wheelLeft.clearForceTotal();
+			wheelRight.clearForceTotal();
 
 			// TODO: angle for each wheel individually
 
@@ -288,15 +282,6 @@ namespace F16
 				wheelNose.updateForceFriction(groundSpeed, weightperwheel);
 				wheelLeft.updateForceFriction(groundSpeed, weightperwheel);
 				wheelRight.updateForceFriction(groundSpeed, weightperwheel);
-
-				CxRollingFriction += wheelNose.CxWheelFriction;
-				CzRollingFriction += wheelNose.CzWheelFriction;
-
-				CxRollingFriction += wheelLeft.CxWheelFriction;
-				CzRollingFriction += wheelLeft.CzWheelFriction;
-
-				CxRollingFriction += wheelRight.CxWheelFriction;
-				CzRollingFriction += wheelRight.CzWheelFriction;
 			}
 		}
 
