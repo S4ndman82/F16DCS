@@ -251,14 +251,14 @@ namespace F16
 		{
 			// note: airbrake limit 60 degrees normally, 
 			// 43 deg when landing gear down (prevent strike to runway)
-			double maxAngle = 60;
+			double maxAnglePCT = 1.0; // 60 deg
 			if (isGearDown == true)
 			{
-				maxAngle = 43;
+				maxAnglePCT = 0.6; // ~43 deg
 			}
 
 			// this uses just percentage for now
-			if (airbrakeSwitch == true && airbrakeAngle < 1.0)
+			if (airbrakeSwitch == true && airbrakeAngle < maxAnglePCT)
 			{
 				airbrakeAngle += (frameTime);
 			}
@@ -266,7 +266,7 @@ namespace F16
 			{
 				airbrakeAngle -= (frameTime);
 			}
-			airbrakeAngle = limit(airbrakeAngle, 0, 1);
+			airbrakeAngle = limit(airbrakeAngle, 0, maxAnglePCT);
 		}
 
 	//protected:
