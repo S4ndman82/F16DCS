@@ -41,7 +41,7 @@ namespace F16
 
 		// current frictions applied on wheel
 		double CxWheelFriction;
-		double CyWheelFriction; // side-ways friction (should be Zbody axis)
+		double CzWheelFriction; // side-ways friction (should be Zbody axis)
 
 		double brakeInput; // braking command/input from user
 		double brakeForce; // result force
@@ -64,7 +64,7 @@ namespace F16
 			, strutCompression(0)
 			, wheelStrutDownAngle(0)
 			, CxWheelFriction(0)
-			, CyWheelFriction(0)
+			, CzWheelFriction(0)
 			, brakeInput(0)
 			, brakeForce(0)
 			, actingForce()
@@ -80,21 +80,6 @@ namespace F16
 				return true;
 			}
 			return false;
-		}
-
-		void wheelBrake()
-		{
-			if (strutCompression == 0)
-			{
-				// no weight on wheels?
-				brakeForce = 0;
-				return;
-			}
-
-			// just percentage of max according to input 0..1, right?
-			brakeForce = abs(brakeInput) * wheel_brake_moment_max;
-
-			// if anti-skid is enabled -> check for locking
 		}
 
 		void setActingForce(double x, double y, double z)
@@ -152,7 +137,7 @@ namespace F16
 			if (isWoW() == false)
 			{
 				CxWheelFriction = 0;
-				CyWheelFriction = 0;
+				CzWheelFriction = 0;
 				brakeForce = 0;
 				return;
 			}
@@ -161,29 +146,28 @@ namespace F16
 			// -> apply sliding friction factor
 			//if (braking && wheel locked (anti-skid==false) -> glide-factor?)
 
-			if (isWoW() == true && groundSpeed > 0)
+			if (groundSpeed > 0 && brakeInput > 0)
 			{
-				// TODO: amount of weight per wheel instead?
-				// also weight balance? wheel size?
-				// TODO: nose-gear steering angle etc.
-				CxWheelFriction = (-wheel_roll_friction_factor * weightN);
+				// just percentage of max according to input 0..1, right?
+				brakeForce = abs(brakeInput) * wheel_brake_moment_max;
 
-				// should have wheel_side_friction_factor ?
-				//CyWheelFriction = 0.18 * weightN;
-				//CyWheelFriction = wheel_side_friction_factor;
+				// if anti-skid is enabled -> check for locking
+				// rotation speed of the wheel related to linear ground speed
+				//weightN * wheel_glide_friction_factor if locking?
 			}
-			/*
-			else if (isWoW() == true && groundSpeed == 0)
+
+			// note: DCS has "left-hand notation" so side-slip is Z-axis?
+			CzWheelFriction = wheel_side_friction_factor * weightN; // <- side-slip factor?
+
+			if (groundSpeed > 0)
 			{
-				CxWheelFriction = wheel_static_friction_factor;
-				CyWheelFriction = wheel_side_friction_factor;
+				// just rolling friction?
+				CxWheelFriction = (-wheel_roll_friction_factor * weightN);
 			}
-			*/
 			else
 			{
-				// no weight on wheels
-				CxWheelFriction = 0.0;
-				CyWheelFriction = 0.0;
+				// "static" friction needed to overcome to start moving?
+				CxWheelFriction = (-wheel_static_friction_factor * weightN);
 			}
 
 		}
