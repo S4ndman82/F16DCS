@@ -122,8 +122,11 @@ namespace F16
 		double		leading_edge_flap_integrated_gained;
 		double		leading_edge_flap_integrated_gained_biased;
 
+		// note: airbrake limit different when landing gear down (prevent strike to runway)
 		double airbrakeAngle; // 0 = off (in percentage)
 		bool airbrakeSwitch; // switch status
+
+		bool isGearDown; // is landing gear down
 
 		// Pitch controller variables
 		double		longStickInput; // pitch normalized
@@ -168,6 +171,7 @@ namespace F16
 			, leading_edge_flap_integrated_gained_biased(0)
 			, airbrakeAngle(0)
 			, airbrakeSwitch(false)
+			, isGearDown(true)
 			, longStickInput(0)
 			, latStickInput(0)
 			, longStickInputRaw(0)
@@ -227,6 +231,10 @@ namespace F16
 		{
 			airbrakeSwitch = !airbrakeSwitch;
 		}
+		void setIsGearDown(bool gearDown)
+		{
+			isGearDown = gearDown;
+		}
 
 		// right-side
 		float getAirbrakeRSAngle() const
@@ -241,6 +249,15 @@ namespace F16
 
 		void updateAirBrake(const double frameTime)
 		{
+			// note: airbrake limit 60 degrees normally, 
+			// 43 deg when landing gear down (prevent strike to runway)
+			double maxAngle = 60;
+			if (isGearDown == true)
+			{
+				maxAngle = 43;
+			}
+
+			// this uses just percentage for now
 			if (airbrakeSwitch == true && airbrakeAngle < 1.0)
 			{
 				airbrakeAngle += (frameTime);

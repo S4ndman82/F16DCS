@@ -32,6 +32,7 @@ namespace F16
 
 		bool gearLevelUp; // gear lever up/down (note runway/air start)
 		double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
+		//bool gearDownLocked; // gear down and locked?
 
 	public:
 
@@ -226,6 +227,18 @@ namespace F16
 		void setGearUp()
 		{
 			gearLevelUp = true;
+		}
+
+		// is gear "down and locked" -> affects airbrake logic
+		bool isGearDownLocked() const
+		{
+			if (gearDownAngle < 1.0)
+			{
+				// not completely down
+				return false;
+			}
+			// at max -> down & locked
+			return true;
 		}
 
 		// need current weight of the whole aircraft

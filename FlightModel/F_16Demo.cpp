@@ -236,15 +236,14 @@ void ed_fm_simulate(double dt)
 	F16::Electrics.updateFrame(frametime);
 	F16::Airframe.updateFrame(frametime);
 
-	//---------------------------------------------
-	//-----CONTROL DYNAMICS------------------------
-	//---------------------------------------------
-
-	F16::FlightControls.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);
-
 	// TODO:! give ground speed to calculate wheel slip/grip!
 	// we use total velocity for now..
 	F16::LandingGear.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Motion.getWeightN(), frametime);
+
+	//-----CONTROL DYNAMICS------------------------
+	// landing gear "down&locked" affects some logic
+	F16::FlightControls.setIsGearDown(F16::LandingGear.isGearDownLocked());
+	F16::FlightControls.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::FlightControls.flightSurface.elevator_DEG, frametime);
 	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
@@ -953,6 +952,7 @@ void ed_fm_cold_start()
 	F16::Electrics.setElectricsOn();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
+	F16::FlightControls.setIsGearDown(true);
 
 	if (locateCockpitDll() == true)
 	{
@@ -975,6 +975,7 @@ void ed_fm_hot_start()
 	F16::Electrics.setElectricsOn();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
+	F16::FlightControls.setIsGearDown(true);
 
 	if (locateCockpitDll() == true)
 	{
@@ -997,6 +998,7 @@ void ed_fm_hot_start_in_air()
 	F16::Electrics.setElectricsOn();
 	F16::Engine.startEngine();
 	F16::FlightControls.setAirbrakeOFF();
+	F16::FlightControls.setIsGearDown(false);
 
 	if (locateCockpitDll() == true)
 	{
