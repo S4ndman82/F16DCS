@@ -21,6 +21,13 @@ namespace F16
 	const double		inertia_Iy_KGM2			= 75673.6;		// Reference moment of inertia (kg/m^2)
 	const double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2)
 	const double		meterToFoot				= 3.28084;		// Meter to foot conversion factor
+
+	////////////////////
+	// some additional stuff that should be used as functions perhaps (see if we need them)
+	// VS2013 does not yet support constexpr though, need upgrade to 2015.. :(
+	//
+	//constexpr double rankineToKelvin(double rankine) { return rankine / 1.8; }
+	//constexpr double kelvinToRankine(double kelvin) { return kelvin * 1.8; }
 }
 
 #endif // ifndef _F16CONSTANTS_H_
