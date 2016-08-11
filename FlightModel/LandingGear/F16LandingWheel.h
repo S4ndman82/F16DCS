@@ -134,7 +134,7 @@ namespace F16
 		// also, depending on how many wheels the weight is distributed on
 		void updateForceFriction(const double groundSpeed, const double weightN)
 		{
-			if (isWoW() == false)
+			if (isWoW() == false) // strut is not compressed -> no weight on wheel
 			{
 				CxWheelFriction = 0;
 				CzWheelFriction = 0;

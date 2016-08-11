@@ -47,7 +47,7 @@ namespace F16
 		// free-rolling friction of all wheels combined
 		// TODO: need to fix per-wheel friction and nose-wheel steering angle handling
 		double CxRollingFriction;
-		double CyRollingFriction;
+		double CzRollingFriction;
 
 		F16LandingWheel wheelNose;
 		F16LandingWheel wheelLeft;
@@ -67,7 +67,7 @@ namespace F16
 			, CzGearAero(0)
 			, CxGearAero(0)
 			, CxRollingFriction(0)
-			, CyRollingFriction(0)
+			, CzRollingFriction(0)
 			, wheelNose(0.479, 3.6) // <- inertia should be different for nose wheel? (smaller wheel)
 			, wheelLeft(0.68, 3.6)
 			, wheelRight(0.68, 3.6)
@@ -86,6 +86,17 @@ namespace F16
 				return true;
 			}
 			return false;
+		}
+		int countWoW()
+		{
+			int n = 0;
+			if (wheelNose.isWoW())
+				n++;
+			if (wheelLeft.isWoW())
+				n++;
+			if (wheelRight.isWoW())
+				n++;
+			return n;
 		}
 
 		void setParkingBreak(bool OnOff)
@@ -234,6 +245,9 @@ namespace F16
 		// and speed relative to ground (static, sliding or rolling friction of each wheel)
 		void updateFrame(const double groundSpeed, const double weightN, double frameTime)
 		{
+			// recount for each frame
+			CxRollingFriction = CzRollingFriction = 0;
+
 			// TODO: angle for each wheel individually
 
 			// if there is weight on wheels -> do nothing
@@ -264,30 +278,28 @@ namespace F16
 
 			gearAeroDrag();
 
-			wheelNose.updateForceFriction(groundSpeed, weightN);
-			wheelLeft.updateForceFriction(groundSpeed, weightN);
-			wheelRight.updateForceFriction(groundSpeed, weightN);
-
-			//wheelFriction();
-			//wheelBrakeEffect(weightN);
-		}
-
-		// let's see.. 
-		// total static friction should be amount of friction required (by engine thrust)
-		// to be exceeded before we start rolling
-		/* 
-		void getTotalStaticFriction(const double weightN, double &Cx, double &Cy)
-		{
-			if (isWoW() == false)
+			// let's see.. 
+			// total static friction should be amount of friction required (by engine thrust)
+			// to be exceeded before we start rolling
+			if (isWoW() == true) // <- at least one wheel has weight on it
 			{
-				Cx = Cy = 0;
-				return;
-			}
+				double weightperwheel = weightN / countWoW();
 
-			Cx = weightN * wheelNose.wheel_static_friction_factor;
-			Cy = weightN * wheelNose.wheel_side_friction_factor;
+				wheelNose.updateForceFriction(groundSpeed, weightperwheel);
+				wheelLeft.updateForceFriction(groundSpeed, weightperwheel);
+				wheelRight.updateForceFriction(groundSpeed, weightperwheel);
+
+				CxRollingFriction += wheelNose.CxWheelFriction;
+				CzRollingFriction += wheelNose.CzWheelFriction;
+
+				CxRollingFriction += wheelLeft.CxWheelFriction;
+				CzRollingFriction += wheelLeft.CzWheelFriction;
+
+				CxRollingFriction += wheelRight.CxWheelFriction;
+				CzRollingFriction += wheelRight.CzWheelFriction;
+			}
 		}
-		*/
+
 
 	protected:
 
@@ -299,73 +311,11 @@ namespace F16
 			CxGearAero = - (CDGearAero * gearYcos);
 		}
 
-		/*
-		void wheelFriction()
-		{
-			// TODO: can we just add together like this?
-
-			CxRollingFriction += wheelNose.CxWheelFriction;
-			CxRollingFriction += wheelLeft.CxWheelFriction;
-			CxRollingFriction += wheelRight.CxWheelFriction;
-
-			CyRollingFriction += wheelNose.CyWheelFriction;
-			CyRollingFriction += wheelLeft.CyWheelFriction;
-			CyRollingFriction += wheelRight.CyWheelFriction;
-		}
-		*/
-
-		/*
-		void wheelBrakeEffect(const double weightN)
-		{
-			// TODO: also anti-skid system, wheel locking without it etc.
-
-			// also include hydraulic system pressure for effective braking force (not just indicated)
-			// also check if there is electric power?
-
-			if (antiSkidOn == true)
-			{}
-
-			//wheelNose.wheelBrake();
-			wheelLeft.wheelBrake();
-			wheelRight.wheelBrake();
-		}
-		*/
-
 		void brakeFluidUsage(double frameTime)
 		{
 			// TODO: there's fluid for approx. 75s (toe brakes)
 			// parking brake usage does not deplete fluid
 		}
-
-		/*
-		void updateStrutCompression()
-		{
-			// TODO: actual calculations of weight on each wheel,
-			// especially force when landing unevenly etc.
-
-			if (gearDownAngle == 0)
-			{
-				// retracted
-				wheelNose.setStrutRetracted();
-				wheelLeft.setStrutRetracted();
-				wheelRight.setStrutRetracted();
-			}
-			else if (isWoW() == true)
-			{
-				// parking
-				wheelNose.setStrutParking();
-				wheelLeft.setStrutParking();
-				wheelRight.setStrutParking();
-			}
-			else
-			{
-				// extended
-				wheelNose.setStrutExtended();
-				wheelLeft.setStrutExtended();
-				wheelRight.setStrutExtended();
-			}
-		}
-		*/
 	};
 }
 

@@ -289,7 +289,7 @@ void ed_fm_simulate(double dt)
 		F16::Motion.updateNoseWheelTurn(F16::LandingGear.getNoseTurnDirection(), F16::LandingGear.getNosegearAngle());
 
 		// combined rolling friction currently, not per-wheel as it should perhaps..
-		F16::Motion.updateRollingFriction(F16::LandingGear.CxRollingFriction, F16::LandingGear.CyRollingFriction);
+		F16::Motion.updateRollingFriction(F16::LandingGear.CxRollingFriction, F16::LandingGear.CzRollingFriction);
 
 		// just braking force, needs refining
 		F16::Motion.updateBrakingFriction(F16::LandingGear.wheelLeft.brakeForce, F16::LandingGear.wheelRight.brakeForce);
