@@ -425,12 +425,7 @@ void ed_fm_set_command(int command, float value)
 		break;
 
 	case JoystickThrottle:
-		{
-			// MaksRUD	=	0.85, -- Military power state of the throttle
-			// ForsRUD	=	0.91, -- Afterburner state of the throttle
-			double limited = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
-			F16::Engine.setThrottleInput(limited);
-		}
+		F16::Engine.setThrottleInputRaw(value);
 		break;
 
 	case ApuStart:
@@ -476,14 +471,14 @@ void ed_fm_set_command(int command, float value)
 
 		// analog input (axis)
 	case WheelBrake:
-		F16::LandingGear.setWheelBrakeLeft(limit(value, 0, 1.0));
-		F16::LandingGear.setWheelBrakeRight(limit(value, 0, 1.0));
+		F16::LandingGear.setWheelBrakeLeft(value);
+		F16::LandingGear.setWheelBrakeRight(value);
 		break;
 	case WheelBrakeLeft:
-		F16::LandingGear.setWheelBrakeLeft(limit(value, 0, 1.0));
+		F16::LandingGear.setWheelBrakeLeft(value);
 		break;
 	case WheelBrakeRight:
-		F16::LandingGear.setWheelBrakeRight(limit(value, 0, 1.0));
+		F16::LandingGear.setWheelBrakeRight(value);
 		break;
 
 		// switch/button input (keyboard)

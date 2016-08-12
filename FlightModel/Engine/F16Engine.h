@@ -106,10 +106,22 @@ namespace F16
 		{}
 		~F16Engine() {}
 
+		// MaksRUD	=	0.85, -- Military power state of the throttle
+		// ForsRUD	=	0.91, -- Afterburner state of the throttle
+		void setThrottleInputRaw(double value)
+		{
+			// old code, see if we need changes..
+			double limited = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
+
+			throttleInput = limited;
+		}
+
+		/*
 		void setThrottleInput(double value)
 		{
 			throttleInput = value;
 		}
+		*/
 		double getThrottleInput() const
 		{
 			return throttleInput;
