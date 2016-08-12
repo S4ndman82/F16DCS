@@ -22,6 +22,12 @@ namespace F16
 		{}
 		~AnalogInput() {}
 
+		AnalogInput& operator=(const double value)
+		{
+			current_value = limit(value, lower_limit, upper_limit);
+			return *this;
+		}
+
 		void setValue(const double value)
 		{
 			current_value = limit(value, lower_limit, upper_limit);
