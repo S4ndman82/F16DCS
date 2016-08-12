@@ -115,6 +115,9 @@
     <ClInclude Include="Atmosphere\F16GroundSurface.h">
       <Filter>Atmosphere</Filter>
     </ClInclude>
+    <ClInclude Include="Inputs\F16AnalogInput.h">
+      <Filter>Inputs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
