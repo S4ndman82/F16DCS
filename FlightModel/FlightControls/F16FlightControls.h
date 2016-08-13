@@ -560,8 +560,27 @@ namespace F16
 			return rollRateCommand;
 		}
 
+		double getRollFeelGain(const double longStickForce) const
+		{
+			double longStickForceGained = longStickForce * 0.0667;
+			double rollFeelGain = 0.0;
+			if (abs(longStickForce) > 25.0)
+			{
+				rollFeelGain = 0.7;
+			}
+			else if (longStickForce >= 0.0)
+			{
+				rollFeelGain = -0.012 * longStickForceGained + 1.0;
+			}
+			else if (longStickForce < 0.0)
+			{
+				rollFeelGain = 0.012 * longStickForceGained + 1.0;
+			}
+			return rollFeelGain;
+		}
+
 		// Controller for roll
-		double fcs_roll_controller(double latStickInput, double longStickForce, double dynPressure_LBFT2, double dt)
+		double fcs_roll_controller(double latStickInput, double dynPressure_LBFT2, double dt)
 		{
 			const double roll_rate = bodyState.getRollRateDegs();
 			double ay = bodyState.getAccYPerG();
@@ -594,20 +613,7 @@ namespace F16
 
 			double latStickForceBiased = latStickForce - (ay * 8.9);  // CJS: remove side acceleration bias?
 
-			double longStickForceGained = longStickForce * 0.0667;
-			double rollFeelGain = 0.0;
-			if(abs(longStickForce) > 25.0)
-			{
-				rollFeelGain = 0.7;
-			}
-			else if(longStickForce >= 0.0)
-			{
-				rollFeelGain = -0.012 * longStickForceGained + 1.0;
-			}
-			else if(longStickForce < 0.0)
-			{
-				rollFeelGain = 0.012 * longStickForceGained + 1.0;
-			}
+			double rollFeelGain = getRollFeelGain(m_longStickForce);
 
 			double rollRateCommand = getRollRateCommand(latStickForceBiased * rollFeelGain);
 
@@ -739,7 +745,7 @@ namespace F16
 			flightSurface.elevator_DEG = elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 			flightSurface.elevator_DEG = limit(flightSurface.elevator_DEG, -25.0, 25.0);
 
-			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput.getValue(), m_longStickForce, dynamicPressure_LBFT2, frametime));
+			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput.getValue(), dynamicPressure_LBFT2, frametime));
 			flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 			flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 
