@@ -145,18 +145,14 @@ namespace F16
 		// Pitch controller variables
 		AnalogInput		longStickInput; // pitch normalized
 		AnalogInput		latStickInput; // bank normalized
-		double		longStickInputRaw; // pitch orig
-		double		latStickInputRaw; // bank orig
+		AnalogInput		pedInput;		// Pedal input command normalized (-1 to 1)
 
 		// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 		bool manualPitchOverride;
 
 		double		m_stickCommandPosFiltered;
-		double		alphaFiltered;
+		double		m_alphaFiltered;
 		double		m_longStickForce;
-
-		double		pedInput;		// Pedal input command normalized (-1 to 1)
-		double		pedInputRaw;	// yaw orig
 
 		// Control filters (general filters to easily code up when compared to report block diagrams)
 		DummyFilter	pitchRateWashout;
@@ -191,14 +187,11 @@ namespace F16
 			, trimState(-0.3, 0, 0) // <- why -0.3 for pitch?
 			, longStickInput(-1.0, 1.0)
 			, latStickInput(-1.0, 1.0)
-			, longStickInputRaw(0)
-			, latStickInputRaw(0)
+			, pedInput(-1.0, 1.0)
 			, manualPitchOverride(false)
 			, m_stickCommandPosFiltered(0)
-			, alphaFiltered(0)
+			, m_alphaFiltered(0)
 			, m_longStickForce(0)
-			, pedInput(0)
-			, pedInputRaw(0)
 			, pitchRateWashout()
 			, pitchIntegrator()
 			, pitchPreActuatorFilter()
@@ -218,19 +211,17 @@ namespace F16
 		{}
 		~F16FlightControls() {}
 
-		void setPedInput(double value)
-		{
-			pedInput = value;
-		}
 		void setLatStickInput(double value) 
 		{
-			latStickInputRaw = value;
 			latStickInput = value;
 		}
 		void setLongStickInput(double value) 
 		{
-			longStickInputRaw = value;
 			longStickInput = -value;
+		}
+		void setPedInput(double value)
+		{
+			pedInput = -value;
 		}
 
 		void initAirBrakeOff()
@@ -312,6 +303,27 @@ namespace F16
 			return leading_edge_flap_integrated_gained_biased; 
 		}
 
+		double getRudderCommand(const double pedInput) const
+		{
+			double rudderForceCommand = pedInput * 450.0;
+
+			double rudderCommand = 0.0;
+			if (abs(rudderForceCommand) < 44.0)
+			{
+				rudderCommand = 0.0;
+			}
+			else if (rudderForceCommand >= 44.0)
+			{
+				rudderCommand = -0.0739 * rudderForceCommand + 3.2512;
+			}
+			else if (rudderForceCommand <= -44.0)
+			{
+				rudderCommand = -0.0739 * rudderForceCommand - 3.2512;
+			}
+
+			return limit(rudderCommand, -30.0, 30.0);
+		}
+
 		// Controller for yaw
 		double fcs_yaw_controller(double pedInput, double aileron_commanded, double dt)
 		{
@@ -338,27 +350,11 @@ namespace F16
 				yawServoFilter.InitFilter(numerators3,denomiantors3,2,dt);
 			}
 
-			double rudderForceCommand = pedInput * 450.0;
-
-			double rudderCommand = 0.0;
-			if(abs(rudderForceCommand) < 44.0)
-			{
-				rudderCommand = 0.0;
-			}
-			else if(rudderForceCommand >= 44.0)
-			{
-				rudderCommand = -0.0739 * rudderForceCommand + 3.2512;
-			}
-			else if(rudderForceCommand <= -44.0)
-			{
-				rudderCommand = -0.0739 * rudderForceCommand - 3.2512;
-			}
-
-			rudderCommand = limit(rudderCommand, -30.0, 30.0);
+			double rudderCommand = getRudderCommand(pedInput);
 			double rudderCommandFiltered = rudderCommandFilter.Filter(!(simInitialized),dt,rudderCommand);
 			double rudderCommandFilteredWTrim = trimState.trimYaw - rudderCommandFiltered;
 
-			double alphaGained = alphaFiltered * (1.0 / 57.3);
+			double alphaGained = m_alphaFiltered * (1.0 / 57.3);
 			double rollRateWithAlpha = roll_rate * alphaGained;
 			double yawRateWithRoll = yaw_rate - rollRateWithAlpha;
 
@@ -367,7 +363,7 @@ namespace F16
 
 			double yawRateFilteredWithSideAccel = yawRateWithRollFiltered;// + (ay * 19.3);
 
-			double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * aileron_commanded;
+			double aileronGained = limit(0.05 * m_alphaFiltered, 0.0, 1.5) * aileron_commanded;
 
 			double finalRudderCommand = aileronGained + yawRateFilteredWithSideAccel + rudderCommandFilteredWTrim;
 
@@ -432,11 +428,10 @@ namespace F16
 		}
 
 		// Schedule gain component due to dynamic pressure
-		double dynamic_pressure_schedule(double dynPressure_LBFT2)
+		double dynamic_pressure_schedule(const double dynPressure_LBFT2) const
 		{
 			double dynamicPressure_kNM2 = dynPressure_LBFT2 * 1.4881639/1000.0; //for kN/m^2
 			double scheduleOutput = 0.0;
-
 			if(dynamicPressure_kNM2 < 9.576)
 			{
 				scheduleOutput = 1.0;
@@ -451,14 +446,11 @@ namespace F16
 				scheduleOutput = -0.003 * dynamicPressure_kNM2 + 0.5277;
 				//scheduleOutput = -0.001 * dynamicPressure_kNM2 + 0.2422;
 			}
-
-			scheduleOutput = limit(scheduleOutput,0.05,1.0);
-
-			return scheduleOutput;
+			return limit(scheduleOutput,0.05,1.0);
 		}
 
 		// Angle of attack limiter logic
-		double angle_of_attack_limiter(double alphaFiltered, double pitchRateCommand) const
+		double angle_of_attack_limiter(const double alphaFiltered, const double pitchRateCommand) const
 		{
 			double topLimit = limit((alphaFiltered - 22.5) * 0.69, 0.0, 99999.0);
 			double bottomLimit = limit((alphaFiltered - 15.0 + pitchRateCommand) * 0.322, 0.0, 99999.0);
@@ -503,13 +495,13 @@ namespace F16
 			double azFiltered = accelFilter.Filter(!(simInitialized), dt, az-1.0);
 
 			double alphaLimited = limit(bodyState.alpha_DEG, -5.0, 30.0);
-			double alphaLimitedRate = 10.0 * (alphaLimited - alphaFiltered);
-			alphaFiltered += (alphaLimitedRate * dt);
+			double alphaLimitedRate = 10.0 * (alphaLimited - m_alphaFiltered);
+			m_alphaFiltered += (alphaLimitedRate * dt);
 
 			double pitchRateWashedOut = pitchRateWashout.Filter(!(simInitialized),dt,pitch_rate);
 			double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;		
 
-			double limiterCommand = angle_of_attack_limiter(-alphaFiltered, pitchRateCommand);
+			double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
 
 			double gLimiterCommand = -(azFiltered +  (pitchRateWashedOut * 0.2));	
 
@@ -519,7 +511,7 @@ namespace F16
 			finalCombinedCommandFilteredLimited = finalCombinedCommandFilteredLimited + finalCombinedCommand;
 
 			double finalPitchCommandTotal = pitchPreActuatorFilter.Filter(!(simInitialized),dt,finalCombinedCommandFilteredLimited);
-			finalPitchCommandTotal += (0.5 * alphaFiltered);
+			finalPitchCommandTotal += (0.5 * m_alphaFiltered);
 
 			return finalPitchCommandTotal;
 
@@ -771,7 +763,7 @@ namespace F16
 			flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 			flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 
-			double rudder_DEG_commanded = fcs_yaw_controller(pedInput, aileron_DEG_commanded, frametime);
+			double rudder_DEG_commanded = fcs_yaw_controller(pedInput.getValue(), aileron_DEG_commanded, frametime);
 			flightSurface.rudder_DEG = rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 			flightSurface.rudder_DEG = limit(flightSurface.rudder_DEG, -30.0, 30.0);
 

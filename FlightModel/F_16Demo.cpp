@@ -123,6 +123,10 @@ bool locateCockpitDll();
 //-------------------------------------------------------
 namespace F16
 {
+	double		longStickInputRaw = 0; // pitch orig (just for cockpit anim)
+	double		latStickInputRaw = 0; // bank orig (just for cockpit anim)
+	double		pedInputRaw = 0;	// yaw orig (just for cockpit anim)
+
 	F16Atmosphere Atmos;
 	F16GroundSurface Ground(&Atmos);
 	F16Aero Aero;
@@ -405,21 +409,22 @@ void ed_fm_set_command(int command, float value)
 	switch (command)
 	{
 	case JoystickRoll:
+		F16::latStickInputRaw = value; // just for cockpit anim
+
 		F16::FlightControls.setLatStickInput(value);
 		break;
 
 	case JoystickPitch:
+		F16::longStickInputRaw = value; // just for cockpit anim
+
 		F16::FlightControls.setLongStickInput(value);
 		break;
 
 	case JoystickYaw:
-		{
-			F16::FlightControls.pedInputRaw = value;
-			F16::FlightControls.setPedInput(limit(-value, -1.0, 1.0));
+		F16::pedInputRaw = value; // just for cockpit anim
 
-			// use raw input for nosewheel now
-			F16::LandingGear.nosewheelTurn(value); // <- does nothing if not enabled or no weight on wheels
-		}
+		F16::FlightControls.setPedInput(value);
+		F16::LandingGear.nosewheelTurn(value); // <- does nothing if not enabled or no weight on wheels
 		break;
 
 	case JoystickThrottle:
@@ -538,8 +543,9 @@ void ed_fm_set_command(int command, float value)
 		F16::Airframe.canopyToggle();
 		break;
 
-	case 215:
+	case 215: // trimstop command (key up)
 		break;
+
 	case 2142:
 	case 2143:
 		// ignore these, they are noisy
@@ -794,8 +800,8 @@ void ed_fm_set_fc3_cockpit_draw_args (EdDrawArgument * drawargs,size_t size)
 	// yay! this seems to work ok!
 	// TODO: movement is really small in real-life -> limit movements (1/4 inches both axes)
 	// currently you can use this to check joystick vs. in-cockpit movement
-	drawargs[2].f = (float)F16::FlightControls.longStickInputRaw;
-	drawargs[3].f = (float)F16::FlightControls.latStickInputRaw;
+	drawargs[2].f = (float)F16::longStickInputRaw;
+	drawargs[3].f = (float)F16::latStickInputRaw;
 
 }
 
