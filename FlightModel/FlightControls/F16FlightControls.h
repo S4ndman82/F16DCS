@@ -151,7 +151,7 @@ namespace F16
 		double		stickCommandPosFiltered;
 		double		azFiltered;
 		double		alphaFiltered;
-		double		longStickForce;
+		double		m_longStickForce;
 
 		double		pedInput;		// Pedal input command normalized (-1 to 1)
 		double		pedInputRaw;	// yaw orig
@@ -194,7 +194,7 @@ namespace F16
 			, stickCommandPosFiltered(0)
 			, azFiltered(0)
 			, alphaFiltered(0)
-			, longStickForce(0)
+			, m_longStickForce(0)
 			, pedInput(0)
 			, pedInputRaw(0)
 			, pitchRateWashout()
@@ -376,6 +376,32 @@ namespace F16
 			//return yawServoCommand;
 		}
 
+		double getPitchRateCommand(const double longStickInputForce) const
+		{
+			double longStickCommand_G = 0.0;
+			if (abs(longStickInputForce) <= 8.0)
+			{
+				longStickCommand_G = 0.0;
+			}
+			else if ((longStickInputForce < -8) && (longStickInputForce > -33.0))
+			{
+				longStickCommand_G = (0.016 * longStickInputForce) + 0.128;
+			}
+			else if (longStickInputForce <= -33.0)
+			{
+				longStickCommand_G = (0.067 * longStickInputForce) + 1.8112;
+			}
+			else if ((longStickInputForce > 8.0) && (longStickInputForce < 33.0))
+			{
+				longStickCommand_G = (0.032 * longStickInputForce) - 0.256;
+			}
+			else if (longStickInputForce >= 33.0)
+			{
+				longStickCommand_G = 0.0681*longStickInputForce - 1.4468;
+			}
+			return longStickCommand_G;
+		}
+
 		// Stick force schedule for pitch control
 		double fcs_pitch_controller_force_command(double longStickInput, double dt)
 		{
@@ -389,29 +415,9 @@ namespace F16
 				longStickInputForce = longStickInput * 180.0;
 			}
 			longStickInputForce = limit(longStickInputForce,-180.0,80.0);
-			longStickForce = longStickInputForce;
+			m_longStickForce = longStickInputForce;
 
-			double longStickCommand_G = 0.0;
-			if(abs(longStickInputForce) <=  8.0)
-			{
-				longStickCommand_G = 0.0;
-			}
-			else if((longStickInputForce < -8) && (longStickInputForce > -33.0))
-			{
-				longStickCommand_G = (0.016 * longStickInputForce) + 0.128;
-			}
-			else if(longStickInputForce <= -33.0)
-			{
-				longStickCommand_G = (0.067 * longStickInputForce) + 1.8112;
-			}
-			else if((longStickInputForce > 8.0) && (longStickInputForce < 33.0))
-			{
-				longStickCommand_G = (0.032 * longStickInputForce) - 0.256;
-			}
-			else if(longStickInputForce >= 33.0)
-			{
-				longStickCommand_G = 0.0681*longStickInputForce - 1.4468;
-			}
+			double longStickCommand_G = getPitchRateCommand(longStickInputForce);
 
 			double longStickCommandWithTrim_G = trimState.trimPitch - longStickCommand_G;
 
@@ -520,6 +526,40 @@ namespace F16
 			//return actuatorDynamicsResult;	
 		}
 
+		double getRollRateCommand(const double latStickForceFinal) const
+		{
+			double rollRateCommand = 0.0;
+			if (abs(latStickForceFinal) < 3.0)
+			{
+				rollRateCommand = 0.0;
+			}
+			else if ((latStickForceFinal >= 3.0) && (latStickForceFinal <= 25.0))
+			{
+				rollRateCommand = 0.9091 * latStickForceFinal - 2.7273;
+			}
+			else if ((latStickForceFinal > 25.0) && (latStickForceFinal <= 46.0))
+			{
+				rollRateCommand = 2.8571 * latStickForceFinal - 51.429;
+			}
+			else if ((latStickForceFinal > 46.0))
+			{
+				rollRateCommand = 7.5862 * latStickForceFinal - 268.97;
+			}
+			else if ((latStickForceFinal <= -3.0) && (latStickForceFinal >= -25.0))
+			{
+				rollRateCommand = 0.9091 * latStickForceFinal + 2.7273;
+			}
+			else if ((latStickForceFinal < -25.0) && (latStickForceFinal >= -46.0))
+			{
+				rollRateCommand = 2.8571 * latStickForceFinal + 51.429;
+			}
+			else if ((latStickForceFinal < -46.0))
+			{
+				rollRateCommand = 7.5862 * latStickForceFinal + 268.97;
+			}
+			return rollRateCommand;
+		}
+
 		// Controller for roll
 		double fcs_roll_controller(double latStickInput, double longStickForce, double dynPressure_LBFT2, double dt)
 		{
@@ -569,37 +609,7 @@ namespace F16
 				rollFeelGain = 0.012 * longStickForceGained + 1.0;
 			}
 
-			double latStickForceFinal = latStickForceBiased * rollFeelGain;
-
-			double rollRateCommand = 0.0;
-			if(abs(latStickForceFinal) < 3.0)
-			{
-				rollRateCommand = 0.0;
-			}
-			else if((latStickForceFinal >= 3.0) && (latStickForceFinal <= 25.0))
-			{
-				rollRateCommand = 0.9091 * latStickForceFinal - 2.7273;
-			}
-			else if((latStickForceFinal > 25.0) && (latStickForceFinal <= 46.0))
-			{
-				rollRateCommand = 2.8571 * latStickForceFinal - 51.429;
-			}
-			else if((latStickForceFinal > 46.0))
-			{
-				rollRateCommand = 7.5862 * latStickForceFinal - 268.97;
-			}
-			else if((latStickForceFinal <= -3.0) && (latStickForceFinal >= -25.0))
-			{
-				rollRateCommand = 0.9091 * latStickForceFinal + 2.7273;
-			}
-			else if((latStickForceFinal < -25.0) && (latStickForceFinal >= -46.0))
-			{
-				rollRateCommand = 2.8571 * latStickForceFinal + 51.429;
-			}
-			else if((latStickForceFinal < -46.0))
-			{
-				rollRateCommand = 7.5862 * latStickForceFinal + 268.97;
-			}
+			double rollRateCommand = getRollRateCommand(latStickForceBiased * rollFeelGain);
 
 			double rollRateCommandFilterd = rollCommandFilter.Filter(!(simInitialized),dt,rollRateCommand);
 
@@ -729,7 +739,7 @@ namespace F16
 			flightSurface.elevator_DEG = elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 			flightSurface.elevator_DEG = limit(flightSurface.elevator_DEG, -25.0, 25.0);
 
-			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput.getValue(), longStickForce, dynamicPressure_LBFT2, frametime));
+			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput.getValue(), m_longStickForce, dynamicPressure_LBFT2, frametime));
 			flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 			flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 
