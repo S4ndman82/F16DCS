@@ -49,18 +49,35 @@ namespace F16
 
 		void updateFrame(double frameTime)
 		{
+			if (surfaceHeightWithObj > surfaceHeight)
+			{
+				// ground effect disrupted by object (or uneven surface?)
+				return;
+			}
+
+			//calculation of ground surface with aircraft normal
+			// -> max effect when aligned, reduced as banking
+
+			// trailing edge downwash effect (are flaps down?)
+			// wingtip vortices (sidewinders?)
+
+			// we might need airspeed and air pressure to determine magnitude of lift effect
+			Vec3 airSpeed;
+			pAtmos->getAirspeed(airSpeed);
+
+			// also reduction of induced drag when in ground effect -> less thrust needed
+
 			// TODO: check height, set for ground effect simulation?
 			// also if weight on wheels?
-			/*
-			if (F16::wingSpan_FT >= (F16::meterToFoot*surfaceHeight) && F16::LandingGear.isWoW() == false)
+			if (F16::wingSpan_FT >= (F16::meterToFoot*surfaceHeight) /*&& F16::LandingGear.isWoW() == false*/)
 			{
 				// in ground effect with the surface?
 				// flying above ground, no weight on wheels?
-			}
-			*/
 
-			Vec3 airSpeed;
-			pAtmos->getAirspeed(airSpeed);
+				//double diff = F16::wingSpan_FT - (F16::meterToFoot*surfaceHeight);
+
+			}
+
 
 		}
 	};

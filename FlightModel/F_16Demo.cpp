@@ -770,6 +770,7 @@ void ed_fm_set_fc3_cockpit_draw_args (EdDrawArgument * drawargs,size_t size)
 	*/
 	// yay! this seems to work ok!
 	// TODO: movement is really small in real-life -> limit movements (1/4 inches both axes)
+	// currently you can use this to check joystick vs. in-cockpit movement
 	drawargs[2].f = (float)F16::FlightControls.longStickInputRaw;
 	drawargs[3].f = (float)F16::FlightControls.latStickInputRaw;
 
