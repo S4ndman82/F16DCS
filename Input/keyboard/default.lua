@@ -78,6 +78,15 @@ join(res.keyCommands,{
 {combos = {{key = 'H', reformers = {'RShift','RAlt'}}}, pressed = iCommandHUDBrightnessDown, name = _('HUD Brightness down'), category = _('Systems')},
 {combos = {{key = 'R'}}, down = iCommandPlaneFuelOn, up = iCommandPlaneFuelOff, name = _('Fuel Dump'), category = _('Systems')},
 
+-- trimming
+{combos = {{key = 'A', reformers = {'LShift'}}}, pressed = iCommandPlaneTrimUp, up = iCommandPlaneTrimStop, name = _('trim: Nose Up'), category = _('Flight Control')},
+{combos = {{key = 'Z', reformers = {'LShift'}}}, pressed = iCommandPlaneTrimDown, up = iCommandPlaneTrimStop, name = _('trim: Nose Down'), category = _('Flight Control')},
+{combos = {{key = 'S', reformers = {'LShift'}}}, pressed = iCommandPlaneTrimLeft, up = iCommandPlaneTrimStop, name = _('trim: Left wing Down'), category = _('Flight Control')},
+{combos = {{key = 'D', reformers = {'LShift'}}}, pressed = iCommandPlaneTrimRight, up = iCommandPlaneTrimStop, name = _('trim: Right wing Down'), category = _('Flight Control')},
+{combos = {{key = 'Z', reformers = {'LShift'}}}, pressed = iCommandPlaneTrimLeftRudder, up = iCommandPlaneTrimStop, name = _('trim: Rudder Left'), category = _('Flight Control')},
+{combos = {{key = 'X', reformers = {'LShift'}}}, pressed = iCommandPlaneTrimRightRudder, up = iCommandPlaneTrimStop, name = _('trim: Rudder Right'), category = _('Flight Control')},
+
+
 -- Modes
 {combos = {{key = '2'}}, down = iCommandPlaneModeBVR, name = _('(2) Beyond Visual Range Mode'), category = _('Modes')},
 {combos = {{key = '3'}}, down = iCommandPlaneModeVS, name = _('(3) Close Air Combat Vertical Scan Mode'), category = _('Modes')},

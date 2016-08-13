@@ -147,9 +147,11 @@ namespace F16
 		AnalogInput		latStickInput; // bank normalized
 		double		longStickInputRaw; // pitch orig
 		double		latStickInputRaw; // bank orig
-		
-		double		stickCommandPosFiltered;
-		double		azFiltered;
+
+		// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
+		bool manualPitchOverride;
+
+		double		m_stickCommandPosFiltered;
 		double		alphaFiltered;
 		double		m_longStickForce;
 
@@ -191,8 +193,8 @@ namespace F16
 			, latStickInput(-1.0, 1.0)
 			, longStickInputRaw(0)
 			, latStickInputRaw(0)
-			, stickCommandPosFiltered(0)
-			, azFiltered(0)
+			, manualPitchOverride(false)
+			, m_stickCommandPosFiltered(0)
 			, alphaFiltered(0)
 			, m_longStickForce(0)
 			, pedInput(0)
@@ -423,10 +425,10 @@ namespace F16
 
 			double longStickCommandWithTrimLimited_G = limit(longStickCommandWithTrim_G, -4.0, 8.0);
 
-			double longStickCommandWithTrimLimited_G_Rate = 4.0 * (longStickCommandWithTrimLimited_G - stickCommandPosFiltered);
-			stickCommandPosFiltered += (longStickCommandWithTrimLimited_G_Rate * dt);
+			double longStickCommandWithTrimLimited_G_Rate = 4.0 * (longStickCommandWithTrimLimited_G - m_stickCommandPosFiltered);
+			m_stickCommandPosFiltered += (longStickCommandWithTrimLimited_G_Rate * dt);
 
-			return stickCommandPosFiltered;
+			return m_stickCommandPosFiltered;
 		}
 
 		// Schedule gain component due to dynamic pressure
@@ -498,7 +500,7 @@ namespace F16
 
 			double dynamicPressureScheduled = dynamic_pressure_schedule(dynPressure_LBFT2);	
 
-			azFiltered = accelFilter.Filter(!(simInitialized), dt, az-1.0);
+			double azFiltered = accelFilter.Filter(!(simInitialized), dt, az-1.0);
 
 			double alphaLimited = limit(bodyState.alpha_DEG, -5.0, 30.0);
 			double alphaLimitedRate = 10.0 * (alphaLimited - alphaFiltered);
@@ -693,30 +695,50 @@ namespace F16
 			bodyState.pitchRate_RPS = omegaz;
 			bodyState.yawRate_RPS = -omegay;
 
+			// note the change in coordinate system here..
 			bodyState.accz = ay;
 			bodyState.accy = az;
 		}
 
-		/*
-		void setTrimPitch(double trim)
+		void trimPitch(bool up)
 		{
-			// TODO: check the kind of value we would get here,
-			// is it absolute value or difference etc.
-			trimState.trimPitch = trim;
+			// TODO: check the kind of values we should use per notch
+			const double trim = 1;
+			if (up == true)
+			{
+				trimState.trimPitch += trim;
+			}
+			else
+			{
+				trimState.trimPitch -= trim;
+			}
 		}
-		void setTrimRoll(double trim)
+		void trimRoll(bool cw)
 		{
-			// TODO: check the kind of value we would get here,
-			// is it absolute value or difference etc.
-			trimState.trimRoll = trim;
+			// TODO: check the kind of values we should use per notch
+			const double trim = 1;
+			if (cw == true)
+			{
+				trimState.trimRoll += trim;
+			}
+			else
+			{
+				trimState.trimRoll -= trim;
+			}
 		}
-		void setTrimYaw(double trim)
+		void trimYaw(bool right)
 		{
-			// TODO: check the kind of value we would get here,
-			// is it absolute value or difference etc.
-			trimState.trimYaw = trim;
+			// TODO: check the kind of values we should use per notch
+			const double trim = 1;
+			if (right == true)
+			{
+				trimState.trimYaw += trim;
+			}
+			else
+			{
+				trimState.trimYaw -= trim;
+			}
 		}
-		*/
 
 		//---------------------------------------------
 		//-----CONTROL DYNAMICS------------------------

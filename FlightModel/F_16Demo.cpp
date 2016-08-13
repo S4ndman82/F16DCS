@@ -512,28 +512,34 @@ void ed_fm_set_command(int command, float value)
 		*/
 		break;
 
-		/*
-	case TrimPitch:
-		swprintf(dbgmsg, 255, L" F16::trim pitch: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
+	case TrimPitchDown:
+		F16::FlightControls.trimPitch(false);
+		break;
+	case TrimPitchUp:
+		F16::FlightControls.trimPitch(true);
 		break;
 
-	case TrimRoll:
-		swprintf(dbgmsg, 255, L" F16::trim roll: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
+	case TrimRollCCW:
+		F16::FlightControls.trimRoll(false);
+		break;
+	case TrimRollCW:
+		F16::FlightControls.trimRoll(true);
 		break;
 
-	case TrimYaw:
-		swprintf(dbgmsg, 255, L" F16::trim yaw: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
+	case TrimYawLeft:
+		F16::FlightControls.trimYaw(false);
 		break;
-		*/
+	case TrimYawRight:
+		F16::FlightControls.trimYaw(true);
+		break;
 
 	case Canopy:
 		// on/off toggle (needs some actuator support as well)
 		F16::Airframe.canopyToggle();
 		break;
 
+	case 215:
+		break;
 	case 2142:
 	case 2143:
 		// ignore these, they are noisy
