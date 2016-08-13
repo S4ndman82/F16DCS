@@ -12,29 +12,37 @@ namespace F16
 		const double lower_limit;
 		const double upper_limit;
 
+		double prev_value;
 		double current_value;
 
 	public:
 		AnalogInput(const double lower, const double upper) 
 			: lower_limit(lower)
 			, upper_limit(upper)
+			, prev_value(0)
 			, current_value(0)
 		{}
 		~AnalogInput() {}
 
 		AnalogInput& operator=(const double value)
 		{
+			prev_value = current_value;
 			current_value = limit(value, lower_limit, upper_limit);
 			return *this;
 		}
 
 		void setValue(const double value)
 		{
+			prev_value = current_value;
 			current_value = limit(value, lower_limit, upper_limit);
 		}
 		double getValue() const
 		{
 			return current_value;
+		}
+		double getDelta() const
+		{
+			return (current_value - prev_value);
 		}
 
 		double getLower() const

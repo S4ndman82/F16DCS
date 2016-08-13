@@ -101,13 +101,13 @@ namespace F16
 		void setWheelBrakeLeft(double value)
 		{
 			// 0..1 from input
-			wheelLeft.brakeInput = limit(value, 0, 1.0);
+			wheelLeft.brakeInput = value;
 		}
 		// joystick axis
 		void setWheelBrakeRight(double value)
 		{
 			// 0..1 from input
-			wheelRight.brakeInput = limit(value, 0, 1.0);
+			wheelRight.brakeInput = value;
 		}
 
 		// key press DOWN

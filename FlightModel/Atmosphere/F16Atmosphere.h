@@ -14,7 +14,6 @@ namespace F16
 	{
 	protected:
 		// internally used temporary values
-		double temp;
 		double rho;
 
 		//-----------------------------------------------------------------
@@ -47,8 +46,7 @@ namespace F16
 		double		totalVelocity_FPS;	// Total velocity (always positive) (ft/s)
 
 		F16Atmosphere() 
-			: temp(0)
-			, rho(0)
+			: rho(0)
 			, wind()
 			, velocity_world_cs()
 			, m_airspeed()
@@ -72,7 +70,6 @@ namespace F16
 			speed_of_sound = soundspeed;
 
 			// calculate some helpers already
-			temp = ambientTemperature_DegK * 1.8; // In Deg Rankine
 			rho = ambientDensity_KgPerM3 * 0.00194032033;
 		}
 
@@ -100,6 +97,8 @@ namespace F16
 			{
 				totalVelocity_FPS = 0.01;
 			}
+
+			double temp = ambientTemperature_DegK * 1.8; // In Deg Rankine
 
 			// Call the atmosphere model to get mach and dynamic pressure
 			// I'm used to english units so I am using LB/FT^2 for the pressures

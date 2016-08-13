@@ -405,13 +405,11 @@ void ed_fm_set_command(int command, float value)
 	switch (command)
 	{
 	case JoystickRoll:
-		F16::FlightControls.latStickInputRaw = value;
-		F16::FlightControls.setLatStickInput(limit(value, -1.0, 1.0));
+		F16::FlightControls.setLatStickInput(value);
 		break;
 
 	case JoystickPitch:
-		F16::FlightControls.longStickInputRaw = value;
-		F16::FlightControls.setLongStickInput(limit(-value, -1.0, 1.0));
+		F16::FlightControls.setLongStickInput(value);
 		break;
 
 	case JoystickYaw:

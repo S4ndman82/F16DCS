@@ -4,9 +4,12 @@
 #include "../stdafx.h"
 #include <memory.h>
 #include "../UtilityFunctions.h"
-//#include "../include/general_filter.h"
 
+//#include "../include/general_filter.h"
 #include "DummyFilter.h"
+
+#include "Inputs/F16AnalogInput.h"
+
 
 namespace F16
 {
@@ -130,8 +133,8 @@ namespace F16
 		bool isGearDown; // is landing gear down
 
 		// Pitch controller variables
-		double		longStickInput; // pitch normalized
-		double		latStickInput; // bank normalized
+		AnalogInput		longStickInput; // pitch normalized
+		AnalogInput		latStickInput; // bank normalized
 		double		longStickInputRaw; // pitch orig
 		double		latStickInputRaw; // bank orig
 		
@@ -173,8 +176,8 @@ namespace F16
 			, airbrakeAngle(0)
 			, airbrakeSwitch(false)
 			, isGearDown(true)
-			, longStickInput(0)
-			, latStickInput(0)
+			, longStickInput(-1.0, 1.0)
+			, latStickInput(-1.0, 1.0)
 			, longStickInputRaw(0)
 			, latStickInputRaw(0)
 			, stickCommandPosFiltered(0)
@@ -208,11 +211,15 @@ namespace F16
 		}
 		void setLatStickInput(double value) 
 		{
+			latStickInputRaw = value;
+			//latStickInput = limit(value, -1.0, 1.0);
 			latStickInput = value;
 		}
 		void setLongStickInput(double value) 
 		{
-			longStickInput = value;
+			longStickInputRaw = value;
+			//longStickInput = limit(-value, -1.0, 1.0);
+			longStickInput = -value;
 		}
 
 		void initAirBrakeOff()
@@ -689,12 +696,12 @@ namespace F16
 			// -Angle of attack (deg)
 			// -Pitch rate (rad/sec)
 			// -Differential command (from roll controller, not quite implemented yet)
-			double elevator_DEG_commanded = -(fcs_pitch_controller(longStickInput, -0.3, 0.0, dynamicPressure_LBFT2, frametime));
+			double elevator_DEG_commanded = -(fcs_pitch_controller(longStickInput.getValue(), -0.3, 0.0, dynamicPressure_LBFT2, frametime));
 			// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 			flightSurface.elevator_DEG = elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 			flightSurface.elevator_DEG = limit(flightSurface.elevator_DEG, -25.0, 25.0);
 
-			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput, longStickForce, 0.0, dynamicPressure_LBFT2, frametime));
+			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput.getValue(), longStickForce, 0.0, dynamicPressure_LBFT2, frametime));
 			flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 			flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 

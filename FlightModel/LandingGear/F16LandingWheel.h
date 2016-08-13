@@ -3,6 +3,8 @@
 
 #include "../stdafx.h"
 
+#include "Inputs/F16AnalogInput.h"
+
 namespace F16
 {
 	// nosewheel steering (NWS) limited to 32 degrees in each direction
@@ -43,7 +45,7 @@ namespace F16
 		double CxWheelFriction;
 		double CzWheelFriction; // side-ways friction (should be Zbody axis)
 
-		double brakeInput; // braking command/input from user
+		AnalogInput brakeInput; // braking command/input from user
 		double brakeForce; // result force
 
 		// from DCS, see ed_fm_suspension_feedback()
@@ -65,7 +67,7 @@ namespace F16
 			, wheelStrutDownAngle(0)
 			, CxWheelFriction(0)
 			, CzWheelFriction(0)
-			, brakeInput(0)
+			, brakeInput(0, 1.0)
 			, brakeForce(0)
 			, actingForce()
 			, actingForcePoint()
@@ -151,16 +153,19 @@ namespace F16
 			// -> apply sliding friction factor
 			//if (braking && wheel locked (anti-skid==false) -> glide-factor?)
 
-			if (groundSpeed > 0 && brakeInput > 0)
+			if (groundSpeed > 0 && brakeInput.getValue() > 0)
 			{
 				// just percentage of max according to input 0..1, right?
-				brakeForce = abs(brakeInput) * wheel_brake_moment_max;
+				brakeForce = abs(brakeInput.getValue()) * wheel_brake_moment_max;
 
 				// if anti-skid is enabled -> check for locking
 				// rotation speed of the wheel related to linear ground speed
 				//weightN * wheel_glide_friction_factor if locking?
 
 				// TODO: also consider wheel rotational inertia
+
+				// apply brakeforce as reduction of inertia?
+				// 
 			}
 
 			// note: DCS has "left-hand notation" so side-slip is Z-axis?
