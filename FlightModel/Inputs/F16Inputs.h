@@ -84,6 +84,12 @@ enum F16InputCommands
 	NoseWheelSteering = 1609, // named as "NWS disengage"?
 	//RefuelingBoom 
 
+	/*
+	TrimPitch,
+	TrimRoll,
+	TrimYaw,
+	*/
+
 	//{down = iCommandPlaneParachute, name = _('Dragging Chute'), category = _('Systems')},
 	//DraggingChute // iCommandPlaneParachute
 

@@ -512,6 +512,23 @@ void ed_fm_set_command(int command, float value)
 		*/
 		break;
 
+		/*
+	case TrimPitch:
+		swprintf(dbgmsg, 255, L" F16::trim pitch: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+		break;
+
+	case TrimRoll:
+		swprintf(dbgmsg, 255, L" F16::trim roll: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+		break;
+
+	case TrimYaw:
+		swprintf(dbgmsg, 255, L" F16::trim yaw: %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+		break;
+		*/
+
 	case Canopy:
 		// on/off toggle (needs some actuator support as well)
 		F16::Airframe.canopyToggle();

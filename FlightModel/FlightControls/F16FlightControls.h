@@ -673,8 +673,28 @@ namespace F16
 
 			bodyState.accz = ay;
 			bodyState.accy = az;
-
 		}
+
+		/*
+		void setTrimPitch(double trim)
+		{
+			// TODO: check the kind of value we would get here,
+			// is it absolute value or difference etc.
+			trimState.trimPitch = trim;
+		}
+		void setTrimRoll(double trim)
+		{
+			// TODO: check the kind of value we would get here,
+			// is it absolute value or difference etc.
+			trimState.trimRoll = trim;
+		}
+		void setTrimYaw(double trim)
+		{
+			// TODO: check the kind of value we would get here,
+			// is it absolute value or difference etc.
+			trimState.trimYaw = trim;
+		}
+		*/
 
 		//---------------------------------------------
 		//-----CONTROL DYNAMICS------------------------
