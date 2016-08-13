@@ -56,7 +56,7 @@ mount_vfs_liveries_path (current_mod_path.."/Liveries")
 -- currently needed for DCS to detect plugin as flyable..
 dofile(current_mod_path..'/Database/F16Demo.lua')
 
-suspension = 
+suspension_data = 
 {
 	{
 		mass  			  = 200,
@@ -250,7 +250,7 @@ local FM =
 	[2] = "F16DemoFM", -- DLL binarires for FM
 	center_of_mass		=	{ 0.183 , 0.261 , 0.0},		-- center of mass position relative to object 3d model center for empty aircraft
 	moment_of_inertia  	= 	{12874.0, 85552.1, 75673.6},   	-- moment of inertia of empty aircraft
-	suspension   		= suspension, -- gear posts initialization
+	suspension   		= suspension_data, -- gear posts initialization
 }
 
 --make_flyable(obj_name,optional_cockpit path,optional_fm = {mod_of_fm_origin,dll_with_fm})

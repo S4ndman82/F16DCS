@@ -31,7 +31,9 @@ namespace F16
 		double trimRoll = 0.0;
 		double trimYaw = 0.0;
 	public:
-		F16TrimState() {}
+		F16TrimState(const double pitch, const double roll, const double yaw) 
+			: trimPitch(pitch), trimRoll(roll), trimYaw(yaw)
+		{}
 		~F16TrimState() {}
 	};
 
@@ -132,6 +134,8 @@ namespace F16
 
 		bool isGearDown; // is landing gear down
 
+		F16TrimState trimState;
+
 		// Pitch controller variables
 		AnalogInput		longStickInput; // pitch normalized
 		AnalogInput		latStickInput; // bank normalized
@@ -176,6 +180,7 @@ namespace F16
 			, airbrakeAngle(0)
 			, airbrakeSwitch(false)
 			, isGearDown(true)
+			, trimState(-0.3, 0, 0) // <- why -0.3 for pitch?
 			, longStickInput(-1.0, 1.0)
 			, latStickInput(-1.0, 1.0)
 			, longStickInputRaw(0)
@@ -212,13 +217,11 @@ namespace F16
 		void setLatStickInput(double value) 
 		{
 			latStickInputRaw = value;
-			//latStickInput = limit(value, -1.0, 1.0);
 			latStickInput = value;
 		}
 		void setLongStickInput(double value) 
 		{
 			longStickInputRaw = value;
-			//longStickInput = limit(-value, -1.0, 1.0);
 			longStickInput = -value;
 		}
 
@@ -696,16 +699,17 @@ namespace F16
 			// -Angle of attack (deg)
 			// -Pitch rate (rad/sec)
 			// -Differential command (from roll controller, not quite implemented yet)
-			double elevator_DEG_commanded = -(fcs_pitch_controller(longStickInput.getValue(), -0.3, 0.0, dynamicPressure_LBFT2, frametime));
+
+			double elevator_DEG_commanded = -(fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_LBFT2, frametime));
 			// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 			flightSurface.elevator_DEG = elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 			flightSurface.elevator_DEG = limit(flightSurface.elevator_DEG, -25.0, 25.0);
 
-			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput.getValue(), longStickForce, 0.0, dynamicPressure_LBFT2, frametime));
+			double aileron_DEG_commanded = (fcs_roll_controller(latStickInput.getValue(), longStickForce, trimState.trimRoll, dynamicPressure_LBFT2, frametime));
 			flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 			flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 
-			double rudder_DEG_commanded = fcs_yaw_controller(pedInput, 0.0, aileron_DEG_commanded, frametime);
+			double rudder_DEG_commanded = fcs_yaw_controller(pedInput, trimState.trimYaw, aileron_DEG_commanded, frametime);
 			flightSurface.rudder_DEG = rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 			flightSurface.rudder_DEG = limit(flightSurface.rudder_DEG, -30.0, 30.0);
 
