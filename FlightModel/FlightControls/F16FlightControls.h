@@ -282,6 +282,9 @@ namespace F16
 			{
 				maxAnglePCT = 0.6; // ~43 deg
 			}
+			// TODO: if weight on wheel -> max opening
+			// if gear down but no weight on wheel -> restricted
+			// controlled by additional switch in cockpit?
 
 			// this uses just percentage for now
 			if (airbrakeSwitch == true && airbrakeAngle < maxAnglePCT)
