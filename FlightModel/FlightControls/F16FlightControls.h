@@ -27,10 +27,15 @@ namespace F16
 	class F16TrimState
 	{
 	public:
-		// TODO: add limits of trimmer for each axis
+		// TODO: limits of trimmer for each axis
 		//const double pitchLimit;
 		//const double rollLimit;
 		//const double yawLimit;
+
+		// increments per "notch" for each axis
+		const double pitchIncrement;
+		const double rollIncrement;
+		const double yawIncrement;
 
 		double trimPitch = 0.0;
 		double trimRoll = 0.0;
@@ -38,9 +43,20 @@ namespace F16
 
 	public:
 		F16TrimState(const double pitch, const double roll, const double yaw) 
-			: trimPitch(pitch), trimRoll(roll), trimYaw(yaw)
+			//: pitchLimit(5.0), rollLimit(5.0), yawLimit(5.0)
+			: pitchIncrement(0.1), rollIncrement(0.1), yawIncrement(0.1)
+			, trimPitch(pitch), trimRoll(roll), trimYaw(yaw)
 		{}
 		~F16TrimState() {}
+
+		void pitchUp() 		{ trimPitch += pitchIncrement; }
+		void pitchDown()	{ trimPitch -= pitchIncrement; }
+
+		void rollCCW()		{ trimRoll -= rollIncrement; }
+		void rollCW()		{ trimRoll += rollIncrement; }
+
+		void yawLeft()		{ trimYaw += yawIncrement; }
+		void yawRight()		{ trimYaw -= yawIncrement; }
 	};
 
 	// just keep some things together in easily accessible way
@@ -690,46 +706,6 @@ namespace F16
 			// note the change in coordinate system here..
 			bodyState.accz = ay;
 			bodyState.accy = az;
-		}
-
-		void trimPitch(bool up)
-		{
-			// TODO: check the kind of values we should use per notch
-			const double trim = 1;
-			if (up == true)
-			{
-				trimState.trimPitch += trim;
-			}
-			else
-			{
-				trimState.trimPitch -= trim;
-			}
-		}
-		void trimRoll(bool cw)
-		{
-			// TODO: check the kind of values we should use per notch
-			const double trim = 1;
-			if (cw == true)
-			{
-				trimState.trimRoll += trim;
-			}
-			else
-			{
-				trimState.trimRoll -= trim;
-			}
-		}
-		void trimYaw(bool right)
-		{
-			// TODO: check the kind of values we should use per notch
-			const double trim = 1;
-			if (right == true)
-			{
-				trimState.trimYaw += trim;
-			}
-			else
-			{
-				trimState.trimYaw -= trim;
-			}
 		}
 
 		//---------------------------------------------

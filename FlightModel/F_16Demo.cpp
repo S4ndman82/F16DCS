@@ -518,24 +518,24 @@ void ed_fm_set_command(int command, float value)
 		break;
 
 	case TrimPitchDown:
-		F16::FlightControls.trimPitch(false);
+		F16::FlightControls.trimState.pitchDown();
 		break;
 	case TrimPitchUp:
-		F16::FlightControls.trimPitch(true);
+		F16::FlightControls.trimState.pitchUp();
 		break;
 
 	case TrimRollCCW:
-		F16::FlightControls.trimRoll(false);
+		F16::FlightControls.trimState.rollCCW();
 		break;
 	case TrimRollCW:
-		F16::FlightControls.trimRoll(true);
+		F16::FlightControls.trimState.rollCW();
 		break;
 
 	case TrimYawLeft:
-		F16::FlightControls.trimYaw(false);
+		F16::FlightControls.trimState.yawLeft();
 		break;
 	case TrimYawRight:
-		F16::FlightControls.trimYaw(true);
+		F16::FlightControls.trimState.yawRight();
 		break;
 
 	case Canopy:
