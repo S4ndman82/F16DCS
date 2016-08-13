@@ -27,9 +27,15 @@ namespace F16
 	class F16TrimState
 	{
 	public:
+		// TODO: add limits of trimmer for each axis
+		//const double pitchLimit;
+		//const double rollLimit;
+		//const double yawLimit;
+
 		double trimPitch = 0.0;
 		double trimRoll = 0.0;
 		double trimYaw = 0.0;
+
 	public:
 		F16TrimState(const double pitch, const double roll, const double yaw) 
 			: trimPitch(pitch), trimRoll(roll), trimYaw(yaw)
