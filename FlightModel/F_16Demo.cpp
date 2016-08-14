@@ -228,7 +228,8 @@ void ed_fm_simulate(double dt)
 
 	// this part is only needed once and only on start of simulation
 	// -> move to where actual initialization is done
-	F16::FlightControls.initialize(frametime);
+	// -> no need to repeat
+	//F16::FlightControls.initialize(frametime);
 
 	// Get the total absolute velocity acting on the aircraft with wind included
 	// using english units so airspeed is in feet/second here
@@ -794,7 +795,7 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	size: count of elements in array
 */
 // use ModelViewer for details in Cockpit-Viper.edm
-void ed_fm_set_fc3_cockpit_draw_args (EdDrawArgument * drawargs,size_t size)
+void ed_fm_set_fc3_cockpit_draw_args(EdDrawArgument * drawargs,size_t size)
 {
 	/*
 		-- stick arg 2 and 3 match args in cockpit edm, anim should work with proper input binding
@@ -818,7 +819,7 @@ void ed_fm_set_fc3_cockpit_draw_args (EdDrawArgument * drawargs,size_t size)
 /*
 shake level amplitude for head simulation , 
 */
-double ed_fm_get_shake_amplitude ()
+double ed_fm_get_shake_amplitude()
 {
 	return 0;
 }
@@ -834,7 +835,7 @@ void ed_fm_configure(const char * cfg_path)
 will be called for your internal configuration
 void ed_fm_release   called when fm not needed anymore : aircraft death etc.
 */
-void ed_fm_release ()
+void ed_fm_release()
 {
 	// we are calling destructors automatically but could cleanup earlier here..
 }
@@ -873,11 +874,14 @@ double ed_fm_get_param(unsigned param_enum)
 	case ED_FM_ENGINE_1_RELATED_THRUST:
 		return F16::Engine.getEngineRelatedThrust();
 	case ED_FM_ENGINE_1_CORE_RPM:
+		return F16::Engine.getEngineRpm();
 	case ED_FM_ENGINE_1_CORE_RELATED_RPM:
+		return F16::Engine.getEngineRelatedRpm();
 	case ED_FM_ENGINE_1_CORE_THRUST:
+		return F16::Engine.getEngineThrust();
 	case ED_FM_ENGINE_1_CORE_RELATED_THRUST:
-		// not implemented now
-		return 0;
+		return F16::Engine.getEngineRelatedThrust();
+
 	case ED_FM_ENGINE_1_TEMPERATURE:
 		return F16::Engine.getEngineTemperature();
 	case ED_FM_ENGINE_1_OIL_PRESSURE:

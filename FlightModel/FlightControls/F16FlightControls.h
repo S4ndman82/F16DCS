@@ -233,7 +233,10 @@ namespace F16
 			, yawServoFilter()
 			, bodyState()
 			, flightSurface()
-		{}
+		{
+			// just do this once when constructing
+			initialize(0);
+		}
 		~F16FlightControls() {}
 
 		void setLatStickInput(double value) 
