@@ -40,6 +40,15 @@ int    ed_cockpit_compare_parameters			  (void		  * handle_1,void * handle_2)
 }
 */
 
+/*
+load CockpitBase.dll, 
+GetProcAddress "ed_cockpit_get_base_sensor_output", 
+you can call that with the argument of the base sensor index and it will return the float value to you.
+
+-> access lua-defined sensors from C++ code this way?
+*/
+
+
 double test(double in)
 {
 	return in*10.0;
