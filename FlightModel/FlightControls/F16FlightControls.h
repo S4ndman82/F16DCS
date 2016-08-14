@@ -738,6 +738,12 @@ namespace F16
 			bodyState.accy = az;
 		}
 
+		// after first frame is done
+		void setInitialized()
+		{
+			simInitialized = true;
+		}
+
 		//---------------------------------------------
 		//-----CONTROL DYNAMICS------------------------
 		//---------------------------------------------

@@ -300,7 +300,7 @@ void ed_fm_simulate(double dt)
 
 	// TODO: remove
 	// Tell the simulation that it has gone through the first frame
-	F16::FlightControls.simInitialized = true;
+	F16::FlightControls.setInitialized();
 }
 
 /*
