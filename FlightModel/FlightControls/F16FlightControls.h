@@ -325,7 +325,11 @@ namespace F16
 			airbrakeAngle = limit(airbrakeAngle, 0, maxAnglePCT);
 		}
 
-	//protected:
+		/*
+		bool initializeLeadingEdgeFlapController()
+		{
+		}
+		*/
 
 		// Controller for the leading edge flaps
 		double leading_edge_flap_controller(double dynamicPressure_FTLB, double staticPressure_FTLB, double frameTime)
@@ -376,25 +380,6 @@ namespace F16
 			const double roll_rate = bodyState.getRollRateDegs();
 			const double yaw_rate = bodyState.getYawRateDegs();
 			double ay = bodyState.getAccYPerG();
-
-			if(!(simInitialized))
-			{
-				double numerators[2] = {0.0,4.0};
-				double denominators[2] = {1.0,4.0};
-				rudderCommandFilter.InitFilter(numerators,denominators,1,dt);
-
-				double numerators1[2] = {1.0,0.0};
-				double denominators1[2] = {1.0,1.0};
-				yawRateWashout.InitFilter(numerators1,denominators1,1,dt);
-
-				double numerators2[2] = {3.0,15.0};
-				double denominators2[2] = {1.0,15.0};
-				yawRateFilter.InitFilter(numerators2,denominators2,1,dt);
-
-				double numerators3[3] = { 0.0, 0.0, pow(52.0,2.0)};
-				double denomiantors3[3] = { 1.0, 2.0*0.7*52.0, pow(52.0,2.0)};
-				yawServoFilter.InitFilter(numerators3,denomiantors3,2,dt);
-			}
 
 			double rudderCommand = getRudderCommand(pedInput);
 			double rudderCommandFiltered = rudderCommandFilter.Filter(!(simInitialized),dt,rudderCommand);
@@ -504,35 +489,13 @@ namespace F16
 			return (topLimit + bottomLimit);
 		}
 
+
 		// Controller for pitch
 		// (differentialCommand is hard-coded to 0 in caller)
 		double fcs_pitch_controller(double longStickInput, double differentialCommand, double dynPressure_LBFT2, double dt)
 		{
 			const double pitch_rate = bodyState.getPitchRateDegs();
 			const double az = bodyState.getAccZPerG();
-
-			if(!(simInitialized))
-			{
-				double numerators[2] = {1.0,0.0};
-				double denominators[2] = {1.0,1.0};
-				pitchRateWashout.InitFilter(numerators,denominators,1,dt);
-
-				numerators[0] = 0.0; numerators[1] = 2.5;
-				denominators[0] = 1.0; denominators[1] = 0.0;
-				pitchIntegrator.InitFilter(numerators,denominators,1,dt);
-
-				numerators[0] = 3.0; numerators[1] = 15;
-				denominators[0] = 1.0; denominators[1] = 15.0;
-				pitchPreActuatorFilter.InitFilter(numerators,denominators,1,dt);
-
-				double numerators2[3] = { 0.0, 0.0, pow(52.0,2.0)};
-				double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0,2.0)};
-				pitchActuatorDynamicsFilter.InitFilter(numerators2,denomiantors2,2,dt);
-
-				numerators[0] = 0.0; numerators[1] = 15.0;
-				denominators[0] = 1.0; denominators[1] = 15.0;
-				accelFilter.InitFilter(numerators,denominators,1,dt);
-			}
 
 			double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, dt);
 
@@ -625,28 +588,6 @@ namespace F16
 			const double roll_rate = bodyState.getRollRateDegs();
 			double ay = bodyState.getAccYPerG();
 
-			if(!(simInitialized))
-			{
-				double numerators[2] = {0.0,60.0};
-				double denominators[2] = {1.0,60.0};
-				latStickForceFilter.InitFilter(numerators,denominators,1,dt);
-
-				double numerators1[2] = {0.0,10.0};
-				double denominators1[2] = {1.0,10.0};
-				rollCommandFilter.InitFilter(numerators1,denominators1,1,dt);
-
-				double numerators2[3] = { 0.0, 0.0, pow(52.0,2.0)};
-				double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0,2.0)};
-				rollActuatorDynamicsFilter.InitFilter(numerators2,denomiantors2,2,dt);
-
-				double numerators3[2] = {0.0,50.0};
-				double denominators3[2] = {1.0,50.0};
-				rollRateFilter1.InitFilter(numerators3,denominators3,1,dt);
-
-				double numerators4[3] = { 4.0, 64.0, 6400.0};
-				double denomiantors4[3] = { 1.0, 80.0, 6400.0};
-				rollRateFilter2.InitFilter(numerators4,denomiantors4,2,dt);
-			}
 
 			double latStickForceCmd = latStickInput * 75.0;
 			double latStickForce = latStickForceFilter.Filter(!(simInitialized),dt,latStickForceCmd);
@@ -712,7 +653,100 @@ namespace F16
 			return trailing_edge_flap_deflection;
 		}
 
+		bool initializeYawController(double dt)
+		{
+			if (!(simInitialized))
+			{
+				double numerators[2] = { 0.0, 4.0 };
+				double denominators[2] = { 1.0, 4.0 };
+				rudderCommandFilter.InitFilter(numerators, denominators, 1, dt);
+
+				double numerators1[2] = { 1.0, 0.0 };
+				double denominators1[2] = { 1.0, 1.0 };
+				yawRateWashout.InitFilter(numerators1, denominators1, 1, dt);
+
+				double numerators2[2] = { 3.0, 15.0 };
+				double denominators2[2] = { 1.0, 15.0 };
+				yawRateFilter.InitFilter(numerators2, denominators2, 1, dt);
+
+				double numerators3[3] = { 0.0, 0.0, pow(52.0, 2.0) };
+				double denomiantors3[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
+				yawServoFilter.InitFilter(numerators3, denomiantors3, 2, dt);
+			}
+			return true;
+		}
+
+		bool initializePitchController(double dt)
+		{
+			if (!(simInitialized))
+			{
+				double numerators[2] = { 1.0, 0.0 };
+				double denominators[2] = { 1.0, 1.0 };
+				pitchRateWashout.InitFilter(numerators, denominators, 1, dt);
+
+				numerators[0] = 0.0; numerators[1] = 2.5;
+				denominators[0] = 1.0; denominators[1] = 0.0;
+				pitchIntegrator.InitFilter(numerators, denominators, 1, dt);
+
+				numerators[0] = 3.0; numerators[1] = 15;
+				denominators[0] = 1.0; denominators[1] = 15.0;
+				pitchPreActuatorFilter.InitFilter(numerators, denominators, 1, dt);
+
+				double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
+				double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
+				pitchActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2, dt);
+
+				numerators[0] = 0.0; numerators[1] = 15.0;
+				denominators[0] = 1.0; denominators[1] = 15.0;
+				accelFilter.InitFilter(numerators, denominators, 1, dt);
+			}
+			return true;
+		}
+
+		bool initializeRollController(double dt)
+		{
+			if (!(simInitialized))
+			{
+				double numerators[2] = { 0.0, 60.0 };
+				double denominators[2] = { 1.0, 60.0 };
+				latStickForceFilter.InitFilter(numerators, denominators, 1, dt);
+
+				double numerators1[2] = { 0.0, 10.0 };
+				double denominators1[2] = { 1.0, 10.0 };
+				rollCommandFilter.InitFilter(numerators1, denominators1, 1, dt);
+
+				double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
+				double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
+				rollActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2, dt);
+
+				double numerators3[2] = { 0.0, 50.0 };
+				double denominators3[2] = { 1.0, 50.0 };
+				rollRateFilter1.InitFilter(numerators3, denominators3, 1, dt);
+
+				double numerators4[3] = { 4.0, 64.0, 6400.0 };
+				double denomiantors4[3] = { 1.0, 80.0, 6400.0 };
+				rollRateFilter2.InitFilter(numerators4, denomiantors4, 2, dt);
+			}
+			return true;
+		}
+
 	public:
+
+		bool initialize(double dt)
+		{
+			if (simInitialized == true)
+			{
+				return true;
+			}
+
+			bool res = true;
+
+			res &= initializePitchController(dt);
+			res &= initializeRollController(dt);
+			res &= initializeYawController(dt);
+
+			return res;
+		}
 
 		// before simulation starts
 		void setCurrentState(double ax, double ay, double az)

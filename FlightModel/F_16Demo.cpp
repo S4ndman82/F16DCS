@@ -226,6 +226,10 @@ void ed_fm_simulate(double dt)
 	// a new set for this run frame
 	F16::Motion.clear();
 
+	// this part is only needed once and only on start of simulation
+	// -> move to where actual initialization is done
+	F16::FlightControls.initialize(frametime);
+
 	// Get the total absolute velocity acting on the aircraft with wind included
 	// using english units so airspeed is in feet/second here
 	F16::Atmos.updateFrame(frametime);
