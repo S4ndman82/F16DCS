@@ -382,15 +382,15 @@ namespace F16
 			double ay = bodyState.getAccYPerG();
 
 			double rudderCommand = getRudderCommand(pedInput);
-			double rudderCommandFiltered = rudderCommandFilter.Filter(!(simInitialized),dt,rudderCommand);
+			double rudderCommandFiltered = rudderCommandFilter.Filter(dt,rudderCommand);
 			double rudderCommandFilteredWTrim = trimState.trimYaw - rudderCommandFiltered;
 
 			double alphaGained = m_alphaFiltered * (1.0 / 57.3);
 			double rollRateWithAlpha = roll_rate * alphaGained;
 			double yawRateWithRoll = yaw_rate - rollRateWithAlpha;
 
-			double yawRateWithRollWashedOut = yawRateWashout.Filter(!(simInitialized),dt,yawRateWithRoll);
-			double yawRateWithRollFiltered = yawRateFilter.Filter(!(simInitialized),dt,yawRateWithRollWashedOut);
+			double yawRateWithRollWashedOut = yawRateWashout.Filter(dt,yawRateWithRoll);
+			double yawRateWithRollFiltered = yawRateFilter.Filter(dt,yawRateWithRollWashedOut);
 
 			double yawRateFilteredWithSideAccel = yawRateWithRollFiltered;// + (ay * 19.3);
 
@@ -501,13 +501,13 @@ namespace F16
 
 			double dynamicPressureScheduled = dynamic_pressure_schedule(dynPressure_LBFT2);	
 
-			double azFiltered = accelFilter.Filter(!(simInitialized), dt, az-1.0);
+			double azFiltered = accelFilter.Filter(dt, az-1.0);
 
 			double alphaLimited = limit(bodyState.alpha_DEG, -5.0, 30.0);
 			double alphaLimitedRate = 10.0 * (alphaLimited - m_alphaFiltered);
 			m_alphaFiltered += (alphaLimitedRate * dt);
 
-			double pitchRateWashedOut = pitchRateWashout.Filter(!(simInitialized),dt,pitch_rate);
+			double pitchRateWashedOut = pitchRateWashout.Filter(dt,pitch_rate);
 			double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;		
 
 			double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
@@ -516,10 +516,10 @@ namespace F16
 
 			double finalCombinedCommand = dynamicPressureScheduled * (2.5 * (stickCommandPos + limiterCommand + gLimiterCommand));
 
-			double finalCombinedCommandFilteredLimited = limit(pitchIntegrator.Filter(!(simInitialized),dt,finalCombinedCommand),-25.0,25.0);
+			double finalCombinedCommandFilteredLimited = limit(pitchIntegrator.Filter(dt,finalCombinedCommand),-25.0,25.0);
 			finalCombinedCommandFilteredLimited = finalCombinedCommandFilteredLimited + finalCombinedCommand;
 
-			double finalPitchCommandTotal = pitchPreActuatorFilter.Filter(!(simInitialized),dt,finalCombinedCommandFilteredLimited);
+			double finalPitchCommandTotal = pitchPreActuatorFilter.Filter(dt,finalCombinedCommandFilteredLimited);
 			finalPitchCommandTotal += (0.5 * m_alphaFiltered);
 
 			return finalPitchCommandTotal;
@@ -590,7 +590,7 @@ namespace F16
 
 
 			double latStickForceCmd = latStickInput * 75.0;
-			double latStickForce = latStickForceFilter.Filter(!(simInitialized),dt,latStickForceCmd);
+			double latStickForce = latStickForceFilter.Filter(dt,latStickForceCmd);
 
 			double latStickForceBiased = latStickForce - (ay * 8.9);  // CJS: remove side acceleration bias?
 
@@ -598,11 +598,11 @@ namespace F16
 
 			double rollRateCommand = getRollRateCommand(latStickForceBiased * rollFeelGain);
 
-			double rollRateCommandFilterd = rollCommandFilter.Filter(!(simInitialized),dt,rollRateCommand);
+			double rollRateCommandFilterd = rollCommandFilter.Filter(dt,rollRateCommand);
 
-			double rollRateFiltered1 = rollRateFilter1.Filter(!(simInitialized),dt,roll_rate);
+			double rollRateFiltered1 = rollRateFilter1.Filter(dt,roll_rate);
 
-			double rollRateFiltered2 = (rollRateFilter2.Filter(!(simInitialized),dt,rollRateFiltered1));
+			double rollRateFiltered2 = (rollRateFilter2.Filter(dt,rollRateFiltered1));
 
 			double rollRateCommandCombined = rollRateFiltered2 - rollRateCommandFilterd - trimState.trimRoll;
 
@@ -625,7 +625,7 @@ namespace F16
 			double rollCommandGained = limit(rollRateCommandCombined * pressureGain, -21.5, 21.5);
 
 			// Mechanical servo dynamics
-			double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(!(simInitialized),dt,rollCommandGained);	
+			double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(dt,rollCommandGained);	
 			return rollActuatorCommand;
 		}		
 
@@ -744,6 +744,24 @@ namespace F16
 			res &= initializePitchController(dt);
 			res &= initializeRollController(dt);
 			res &= initializeYawController(dt);
+
+			// this kind of stuff is only needed on (re-)initialize
+			// -> remove one pointless flag parameter from each Filter() call
+			pitchRateWashout.ResetFilter();
+			pitchIntegrator.ResetFilter();
+			pitchPreActuatorFilter.ResetFilter();
+			pitchActuatorDynamicsFilter.ResetFilter();
+			accelFilter.ResetFilter();
+			latStickForceFilter.ResetFilter();
+			rollCommandFilter.ResetFilter();
+			rollActuatorDynamicsFilter.ResetFilter();
+			rollRateFilter1.ResetFilter();
+			rollRateFilter2.ResetFilter();
+			rudderCommandFilter.ResetFilter();
+			yawRateWashout.ResetFilter();
+			yawRateFilter.ResetFilter();
+			yawServoFilter.ResetFilter();
+
 
 			return res;
 		}

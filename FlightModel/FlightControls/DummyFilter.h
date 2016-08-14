@@ -30,12 +30,22 @@ public:
     void SetCoefficients(double *pdNumerator, double *pdDenominator)
 	{
 	}
+	/* call ResetFilter() when necessary, don't have the flag on each call: that is pointless
     double Filter(bool bResetFlag, double dFrameTime_SEC, double dInput)
 	{
 		SetFrameTime(dFrameTime_SEC);
 		return dInput;
 	}
-    void SetFrameTime(double dFrameTime_SEC)
+	*/
+	double Filter(double dFrameTime_SEC, double dInput)
+	{
+		SetFrameTime(dFrameTime_SEC);
+		return dInput;
+	}
+	void ResetFilter()
+	{
+	}
+	void SetFrameTime(double dFrameTime_SEC)
 	{
 		m_dFrameTime_SEC = dFrameTime_SEC;
 	}
