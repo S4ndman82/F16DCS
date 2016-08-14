@@ -745,6 +745,11 @@ namespace F16
 			res &= initializeRollController();
 			res &= initializeYawController();
 
+			resetFilters(dt);
+			return res;
+		}
+		void resetFilters(double dt)
+		{
 			// this kind of stuff is only needed on (re-)initialize
 			// -> remove one pointless flag parameter from each Filter() call
 			pitchRateWashout.ResetFilter(dt);
@@ -761,8 +766,6 @@ namespace F16
 			yawRateWashout.ResetFilter(dt);
 			yawRateFilter.ResetFilter(dt);
 			yawServoFilter.ResetFilter(dt);
-
-			return res;
 		}
 
 		// before simulation starts
