@@ -653,79 +653,79 @@ namespace F16
 			return trailing_edge_flap_deflection;
 		}
 
-		bool initializeYawController(double dt)
+		bool initializeYawController()
 		{
 			if (!(simInitialized))
 			{
 				double numerators[2] = { 0.0, 4.0 };
 				double denominators[2] = { 1.0, 4.0 };
-				rudderCommandFilter.InitFilter(numerators, denominators, 1, dt);
+				rudderCommandFilter.InitFilter(numerators, denominators, 1);
 
 				double numerators1[2] = { 1.0, 0.0 };
 				double denominators1[2] = { 1.0, 1.0 };
-				yawRateWashout.InitFilter(numerators1, denominators1, 1, dt);
+				yawRateWashout.InitFilter(numerators1, denominators1, 1);
 
 				double numerators2[2] = { 3.0, 15.0 };
 				double denominators2[2] = { 1.0, 15.0 };
-				yawRateFilter.InitFilter(numerators2, denominators2, 1, dt);
+				yawRateFilter.InitFilter(numerators2, denominators2, 1);
 
 				double numerators3[3] = { 0.0, 0.0, pow(52.0, 2.0) };
 				double denomiantors3[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-				yawServoFilter.InitFilter(numerators3, denomiantors3, 2, dt);
+				yawServoFilter.InitFilter(numerators3, denomiantors3, 2);
 			}
 			return true;
 		}
 
-		bool initializePitchController(double dt)
+		bool initializePitchController()
 		{
 			if (!(simInitialized))
 			{
 				double numerators[2] = { 1.0, 0.0 };
 				double denominators[2] = { 1.0, 1.0 };
-				pitchRateWashout.InitFilter(numerators, denominators, 1, dt);
+				pitchRateWashout.InitFilter(numerators, denominators, 1);
 
 				numerators[0] = 0.0; numerators[1] = 2.5;
 				denominators[0] = 1.0; denominators[1] = 0.0;
-				pitchIntegrator.InitFilter(numerators, denominators, 1, dt);
+				pitchIntegrator.InitFilter(numerators, denominators, 1);
 
 				numerators[0] = 3.0; numerators[1] = 15;
 				denominators[0] = 1.0; denominators[1] = 15.0;
-				pitchPreActuatorFilter.InitFilter(numerators, denominators, 1, dt);
+				pitchPreActuatorFilter.InitFilter(numerators, denominators, 1);
 
 				double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
 				double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-				pitchActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2, dt);
+				pitchActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
 
 				numerators[0] = 0.0; numerators[1] = 15.0;
 				denominators[0] = 1.0; denominators[1] = 15.0;
-				accelFilter.InitFilter(numerators, denominators, 1, dt);
+				accelFilter.InitFilter(numerators, denominators, 1);
 			}
 			return true;
 		}
 
-		bool initializeRollController(double dt)
+		bool initializeRollController()
 		{
 			if (!(simInitialized))
 			{
 				double numerators[2] = { 0.0, 60.0 };
 				double denominators[2] = { 1.0, 60.0 };
-				latStickForceFilter.InitFilter(numerators, denominators, 1, dt);
+				latStickForceFilter.InitFilter(numerators, denominators, 1);
 
 				double numerators1[2] = { 0.0, 10.0 };
 				double denominators1[2] = { 1.0, 10.0 };
-				rollCommandFilter.InitFilter(numerators1, denominators1, 1, dt);
+				rollCommandFilter.InitFilter(numerators1, denominators1, 1);
 
 				double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
 				double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-				rollActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2, dt);
+				rollActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
 
 				double numerators3[2] = { 0.0, 50.0 };
 				double denominators3[2] = { 1.0, 50.0 };
-				rollRateFilter1.InitFilter(numerators3, denominators3, 1, dt);
+				rollRateFilter1.InitFilter(numerators3, denominators3, 1);
 
 				double numerators4[3] = { 4.0, 64.0, 6400.0 };
 				double denomiantors4[3] = { 1.0, 80.0, 6400.0 };
-				rollRateFilter2.InitFilter(numerators4, denomiantors4, 2, dt);
+				rollRateFilter2.InitFilter(numerators4, denomiantors4, 2);
 			}
 			return true;
 		}
@@ -741,27 +741,26 @@ namespace F16
 
 			bool res = true;
 
-			res &= initializePitchController(dt);
-			res &= initializeRollController(dt);
-			res &= initializeYawController(dt);
+			res &= initializePitchController();
+			res &= initializeRollController();
+			res &= initializeYawController();
 
 			// this kind of stuff is only needed on (re-)initialize
 			// -> remove one pointless flag parameter from each Filter() call
-			pitchRateWashout.ResetFilter();
-			pitchIntegrator.ResetFilter();
-			pitchPreActuatorFilter.ResetFilter();
-			pitchActuatorDynamicsFilter.ResetFilter();
-			accelFilter.ResetFilter();
-			latStickForceFilter.ResetFilter();
-			rollCommandFilter.ResetFilter();
-			rollActuatorDynamicsFilter.ResetFilter();
-			rollRateFilter1.ResetFilter();
-			rollRateFilter2.ResetFilter();
-			rudderCommandFilter.ResetFilter();
-			yawRateWashout.ResetFilter();
-			yawRateFilter.ResetFilter();
-			yawServoFilter.ResetFilter();
-
+			pitchRateWashout.ResetFilter(dt);
+			pitchIntegrator.ResetFilter(dt);
+			pitchPreActuatorFilter.ResetFilter(dt);
+			pitchActuatorDynamicsFilter.ResetFilter(dt);
+			accelFilter.ResetFilter(dt);
+			latStickForceFilter.ResetFilter(dt);
+			rollCommandFilter.ResetFilter(dt);
+			rollActuatorDynamicsFilter.ResetFilter(dt);
+			rollRateFilter1.ResetFilter(dt);
+			rollRateFilter2.ResetFilter(dt);
+			rudderCommandFilter.ResetFilter(dt);
+			yawRateWashout.ResetFilter(dt);
+			yawRateFilter.ResetFilter(dt);
+			yawServoFilter.ResetFilter(dt);
 
 			return res;
 		}
