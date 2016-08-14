@@ -497,14 +497,17 @@ void ed_fm_set_command(int command, float value)
 	case Gear:
 		F16::LandingGear.switchGearUpDown();
 		// also switch trailing-edge flaps position
+		//F16::FlightControls.setGearRelatedFlaps()
 		break;
 	case LandingGearUp:
 		F16::LandingGear.setGearUp();
 		// also switch trailing-edge flaps position
+		//F16::FlightControls.setGearRelatedFlaps(true);
 		break;
 	case LandingGearDown:
 		F16::LandingGear.setGearDown();
 		// also switch trailing-edge flaps position
+		//F16::FlightControls.setGearRelatedFlaps(false);
 		break;
 
 	case NoseWheelSteering:

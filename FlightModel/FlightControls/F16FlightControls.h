@@ -167,6 +167,12 @@ namespace F16
 		// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 		bool manualPitchOverride;
 
+		// flap position logic according to when landing gears are down:
+		// flaps are controlled with landing gear lever as well,
+		// gears go down -> trailing edge flaps go down
+		// gear go up -> trailing edge flaps go up
+		bool gearRelatedFlaps;
+
 		double		m_stickCommandPosFiltered;
 		double		m_alphaFiltered;
 		double		m_longStickForce;
@@ -207,6 +213,7 @@ namespace F16
 			, latStickInput(-1.0, 1.0)
 			, pedInput(-1.0, 1.0)
 			, manualPitchOverride(false)
+			, gearRelatedFlaps(false)
 			, m_stickCommandPosFiltered(0)
 			, m_alphaFiltered(0)
 			, m_longStickForce(0)
@@ -240,6 +247,20 @@ namespace F16
 		void setPedInput(double value)
 		{
 			pedInput = -value;
+		}
+
+		void setManualPitchOverride(bool aoa_override)
+		{
+			manualPitchOverride = aoa_override;
+		}
+
+		// landing gear related flaps:
+		// flaps are controlled with landing gear lever as well,
+		// gears go down -> trailing edge flaps go down
+		// gear go up -> trailing edge flaps go up
+		void setGearRelatedFlaps(bool up)
+		{
+			gearRelatedFlaps = up;
 		}
 
 		void initAirBrakeOff()
