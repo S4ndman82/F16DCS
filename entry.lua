@@ -4,7 +4,7 @@ declare_plugin(self_ID,
 {
 installed 	 = true, -- if false that will be place holder , or advertising
 dirName	  	 = current_mod_path,
-version		 = "1.2.14-150110",		 
+version		 = "1.5.4 WIP",		 
 state		 = "installed",
 info		 = _("F-16 Technology Demonstration.  High Fidelity Flight Dynamics Model"),
 binaries	= { 'F16DemoFM', },  -- The DLL of the external flight model 
