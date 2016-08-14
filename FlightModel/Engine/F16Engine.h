@@ -109,6 +109,25 @@ namespace F16
 		{}
 		~F16Engine() {}
 
+		// engine can get torque from JFS to spoolup when starting,
+		// set that here to determine rotation
+		void setStarterTorque(double value)
+		{
+		}
+
+		// additional air pressure/flow either when in air (airstart)
+		// or other source such as engine bleed air feedback
+		// to improve starting (avoid compressor stall),
+		// set that here
+		void setIntakeAirPressure(double value)
+		{
+		}
+
+		// fuel pump provided pressure of fuel
+		void setFuelPressure(double value)
+		{
+		}
+
 		// MaksRUD	=	0.85, -- Military power state of the throttle
 		// ForsRUD	=	0.91, -- Afterburner state of the throttle
 		void setThrottleInputRaw(double value)
@@ -118,13 +137,6 @@ namespace F16
 
 			throttleInput = limited;
 		}
-
-		/*
-		void setThrottleInput(double value)
-		{
-			throttleInput = value;
-		}
-		*/
 		double getThrottleInput() const
 		{
 			return throttleInput;
