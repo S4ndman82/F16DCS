@@ -152,6 +152,7 @@ namespace F16
 		// note: airbrake limit different when landing gear down (prevent strike to runway)
 		// cx_brk = 0.08, --coefficient, drag, breaks <- for airbrake?
 		double airbrakeAngle; // 0 = off (in percentage)
+		double airbrakeRate; // movement rate
 		bool airbrakeSwitch; // switch status
 
 		bool isGearDown; // is landing gear down
@@ -198,6 +199,7 @@ namespace F16
 			, leading_edge_flap_integrated_gained(0)
 			, leading_edge_flap_integrated_gained_biased(0)
 			, airbrakeAngle(0)
+			, airbrakeRate(1)
 			, airbrakeSwitch(false)
 			, isGearDown(true)
 			, trimState(-0.3, 0, 0) // <- why -0.3 for pitch?
@@ -275,6 +277,10 @@ namespace F16
 
 		void updateAirBrake(const double frameTime)
 		{
+			// for now, just use frametime for rate of movement
+			// and add actuators for it later
+			double movementRate = airbrakeRate*frameTime;
+
 			// note: airbrake limit 60 degrees normally, 
 			// 43 deg when landing gear down (prevent strike to runway)
 			double maxAnglePCT = 1.0; // 60 deg
@@ -289,11 +295,11 @@ namespace F16
 			// this uses just percentage for now
 			if (airbrakeSwitch == true && airbrakeAngle < maxAnglePCT)
 			{
-				airbrakeAngle += (frameTime);
+				airbrakeAngle += movementRate;
 			}
 			else if (airbrakeSwitch == false && airbrakeAngle > 0)
 			{
-				airbrakeAngle -= (frameTime);
+				airbrakeAngle -= movementRate;
 			}
 			airbrakeAngle = limit(airbrakeAngle, 0, maxAnglePCT);
 		}
