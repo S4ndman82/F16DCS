@@ -73,7 +73,9 @@ namespace F16
 		// range 0 - 80,000pph (instruments)
 
 		// oil pressure: 0-100 psi
+		// directly related to engine rpm?
 		double oilPressure;
+		bool oilPressureWarning;
 
 		// temperatures, overheat
 
@@ -82,8 +84,8 @@ namespace F16
 		// cockpit gauge: 300..900 range
 		double engineTemperature;
 
-		//double engineRPM; // rounds per minute: non-zero if shutdown in air?
-		//double drag; // amount of drag if not running while in air?
+		double engineRPM; // rounds per minute: non-zero if shutdown in air?
+		//double drag; // amount of drag if not running while in air? windmilling effect?
 
 		bool starting; // "spooling up"
 		bool stopping; // "spooling down"
@@ -98,8 +100,9 @@ namespace F16
 			, afterburner(0)
 			, fuelPerFrame(0)
 			, oilPressure(100)
+			, oilPressureWarning(false)
 			, engineTemperature(900)
-			//, engineRPM(0)
+			, engineRPM(0)
 			, starting(false)
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
@@ -240,8 +243,24 @@ namespace F16
 			return thrust_N;
 		}
 
+		void airstart(double frameTime);
+
 		void updateFrame(const double mach, double alt, double frameTime);
+
 	};
+
+	// airstart essentially needs enough airflow/pressure to rotate engine
+	// (UFC, BUC)
+	void F16Engine::airstart(double frameTime)
+	{
+		// when rpm within 25-40 percent, airstart possible (30 degree dive)
+		// (spooldown)
+
+		// another way is use of JFS
+
+		// throttle setting, airspeed (windmilling effect)
+	}
+
 
 	// Coded from the simulator study document
 	void F16Engine::updateFrame(const double mach, double alt, double frameTime)
