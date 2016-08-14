@@ -23,9 +23,12 @@
 // Control the main portion of the discrete simulation event
 //
 // This project will compile a DLL.  This DLL needs to be compiled with the
-// same machine type of your machine (x86 or x64).  This DLL then needs to
+// same machine type of your machine (x64 only).  This DLL then needs to
 // be placed within the bin directory in your mod/aircraft/XXXairplane/ 
 // directory within DCS World.  
+//
+// Note that 32-bit build is not supported any longer.
+// It might compile by adding build configuration but might not work correctly.
 //
 // See associated entry.lua for how to tell the mod to use the DLL flight
 // model
