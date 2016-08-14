@@ -655,78 +655,84 @@ namespace F16
 
 		bool initializeYawController()
 		{
-			if (!(simInitialized))
+			if (simInitialized == true)
 			{
-				double numerators[2] = { 0.0, 4.0 };
-				double denominators[2] = { 1.0, 4.0 };
-				rudderCommandFilter.InitFilter(numerators, denominators, 1);
-
-				double numerators1[2] = { 1.0, 0.0 };
-				double denominators1[2] = { 1.0, 1.0 };
-				yawRateWashout.InitFilter(numerators1, denominators1, 1);
-
-				double numerators2[2] = { 3.0, 15.0 };
-				double denominators2[2] = { 1.0, 15.0 };
-				yawRateFilter.InitFilter(numerators2, denominators2, 1);
-
-				double numerators3[3] = { 0.0, 0.0, pow(52.0, 2.0) };
-				double denomiantors3[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-				yawServoFilter.InitFilter(numerators3, denomiantors3, 2);
+				return true;
 			}
+
+			double numerators[2] = { 0.0, 4.0 };
+			double denominators[2] = { 1.0, 4.0 };
+			rudderCommandFilter.InitFilter(numerators, denominators, 1);
+
+			double numerators1[2] = { 1.0, 0.0 };
+			double denominators1[2] = { 1.0, 1.0 };
+			yawRateWashout.InitFilter(numerators1, denominators1, 1);
+
+			double numerators2[2] = { 3.0, 15.0 };
+			double denominators2[2] = { 1.0, 15.0 };
+			yawRateFilter.InitFilter(numerators2, denominators2, 1);
+
+			double numerators3[3] = { 0.0, 0.0, pow(52.0, 2.0) };
+			double denomiantors3[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
+			yawServoFilter.InitFilter(numerators3, denomiantors3, 2);
 			return true;
 		}
 
 		bool initializePitchController()
 		{
-			if (!(simInitialized))
+			if (simInitialized == true)
 			{
-				double numerators[2] = { 1.0, 0.0 };
-				double denominators[2] = { 1.0, 1.0 };
-				pitchRateWashout.InitFilter(numerators, denominators, 1);
-
-				numerators[0] = 0.0; numerators[1] = 2.5;
-				denominators[0] = 1.0; denominators[1] = 0.0;
-				pitchIntegrator.InitFilter(numerators, denominators, 1);
-
-				numerators[0] = 3.0; numerators[1] = 15;
-				denominators[0] = 1.0; denominators[1] = 15.0;
-				pitchPreActuatorFilter.InitFilter(numerators, denominators, 1);
-
-				double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
-				double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-				pitchActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
-
-				numerators[0] = 0.0; numerators[1] = 15.0;
-				denominators[0] = 1.0; denominators[1] = 15.0;
-				accelFilter.InitFilter(numerators, denominators, 1);
+				return true;
 			}
+
+			double numerators[2] = { 1.0, 0.0 };
+			double denominators[2] = { 1.0, 1.0 };
+			pitchRateWashout.InitFilter(numerators, denominators, 1);
+
+			numerators[0] = 0.0; numerators[1] = 2.5;
+			denominators[0] = 1.0; denominators[1] = 0.0;
+			pitchIntegrator.InitFilter(numerators, denominators, 1);
+
+			numerators[0] = 3.0; numerators[1] = 15;
+			denominators[0] = 1.0; denominators[1] = 15.0;
+			pitchPreActuatorFilter.InitFilter(numerators, denominators, 1);
+
+			double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
+			double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
+			pitchActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
+
+			numerators[0] = 0.0; numerators[1] = 15.0;
+			denominators[0] = 1.0; denominators[1] = 15.0;
+			accelFilter.InitFilter(numerators, denominators, 1);
 			return true;
 		}
 
 		bool initializeRollController()
 		{
-			if (!(simInitialized))
+			if (simInitialized == true)
 			{
-				double numerators[2] = { 0.0, 60.0 };
-				double denominators[2] = { 1.0, 60.0 };
-				latStickForceFilter.InitFilter(numerators, denominators, 1);
-
-				double numerators1[2] = { 0.0, 10.0 };
-				double denominators1[2] = { 1.0, 10.0 };
-				rollCommandFilter.InitFilter(numerators1, denominators1, 1);
-
-				double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
-				double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-				rollActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
-
-				double numerators3[2] = { 0.0, 50.0 };
-				double denominators3[2] = { 1.0, 50.0 };
-				rollRateFilter1.InitFilter(numerators3, denominators3, 1);
-
-				double numerators4[3] = { 4.0, 64.0, 6400.0 };
-				double denomiantors4[3] = { 1.0, 80.0, 6400.0 };
-				rollRateFilter2.InitFilter(numerators4, denomiantors4, 2);
+				return true;
 			}
+
+			double numerators[2] = { 0.0, 60.0 };
+			double denominators[2] = { 1.0, 60.0 };
+			latStickForceFilter.InitFilter(numerators, denominators, 1);
+
+			double numerators1[2] = { 0.0, 10.0 };
+			double denominators1[2] = { 1.0, 10.0 };
+			rollCommandFilter.InitFilter(numerators1, denominators1, 1);
+
+			double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
+			double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
+			rollActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
+
+			double numerators3[2] = { 0.0, 50.0 };
+			double denominators3[2] = { 1.0, 50.0 };
+			rollRateFilter1.InitFilter(numerators3, denominators3, 1);
+
+			double numerators4[3] = { 4.0, 64.0, 6400.0 };
+			double denomiantors4[3] = { 1.0, 80.0, 6400.0 };
+			rollRateFilter2.InitFilter(numerators4, denomiantors4, 2);
 			return true;
 		}
 
