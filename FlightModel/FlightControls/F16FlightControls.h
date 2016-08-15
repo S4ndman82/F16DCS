@@ -362,18 +362,24 @@ namespace F16
 		// right-side
 		float getAirbrakeRSAngle() const
 		{
+			// TODO: value from degrees to percentages here
+
 			// use same for both sides for now
 			return (float)airbrakeActuator.m_current;
 		}
 		// left-side
 		float getAirbrakeLSAngle() const
 		{
+			// TODO: value from degrees to percentages here
+
 			// use same for both sides for now
 			return (float)airbrakeActuator.m_current;
 		}
 
 		void updateAirBrake(const double frameTime)
 		{
+			// TODO: change values to degrees here
+
 			// for now, just use frametime for rate of movement
 			// (multiplier 1)
 
