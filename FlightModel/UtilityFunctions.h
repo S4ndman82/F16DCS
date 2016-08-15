@@ -137,7 +137,10 @@ bool getHyperCube(double **Xmat, int **indexMatrix, const double *V, const ND_IN
 		/* Check to see if this point is within the bound */
 		if(x<xmin || x>xmax)
 		{
-			return false;
+			ErrMsg("Point lies out data grid (in getHyperCube)");
+
+			// can this happen in normal case or should we just bail out now?
+			//return false;
 		}
 		else
 		{
