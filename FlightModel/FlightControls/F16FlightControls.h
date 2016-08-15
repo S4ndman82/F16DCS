@@ -22,6 +22,31 @@ namespace F16
 		~F16FcsController() {}
 	};
 
+	// simple actuator,
+	// replace with another later when ready..
+	class F16Actuator
+	{
+	public:
+		double moveRate;
+		double commanded;
+		double current;
+
+		double minLimit;
+		double maxLimit;
+		bool haveLimits;
+
+	public:
+		F16Actuator() 
+			: moveRate(1.0), commanded(0), current(0), 
+			, minLimit(0), maxLimit(0), haveLimits(false)
+		{}
+		~F16Actuator() {}
+
+		void updateFrame(double frameTime)
+		{
+		}
+	};
+
 	// if/when trimming support is needed,
 	// keep settings in one place.
 	class F16TrimState
@@ -310,7 +335,7 @@ namespace F16
 			double maxAnglePCT = 1.0; // 60 deg
 			if (isGearDown == true)
 			{
-				maxAnglePCT = 0.6; // ~43 deg
+				maxAnglePCT = 0.71; // ~43 deg
 			}
 			// TODO: if weight on wheel -> max opening
 			// if gear down but no weight on wheel -> restricted
@@ -843,6 +868,7 @@ namespace F16
 			flightSurface.rudder_DEG = limit(flightSurface.rudder_DEG, -30.0, 30.0);
 
 			// reuse in drawargs
+			//flightSurface.leadingEdgeFlap_PCT = 
 			flightSurface.aileron_PCT = flightSurface.aileron_DEG / 21.5;
 			flightSurface.elevator_PCT = flightSurface.elevator_DEG / 25.0;
 			flightSurface.rudder_PCT = flightSurface.rudder_DEG / 30.0;
