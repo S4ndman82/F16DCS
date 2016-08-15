@@ -984,9 +984,9 @@ void ed_fm_cold_start()
 	// input does not work correctly yet
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyOpen();
+	F16::FlightControls.initAirBrakeOff();
 	F16::Electrics.setElectricsOn(); // <- off
 	F16::Engine.startEngine(); // <- stop
-	F16::FlightControls.setAirbrakeOFF();
 	F16::FlightControls.setIsGearDown(true);
 
 	if (locateCockpitDll() == true)
@@ -1007,9 +1007,9 @@ void ed_fm_hot_start()
 	// engine on
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyClosed();
+	F16::FlightControls.initAirBrakeOff();
 	F16::Electrics.setElectricsOn();
 	F16::Engine.startEngine();
-	F16::FlightControls.setAirbrakeOFF();
 	F16::FlightControls.setIsGearDown(true);
 
 	if (locateCockpitDll() == true)
@@ -1030,9 +1030,9 @@ void ed_fm_hot_start_in_air()
 	// engine on
 	F16::LandingGear.initGearsUp();
 	F16::Airframe.initCanopyClosed();
+	F16::FlightControls.initAirBrakeOff();
 	F16::Electrics.setElectricsOn();
 	F16::Engine.startEngine();
-	F16::FlightControls.setAirbrakeOFF();
 	F16::FlightControls.setIsGearDown(false);
 
 	if (locateCockpitDll() == true)

@@ -58,7 +58,10 @@ namespace F16
 		{
 			double movementPerFrame = m_moveRate*frameTime;
 			double diff = m_commanded - m_current;
-			if (movementPerFrame < diff)
+
+			// if movement per frame is small enough (either direction),
+			// it can be done in one frame
+			if (movementPerFrame < abs(diff))
 			{
 				// moving direction from whatever position we are in
 				if (diff > 0)
@@ -214,8 +217,8 @@ namespace F16
 
 		// note: airbrake limit different when landing gear down (prevent strike to runway)
 		// cx_brk = 0.08, --coefficient, drag, breaks <- for airbrake?
-		double airbrakeAngle; // 0 = off (in percentage)
-		double airbrakeRate; // movement rate
+		//double airbrakeAngle; // 0 = off (in percentage)
+		//double airbrakeRate; // movement rate
 		bool airbrakeSwitch; // switch status
 
 		F16Actuator airbrakeActuator;
@@ -269,10 +272,9 @@ namespace F16
 			, leading_edge_flap_rate(0)
 			, leading_edge_flap_integrated_gained(0)
 			, leading_edge_flap_integrated_gained_biased(0)
-			, airbrakeAngle(0)
-			, airbrakeRate(1)
+			//, airbrakeAngle(0)
 			, airbrakeSwitch(false)
-			, airbrakeActuator(1.0) // <- for now, set 1 (1*frametime)
+			, airbrakeActuator(1.0, 0, 1.0) //
 			, isGearDown(true)
 			, trimState(-0.3, 0, 0) // <- why -0.3 for pitch? edit: apparently to counteract something else?
 			, longStickInput(-1.0, 1.0)
@@ -335,15 +337,18 @@ namespace F16
 		void initAirBrakeOff()
 		{
 			airbrakeSwitch = false;
-			airbrakeAngle = 0.0;
+			airbrakeActuator.m_current = 0;
+			airbrakeActuator.m_commanded = 0;
 		}
 		void setAirbrakeON()
 		{
 			airbrakeSwitch = true;
+			airbrakeActuator.m_commanded = 1;
 		}
 		void setAirbrakeOFF()
 		{
 			airbrakeSwitch = false;
+			airbrakeActuator.m_commanded = 0;
 		}
 		void switchAirbrake()
 		{
@@ -357,19 +362,20 @@ namespace F16
 		// right-side
 		float getAirbrakeRSAngle() const
 		{
-			return (float)airbrakeAngle;
+			// use same for both sides for now
+			return (float)airbrakeActuator.m_current;
 		}
 		// left-side
 		float getAirbrakeLSAngle() const
 		{
-			return (float)airbrakeAngle;
+			// use same for both sides for now
+			return (float)airbrakeActuator.m_current;
 		}
 
 		void updateAirBrake(const double frameTime)
 		{
 			// for now, just use frametime for rate of movement
-			// and add actuators for it later
-			double movementRate = airbrakeRate*frameTime;
+			// (multiplier 1)
 
 			// note: airbrake limit 60 degrees normally, 
 			// 43 deg when landing gear down (prevent strike to runway)
@@ -378,20 +384,24 @@ namespace F16
 			{
 				maxAnglePCT = 0.71; // ~43 deg
 			}
+			airbrakeActuator.m_maxLimit = maxAnglePCT;
+			airbrakeActuator.m_haveLimits = true;
+
 			// TODO: if weight on wheel -> max opening
 			// if gear down but no weight on wheel -> restricted
 			// controlled by additional switch in cockpit?
 
-			// this uses just percentage for now
-			if (airbrakeSwitch == true && airbrakeAngle < maxAnglePCT)
+			if (airbrakeSwitch == true)
 			{
-				airbrakeAngle += movementRate;
+				// open to max allowed by limit
+				airbrakeActuator.m_commanded = maxAnglePCT;
 			}
-			else if (airbrakeSwitch == false && airbrakeAngle > 0)
+			else
 			{
-				airbrakeAngle -= movementRate;
+				// close it
+				airbrakeActuator.m_commanded = 0;
 			}
-			airbrakeAngle = limit(airbrakeAngle, 0, maxAnglePCT);
+			airbrakeActuator.updateFrame(frameTime);
 		}
 
 		/*
