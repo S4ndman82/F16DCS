@@ -909,6 +909,10 @@ namespace F16
 			// -Pitch rate (rad/sec)
 			// -Differential command (from roll controller, not quite implemented yet)
 
+			// TODO: roll controller should also calculate elevator angle for combined effects?
+			// or pitch controller should calculate roll effect too?
+			// -> check control laws, in addition to handling supersonic flutter
+
 			double elevator_DEG_commanded = -(fcs_pitch_controller(longStickInput.getValue(), 0.0, dynamicPressure_LBFT2, frametime));
 			// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 			flightSurface.elevator_DEG = elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
