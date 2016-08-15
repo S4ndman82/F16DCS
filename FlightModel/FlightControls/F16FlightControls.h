@@ -29,7 +29,7 @@ namespace F16
 	public:
 		// This is "idealized" mathematical model more than actual
 		// representation. Hence things like movement geometry is missing.
-		// No calculation for force required either.
+		// No calculation for the required force, either.
 
 		double m_moveRate;
 		double m_commanded;
