@@ -31,9 +31,9 @@ namespace F16
 		// representation. Hence things like movement geometry is missing.
 		// No calculation for the required force, either.
 
-		double m_moveRate;
-		double m_commanded;
-		double m_current;
+		double m_moveRate; // "slowness"
+		double m_commanded; // target movement
+		double m_current; // current position
 
 		double m_minLimit;
 		double m_maxLimit;
