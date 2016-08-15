@@ -27,23 +27,57 @@ namespace F16
 	class F16Actuator
 	{
 	public:
-		double moveRate;
-		double commanded;
-		double current;
+		// This is "idealized" mathematical model more than actual
+		// representation. Hence things like movement geometry is missing.
+		// No calculation for force required either.
 
-		double minLimit;
-		double maxLimit;
-		bool haveLimits;
+		double m_moveRate;
+		double m_commanded;
+		double m_current;
+
+		double m_minLimit;
+		double m_maxLimit;
+		bool m_haveLimits;
 
 	public:
 		F16Actuator() 
-			: moveRate(1.0), commanded(0), current(0), 
-			, minLimit(0), maxLimit(0), haveLimits(false)
+			: m_moveRate(1.0), m_commanded(0), m_current(0),
+			m_minLimit(0), m_maxLimit(0), m_haveLimits(false)
+		{}
+		F16Actuator(const double moverate, const double minLimit, const double maxLimit)
+			: m_moveRate(moverate), m_commanded(0), m_current(0),
+			m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true)
 		{}
 		~F16Actuator() {}
 
-		void updateFrame(double frameTime)
+		void updateFrame(const double frameTime)
 		{
+			double movementPerFrame = m_moveRate*frameTime;
+			double diff = m_commanded - m_current;
+			if (movementPerFrame < diff)
+			{
+				// moving direction from whatever position we are in
+				if (diff > 0)
+				{
+					m_current += movementPerFrame;
+				}
+				else if (diff < 0)
+				{
+					m_current -= movementPerFrame;
+				}
+			}
+			else
+			{
+				// movement step per frame smaller than what max per frame is
+				// -> set to target
+				m_current = m_commanded;
+			}
+
+			// check that boundaries are not exceeded
+			if (m_haveLimits == true && m_minLimit != m_maxLimit)
+			{
+				m_current = limit(m_current, m_minLimit, m_maxLimit);
+			}
 		}
 	};
 
@@ -180,6 +214,8 @@ namespace F16
 		double airbrakeRate; // movement rate
 		bool airbrakeSwitch; // switch status
 
+		F16Actuator airbrakeActuator;
+
 		bool isGearDown; // is landing gear down
 
 		F16TrimState trimState;
@@ -232,6 +268,7 @@ namespace F16
 			, airbrakeAngle(0)
 			, airbrakeRate(1)
 			, airbrakeSwitch(false)
+			, airbrakeActuator()
 			, isGearDown(true)
 			, trimState(-0.3, 0, 0) // <- why -0.3 for pitch?
 			, longStickInput(-1.0, 1.0)
