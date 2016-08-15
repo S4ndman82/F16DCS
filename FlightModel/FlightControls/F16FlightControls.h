@@ -390,8 +390,6 @@ namespace F16
 			{
 				maxAnglePCT = 0.71; // ~43 deg
 			}
-			airbrakeActuator.m_maxLimit = maxAnglePCT;
-			airbrakeActuator.m_haveLimits = true;
 
 			// TODO: if weight on wheel -> max opening
 			// if gear down but no weight on wheel -> restricted
