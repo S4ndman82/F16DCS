@@ -115,11 +115,8 @@ void ErrMsg(char *m){
 /*    Get the indices of the hyper cube in the  */
 /*    grid in which the point lies              */
 /************************************************/
-int **getHyperCube(double **Xmat, const double *V, const ND_INFO &ndinfo)
+bool getHyperCube(double **Xmat, int **indexMatrix, const double *V, const ND_INFO &ndinfo)
 {
-	int **indexMatrix = intMatrix(ndinfo.nDimension,2);
-                     /*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
-
 	for(int i=0; i<ndinfo.nDimension; i++)
 	{
 		int indexMax = ndinfo.nPoints[i]; /* Get the total # of points in this dimension */
@@ -140,7 +137,7 @@ int **getHyperCube(double **Xmat, const double *V, const ND_INFO &ndinfo)
 		/* Check to see if this point is within the bound */
 		if(x<xmin || x>xmax)
 		{
-			ErrMsg("Point lies out data grid (in getHyperCube)");
+			return false;
 		}
 		else
 		{
@@ -166,7 +163,7 @@ int **getHyperCube(double **Xmat, const double *V, const ND_INFO &ndinfo)
 		}/*End of if-else */
 	}/* End of for(i= ...) */
 
-	return(indexMatrix);
+	return true;
 } // getHyperCube()
 
 /*********************************************************************************
@@ -255,8 +252,16 @@ double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO
 	int *indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
 	double **xPoint = doubleMatrix(ndinfo.nDimension,2);
 
+	// keep allocation and releasing in one place for simplicity,
+	// just pass this to getHyperCube()
+	int **indexMatrix = intMatrix(ndinfo.nDimension, 2);
+	/*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
+
 	/* Get the indices of the hypercube containing the point in argument */
-	int **indexMatrix = getHyperCube(Xmat, xPar, ndinfo);
+	if (getHyperCube(Xmat, indexMatrix, xPar, ndinfo) == false)
+	{
+		ErrMsg("Point lies out data grid (in getHyperCube)");
+	}
 
 	/* Get the co-ordinates of the hyper cube */
 	for(int i=0; i<ndinfo.nDimension; i++)
