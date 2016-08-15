@@ -931,6 +931,8 @@ namespace F16
 			flightSurface.rudder_PCT = flightSurface.rudder_DEG / 30.0;
 
 			// Trailing edge flap deflection (deg)
+			// Note that flaps should be controlled by landing gear level:
+			// when gears go down flaps go down as well
 			flightSurface.flap_DEG = fcs_flap_controller(totalVelocity_FPS);
 			flightSurface.flap_PCT = flightSurface.flap_DEG / 20.0;
 		}
