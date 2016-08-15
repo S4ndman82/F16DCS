@@ -44,6 +44,10 @@ namespace F16
 			: m_moveRate(1.0), m_commanded(0), m_current(0),
 			m_minLimit(0), m_maxLimit(0), m_haveLimits(false)
 		{}
+		F16Actuator(const double moverate)
+			: m_moveRate(moverate), m_commanded(0), m_current(0),
+			m_minLimit(0), m_maxLimit(0), m_haveLimits(false)
+		{}
 		F16Actuator(const double moverate, const double minLimit, const double maxLimit)
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
 			m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true)
@@ -268,9 +272,9 @@ namespace F16
 			, airbrakeAngle(0)
 			, airbrakeRate(1)
 			, airbrakeSwitch(false)
-			, airbrakeActuator()
+			, airbrakeActuator(1.0) // <- for now, set 1 (1*frametime)
 			, isGearDown(true)
-			, trimState(-0.3, 0, 0) // <- why -0.3 for pitch?
+			, trimState(-0.3, 0, 0) // <- why -0.3 for pitch? edit: apparently to counteract something else?
 			, longStickInput(-1.0, 1.0)
 			, latStickInput(-1.0, 1.0)
 			, pedInput(-1.0, 1.0)
