@@ -242,8 +242,7 @@ double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat,
 		dimNum++;
 	}/* End of while*/
 
-	double result = oldTbuf.vec[0];
-	return(result);
+	return oldTbuf.vec[0];
 } // linearInterpolate()
 
 double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO &ndinfo, UtilBuffer &Tbuf)
@@ -252,11 +251,7 @@ double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO
 
 	int *indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
 	double **xPoint = doubleMatrix(ndinfo.nDimension,2);
-
-	// keep allocation and releasing in one place for simplicity,
-	// just pass this to getHyperCube()
-	int **indexMatrix = intMatrix(ndinfo.nDimension, 2);
-	/*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
+	int **indexMatrix = intMatrix(ndinfo.nDimension, 2); /*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
 
 	/* Get the indices of the hypercube containing the point in argument */
 	if (getHyperCube(Xmat, indexMatrix, xPar, ndinfo) == false)
@@ -286,11 +281,7 @@ double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO
 		Tbuf.vec[i] = Y[index];
 	}
 
-	// is it really really necessary to have second array?
-	// could we just reuse the older which is same size anyway?
-	int *indexVectorLin = (int*)malloc(ndinfo.nDimension * sizeof(int));
-	double result = linearInterpolate(Tbuf, xPar, xPoint, indexVectorLin, ndinfo);
-	free(indexVectorLin);
+	double result = linearInterpolate(Tbuf, xPar, xPoint, indexVector, ndinfo);
 
 	free(indexVector);
 	freeIntMat(indexMatrix, ndinfo.nDimension, 2);
