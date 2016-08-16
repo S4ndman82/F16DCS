@@ -9,20 +9,27 @@ namespace F16
 {
 	class AERO_Function
 	{
+	protected:
+
+		// stuff only for temporary use,
+		// avoid reallocations
+		int *indexVector;
+
 	public:
 		ND_INFO ndinfo; // dimensions descriptor
 
 		double **m_Xmat; // pointers to static arrays of data (X matrix)
-
 		double *m_Ydata; // pointer to static array of related data (Y)
 
 		UtilBuffer m_Tbuf; // reusable buffer to reduce malloc()/free()
+
 
 		double *xPar; // parameters for interpolation (1-3 pars)
 		double m_result; // result value
 
 		AERO_Function()
-			: ndinfo()
+			: indexVector(NULL)
+			, ndinfo()
 			, m_Xmat(NULL)
 			, m_Ydata(NULL)
 			, m_Tbuf()
@@ -49,6 +56,11 @@ namespace F16
 				free(m_Xmat);
 				m_Xmat = NULL;
 			}
+			if (indexVector != NULL)
+			{
+				free(indexVector);
+				indexVector = NULL;
+			}
 		}
 
 		void init(const int nDimension, double *Ydata)
@@ -61,11 +73,13 @@ namespace F16
 
 			int nVertices = (1<<nDimension);
 			m_Tbuf.getVec(nVertices); // preallocate
+
+			indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
 		}
 
 		double interpnf(const double *xPar)
 		{
-			m_result = interpn(m_Xmat, m_Ydata, xPar, ndinfo, m_Tbuf);
+			m_result = interpn(indexVector, m_Xmat, m_Ydata, xPar, ndinfo, m_Tbuf);
 			return m_result;
 		}
 	};
@@ -676,7 +690,8 @@ namespace F16
 
 	public:
 		F16Aero();
-		~F16Aero() {};
+		~F16Aero();
+		void initfn();
 
 		void updateFrame(const double alpha_DEG, const double beta_DEG, const double elevator_DEG, const double frameTime)
 		{
@@ -908,6 +923,15 @@ namespace F16
 		fn_delta_Cm(),
 		fn_eta_el()
 	{
+		initfn();
+	}
+
+	// destructor
+	F16Aero::~F16Aero()
+	{}
+
+	void F16Aero::initfn()
+	{
 		fn_Cx.init(3, _CxData);
 		fn_Cx.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cx.ndinfo.nPoints[1] = beta1_size; 
@@ -1131,7 +1155,7 @@ namespace F16
 		fn_eta_el.init(1, _eta_elData);
 		fn_eta_el.ndinfo.nPoints[0] = dh1_size;	
 		fn_eta_el.m_Xmat[0] = dh1;
-	} // F16Aero::F16Aero()
+	} // F16Aero::initfn()
 }
 
 #endif // ifndef _F16AERO_H_

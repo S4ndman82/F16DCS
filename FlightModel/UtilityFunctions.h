@@ -245,11 +245,10 @@ double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat,
 	return oldTbuf.vec[0];
 } // linearInterpolate()
 
-double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO &ndinfo, UtilBuffer &Tbuf)
+double interpn(int *indexVector, double **Xmat, const double *Y, const double *xPar, const ND_INFO &ndinfo, UtilBuffer &Tbuf)
 {
 	const int nVertices = (1<<ndinfo.nDimension);
 
-	int *indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
 	double **xPoint = doubleMatrix(ndinfo.nDimension,2);
 	int **indexMatrix = intMatrix(ndinfo.nDimension, 2); /*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
 
@@ -283,7 +282,6 @@ double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO
 
 	double result = linearInterpolate(Tbuf, xPar, xPoint, indexVector, ndinfo);
 
-	free(indexVector);
 	freeIntMat(indexMatrix, ndinfo.nDimension, 2);
 	freeDoubleMat(xPoint, ndinfo.nDimension, 2);
 	return(result);
