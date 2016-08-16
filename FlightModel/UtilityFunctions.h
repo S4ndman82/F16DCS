@@ -189,9 +189,8 @@ int getLinIndex(const int *indexVector, const ND_INFO &ndinfo)
 }
 
 // Linearly interpolate between two data values
-double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat, const ND_INFO &ndinfo)
+double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat, int *indexVector, const ND_INFO &ndinfo)
 {
-	int *indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
 	int nVertices = 1<<(ndinfo.nDimension);
 
 	UtilBuffer oldTbuf(nVertices);
@@ -244,7 +243,6 @@ double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat,
 	}/* End of while*/
 
 	double result = oldTbuf.vec[0];
-	free(indexVector);
 	return(result);
 } // linearInterpolate()
 
@@ -288,7 +286,11 @@ double interpn(double **Xmat, const double *Y, const double *xPar, const ND_INFO
 		Tbuf.vec[i] = Y[index];
 	}
 
-	double result = linearInterpolate(Tbuf, xPar, xPoint, ndinfo);
+	// is it really really necessary to have second array?
+	// could we just reuse the older which is same size anyway?
+	int *indexVectorLin = (int*)malloc(ndinfo.nDimension * sizeof(int));
+	double result = linearInterpolate(Tbuf, xPar, xPoint, indexVectorLin, ndinfo);
+	free(indexVectorLin);
 
 	free(indexVector);
 	freeIntMat(indexMatrix, ndinfo.nDimension, 2);
