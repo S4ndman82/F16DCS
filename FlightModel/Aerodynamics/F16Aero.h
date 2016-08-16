@@ -12,17 +12,17 @@ namespace F16
 	public:
 		ND_INFO ndinfo; // dimensions descriptor
 
-		double **X; // pointers to static arrays of data (X matrix)
+		double **m_Xmat; // pointers to static arrays of data (X matrix)
 
-		double *data; // pointer to static array of related data (Y)
+		double *m_Ydata; // pointer to static array of related data (Y)
 
-		UtilBuffer buf; // reusable buffer to reduce malloc()/free()
+		UtilBuffer m_Tbuf; // reusable buffer to reduce malloc()/free()
 
 		AERO_Function()
 			: ndinfo()
-			, X(NULL)
-			, data(NULL)
-			, buf()
+			, m_Xmat(NULL)
+			, m_Ydata(NULL)
+			, m_Tbuf()
 		{
 			ndinfo.nDimension = 0;
 		}
@@ -34,10 +34,10 @@ namespace F16
 				free(ndinfo.nPoints);
 				ndinfo.nPoints = NULL;
 			}
-			if (X != NULL)
+			if (m_Xmat != NULL)
 			{
-				free(X);
-				X = NULL;
+				free(m_Xmat);
+				m_Xmat = NULL;
 			}
 		}
 
@@ -45,15 +45,15 @@ namespace F16
 		{
 			ndinfo.nDimension = nDimension;
 			ndinfo.nPoints = (int*)malloc(ndinfo.nDimension*sizeof(int));
-			X = (double **) malloc(ndinfo.nDimension*sizeof(double*));
+			m_Xmat = (double **)malloc(ndinfo.nDimension*sizeof(double*));
 
 			int nVertices = (1<<nDimension);
-			buf.getVec(nVertices); // preallocate
+			m_Tbuf.getVec(nVertices); // preallocate
 		}
 
 		double interpnf(const double *xPar)
 		{
-			return interpn(X, data, xPar, ndinfo, buf);
+			return interpn(m_Xmat, m_Ydata, xPar, ndinfo, m_Tbuf);
 		}
 	};
 
@@ -915,271 +915,271 @@ namespace F16
 		fn_eta_el()
 	{
 		fn_Cx.init(3);
-		fn_Cx.data = _CxData;
+		fn_Cx.m_Ydata = _CxData;
 		fn_Cx.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cx.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cx.ndinfo.nPoints[2] = dh1_size; 
-		fn_Cx.X[0] = alpha1;
-		fn_Cx.X[1] = beta1;
-		fn_Cx.X[2] = dh1;
+		fn_Cx.m_Xmat[0] = alpha1;
+		fn_Cx.m_Xmat[1] = beta1;
+		fn_Cx.m_Xmat[2] = dh1;
 
 		fn_Cz.init(3); /* alpha,beta,dele */
-		fn_Cz.data = _CzData;
+		fn_Cz.m_Ydata = _CzData;
 		fn_Cz.ndinfo.nPoints[0] = alpha1_size;	/* Alpha npoints */
 		fn_Cz.ndinfo.nPoints[1] = beta1_size; /* Beta npoints  */
 		fn_Cz.ndinfo.nPoints[2] = dh1_size;  /* dele npoints  */
-		fn_Cz.X[0] = alpha1;
-		fn_Cz.X[1] = beta1;
-		fn_Cz.X[2] = dh1;
+		fn_Cz.m_Xmat[0] = alpha1;
+		fn_Cz.m_Xmat[1] = beta1;
+		fn_Cz.m_Xmat[2] = dh1;
 
 		fn_Cm.init(3);
-		fn_Cm.data = _CmData;
+		fn_Cm.m_Ydata = _CmData;
 		fn_Cm.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cm.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cm.ndinfo.nPoints[2] = dh1_size; 
-		fn_Cm.X[0] = alpha1;
-		fn_Cm.X[1] = beta1;
-		fn_Cm.X[2] = dh1;
+		fn_Cm.m_Xmat[0] = alpha1;
+		fn_Cm.m_Xmat[1] = beta1;
+		fn_Cm.m_Xmat[2] = dh1;
 
 		fn_Cy.init(2);
-		fn_Cy.data = _CyData;
+		fn_Cy.m_Ydata = _CyData;
 		fn_Cy.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cy.ndinfo.nPoints[1] = beta1_size; 
-		fn_Cy.X[0] = alpha1;
-		fn_Cy.X[1] = beta1;
+		fn_Cy.m_Xmat[0] = alpha1;
+		fn_Cy.m_Xmat[1] = beta1;
 
 		fn_Cn.init(3);
-		fn_Cn.data = _CnData;
+		fn_Cn.m_Ydata = _CnData;
 		fn_Cn.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cn.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cn.ndinfo.nPoints[2] = dh2_size;
-		fn_Cn.X[0] = alpha1;
-		fn_Cn.X[1] = beta1;
-		fn_Cn.X[2] = dh2;
+		fn_Cn.m_Xmat[0] = alpha1;
+		fn_Cn.m_Xmat[1] = beta1;
+		fn_Cn.m_Xmat[2] = dh2;
 
 		fn_Cl.init(3);
-		fn_Cl.data = _ClData;
+		fn_Cl.m_Ydata = _ClData;
 		fn_Cl.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cl.ndinfo.nPoints[1] = beta1_size;
 		fn_Cl.ndinfo.nPoints[2] = dh2_size;
-		fn_Cl.X[0] = alpha1;
-		fn_Cl.X[1] = beta1;
-		fn_Cl.X[2] = dh2;
+		fn_Cl.m_Xmat[0] = alpha1;
+		fn_Cl.m_Xmat[1] = beta1;
+		fn_Cl.m_Xmat[2] = dh2;
 
 		fn_Cx_lef.init(2);
-		fn_Cx_lef.data = _Cx_lefData;
+		fn_Cx_lef.m_Ydata = _Cx_lefData;
 		fn_Cx_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cx_lef.ndinfo.nPoints[1] = beta1_size;
-		fn_Cx_lef.X[0] = alpha2;
-		fn_Cx_lef.X[1] = beta1;
+		fn_Cx_lef.m_Xmat[0] = alpha2;
+		fn_Cx_lef.m_Xmat[1] = beta1;
 
 		fn_Cz_lef.init(2);
-		fn_Cz_lef.data = _Cz_lefData;
+		fn_Cz_lef.m_Ydata = _Cz_lefData;
 		fn_Cz_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cz_lef.ndinfo.nPoints[1] = beta1_size; 
-		fn_Cz_lef.X[0] = alpha2;
-		fn_Cz_lef.X[1] = beta1;
+		fn_Cz_lef.m_Xmat[0] = alpha2;
+		fn_Cz_lef.m_Xmat[1] = beta1;
 
 		fn_Cm_lef.init(2);
-		fn_Cm_lef.data = _Cm_lefData;
+		fn_Cm_lef.m_Ydata = _Cm_lefData;
 		fn_Cm_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cm_lef.ndinfo.nPoints[1] = beta1_size; 
-		fn_Cm_lef.X[0] = alpha2;
-		fn_Cm_lef.X[1] = beta1;
+		fn_Cm_lef.m_Xmat[0] = alpha2;
+		fn_Cm_lef.m_Xmat[1] = beta1;
 
 		fn_Cy_lef.init(2);
-		fn_Cy_lef.data = _Cy_lefData;
+		fn_Cy_lef.m_Ydata = _Cy_lefData;
 		fn_Cy_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cy_lef.ndinfo.nPoints[1] = beta1_size; 
-		fn_Cy_lef.X[0] = alpha2;
-		fn_Cy_lef.X[1] = beta1;
+		fn_Cy_lef.m_Xmat[0] = alpha2;
+		fn_Cy_lef.m_Xmat[1] = beta1;
 
 		fn_Cn_lef.init(2);
-		fn_Cn_lef.data = _Cn_lefData;
+		fn_Cn_lef.m_Ydata = _Cn_lefData;
 		fn_Cn_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cn_lef.ndinfo.nPoints[1] = beta1_size; 
-		fn_Cn_lef.X[0] = alpha2;
-		fn_Cn_lef.X[1] = beta1;
+		fn_Cn_lef.m_Xmat[0] = alpha2;
+		fn_Cn_lef.m_Xmat[1] = beta1;
 
 		fn_Cl_lef.init(2); /* alpha,beta*/
-		fn_Cl_lef.data = _Cl_lefData;
+		fn_Cl_lef.m_Ydata = _Cl_lefData;
 		fn_Cl_lef.ndinfo.nPoints[0] = alpha2_size;	/* Alpha npoints */
 		fn_Cl_lef.ndinfo.nPoints[1] = beta1_size; /* Beta npoints  */
-		fn_Cl_lef.X[0] = alpha2;
-		fn_Cl_lef.X[1] = beta1;
+		fn_Cl_lef.m_Xmat[0] = alpha2;
+		fn_Cl_lef.m_Xmat[1] = beta1;
 
 		fn_CXq.init(1);
-		fn_CXq.data = _CxqData;
+		fn_CXq.m_Ydata = _CxqData;
 		fn_CXq.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CXq.X[0] = alpha1;
+		fn_CXq.m_Xmat[0] = alpha1;
 
 		fn_CZq.init(1);
-		fn_CZq.data = _CzqData;
+		fn_CZq.m_Ydata = _CzqData;
 		fn_CZq.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CZq.X[0] = alpha1;
+		fn_CZq.m_Xmat[0] = alpha1;
 
 		fn_CMq.init(1);
-		fn_CMq.data = _CmqData;
+		fn_CMq.m_Ydata = _CmqData;
 		fn_CMq.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CMq.X[0] = alpha1;
+		fn_CMq.m_Xmat[0] = alpha1;
 
 		fn_CYp.init(1);
-		fn_CYp.data = _CypData;
+		fn_CYp.m_Ydata = _CypData;
 		fn_CYp.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CYp.X[0] = alpha1;
+		fn_CYp.m_Xmat[0] = alpha1;
 
 		fn_CYr.init(1);
-		fn_CYr.data = _CyrData;
+		fn_CYr.m_Ydata = _CyrData;
 		fn_CYr.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CYr.X[0] = alpha1;
+		fn_CYr.m_Xmat[0] = alpha1;
 
 		fn_CNr.init(1);
-		fn_CNr.data = _CnrData;
+		fn_CNr.m_Ydata = _CnrData;
 		fn_CNr.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CNr.X[0] = alpha1;
+		fn_CNr.m_Xmat[0] = alpha1;
 
 		fn_CNp.init(1);
-		fn_CNp.data = _CnpData;
+		fn_CNp.m_Ydata = _CnpData;
 		fn_CNp.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CNp.X[0] = alpha1;
+		fn_CNp.m_Xmat[0] = alpha1;
 
 		fn_CLp.init(1);
-		fn_CLp.data = _ClpData;
+		fn_CLp.m_Ydata = _ClpData;
 		fn_CLp.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CLp.X[0] = alpha1;
+		fn_CLp.m_Xmat[0] = alpha1;
 
 		fn_CLr.init(1);
-		fn_CLr.data = _ClrData;
+		fn_CLr.m_Ydata = _ClrData;
 		fn_CLr.ndinfo.nPoints[0] = alpha1_size;	
-		fn_CLr.X[0] = alpha1;
+		fn_CLr.m_Xmat[0] = alpha1;
 
 		fn_delta_CXq_lef.init(1);
-		fn_delta_CXq_lef.data = _delta_CXq_lefData;
+		fn_delta_CXq_lef.m_Ydata = _delta_CXq_lefData;
 		fn_delta_CXq_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CXq_lef.X[0] = alpha2;
+		fn_delta_CXq_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CYr_lef.init(1);
-		fn_delta_CYr_lef.data = _delta_CYr_lefData;
+		fn_delta_CYr_lef.m_Ydata = _delta_CYr_lefData;
 		fn_delta_CYr_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CYr_lef.X[0] = alpha2;
+		fn_delta_CYr_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CYp_lef.init(1);
-		fn_delta_CYp_lef.data = _delta_CYp_lefData;
+		fn_delta_CYp_lef.m_Ydata = _delta_CYp_lefData;
 		fn_delta_CYp_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CYp_lef.X[0] = alpha2;
+		fn_delta_CYp_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CZq_lef.init(1);
-		fn_delta_CZq_lef.data = _delta_CZq_lefData;
+		fn_delta_CZq_lef.m_Ydata = _delta_CZq_lefData;
 		fn_delta_CZq_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CZq_lef.X[0] = alpha2;
+		fn_delta_CZq_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CLr_lef.init(1);
-		fn_delta_CLr_lef.data = _delta_CLr_lefData;
+		fn_delta_CLr_lef.m_Ydata = _delta_CLr_lefData;
 		fn_delta_CLr_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CLr_lef.X[0] = alpha2;
+		fn_delta_CLr_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CLp_lef.init(1);
-		fn_delta_CLp_lef.data = _delta_CLp_lefData;
+		fn_delta_CLp_lef.m_Ydata = _delta_CLp_lefData;
 		fn_delta_CLp_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CLp_lef.X[0] = alpha2;
+		fn_delta_CLp_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CMq_lef.init(1);
-		fn_delta_CMq_lef.data = _delta_CMq_lefData;
+		fn_delta_CMq_lef.m_Ydata = _delta_CMq_lefData;
 		fn_delta_CMq_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CMq_lef.X[0] = alpha2;
+		fn_delta_CMq_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CNr_lef.init(1);
-		fn_delta_CNr_lef.data = _delta_CNr_lefData;
+		fn_delta_CNr_lef.m_Ydata = _delta_CNr_lefData;
 		fn_delta_CNr_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CNr_lef.X[0] = alpha2;
+		fn_delta_CNr_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CNp_lef.init(1);
-		fn_delta_CNp_lef.data = _delta_CNp_lefData;
+		fn_delta_CNp_lef.m_Ydata = _delta_CNp_lefData;
 		fn_delta_CNp_lef.ndinfo.nPoints[0] = alpha2_size;	
-		fn_delta_CNp_lef.X[0] = alpha2;
+		fn_delta_CNp_lef.m_Xmat[0] = alpha2;
 
 		fn_Cy_r30.init(2);
-		fn_Cy_r30.data = _Cy_r30Data;
+		fn_Cy_r30.m_Ydata = _Cy_r30Data;
 		fn_Cy_r30.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cy_r30.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cy_r30.X[0] = alpha1;
-		fn_Cy_r30.X[1] = beta1;
+		fn_Cy_r30.m_Xmat[0] = alpha1;
+		fn_Cy_r30.m_Xmat[1] = beta1;
 
 		fn_Cn_r30.init(2);
-		fn_Cn_r30.data = _Cn_r30Data;
+		fn_Cn_r30.m_Ydata = _Cn_r30Data;
 		fn_Cn_r30.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cn_r30.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cn_r30.X[0] = alpha1;
-		fn_Cn_r30.X[1] = beta1;
+		fn_Cn_r30.m_Xmat[0] = alpha1;
+		fn_Cn_r30.m_Xmat[1] = beta1;
 
 		fn_Cl_r30.init(2);
-		fn_Cl_r30.data = _Cl_r30Data;
+		fn_Cl_r30.m_Ydata = _Cl_r30Data;
 		fn_Cl_r30.ndinfo.nPoints[0] = alpha1_size;
 		fn_Cl_r30.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cl_r30.X[0] = alpha1;
-		fn_Cl_r30.X[1] = beta1;
+		fn_Cl_r30.m_Xmat[0] = alpha1;
+		fn_Cl_r30.m_Xmat[1] = beta1;
 
 		fn_Cy_a20.init(2);
-		fn_Cy_a20.data = _Cy_a20Data;
+		fn_Cy_a20.m_Ydata = _Cy_a20Data;
 		fn_Cy_a20.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cy_a20.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cy_a20.X[0] = alpha1;
-		fn_Cy_a20.X[1] = beta1;
+		fn_Cy_a20.m_Xmat[0] = alpha1;
+		fn_Cy_a20.m_Xmat[1] = beta1;
 
 		fn_Cy_a20_lef.init(2);
-		fn_Cy_a20_lef.data = _Cy_a20_lefData;
+		fn_Cy_a20_lef.m_Ydata = _Cy_a20_lefData;
 		fn_Cy_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cy_a20_lef.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cy_a20_lef.X[0] = alpha2;
-		fn_Cy_a20_lef.X[1] = beta1;
+		fn_Cy_a20_lef.m_Xmat[0] = alpha2;
+		fn_Cy_a20_lef.m_Xmat[1] = beta1;
 
 		fn_Cn_a20.init(2);
-		fn_Cn_a20.data = _Cn_a20Data;
+		fn_Cn_a20.m_Ydata = _Cn_a20Data;
 		fn_Cn_a20.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cn_a20.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cn_a20.X[0] = alpha1;
-		fn_Cn_a20.X[1] = beta1;
+		fn_Cn_a20.m_Xmat[0] = alpha1;
+		fn_Cn_a20.m_Xmat[1] = beta1;
 
 		fn_Cn_a20_lef.init(2);
-		fn_Cn_a20_lef.data = _Cn_a20_lefData;
+		fn_Cn_a20_lef.m_Ydata = _Cn_a20_lefData;
 		fn_Cn_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cn_a20_lef.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cn_a20_lef.X[0] = alpha2;
-		fn_Cn_a20_lef.X[1] = beta1;
+		fn_Cn_a20_lef.m_Xmat[0] = alpha2;
+		fn_Cn_a20_lef.m_Xmat[1] = beta1;
 
 		fn_Cl_a20.init(2);
-		fn_Cl_a20.data = _Cl_a20Data;
+		fn_Cl_a20.m_Ydata = _Cl_a20Data;
 		fn_Cl_a20.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cl_a20.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cl_a20.X[0] = alpha1;
-		fn_Cl_a20.X[1] = beta1;
+		fn_Cl_a20.m_Xmat[0] = alpha1;
+		fn_Cl_a20.m_Xmat[1] = beta1;
 
 		fn_Cl_a20_lef.init(2);
-		fn_Cl_a20_lef.data = _Cl_a20_lefData;
+		fn_Cl_a20_lef.m_Ydata = _Cl_a20_lefData;
 		fn_Cl_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cl_a20_lef.ndinfo.nPoints[1] = beta1_size;	
-		fn_Cl_a20_lef.X[0] = alpha2;
-		fn_Cl_a20_lef.X[1] = beta1;
+		fn_Cl_a20_lef.m_Xmat[0] = alpha2;
+		fn_Cl_a20_lef.m_Xmat[1] = beta1;
 
 		fn_delta_CNbeta.init(1);
-		fn_delta_CNbeta.data = _delta_CNbetaData;
+		fn_delta_CNbeta.m_Ydata = _delta_CNbetaData;
 		fn_delta_CNbeta.ndinfo.nPoints[0] = alpha1_size;	
-		fn_delta_CNbeta.X[0] = alpha1;
+		fn_delta_CNbeta.m_Xmat[0] = alpha1;
 
 		fn_delta_CLbeta.init(1);
-		fn_delta_CLbeta.data = _delta_CLbetaData;
+		fn_delta_CLbeta.m_Ydata = _delta_CLbetaData;
 		fn_delta_CLbeta.ndinfo.nPoints[0] = alpha1_size;	
-		fn_delta_CLbeta.X[0] = alpha1;
+		fn_delta_CLbeta.m_Xmat[0] = alpha1;
 
 		fn_delta_Cm.init(1);
-		fn_delta_Cm.data = _delta_CmData;
+		fn_delta_Cm.m_Ydata = _delta_CmData;
 		fn_delta_Cm.ndinfo.nPoints[0] = alpha1_size;	
-		fn_delta_Cm.X[0] = alpha1;
+		fn_delta_Cm.m_Xmat[0] = alpha1;
 
 		fn_eta_el.init(1);
-		fn_eta_el.data = _eta_elData;
+		fn_eta_el.m_Ydata = _eta_elData;
 		fn_eta_el.ndinfo.nPoints[0] = dh1_size;	
-		fn_eta_el.X[0] = dh1;
+		fn_eta_el.m_Xmat[0] = dh1;
 	} // F16Aero::F16Aero()
 }
 
