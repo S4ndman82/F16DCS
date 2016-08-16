@@ -18,11 +18,14 @@ namespace F16
 
 		UtilBuffer m_Tbuf; // reusable buffer to reduce malloc()/free()
 
+		double m_result; // result value
+
 		AERO_Function()
 			: ndinfo()
 			, m_Xmat(NULL)
 			, m_Ydata(NULL)
 			, m_Tbuf()
+			, m_result(0)
 		{
 			ndinfo.nDimension = 0;
 		}
@@ -43,6 +46,7 @@ namespace F16
 
 		void init(const int nDimension)
 		{
+			m_result = 0;
 			ndinfo.nDimension = nDimension;
 			ndinfo.nPoints = (int*)malloc(ndinfo.nDimension*sizeof(int));
 			m_Xmat = (double **)malloc(ndinfo.nDimension*sizeof(double*));
@@ -53,7 +57,8 @@ namespace F16
 
 		double interpnf(const double *xPar)
 		{
-			return interpn(m_Xmat, m_Ydata, xPar, ndinfo, m_Tbuf);
+			m_result = interpn(m_Xmat, m_Ydata, xPar, ndinfo, m_Tbuf);
+			return m_result;
 		}
 	};
 
