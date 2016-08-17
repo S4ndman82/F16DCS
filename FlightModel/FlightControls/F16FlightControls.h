@@ -529,6 +529,9 @@ namespace F16
 			longStickInputForce = limit(longStickInputForce,-180.0,80.0);
 			m_longStickForce = longStickInputForce;
 
+			// TODO: if pitch override command is in effect -> override G-limit
+			//if (manualPitchOverride == true)
+
 			double longStickCommand_G = getPitchRateCommand(longStickInputForce);
 
 			double longStickCommandWithTrim_G = trimState.trimPitch - longStickCommand_G;
