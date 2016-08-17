@@ -23,8 +23,10 @@ namespace F16
 
 		UtilBuffer m_Tbuf; // reusable buffer to reduce malloc()/free()
 
+		UtilMatrix<double> m_xPointMat; // used in interpolation, reduce reallocation
+		UtilMatrix<int> m_indexMat; // used in interpolation, reduce reallocation
 
-		double *xPar; // parameters for interpolation (1-3 pars)
+		//double *xPar; // parameters for interpolation (1-3 pars)
 		double m_result; // result value
 
 		AERO_Function()
@@ -33,7 +35,9 @@ namespace F16
 			, m_Xmat(NULL)
 			, m_Ydata(NULL)
 			, m_Tbuf()
-			, xPar(NULL)
+			, m_xPointMat()
+			, m_indexMat()
+			//, xPar(NULL)
 			, m_result(0)
 		{
 			ndinfo.nDimension = 0;
@@ -41,11 +45,15 @@ namespace F16
 
 		~AERO_Function()
 		{
+			/*
 			if (xPar != NULL)
 			{
 				free(xPar);
 				xPar = NULL;
 			}
+			*/
+			m_indexMat.release();
+			m_xPointMat.release();
 			if (ndinfo.nPoints != NULL)
 			{
 				free(ndinfo.nPoints);
@@ -74,12 +82,17 @@ namespace F16
 			int nVertices = (1<<nDimension);
 			m_Tbuf.getVec(nVertices); // preallocate
 
+			// preallocate
+			m_xPointMat.allocate(ndinfo.nDimension, 2);
+			m_indexMat.allocate(ndinfo.nDimension, 2);
+
+			// preallocate another temporary buffer to reuse
 			indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
 		}
 
 		double interpnf(const double *xPar)
 		{
-			m_result = interpn(indexVector, m_Xmat, m_Ydata, xPar, ndinfo, m_Tbuf);
+			m_result = interpn(indexVector, m_Xmat, m_Ydata, xPar, m_xPointMat.m_mat, m_indexMat.m_mat, ndinfo, m_Tbuf);
 			return m_result;
 		}
 	};
@@ -101,7 +114,6 @@ namespace F16
 		double		Czq_delta_lef;
 		double		Cm_total;
 		double		Cm;
-		double		eta_el;
 		double		Cm_delta_lef;
 		double		Cmq;
 		double		Cmq_delta_lef;
@@ -139,6 +151,7 @@ namespace F16
 		double		Clr_delta_lef;
 		double		Clp;
 		double		Clp_delta_lef;
+		double		eta_el;
 
 		AERO_Function fn_Cx;
 		AERO_Function fn_Cz;
@@ -841,7 +854,6 @@ namespace F16
 		Czq_delta_lef(0),	
 		Cm_total(0),		
 		Cm(0),				
-		eta_el(0),			
 		Cm_delta_lef(0),	
 		Cmq(0),				
 		Cmq_delta_lef(0),	
@@ -879,6 +891,7 @@ namespace F16
 		Clr_delta_lef(0),	
 		Clp(0),				
 		Clp_delta_lef(0),
+		eta_el(0),
 		fn_Cx(),
 		fn_Cz(),
 		fn_Cm(),

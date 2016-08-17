@@ -63,6 +63,48 @@ public:
 	}
 };
 
+/**/
+template<typename T> class UtilMatrix
+{
+public:
+	T **m_mat;
+	size_t m_n;
+	size_t m_m;
+
+	UtilMatrix()
+		: m_mat(nullptr), m_n(0), m_m(0)
+	{}
+	~UtilMatrix() 
+	{
+		release();
+	}
+
+	void allocate(const size_t n, const size_t m)
+	{
+		m_n = n; m_m = m;
+		m_mat = (T**)malloc(m_n*sizeof(T*));
+		for (size_t i = 0; i < m_n; i++)
+		{
+			m_mat[i] = (T*)malloc(m_m*sizeof(T));
+		}
+	}
+	void release()
+	{
+		if (m_mat == nullptr)
+		{
+			return;
+		}
+
+		for (size_t i = 0; i < m_n; i++)
+		{
+			free(m_mat[i]);
+		}
+		free(m_mat);
+		m_mat = nullptr;
+	}
+};
+/**/
+
 // Start of Utility Functions
 
 // Struct to define a set of data with a given number of dimenions and points
@@ -70,42 +112,6 @@ typedef struct {
 		int nDimension;
 		int *nPoints;   
 		} ND_INFO;
-
-// Matrix of all integers
-int **intMatrix(int n,int m){
-	int **mat = (int**) malloc(n*sizeof(int*));
-	for(int i=0;i<n;i++)
-		mat[i] = (int*) malloc(m*sizeof(int));
-	return(mat);
-	}
-
-// Matrix of all doubles
-double **doubleMatrix(int n,int m){
-	double **mat = (double**) malloc(n*sizeof(double*));
-	for(int i=0;i<n;i++)
-		mat[i] = (double*) malloc(m*sizeof(double));
-	return(mat);
-	}
-
-// Clear out the provided integer matrix
-void freeIntMat(int **mat,int n,int m){
-	/* the column size is not used but is required only
-		for debugging purpose
-	*/
-	for(int i=0;i<n;i++)
-		free(mat[i]);
-	free(mat);
-	}
-
-// Clear out the providced double matrix
-void freeDoubleMat(double **mat,int n,int m){
-	/* the column size is not used but is required only
-		for debugging purpose
-	*/
-	for(int i=0;i<n;i++)
-		free(mat[i]);
-	free(mat);
-	}
 
 // Error Call Helper Function
 void ErrMsg(char *m){
@@ -245,12 +251,10 @@ double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat,
 	return oldTbuf.vec[0];
 } // linearInterpolate()
 
-double interpn(int *indexVector, double **Xmat, const double *Y, const double *xPar, const ND_INFO &ndinfo, UtilBuffer &Tbuf)
+/*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
+double interpn(int *indexVector, double **Xmat, const double *Y, const double *xPar, double **xPoint, int **indexMatrix, const ND_INFO &ndinfo, UtilBuffer &Tbuf)
 {
 	const int nVertices = (1<<ndinfo.nDimension);
-
-	double **xPoint = doubleMatrix(ndinfo.nDimension,2);
-	int **indexMatrix = intMatrix(ndinfo.nDimension, 2); /*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
 
 	/* Get the indices of the hypercube containing the point in argument */
 	if (getHyperCube(Xmat, indexMatrix, xPar, ndinfo) == false)
@@ -282,8 +286,6 @@ double interpn(int *indexVector, double **Xmat, const double *Y, const double *x
 
 	double result = linearInterpolate(Tbuf, xPar, xPoint, indexVector, ndinfo);
 
-	freeIntMat(indexMatrix, ndinfo.nDimension, 2);
-	freeDoubleMat(xPoint, ndinfo.nDimension, 2);
 	return(result);
 }
 // End of Utility Functions
