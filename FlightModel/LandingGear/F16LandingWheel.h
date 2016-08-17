@@ -153,7 +153,7 @@ namespace F16
 			// -> apply sliding friction factor
 			//if (braking && wheel locked (anti-skid==false) -> glide-factor?)
 
-			if (groundSpeed > 0 && brakeInput.getValue() > 0)
+			if (brakeInput.getValue() > 0)
 			{
 				// just percentage of max according to input 0..1, right?
 				brakeForce = abs(brakeInput.getValue()) * wheel_brake_moment_max * weightN;
@@ -165,7 +165,12 @@ namespace F16
 				// TODO: also consider wheel rotational inertia
 
 				// apply brakeforce as reduction of inertia?
-				// 
+				/*  
+				if (groundSpeed > 0 && brakeInput.getValue() > 0)
+				{
+				// check for rotation speed vs. groundspeed -> gliding or rotation? -> anti-skid
+				}
+				*/
 			}
 
 			// note: DCS has "left-hand notation" so side-slip is Z-axis?
