@@ -273,7 +273,8 @@ void ed_fm_simulate(double dt)
 		F16::FlightControls.bodyState.alpha_DEG, 
 		F16::FlightControls.bodyState.beta_DEG,
 		F16::LandingGear.CxGearAero, 
-		F16::LandingGear.CzGearAero);
+		F16::LandingGear.CzGearAero,
+		F16::FlightControls.getAirbrakeDrag());
 
 	//----------------------------------------------------------------
 	// All prior forces calculated in lbs, needs to be converted

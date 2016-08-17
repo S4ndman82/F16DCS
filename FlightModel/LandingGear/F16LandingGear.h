@@ -26,10 +26,6 @@ namespace F16
 	class F16LandingGear //: public AbstractHydraulicDevice
 	{
 	protected:
-		// precalculate some things
-		const double gearZsin = sin(F16::degtorad);
-		const double gearYcos = cos(F16::degtorad);
-
 		bool gearLevelUp; // gear lever up/down (note runway/air start)
 		double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
 		//bool gearDownLocked; // gear down and locked?
@@ -290,8 +286,12 @@ namespace F16
 
 		void gearAeroDrag(/*double airspeed?*/)
 		{
+			// precalculate some things
+			const double gearZsin = sin(F16::degtorad);
+			const double gearYcos = cos(F16::degtorad);
+
 			// TODO Gear aero (from JBSim F16.xml config)
-			CDGearAero = 0.0270 * gearDownAngle; 
+			CDGearAero = 0.0270 * gearDownAngle; // <- angle 1.0 for fully down, 0 when up
 			CzGearAero = - (CDGearAero * gearZsin);
 			CxGearAero = - (CDGearAero * gearYcos);
 		}

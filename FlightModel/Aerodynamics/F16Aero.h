@@ -781,7 +781,8 @@ namespace F16
 		void computeTotals(const double AtmosTotalVelocity_FPS, 
 						const double flap_PCT, const double leadingEdgeFlap_PCT, const double aileron_PCT, const double rudder_PCT,
 						const double pitchRate_RPS, const double rollRate_RPS, const double yawRate_RPS, 
-						const double alpha_DEG, const double beta_DEG, const double LgCxGearAero, const double LgCzGearAero)
+						const double alpha_DEG, const double beta_DEG, const double LgCxGearAero, const double LgCzGearAero,
+						const double CdAirbrake)
 		{
 			// precalculate some terms to simplify statements
 			const double totalVelocity_FPS = 2*AtmosTotalVelocity_FPS;
@@ -801,6 +802,9 @@ namespace F16
 			double dXdQ = meanChordFPS * (Cxq + Cxq_delta_lef*leadingEdgeFlap_PCT);
 			Cx_total = Cx + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*pitchRate_RPS;
 			Cx_total += CxFlaps + LgCxGearAero;
+
+			/* airbrake - testing now*/
+			Cx_total += CdAirbrake;
 
 			/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
 			double dZdQ = meanChordFPS * (Czq + Cz_delta_lef*leadingEdgeFlap_PCT);

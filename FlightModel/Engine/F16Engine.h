@@ -212,6 +212,9 @@ namespace F16
 
 		void startEngine()
 		{
+			//throttleInput = 0;
+			//fuelPerFrame = 0;
+
 			starting = true;
 			stopping = false;
 
@@ -226,6 +229,7 @@ namespace F16
 			// temporary for testing
 			isIgnited = false;
 			fuelPerFrame = 0;
+			throttleInput = 0;
 		}
 
 		double getLowPressureBleedAir() const

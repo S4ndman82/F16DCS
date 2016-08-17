@@ -411,11 +411,11 @@ namespace F16
 			// after actuator move, calculate new drag at new position
 
 			// TODO: switch to actual angles instead of percentages
-			double angle = cos(airbrakeActuator.m_current);
+			//double angle = cos(airbrakeActuator.m_current);
 
 			// TEST!
 			// just use full now for testing
-			double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
+			//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
 
 			/* source: http://www.f-16.net/forum/viewtopic.php?t=11398
 			Because landing is such a low speed, I did not bother to calculate those forces. 
@@ -965,6 +965,14 @@ namespace F16
 			// when gears go down flaps go down as well
 			flightSurface.flap_DEG = fcs_flap_controller(totalVelocity_FPS);
 			flightSurface.flap_PCT = flightSurface.flap_DEG / 20.0;
+		}
+
+		double getAirbrakeDrag()
+		{
+			//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
+			double airbrake_PCT = airbrakeActuator.m_current;
+			double CDAirbrake = airbrake_PCT * 0.7;
+			return -(CDAirbrake * cos(F16::degtorad));
 		}
 
 	};
