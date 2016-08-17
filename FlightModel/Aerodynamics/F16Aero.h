@@ -92,7 +92,7 @@ namespace F16
 
 		double interpnf(const double *xPar)
 		{
-			m_result = interpn(indexVector, m_Xmat, m_Ydata, xPar, m_xPointMat.m_mat, m_indexMat.m_mat, ndinfo, m_Tbuf);
+			m_result = interpn(indexVector, m_Xmat, m_Ydata, xPar, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 			return m_result;
 		}
 	};

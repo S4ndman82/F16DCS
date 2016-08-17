@@ -140,7 +140,7 @@ void ErrMsg(char *m){
 /*    Get the indices of the hyper cube in the  */
 /*    grid in which the point lies              */
 /************************************************/
-bool getHyperCube(double **Xmat, int **indexMatrix, const double *V, const ND_INFO &ndinfo)
+bool getHyperCube(double **Xmat, UtilMatrix<int> &indexMatrix, const double *V, const ND_INFO &ndinfo)
 {
 	for(int i=0; i<ndinfo.nDimension; i++)
 	{
@@ -173,18 +173,18 @@ bool getHyperCube(double **Xmat, int **indexMatrix, const double *V, const ND_IN
 			{
 				if(x==Xmat[i][j])
 				{
-					indexMatrix[i][0] = indexMatrix[i][1] = j;
+					indexMatrix.m_mat[i][0] = indexMatrix.m_mat[i][1] = j;
 					break;
 				}
 				if(x==Xmat[i][j+1])
 				{
-					indexMatrix[i][0] = indexMatrix[i][1] = j+1;
+					indexMatrix.m_mat[i][0] = indexMatrix.m_mat[i][1] = j + 1;
 					break;
 				}
 				if(x > Xmat[i][j] && x < Xmat[i][j+1] )
 				{
-					indexMatrix[i][0] = j;
-					indexMatrix[i][1] = j+1;
+					indexMatrix.m_mat[i][0] = j;
+					indexMatrix.m_mat[i][1] = j + 1;
 					break;
 				}
 			}/*End of for(j=...) */
@@ -214,7 +214,7 @@ int getLinIndex(const int *indexVector, const ND_INFO &ndinfo)
 }
 
 // Linearly interpolate between two data values
-double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, double **Xmat, int *indexVector, const ND_INFO &ndinfo)
+double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, UtilMatrix<double> &Xmat, int *indexVector, const ND_INFO &ndinfo)
 {
 	int nVertices = 1<<(ndinfo.nDimension);
 
@@ -250,9 +250,9 @@ double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, double
 
 			double f1 = oldTbuf.m_vec[index1];
 			double f2 = oldTbuf.m_vec[index1+1];
-			if(Xmat[dimNum][0] != Xmat[dimNum][1])
+			if (Xmat.m_mat[dimNum][0] != Xmat.m_mat[dimNum][1])
 			{
-				double lambda = (V[dimNum] - Xmat[dimNum][0]) / (Xmat[dimNum][1] - Xmat[dimNum][0]);
+				double lambda = (V[dimNum] - Xmat.m_mat[dimNum][0]) / (Xmat.m_mat[dimNum][1] - Xmat.m_mat[dimNum][0]);
 
 				newTbuf.m_vec[index2] = lambda*f2 + (1-lambda)*f1;
 			}
@@ -271,7 +271,7 @@ double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, double
 } // linearInterpolate()
 
 /*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
-double interpn(int *indexVector, double **Xmat, const double *Y, const double *xPar, double **xPoint, int **indexMatrix, const ND_INFO &ndinfo, UtilBuffer<double> &Tbuf)
+double interpn(int *indexVector, double **Xmat, const double *Y, const double *xPar, UtilMatrix<double> &xPoint, UtilMatrix<int> &indexMatrix, const ND_INFO &ndinfo, UtilBuffer<double> &Tbuf)
 {
 	const int nVertices = (1<<ndinfo.nDimension);
 
@@ -284,10 +284,10 @@ double interpn(int *indexVector, double **Xmat, const double *Y, const double *x
 	/* Get the co-ordinates of the hyper cube */
 	for(int i=0; i<ndinfo.nDimension; i++)
 	{
-		int low  = indexMatrix[i][0];
-		int high = indexMatrix[i][1];
-		xPoint[i][0] = Xmat[i][low];
-		xPoint[i][1] = Xmat[i][high];
+		int low  = indexMatrix.m_mat[i][0];
+		int high = indexMatrix.m_mat[i][1];
+		xPoint.m_mat[i][0] = Xmat[i][low];
+		xPoint.m_mat[i][1] = Xmat[i][high];
 	}
 
 	for(int i=0; i<nVertices; i++)
@@ -296,7 +296,7 @@ double interpn(int *indexVector, double **Xmat, const double *Y, const double *x
 		{
 			int mask = 1<<j;
 			int val = (mask & i) >> j;
-			indexVector[j] = indexMatrix[j][val];
+			indexVector[j] = indexMatrix.m_mat[j][val];
 		}
 
 		int index = getLinIndex(indexVector, ndinfo);
