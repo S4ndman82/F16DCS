@@ -26,8 +26,10 @@ namespace F16
 	// some additional stuff that should be used as functions perhaps (see if we need them)
 	// VS2013 does not yet support constexpr though, need upgrade to 2015.. :(
 	//
-	//constexpr double rankineToKelvin(double rankine) { return rankine / 1.8; }
-	//constexpr double kelvinToRankine(double kelvin) { return kelvin * 1.8; }
+	//constexpr 
+	double rankineToKelvin(double rankine) { return rankine / 1.8; }
+	//constexpr 
+	double kelvinToRankine(double kelvin) { return kelvin * 1.8; }
 }
 
 #endif // ifndef _F16CONSTANTS_H_

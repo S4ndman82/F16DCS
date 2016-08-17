@@ -98,11 +98,11 @@ namespace F16
 				totalVelocity_FPS = 0.01;
 			}
 
-			double temp = ambientTemperature_DegK * 1.8; // In Deg Rankine
+			double tempR = kelvinToRankine(ambientTemperature_DegK); // In Deg Rankine
 
 			// Call the atmosphere model to get mach and dynamic pressure
 			// I'm used to english units so I am using LB/FT^2 for the pressures
-			mach = (totalVelocity_FPS) / sqrt(1.4 * 1716.3 * temp);
+			mach = (totalVelocity_FPS) / sqrt(1.4 * 1716.3 * tempR);
 			dynamicPressure_LBFT2 = .5 * rho * pow(totalVelocity_FPS, 2);
 		}
 
