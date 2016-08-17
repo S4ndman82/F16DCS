@@ -376,7 +376,7 @@ namespace F16
 			return (float)airbrakeActuator.m_current;
 		}
 
-		void updateAirBrake(const double frameTime)
+		void updateAirBrake(const double totalVelocity_FPS, const double dynamicPressure_LBFT2, const double ps_LBFT2, const double frameTime)
 		{
 			// TODO: change values to degrees here
 
@@ -407,7 +407,29 @@ namespace F16
 			}
 			airbrakeActuator.updateFrame(frameTime);
 
+
 			// after actuator move, calculate new drag at new position
+
+			// TODO: switch to actual angles instead of percentages
+			double angle = cos(airbrakeActuator.m_current);
+
+			// TEST!
+			// just use full now for testing
+			double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
+
+			/* source: http://www.f-16.net/forum/viewtopic.php?t=11398
+			Because landing is such a low speed, I did not bother to calculate those forces. 
+			But to estimate the force on the speedbrake at landing, you can use the dynamic pressure at landing speed x speedbrake area x cos 60 deg x Cd
+
+			dynamic pressure q ~ 125 lb/sq ft (from q/M^2 = 1480 lb/sq ft)
+			area ~ 4 sq ft x 4
+			cos 60 deg = .866
+			Cd ~ .7
+
+			total drag force ~ 1212 lb
+
+			That is the total force (parallel to the fuselage centerline) on all four panels at landing speed. It is much less than 3 tons.
+			*/
 
 		}
 
@@ -900,7 +922,7 @@ namespace F16
 		{
 			//if (airbrakeExtended != airbrakeSwitch)
 			// -> actuator movement by frame step
-			updateAirBrake(frametime);
+			updateAirBrake(totalVelocity_FPS, dynamicPressure_LBFT2, ps_LBFT2, frametime);
 
 			// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 			// and is completely automatic
