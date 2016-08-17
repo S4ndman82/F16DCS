@@ -298,6 +298,9 @@ void ed_fm_simulate(double dt)
 									F16::LandingGear.wheelNose.CxWheelFriction,
 									F16::LandingGear.wheelNose.CzWheelFriction);
 
+		// just braking force, needs refining
+		F16::Motion.updateBrakingFriction(F16::LandingGear.wheelLeft.brakeForce, F16::LandingGear.wheelRight.brakeForce);
+
 		// use free-rolling friction as single unit for now
 		// TODO: nose-wheel steering, braking forces etc.
 		F16::Motion.updateNoseWheelTurn(F16::LandingGear.getNoseTurnDirection(), F16::LandingGear.getNosegearAngle());

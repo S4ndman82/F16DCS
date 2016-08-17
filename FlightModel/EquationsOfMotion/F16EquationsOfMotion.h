@@ -273,29 +273,61 @@ namespace F16
 		{
 			// TODO: nose wheel turn
 
-			// TODO: offset pos of each wheel
-			add_local_moment(Vec3(leftWheelX, 0, 0));
-			add_local_moment(Vec3(rightWheelX, 0, 0));
-			add_local_moment(Vec3(noseWheelX, 0, 0));
-
-
-
-			// TODO: debug: check force direction!
-			// check reduction in kinetic energy per wheel
-			// and check that we don't underflow..
-			//add_local_force_cg(Vec3(leftWheelXFriction, 0.0,0.0) /*, Vec3(0.0,0.0,0.0)*/);
-			//add_local_force_cg(Vec3(0.0, 0.0, leftWheelYFriction) /*, Vec3(0.0,0.0,0.0)*/);
-			//add_local_force_cg(Vec3(rightWheelXFriction, 0.0,0.0) /*, Vec3(0.0,0.0,0.0)*/);
-			//add_local_force_cg(Vec3(0.0, 0.0, rightWheelYFriction) /*, Vec3(0.0,0.0,0.0)*/);
+			// silly hack for now, better approach in progress
+			updateRollingFriction(leftWheelX + rightWheelX + noseWheelX, leftWheelZ + rightWheelZ + noseWheelZ);
 		}
 
+		// free-rolling friction
+		void updateRollingFriction(const double CxWheelFriction, const double CzWheelFriction)
+		{
+			// TODO: must have support for static friction: engine power needed to overcome and transfer to rolling
 
+			// note! this is mostly silly hacking now,
+			// better approach in progress
+
+			Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0, 0.0);
+			//Vec3 cx_wheel_friction_pos(0.0,0.0,0.0);
+			//add_local_force_cg(cx_wheel_friction_force /*,cx_wheel_friction_pos*/);
+
+			// test, skip some things for now
+			sum_vec3(common_force, cx_wheel_friction_force);
+			// -> actually need to reduce this from _moment_ not add opposite force?
+		}
+
+		// handle brake input (differential support)
+		void updateBrakingFriction(const double leftBrakeForce, const double rightBrakeForce)
+		{
+			// note! this is mostly silly hacking now,
+			// better approach in progress
+
+			/*
+			Vec3 cxr_wheel_friction_force(rightBrakeForce, 0.0, 0.0);
+			Vec3 cxl_wheel_friction_force(leftBrakeForce, 0.0, 0.0);
+			if (common_force.x < rightBrakeForce)
+			{
+				// silly hack, remove this 
+				cxr_wheel_friction_force.x = -common_force.x;
+			}
+			if (common_force.x < leftBrakeForce)
+			{
+				// silly hack, remove this
+				cxl_wheel_friction_force.x = -common_force.x;
+			}
+
+			Vec3 cxr_wheel_friction_pos(0.0, 0.0, -5.0); // TODO: check offset!
+			add_local_force(cxr_wheel_friction_force, cxr_wheel_friction_pos);
+			Vec3 cxl_wheel_friction_pos(0.0, 0.0, 5.0); // TODO: check offset!
+			add_local_force(cxl_wheel_friction_force, cxl_wheel_friction_pos);
+			*/
+		}
 
 		// something like this to handle when nosewheel is turned?
 		void updateNoseWheelTurn(const Vec3 &nosewheelDirection, const double turnAngle)
 		{
-			// nosewheel pos in lua ? {3.133, -1.6, 0}
-			//Vec3 cx_wheel_pos(5.0,0.0,0.0); // TODO: check offset!
+			// note! this is mostly silly hacking now,
+			// better approach in progress
+
+			//Vec3 cx_wheel_pos(5.0, 0.0, 0.0); // TODO: check offset!
 			//add_local_force(nosewheelDirection, cx_wheel_pos);
 		}
 

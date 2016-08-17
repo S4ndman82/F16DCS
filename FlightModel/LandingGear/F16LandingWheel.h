@@ -156,7 +156,7 @@ namespace F16
 			if (groundSpeed > 0 && brakeInput.getValue() > 0)
 			{
 				// just percentage of max according to input 0..1, right?
-				brakeForce = abs(brakeInput.getValue()) * wheel_brake_moment_max;
+				brakeForce = abs(brakeInput.getValue()) * wheel_brake_moment_max * weightN;
 
 				// if anti-skid is enabled -> check for locking
 				// rotation speed of the wheel related to linear ground speed

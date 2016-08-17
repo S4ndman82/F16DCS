@@ -98,16 +98,16 @@ namespace F16
 		}
 
 		// joystick axis
-		void setWheelBrakeLeft(double value)
+		void setWheelBrakeLeft(const double value)
 		{
 			// 0..1 from input
-			wheelLeft.brakeInput = value;
+			wheelLeft.brakeInput = abs(value);
 		}
 		// joystick axis
-		void setWheelBrakeRight(double value)
+		void setWheelBrakeRight(const double value)
 		{
 			// 0..1 from input
-			wheelRight.brakeInput = value;
+			wheelRight.brakeInput = abs(value);
 		}
 
 		// key press DOWN
