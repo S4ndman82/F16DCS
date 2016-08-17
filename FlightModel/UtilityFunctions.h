@@ -12,23 +12,19 @@
 
 // simple buffer helper
 // reduce repeating malloc()/free()
-class UtilBuffer
+template<typename T> class UtilBuffer
 {
-private: // disallow copying
-	UtilBuffer(const UtilBuffer &other) {};
-	UtilBuffer& operator=(const UtilBuffer &other) {return *this;};
-
 public:
-	double *vec; // array
-	int capacity; // amount of elements in array
+	T *m_vec; // array
+	size_t capacity; // amount of elements in array
 	//int used; // amount of elements in use
 
 	UtilBuffer()
-		: vec(NULL)
+		: m_vec(nullptr)
 		, capacity(0)
 	{}
-	UtilBuffer(const int vertices)
-		: vec(NULL)
+	UtilBuffer(const size_t vertices)
+		: m_vec(nullptr)
 		, capacity(0)
 	{
 		getVec(vertices);
@@ -36,29 +32,34 @@ public:
 	~UtilBuffer() 
 	{
 		// cleanup on destroy (exiting scope)
-		if (vec != NULL)
+		release();
+	}
+	void release()
+	{
+		if (m_vec != nullptr)
 		{
-			free(vec);
-			vec = NULL;
+			free(m_vec);
+			m_vec = nullptr;
 		}
 	}
 
 	// support growing as needed
-	double *getVec(const int vertices)
+	T *getVec(const size_t vertices)
 	{
 		if (vertices > capacity)
 		{
-			free(vec);
+			free(m_vec);
 			capacity = vertices;
-			vec = (double*)malloc(vertices*sizeof(double));
+			m_vec = (T*)malloc(vertices*sizeof(T));
 		}
-		return vec;
+		return m_vec;
 	}
 
-	void copyVec(const int vertices, const double *src)
+	// copy from source, grow if needed
+	void copyVec(const size_t vertices, const T *src)
 	{
-		size_t toCopy = vertices*sizeof(double);
-		double *dest = getVec(vertices); // check for size
+		size_t toCopy = vertices*sizeof(T);
+		T *dest = getVec(vertices); // check for size
 		memcpy(dest, src, toCopy);
 	}
 };
@@ -195,15 +196,15 @@ int getLinIndex(const int *indexVector, const ND_INFO &ndinfo)
 }
 
 // Linearly interpolate between two data values
-double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat, int *indexVector, const ND_INFO &ndinfo)
+double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, double **Xmat, int *indexVector, const ND_INFO &ndinfo)
 {
 	int nVertices = 1<<(ndinfo.nDimension);
 
-	UtilBuffer oldTbuf(nVertices);
-	oldTbuf.copyVec(nVertices, Tbuf.vec);
+	UtilBuffer<double> oldTbuf(nVertices);
+	oldTbuf.copyVec(nVertices, Tbuf.m_vec);
 
 	// reuse buffer until done here
-	UtilBuffer newTbuf;
+	UtilBuffer<double> newTbuf;
 
 	int n = ndinfo.nDimension;
 	int dimNum = 0;
@@ -229,30 +230,30 @@ double linearInterpolate(const UtilBuffer &Tbuf, const double *V, double **Xmat,
 				index2 = index2 + (1<<j)*indexVector[j];
 			}/*End of for j*/
 
-			double f1 = oldTbuf.vec[index1];
-			double f2 = oldTbuf.vec[index1+1];
+			double f1 = oldTbuf.m_vec[index1];
+			double f2 = oldTbuf.m_vec[index1+1];
 			if(Xmat[dimNum][0] != Xmat[dimNum][1])
 			{
 				double lambda = (V[dimNum] - Xmat[dimNum][0]) / (Xmat[dimNum][1] - Xmat[dimNum][0]);
 
-				newTbuf.vec[index2] = lambda*f2 + (1-lambda)*f1;
+				newTbuf.m_vec[index2] = lambda*f2 + (1-lambda)*f1;
 			}
 			else
 			{
-				newTbuf.vec[index2] = f1;
+				newTbuf.m_vec[index2] = f1;
 			}
 		}/*End of for i*/
 
-		oldTbuf.copyVec(nVertices, newTbuf.vec);
+		oldTbuf.copyVec(nVertices, newTbuf.m_vec);
 		n=m;
 		dimNum++;
 	}/* End of while*/
 
-	return oldTbuf.vec[0];
+	return oldTbuf.m_vec[0];
 } // linearInterpolate()
 
 /*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
-double interpn(int *indexVector, double **Xmat, const double *Y, const double *xPar, double **xPoint, int **indexMatrix, const ND_INFO &ndinfo, UtilBuffer &Tbuf)
+double interpn(int *indexVector, double **Xmat, const double *Y, const double *xPar, double **xPoint, int **indexMatrix, const ND_INFO &ndinfo, UtilBuffer<double> &Tbuf)
 {
 	const int nVertices = (1<<ndinfo.nDimension);
 
@@ -281,7 +282,7 @@ double interpn(int *indexVector, double **Xmat, const double *Y, const double *x
 		}
 
 		int index = getLinIndex(indexVector, ndinfo);
-		Tbuf.vec[i] = Y[index];
+		Tbuf.m_vec[i] = Y[index];
 	}
 
 	double result = linearInterpolate(Tbuf, xPar, xPoint, indexVector, ndinfo);

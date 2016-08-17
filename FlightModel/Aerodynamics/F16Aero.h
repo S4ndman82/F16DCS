@@ -21,7 +21,7 @@ namespace F16
 		double **m_Xmat; // pointers to static arrays of data (X matrix)
 		double *m_Ydata; // pointer to static array of related data (Y)
 
-		UtilBuffer m_Tbuf; // reusable buffer to reduce malloc()/free()
+		UtilBuffer<double> m_Tbuf; // reusable buffer to reduce malloc()/free()
 
 		UtilMatrix<double> m_xPointMat; // used in interpolation, reduce reallocation
 		UtilMatrix<int> m_indexMat; // used in interpolation, reduce reallocation
