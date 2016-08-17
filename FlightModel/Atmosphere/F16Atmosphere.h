@@ -35,7 +35,7 @@ namespace F16
 		Vec3	m_airspeed;
 
 	public:
-		double		ambientTemperature_DegK;	// Ambient temperature (kelvon)
+		double		ambientTemperature_DegK;	// Ambient temperature (kelvin)
 		double		ambientDensity_KgPerM3;		// Ambient density (kg/m^3)
 		double		dynamicPressure_LBFT2;		// Dynamic pressure (lb/ft^2)
 		double		speed_of_sound;				// (meters/sec)

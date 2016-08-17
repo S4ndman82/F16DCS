@@ -30,6 +30,9 @@ namespace F16
 			EDFG_MIN,
 			EDFG_MAX
 		};
+		eAirSourceKnob airsourceKnob = EAS_OFF;
+		eTempKnob tempKnob = ETMP_AUTO;
+		eDefogKnob defogKnob = EDFG_MIN;
 
 	public:
 		F16AirConditioning() {}
