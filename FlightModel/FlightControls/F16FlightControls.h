@@ -406,6 +406,9 @@ namespace F16
 				airbrakeActuator.m_commanded = 0;
 			}
 			airbrakeActuator.updateFrame(frameTime);
+
+			// after actuator move, calculate new drag at new position
+
 		}
 
 		/*
