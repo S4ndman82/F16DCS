@@ -71,8 +71,11 @@ namespace F16
 		{
 			m_Ydata = Ydata;
 			m_result = 0;
+
 			ndinfo.nDimension = nDimension;
 			ndinfo.nPoints = (int*)malloc(ndinfo.nDimension*sizeof(int));
+
+			// just array of pointers to static data
 			m_Xmat = (double **)malloc(ndinfo.nDimension*sizeof(double*));
 
 			int nVertices = (1<<nDimension);
