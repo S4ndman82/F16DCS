@@ -41,7 +41,7 @@ namespace F16
 		double		speed_of_sound;				// (meters/sec)
 		double		mach; // Well..Mach, yeah
 
-		double		altitude_FT;		// Absolute altitude MSL (ft)
+		double		altitude;		// Absolute altitude MSL (meters)
 		double		ps_LBFT2;			// Ambient calculated pressure (lb/ft^2)
 		double		totalVelocity_FPS;	// Total velocity (always positive) (ft/s)
 
@@ -55,17 +55,17 @@ namespace F16
 			, dynamicPressure_LBFT2(0)
 			, speed_of_sound(0)
 			, mach(0)
-			, altitude_FT(0)
+			, altitude(0)
 			, ps_LBFT2(0)
 			, totalVelocity_FPS(0)
 		{}
 		~F16Atmosphere() {}
 
-		void setAtmosphere(const double temperature, const double density, const double soundspeed, const double altitude, const double pressure)
+		void setAtmosphere(const double temperature, const double density, const double soundspeed, const double alt, const double pressure)
 		{
 			ambientTemperature_DegK = temperature;
 			ambientDensity_KgPerM3 = density; 
-			altitude_FT = altitude * F16::meterToFoot; // meters to feet
+			altitude = alt;
 			ps_LBFT2 = pressure * 0.020885434273; // (N/m^2) to (lb/ft^2)
 			speed_of_sound = soundspeed;
 
@@ -106,6 +106,10 @@ namespace F16
 			dynamicPressure_LBFT2 = .5 * rho * pow(totalVelocity_FPS, 2);
 		}
 
+		double getAltitudeFeet() const
+		{
+			return altitude * F16::meterToFoot; // meters to feet
+		}
 		void getAirspeed(Vec3 &airSpeed) const
 		{
 			airSpeed = m_airspeed;

@@ -237,13 +237,13 @@ void ed_fm_simulate(double dt)
 	F16::Ground.updateFrame(frametime);
 
 	// update thrust
-	F16::Engine.updateFrame(F16::Atmos.mach, F16::Atmos.altitude_FT, frametime);
+	F16::Engine.updateFrame(F16::Atmos.mach, F16::Atmos.getAltitudeFeet(), frametime);
 
 	// update amount of fuel used and change in mass
 	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);
 
 	// update oxygen provided to pilot: tanks, bleed air from engine etc.
-	F16::EnvCS.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.altitude_FT, frametime);
+	F16::EnvCS.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.getAltitudeFeet(), frametime);
 
 	// use RPM for now 
 	// TODO: switch to torque if/when necessary/available
