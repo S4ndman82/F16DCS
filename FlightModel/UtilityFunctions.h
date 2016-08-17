@@ -4,6 +4,16 @@
 //
 // You could use this header to code up common math utilities your code may use multiple times
 //-----------------------------------------------------------------------------------------------
+//
+// Modified to reduce re-allocations of buffers, added helpers to keep track of buffer data
+// and moved most of allocations outside of primary loops (caller must allocate with helpers).
+// This should improve performance (by reducing allocations) 
+// and should reduce memory fragmentation (also improves performance).
+// As a bonus, code should simpler to follow.
+//
+// Ilkka Prusi 2016 <ilkka.prusi@gmail.com>
+//
+
 #ifndef __UtilFunctions__
 #define __UtilFunctions__
 
@@ -58,6 +68,8 @@ public:
 	// copy from source, grow if needed
 	void copyVec(const size_t vertices, const T *src)
 	{
+		// Note: T should be same type
+
 		size_t toCopy = vertices*sizeof(T);
 		T *dest = getVec(vertices); // check for size
 		memcpy(dest, src, toCopy);
@@ -82,6 +94,12 @@ public:
 
 	void allocate(const size_t n, const size_t m)
 	{
+		// in case need to allocate different size
+		if (n != m_n || m != m_m)
+		{
+			release();
+		}
+
 		m_n = n; m_m = m;
 		m_mat = (T**)malloc(m_n*sizeof(T*));
 		for (size_t i = 0; i < m_n; i++)

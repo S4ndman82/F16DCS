@@ -15,6 +15,8 @@
 namespace F16
 {
 
+	// TODO: G-suit pressure..
+
 	class F16EnvControlSystem
 	{
 	protected:
