@@ -13,7 +13,7 @@ namespace F16
 
 		// stuff only for temporary use,
 		// avoid reallocations
-		int *indexVector;
+		UtilBuffer<int> indexVector;
 
 	public:
 		ND_INFO ndinfo; // dimensions descriptor
@@ -30,7 +30,7 @@ namespace F16
 		double m_result; // result value
 
 		AERO_Function()
-			: indexVector(NULL)
+			: indexVector()
 			, ndinfo()
 			, m_Xmat(NULL)
 			, m_Ydata(NULL)
@@ -64,11 +64,7 @@ namespace F16
 				free(m_Xmat);
 				m_Xmat = NULL;
 			}
-			if (indexVector != NULL)
-			{
-				free(indexVector);
-				indexVector = NULL;
-			}
+			indexVector.release();
 		}
 
 		void init(const int nDimension, double *Ydata)
@@ -87,7 +83,7 @@ namespace F16
 			m_indexMat.allocate(ndinfo.nDimension, 2);
 
 			// preallocate another temporary buffer to reuse
-			indexVector = (int*)malloc(ndinfo.nDimension * sizeof(int));
+			indexVector.getVec(ndinfo.nDimension);
 		}
 
 		double interpnf(const double *xPar)

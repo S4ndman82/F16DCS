@@ -33,11 +33,11 @@ public:
 		: m_vec(nullptr)
 		, capacity(0)
 	{}
-	UtilBuffer(const size_t vertices)
+	UtilBuffer(const size_t elements)
 		: m_vec(nullptr)
 		, capacity(0)
 	{
-		getVec(vertices);
+		getVec(elements);
 	}
 	~UtilBuffer() 
 	{
@@ -54,24 +54,24 @@ public:
 	}
 
 	// support growing as needed
-	T *getVec(const size_t vertices)
+	T *getVec(const size_t elements)
 	{
-		if (vertices > capacity)
+		if (elements > capacity)
 		{
 			free(m_vec);
-			capacity = vertices;
-			m_vec = (T*)malloc(vertices*sizeof(T));
+			capacity = elements;
+			m_vec = (T*)malloc(elements*sizeof(T));
 		}
 		return m_vec;
 	}
 
 	// copy from source, grow if needed
-	void copyVec(const size_t vertices, const T *src)
+	void copyVec(const size_t elements, const T *src)
 	{
 		// Note: T should be same type
 
-		size_t toCopy = vertices*sizeof(T);
-		T *dest = getVec(vertices); // check for size
+		size_t toCopy = elements*sizeof(T);
+		T *dest = getVec(elements); // check for size
 		memcpy(dest, src, toCopy);
 	}
 };
@@ -198,7 +198,7 @@ bool getHyperCube(double **Xmat, UtilMatrix<int> &indexMatrix, const double *V, 
  indexVector contains the co-ordinate of a point in the ndimensional grid
  the indices along each axis are assumed to begin from zero
  *********************************************************************************/
-int getLinIndex(const int *indexVector, const ND_INFO &ndinfo)
+int getLinIndex(const UtilBuffer<int> &indexVector, const ND_INFO &ndinfo)
 {
 	int linIndex=0;
 	for(int i=0; i<ndinfo.nDimension; i++)
@@ -208,13 +208,13 @@ int getLinIndex(const int *indexVector, const ND_INFO &ndinfo)
 		{
 			P = P*ndinfo.nPoints[j];
 		}
-		linIndex = linIndex + P*indexVector[i];
+		linIndex = linIndex + P*indexVector.m_vec[i];
 	}
 	return(linIndex);
 }
 
 // Linearly interpolate between two data values
-double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, UtilMatrix<double> &Xmat, int *indexVector, const ND_INFO &ndinfo)
+double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, UtilMatrix<double> &Xmat, UtilBuffer<int> &indexVector, const ND_INFO &ndinfo)
 {
 	int nVertices = 1<<(ndinfo.nDimension);
 
@@ -237,15 +237,15 @@ double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, UtilMa
 			for(int j=0; j<m; j++)
 			{
 				int mask = (1<<j);
-				indexVector[j] =  (mask & i) >> j;
+				indexVector.m_vec[j] =  (mask & i) >> j;
 			}/*End of for j*/
 
 			int index1 = 0;
 			int index2 = 0;
 			for(int j=0; j<m; j++)
 			{
-				index1 = index1 + (1<<(j+1))*indexVector[j];
-				index2 = index2 + (1<<j)*indexVector[j];
+				index1 = index1 + (1<<(j+1))*indexVector.m_vec[j];
+				index2 = index2 + (1<<j)*indexVector.m_vec[j];
 			}/*End of for j*/
 
 			double f1 = oldTbuf.m_vec[index1];
@@ -271,7 +271,7 @@ double linearInterpolate(const UtilBuffer<double> &Tbuf, const double *V, UtilMa
 } // linearInterpolate()
 
 /*indexMatrix[i][0] => Lower, ...[1]=>Higher*/
-double interpn(int *indexVector, double **Xmat, const double *Y, const double *xPar, UtilMatrix<double> &xPoint, UtilMatrix<int> &indexMatrix, const ND_INFO &ndinfo, UtilBuffer<double> &Tbuf)
+double interpn(UtilBuffer<int> &indexVector, double **Xmat, const double *Y, const double *xPar, UtilMatrix<double> &xPoint, UtilMatrix<int> &indexMatrix, const ND_INFO &ndinfo, UtilBuffer<double> &Tbuf)
 {
 	const int nVertices = (1<<ndinfo.nDimension);
 
@@ -296,7 +296,7 @@ double interpn(int *indexVector, double **Xmat, const double *Y, const double *x
 		{
 			int mask = 1<<j;
 			int val = (mask & i) >> j;
-			indexVector[j] = indexMatrix.m_mat[j][val];
+			indexVector.m_vec[j] = indexMatrix.m_mat[j][val];
 		}
 
 		int index = getLinIndex(indexVector, ndinfo);
