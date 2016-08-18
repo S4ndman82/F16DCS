@@ -46,12 +46,41 @@
 		}, -- end of engine
 */
 
+/*
+some data from: http://www.jet-engine.net/miltfspec.html
+
+Manufacturer	Model	Application(s)	Thrust	Thrust	SFC		SFC		Airflow		OPR		FPR		BPR		TIT		Number	Fan		LPC		HPC		HPT		IPT		LPT		Fan		Length	Width/		Dry	
+										(dry)	(wet)	(dry)	(wet)	[lb/s]										Spools	Stgs	Stgs	Stgs	Stgs	Stgs	Stgs	Diameter		Diameter	Weight		
+										[lbf]	[lbf]	[lb/lbf hr]	[lb/lbf hr]								[K]																[in]	[in]	[in]		[lb]
+
+PW	F100-PW-200			F-16A/B			14,670	23,830	-		2.100	-			25.0	-		0.71	-		2		3		-		10		2		-		2		-		196.3	46.5		
+PW	F100-PW-220			F-16A/B/C/D		14,670	23,830	-		2.100	228			25.0	-		0.71	-		2		3		-		10		2		-		2		-		208.0	46.5	3,200	
+PW	F100-PW-220E		F-16A/B/C/D		14,670	23,830	-		2.100	-			25.0	-		-		-		2		3		-		10		2		-		2		-		196.3	46.5	3,151	
+
+GE	F110-GE-100			F-16C/D			16,600	28,000	0.745	1.971	264			29.0	2.98	0.87	-		2		3		-		9		1		-		2		-		182.3	46.5	3,920	
+GE	F110-GE-129			F-16C/D			17,000	29,000	-		1.900	270			30.7	-		0.76	-		2		3		-		9		1		-		2		-		181.9	46.5	3,980	
+*/
+
 namespace F16
 {
 	// Engine: Pratt & Whitney F100-PW-129 or General Electric F110-GE-129
 	// Thrust: Pratt & Whitney: 65 kN, AB 106 kN; General Electric: 76 kN, AB 129 kN
 	// -> adapt to support either one?
 	// Turbine inlet temperature: 1,350 °C (2,460 °F)
+
+	// other engines: F100-PW-220, F110-GE-100
+
+	enum EngineType
+	{
+		ET_F110GE100, // F110-GE-100 // F-16 C/D
+		ET_F110GE129, // F110-GE-129 // F-16 C/D
+		ET_F100PW200, // F100-PW-200 // F-16A/B
+		ET_F100PW220, // F100-PW-220 // F-16A/B/C/D
+		ET_F100PW220E, // F100-PW-220E // F-16A/B/C/D
+		ET_F100PW229, // F100-PW-229 // F-16 C/D
+		ET_F100PW229A, // F100-PW-229A // F-16 C/D
+		ET_Reserved
+	};
 
 	class F16Engine
 	{
@@ -72,6 +101,9 @@ namespace F16
 		// -> 100pph increase?
 		// range 0 - 80,000pph (instruments)
 
+		// amount of air bypassing compressor and engine core
+		//double bypassRatio;
+
 		// oil pressure: 0-100 psi
 		// directly related to engine rpm?
 		double oilPressure;
@@ -86,6 +118,8 @@ namespace F16
 
 		double engineRPM; // rounds per minute: non-zero if shutdown in air?
 		//double drag; // amount of drag if not running while in air? windmilling effect?
+
+		double compressorRotation;
 
 		bool starting; // "spooling up"
 		bool stopping; // "spooling down"
@@ -103,6 +137,7 @@ namespace F16
 			, oilPressureWarning(false)
 			, engineTemperature(900)
 			, engineRPM(0)
+			, compressorRotation(0)
 			, starting(false)
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
@@ -210,6 +245,40 @@ namespace F16
 			return (throttleInput/100.0);
 		}
 
+		void initEngineOff()
+		{
+			throttleInput = 0;
+			fuelPerFrame = 0;
+
+			starting = false;
+			stopping = false;
+
+			// temporary for testing
+			isIgnited = false;
+		}
+		void initEngineIdle()
+		{
+			throttleInput = 1;
+			fuelPerFrame = 1;
+
+			starting = false;
+			stopping = false;
+
+			// temporary for testing
+			isIgnited = true;
+		}
+		void initEngineCruise()
+		{
+			throttleInput = 50;
+			fuelPerFrame = 10;
+
+			starting = false;
+			stopping = false;
+
+			// temporary for testing
+			isIgnited = true;
+		}
+
 		void startEngine()
 		{
 			//throttleInput = 0;
@@ -229,7 +298,6 @@ namespace F16
 			// temporary for testing
 			isIgnited = false;
 			fuelPerFrame = 0;
-			throttleInput = 0;
 		}
 
 		double getLowPressureBleedAir() const
@@ -259,6 +327,51 @@ namespace F16
 			return thrust_N;
 		}
 
+		// spool up when starting engine normally (with JFS, upto idle)
+		void spoolUp(double frameTime)
+		{
+		}
+		// spool down when stopping engine normally (from idle)
+		void spoolDown(double frameTime)
+		{
+		}
+
+		// inlet velocity and compressor rotational speed (blade aoa)
+		bool isCompressorStall()
+		{
+			// TODO: determine conditions
+
+			return false;
+		}
+
+		// engine returning to idle
+		bool isRollback()
+		{
+			// TODO: determine conditions
+
+			return false;
+		}
+
+		// low pressure compressor stages
+		void lpcStage(double airpressure, double airvelocity, double frameTime)
+		{
+		}
+
+		// high pressure compressor stages
+		void hpcStage(double airpressure, double airvelocity, double frameTime)
+		{
+		}
+
+		// combustion stage
+		void combustionStage(double fuel, double airpressure, double airvelocity, double frameTime)
+		{
+		}
+
+		void exhaustStage(double exhaustpressure, double frameTime)
+		{
+		}
+
+
 		void airstart(double frameTime);
 
 		void updateFrame(const double mach, double alt, double frameTime);
@@ -269,6 +382,8 @@ namespace F16
 	// (UFC, BUC)
 	void F16Engine::airstart(double frameTime)
 	{
+		// check conditions if engine can ignite
+
 		// when rpm within 25-40 percent, airstart possible (30 degree dive)
 		// (spooldown)
 
@@ -281,34 +396,13 @@ namespace F16
 	// Coded from the simulator study document
 	void F16Engine::updateFrame(const double mach, double alt, double frameTime)
 	{
-		/*
-		if (starting == true)
-		{
-			// TODO: update according to frametime
+		// calculate intake airflow/pressure
+		// -> windmilling if engine stopped
+		// -> compressor stall?
 
-			// just skip to final result now..
-			starting = false;
-			isIgnited = true;
-		}
-		else if (stopping == true)
-		{
-			// TODO: update according to frametime
 
-			// just skip to final result now..
-			stopping = false;
-			isIgnited = false;
-		}
-
-		if (isIgnited == false)
-		{
-			engineRPM = 0;
-			afterburner = 0;
-			percentPower = 0;
-			thrust_N = 0;
-			m_power3 = 0;
-			return;
-		}
-		*/
+		// calculate bleed air pressure at current engine rpm:
+		// must rotate AB fuel pump at sufficient speed
 
 		afterburner = (throttleInput - 80.0) / 20.0;
 		if(throttleInput < 78.0)

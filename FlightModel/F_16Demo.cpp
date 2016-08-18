@@ -64,10 +64,12 @@
 //  signals out.
 // -Aircraft naturally trims to 1.3g for some reason, need to apply -0.3 pitch
 //  trim to get aircraft to trim at 1.0g for flight controller
+// -> relaxed static stability (RSS) so as intended?
 // -Actuators cause flutter at high speed due to filtering of sensor signals
 //  Removed servo-dynamics until I can figure this out
 // -Gear reaction happening but ground handling not modeled due to lack of available
 //  API calls
+// -> partially now
 // -Gear automatically drops at 200ft to allow simple touch downs
 //---------------------------------------------------------------------------
 #include "stdafx.h"
@@ -450,6 +452,9 @@ void ed_fm_set_command(int command, float value)
 		*/
 
 		F16::JFS.start();
+
+		// just direct start for now..
+		F16::Engine.startEngine();
 		break;
 	case ApuStop:
 		/*
@@ -989,9 +994,9 @@ void ed_fm_cold_start()
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyOpen();
 	F16::FlightControls.initAirBrakeOff();
-	F16::Electrics.setElectricsOn(); // <- off
-	F16::Engine.startEngine(); // <- stop
 	F16::FlightControls.setIsGearDown(true);
+	F16::Electrics.setElectricsOn(); // <- off
+	F16::Engine.initEngineOff(); // <- stop
 
 	if (locateCockpitDll() == true)
 	{
@@ -1012,9 +1017,9 @@ void ed_fm_hot_start()
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyClosed();
 	F16::FlightControls.initAirBrakeOff();
-	F16::Electrics.setElectricsOn();
-	F16::Engine.startEngine();
 	F16::FlightControls.setIsGearDown(true);
+	F16::Electrics.setElectricsOn();
+	F16::Engine.initEngineIdle();
 
 	if (locateCockpitDll() == true)
 	{
@@ -1035,9 +1040,9 @@ void ed_fm_hot_start_in_air()
 	F16::LandingGear.initGearsUp();
 	F16::Airframe.initCanopyClosed();
 	F16::FlightControls.initAirBrakeOff();
-	F16::Electrics.setElectricsOn();
-	F16::Engine.startEngine();
 	F16::FlightControls.setIsGearDown(false);
+	F16::Electrics.setElectricsOn();
+	F16::Engine.initEngineCruise();
 
 	if (locateCockpitDll() == true)
 	{
