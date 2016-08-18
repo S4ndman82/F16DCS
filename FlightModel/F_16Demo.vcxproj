@@ -116,7 +116,6 @@
     <ClInclude Include="FlightControls\F16FlightControls.h" />
     <ClInclude Include="F_16Demo.h" />
     <ClInclude Include="Hydraulics\AbstractHydraulicDevice.h" />
-    <ClInclude Include="Hydraulics\F16Actuators.h" />
     <ClInclude Include="Hydraulics\F16HydraulicPump.h" />
     <ClInclude Include="Hydraulics\F16HydraulicSystem.h" />
     <ClInclude Include="include\ED_FM_Utility.h" />

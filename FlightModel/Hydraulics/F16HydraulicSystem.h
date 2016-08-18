@@ -3,8 +3,6 @@
 
 #include "../stdafx.h"
 
-#include "Hydraulics/F16Actuators.h"				//Actuators model functions
-
 #include "Hydraulics/F16HydraulicPump.h"
 
 // two systems: system A and B

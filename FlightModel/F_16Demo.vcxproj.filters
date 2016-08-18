@@ -61,9 +61,6 @@
     <ClInclude Include="Electrics\F16Battery.h">
       <Filter>Electrics</Filter>
     </ClInclude>
-    <ClInclude Include="Hydraulics\F16Actuators.h">
-      <Filter>Hydraulics</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\F16EngineManagementSystem.h">
       <Filter>Engine</Filter>
     </ClInclude>
