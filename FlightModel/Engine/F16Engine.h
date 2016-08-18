@@ -119,7 +119,10 @@ namespace F16
 		double engineRPM; // rounds per minute: non-zero if shutdown in air?
 		//double drag; // amount of drag if not running while in air? windmilling effect?
 
-		double compressorRotation;
+		
+		double lpcRotation; // low pressure compressor rotation speed
+		double hpcRotation; // high pressure compressor rotation speed
+
 
 		bool starting; // "spooling up"
 		bool stopping; // "spooling down"
@@ -137,7 +140,8 @@ namespace F16
 			, oilPressureWarning(false)
 			, engineTemperature(900)
 			, engineRPM(0)
-			, compressorRotation(0)
+			, lpcRotation(0)
+			, hpcRotation(0)
 			, starting(false)
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
@@ -337,9 +341,13 @@ namespace F16
 		}
 
 		// inlet velocity and compressor rotational speed (blade aoa)
-		bool isCompressorStall()
+		bool isCompressorStall(double airvelocity, double rotationspeed)
 		{
-			// TODO: determine conditions
+			// if air velocity exceeds compressor rotational speed (blade angle-of-attack)
+			// -> compressor stall
+
+			// TODO: determine conditions, correct formula
+			//if (airvelocity > rotationspeed*degtorad) {}
 
 			return false;
 		}
@@ -353,26 +361,59 @@ namespace F16
 		}
 
 		// low pressure compressor stages
-		void lpcStage(double airpressure, double airvelocity, double frameTime)
+		double lpcStage(double airpressure, double airvelocity, double frameTime)
 		{
 			// no lpc stages?
+			/*
+			if (isCompressorStall(airvelocity, lpcRotation) == true)
+			{
+				// -> stall
+			}
+			*/
+
+			// no stages -> output same as input
+			return airpressure;
 		}
 
 		// high pressure compressor stages
-		void hpcStage(double airpressure, double airvelocity, double frameTime)
+		double hpcStage(double airpressure, double airvelocity, double frameTime)
 		{
+			/*
+			if (isCompressorStall(airvelocity, hpcRotation) == true)
+			{
+				// -> stall
+			}
+			*/
+
 			// 10 or 9 hpc stages depending on engine
 			//double stages[] = {}; // <- compression ratios
+			// -> just for one engine now..
+			// TODO: replace with correct ratios after testing,
+			// ratios should be relative to previous stage?
+			double stages[] = { 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01 };
+
+			// multiply pressure by each compression stage
+			double press = airpressure;
+			for (double d : stages)
+			{
+				press *= d;
+			}
+			return press;
 		}
 
 		// combustion stage
-		void combustionStage(double fuel, double airpressure, double airvelocity, double frameTime)
+		double combustionStage(double fuel, double airpressure, double airvelocity, double frameTime)
 		{
-			// fuel/air mixture
+			// fuel/air mixture: rich/lean mixture of fuel, temperature, volume (pressure)
+			// -> combustion gas to turbines
+
+			// assuming doubling the pressure after combustion
+			// TODO: replace with something suitable according to conditions
+			return airpressure*2;
 		}
 
 		// both hpt and lpt stages as one
-		void turbineStage(double frameTime)
+		double turbineStage(double pressure, double frameTime)
 		{
 			// exhaust gas temperature: after hpt, before lpt
 
@@ -380,14 +421,19 @@ namespace F16
 
 			// 2 or 1 hpt stages depending on engine
 			//double hptstages[] = {}
+			// -> high pressure compressor rotation speed
 
 			// 2 lpt stages
 			//double lptstages[] = {}
+			// -> low pressure compressor rotation speed
+
+			return pressure;
 		}
 
-		void exhaustStage(double exhaustpressure, double frameTime)
+		double exhaustStage(double exhaustpressure, double frameTime)
 		{
 			// exhaust -> thrust, AB
+			return exhaustpressure;
 		}
 
 
