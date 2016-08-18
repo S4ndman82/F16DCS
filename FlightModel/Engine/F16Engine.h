@@ -355,20 +355,39 @@ namespace F16
 		// low pressure compressor stages
 		void lpcStage(double airpressure, double airvelocity, double frameTime)
 		{
+			// no lpc stages?
 		}
 
 		// high pressure compressor stages
 		void hpcStage(double airpressure, double airvelocity, double frameTime)
 		{
+			// 10 or 9 hpc stages depending on engine
+			//double stages[] = {}; // <- compression ratios
 		}
 
 		// combustion stage
 		void combustionStage(double fuel, double airpressure, double airvelocity, double frameTime)
 		{
+			// fuel/air mixture
+		}
+
+		// both hpt and lpt stages as one
+		void turbineStage(double frameTime)
+		{
+			// exhaust gas temperature: after hpt, before lpt
+
+			// high and low pressure turbines -> lpc and hpc compressor rotation
+
+			// 2 or 1 hpt stages depending on engine
+			//double hptstages[] = {}
+
+			// 2 lpt stages
+			//double lptstages[] = {}
 		}
 
 		void exhaustStage(double exhaustpressure, double frameTime)
 		{
+			// exhaust -> thrust, AB
 		}
 
 

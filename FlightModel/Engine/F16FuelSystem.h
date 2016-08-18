@@ -126,6 +126,7 @@ namespace F16
 		// TODO: check units !! (pounds)
 		// 0.45359237 (1/2.2046)
 
+		// TODO: add positions of tanks
 		F16FuelSystem() 
 			: is_unlimited_fuel(false)
 			, previous_usage(0)
