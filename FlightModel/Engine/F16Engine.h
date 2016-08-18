@@ -394,7 +394,7 @@ namespace F16
 
 			// multiply pressure by each compression stage
 			double press = airpressure;
-			for (double d : stages)
+			for (double d : stages) // <- C++11 supported
 			{
 				press *= d;
 			}
@@ -464,6 +464,15 @@ namespace F16
 		// calculate intake airflow/pressure
 		// -> windmilling if engine stopped
 		// -> compressor stall?
+
+		/*
+		double pressure = ambientpressure;
+		pressure = lpcStage(dynpressure, inletvelocity, frameTime);
+		pressure = hpcStage(pressure, frameTime);
+		pressure = combustionStage(pressure, frameTime);
+		pressure = turbineStage(pressure, frameTime);
+		pressure = exhaustStage(pressure, frameTime);
+		*/
 
 
 		// calculate bleed air pressure at current engine rpm:
