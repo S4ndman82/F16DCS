@@ -434,10 +434,20 @@ namespace F16
 			*/
 
 			//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
-			double pressureAreaFT2 = airbrakeArea_FT2 * dynamicPressure_LBFT2;
-			double airbrake_PCT = airbrakeActuator.m_current; // <- switch to actual degrees
-			double CDAirbrake = airbrake_PCT * 0.7;
-			airbrakeDrag = - (CDAirbrake * cos(F16::degtorad));
+
+			if (airbrakeActuator.m_current > 0)
+			{
+				double CDAirbrake = airbrakeActuator.m_current * 0.7;
+				airbrakeDrag = -(CDAirbrake * cos(F16::degtorad));
+
+				//double pressureAreaFT2 = airbrakeArea_FT2 * dynamicPressure_LBFT2;
+				//double airbrake_DEG = (airbrakeActuator.m_current * 60); // <- PCT to DEG
+				//airbrakeDrag = -(0.7 * cos(airbrake_DEG));
+			}
+			else
+			{
+				airbrakeDrag = 0;
+			}
 
 		}
 
