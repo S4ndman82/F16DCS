@@ -220,8 +220,8 @@ namespace F16
 		//double airbrakeAngle; // 0 = off (in percentage)
 		//double airbrakeRate; // movement rate
 		bool airbrakeSwitch; // switch status
-
 		F16Actuator airbrakeActuator;
+		double airbrakeDrag;
 
 		bool isGearDown; // is landing gear down
 
@@ -275,6 +275,7 @@ namespace F16
 			//, airbrakeAngle(0)
 			, airbrakeSwitch(false)
 			, airbrakeActuator(1.0, 0, 1.0) //
+			, airbrakeDrag(0)
 			, isGearDown(true)
 			, trimState(-0.3, 0, 0) // <- why -0.3 for pitch? edit: apparently to counteract something else?
 			, longStickInput(-1.0, 1.0)
@@ -336,6 +337,7 @@ namespace F16
 
 		void initAirBrakeOff()
 		{
+			airbrakeDrag = 0;
 			airbrakeSwitch = false;
 			airbrakeActuator.m_current = 0;
 			airbrakeActuator.m_commanded = 0;
@@ -430,6 +432,12 @@ namespace F16
 
 			That is the total force (parallel to the fuselage centerline) on all four panels at landing speed. It is much less than 3 tons.
 			*/
+
+			//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
+			double pressureAreaFT2 = airbrakeArea_FT2 * dynamicPressure_LBFT2;
+			double airbrake_PCT = airbrakeActuator.m_current; // <- switch to actual degrees
+			double CDAirbrake = airbrake_PCT * 0.7;
+			airbrakeDrag = - (CDAirbrake * cos(F16::degtorad));
 
 		}
 
@@ -969,10 +977,7 @@ namespace F16
 
 		double getAirbrakeDrag()
 		{
-			//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
-			double airbrake_PCT = airbrakeActuator.m_current;
-			double CDAirbrake = airbrake_PCT * 0.7;
-			return -(CDAirbrake * cos(F16::degtorad));
+			return airbrakeDrag;
 		}
 
 	};

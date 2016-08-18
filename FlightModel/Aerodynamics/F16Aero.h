@@ -782,7 +782,7 @@ namespace F16
 						const double flap_PCT, const double leadingEdgeFlap_PCT, const double aileron_PCT, const double rudder_PCT,
 						const double pitchRate_RPS, const double rollRate_RPS, const double yawRate_RPS, 
 						const double alpha_DEG, const double beta_DEG, const double LgCxGearAero, const double LgCzGearAero,
-						const double CdAirbrake)
+						const double CxAirbrake)
 		{
 			// precalculate some terms to simplify statements
 			const double totalVelocity_FPS = 2*AtmosTotalVelocity_FPS;
@@ -804,7 +804,7 @@ namespace F16
 			Cx_total += CxFlaps + LgCxGearAero;
 
 			/* airbrake - testing now*/
-			Cx_total += CdAirbrake;
+			Cx_total += CxAirbrake;
 
 			/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
 			double dZdQ = meanChordFPS * (Czq + Cz_delta_lef*leadingEdgeFlap_PCT);

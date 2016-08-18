@@ -22,6 +22,8 @@ namespace F16
 	const double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2)
 	const double		meterToFoot				= 3.28084;		// Meter to foot conversion factor
 
+	const double		airbrakeArea_FT2		= 14.62;
+
 	////////////////////
 	// some additional stuff that should be used as functions perhaps (see if we need them)
 	// VS2013 does not yet support constexpr though, need upgrade to 2015.. :(
