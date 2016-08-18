@@ -469,7 +469,11 @@ namespace F16
 		double pressure = ambientpressure;
 		pressure = lpcStage(dynpressure, inletvelocity, frameTime);
 		pressure = hpcStage(pressure, frameTime);
-		pressure = combustionStage(pressure, frameTime);
+
+
+		double fuel = (throttleInput -> fuel mixture setting)
+		pressure = combustionStage(fuel, pressure, frameTime);
+
 		pressure = turbineStage(pressure, frameTime);
 		pressure = exhaustStage(pressure, frameTime);
 		*/
