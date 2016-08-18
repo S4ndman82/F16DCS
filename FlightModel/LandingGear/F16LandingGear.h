@@ -5,6 +5,9 @@
 
 #include "F16LandingWheel.h"
 
+// for actuator code
+#include "FlightControls/F16FlightControls.h"
+
 namespace F16
 {
 	// nosewheel steering (NWS) limited to 32 degrees in each direction
@@ -27,7 +30,7 @@ namespace F16
 	{
 	protected:
 		bool gearLevelUp; // gear lever up/down (note runway/air start)
-		double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
+		//double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
 		//bool gearDownLocked; // gear down and locked?
 
 	public:
@@ -36,9 +39,13 @@ namespace F16
 		double noseGearTurnAngle; // steering angle {-1=CW max;1=CCW max}
 
 		// aerodynamic drag when gears are not fully up
-		double CDGearAero;
+		//double CDGearAero;
 		double CzGearAero;
 		double CxGearAero;
+
+		F16Actuator actNose;
+		F16Actuator actLeft;
+		F16Actuator actRight;
 
 		F16LandingWheel wheelNose;
 		F16LandingWheel wheelLeft;
@@ -51,12 +58,15 @@ namespace F16
 
 		F16LandingGear() 
 			: gearLevelUp(false)
-			, gearDownAngle(0)
+			//, gearDownAngle(0)
 			, nosewheelSteering(true) // <- enable by default until button mapping works
 			, noseGearTurnAngle(0)
-			, CDGearAero(0)
+			//, CDGearAero(0)
 			, CzGearAero(0)
 			, CxGearAero(0)
+			, actNose(0.25, 0, 1.0)
+			, actLeft(0.25, 0, 1.0)
+			, actRight(0.25, 0, 1.0)
 			, wheelNose(0.479, 3.6) // <- inertia should be different for nose wheel? (smaller wheel)
 			, wheelLeft(0.68, 3.6)
 			, wheelRight(0.68, 3.6)
@@ -190,18 +200,24 @@ namespace F16
 		void initGearsDown()
 		{
 			gearLevelUp = false;
-			gearDownAngle = 1.0;
-			wheelNose.setStrutAngle(gearDownAngle);
-			wheelLeft.setStrutAngle(gearDownAngle);
-			wheelRight.setStrutAngle(gearDownAngle);
+			//gearDownAngle = 1.0;
+			actNose.m_current = 1.0;
+			actLeft.m_current = 1.0;
+			actRight.m_current = 1.0;
+			wheelNose.setStrutAngle(actNose.m_current);
+			wheelLeft.setStrutAngle(actLeft.m_current);
+			wheelRight.setStrutAngle(actRight.m_current);
 		}
 		void initGearsUp()
 		{
 			gearLevelUp = true;
-			gearDownAngle = 0;
-			wheelNose.setStrutAngle(gearDownAngle);
-			wheelLeft.setStrutAngle(gearDownAngle);
-			wheelRight.setStrutAngle(gearDownAngle);
+			//gearDownAngle = 0;
+			actNose.m_current = 0;
+			actLeft.m_current = 0;
+			actRight.m_current = 0;
+			wheelNose.setStrutAngle(actNose.m_current);
+			wheelLeft.setStrutAngle(actLeft.m_current);
+			wheelRight.setStrutAngle(actRight.m_current);
 		}
 
 		// user "lever" action
@@ -221,7 +237,9 @@ namespace F16
 		// is gear "down and locked" -> affects airbrake logic
 		bool isGearDownLocked() const
 		{
-			if (gearDownAngle < 1.0)
+			if (actNose.m_current < actNose.m_maxLimit
+				|| actLeft.m_current < actLeft.m_maxLimit
+				|| actRight.m_current < actRight.m_maxLimit)
 			{
 				// not completely down
 				return false;
@@ -243,27 +261,25 @@ namespace F16
 			// if there is weight on wheels -> do nothing
 			if (isWoW() == false)
 			{
-				//if status != gearLevelUp
-				// -> actuator movement up/down by frame step
-				if (gearLevelUp == true && gearDownAngle > 0)
+				if (gearLevelUp == true)
 				{
-					// reduce angle by actuator movement
-					// -> simple hack for now
-					gearDownAngle -= (frameTime / 10);
+					actNose.m_commanded = 0;
+					actLeft.m_commanded = 0;
+					actRight.m_commanded = 0;
 				}
-				else if (gearLevelUp == false && gearDownAngle < 1.0)
+				else
 				{
-					// increase angle by actuator movement
-					// -> simple hack for now
-					gearDownAngle += (frameTime / 10);
+					actNose.m_commanded = 1.0;
+					actLeft.m_commanded = 1.0;
+					actRight.m_commanded = 1.0;
 				}
+				actNose.updateFrame(frameTime);
+				actLeft.updateFrame(frameTime);
+				actRight.updateFrame(frameTime);
 
-				// check we don't go over limit
-				gearDownAngle = limit(gearDownAngle, 0, 1.0);
-
-				wheelNose.setStrutAngle(gearDownAngle);
-				wheelLeft.setStrutAngle(gearDownAngle);
-				wheelRight.setStrutAngle(gearDownAngle);
+				wheelNose.setStrutAngle(actNose.m_current);
+				wheelLeft.setStrutAngle(actLeft.m_current);
+				wheelRight.setStrutAngle(actRight.m_current);
 			}
 
 			gearAeroDrag();
@@ -289,11 +305,19 @@ namespace F16
 			// precalculate some things
 			const double gearZsin = sin(F16::degtorad);
 			const double gearYcos = cos(F16::degtorad);
+			const double gearCd = 0.0270;
+
+			double CDNose = actNose.m_current * gearCd;
+			double CDLeft = actLeft.m_current * gearCd;
+			double CDRight = actRight.m_current * gearCd;
 
 			// TODO Gear aero (from JBSim F16.xml config)
-			CDGearAero = 0.0270 * gearDownAngle; // <- angle 1.0 for fully down, 0 when up
-			CzGearAero = - (CDGearAero * gearZsin);
-			CxGearAero = - (CDGearAero * gearYcos);
+			//CDGearAero = 0.0270 * gearDownAngle; // <- angle 1.0 for fully down, 0 when up
+
+			double CdTotal = CDNose + CDLeft + CDRight;
+
+			CzGearAero = -(CdTotal * gearZsin);
+			CxGearAero = -(CdTotal * gearYcos);
 		}
 
 		void brakeFluidUsage(double frameTime)
