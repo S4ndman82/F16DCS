@@ -137,7 +137,7 @@ namespace F16
 	F16Aero Aero;
 	F16JFS JFS;
 	F16EPU Epu;
-	F16Engine Engine;
+	F16Engine Engine(&Atmos);
 	F16HydraulicSystem Hydraulics; 
 	F16FlightControls FlightControls;
 	F16FuelSystem Fuel;

@@ -3,6 +3,8 @@
 
 #include "../stdafx.h"
 
+#include "Atmosphere/F16Atmosphere.h"
+
 /*
 		engine = 
 		{
@@ -82,6 +84,23 @@ namespace F16
 		ET_Reserved
 	};
 
+	// air data as it passes through engine:
+	// air is compressed, fuel added and ignited, various parameters affect burning
+	// and air parameters change when passing through engine
+	class AirData
+	{
+	public:
+		double pressure;
+		double density;
+		double velocity;
+		double volume;
+		double temperature;
+		double humidity;
+
+		AirData() {}
+		~AirData() {}
+	};
+
 	class F16Engine
 	{
 	protected:
@@ -129,7 +148,9 @@ namespace F16
 
 		bool isIgnited; // if it is really running or just rotating from airflow? (out of fuel mid-air?)
 
-		F16Engine() 
+		F16Atmosphere *pAtmos;
+
+		F16Engine(F16Atmosphere *atmos)
 			: m_power3(0)
 			, thrust_N(0)
 			, throttleInput(0)
@@ -145,6 +166,7 @@ namespace F16
 			, starting(false)
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
+			, pAtmos(atmos)
 		{}
 		~F16Engine() {}
 
@@ -461,6 +483,7 @@ namespace F16
 	// Coded from the simulator study document
 	void F16Engine::updateFrame(const double mach, double alt, double frameTime)
 	{
+		AirData air;
 		// calculate intake airflow/pressure
 		// -> windmilling if engine stopped
 		// -> compressor stall?
