@@ -12,6 +12,7 @@ namespace F16
 	const double		wingSpan_FT				= 32.667;		// F-16 wing-span (ft)
 	const double		wingArea_FT2			= 300.0;		// F-16 wing area (ft^2)
 	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft)
+	const double		airbrakeArea_FT2		= 14.62;
 	const double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord
 	const double		actualCG_PCT			= 0.30;			// Actual CG as a % of wing chord
 	const double		pi						= M_PI;			// Pi (3.14159....) - use value from math.h
@@ -22,7 +23,7 @@ namespace F16
 	const double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2)
 	const double		meterToFoot				= 3.28084;		// Meter to foot conversion factor
 	const double		kg_to_newtons			= 9.80665002864;
-	const double		airbrakeArea_FT2		= 14.62;
+	const double		Nm_sq_to_lbft_sq		= 0.020885434273; // (N/m^2) to (lb/ft^2);
 
 	////////////////////
 	// some additional stuff that should be used as functions perhaps (see if we need them)

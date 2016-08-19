@@ -13,9 +13,6 @@ namespace F16
 	class F16Atmosphere
 	{
 	protected:
-		// internally used temporary values
-		double rho;
-
 		//-----------------------------------------------------------------
 		// The local winds acting on the air vehicle as calculated by the
 		// DCS Simulation
@@ -39,26 +36,21 @@ namespace F16
 		double		ambientDensity_KgPerM3;		// Ambient density (kg/m^3)
 		double		dynamicPressure_LBFT2;		// Dynamic pressure (lb/ft^2)
 		double		speed_of_sound;				// (meters/sec)
-		double		mach; // Well..Mach, yeah
 		double		ambientPressure;	// atmosphere pressure (N/m^2)
 		double		altitude;		// Absolute altitude MSL (meters)
-		double		totalVelocity;
-		double		totalVelocity_FPS;	// Total velocity (always positive) (ft/s)
+		double		totalVelocity;	// velocity in m/s
 
 		F16Atmosphere() 
-			: rho(0)
-			, wind()
+			: wind()
 			, velocity_world_cs()
 			, m_airspeed()
 			, ambientTemperature_DegK(0)
 			, ambientDensity_KgPerM3(0)
 			, dynamicPressure_LBFT2(0)
 			, speed_of_sound(0)
-			, mach(0)
 			, ambientPressure(0)
 			, altitude(0)
 			, totalVelocity(0)
-			, totalVelocity_FPS(0)
 		{}
 		~F16Atmosphere() {}
 
@@ -69,9 +61,6 @@ namespace F16
 			altitude = alt;
 			ambientPressure = pressure;
 			speed_of_sound = soundspeed;
-
-			// calculate some helpers already
-			rho = ambientDensity_KgPerM3 * 0.00194032033;
 		}
 
 		void setAirspeed(const double vx, const double vy, const double vz, const double wind_vx, const double wind_vy, const double wind_vz)
@@ -94,17 +83,12 @@ namespace F16
 		void updateFrame(const double frameTime)
 		{
 			totalVelocity = sqrt(m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z);
-			totalVelocity_FPS = totalVelocity * F16::meterToFoot;
-			if (totalVelocity_FPS < 0.01)
-			{
-				totalVelocity_FPS = 0.01;
-			}
 
-			double tempR = kelvinToRankine(ambientTemperature_DegK); // In Deg Rankine
+			double totalVelocity_FPS = getTotalVelocityFPS();
+			double rho = ambientDensity_KgPerM3 * 0.00194032033;
 
 			// Call the atmosphere model to get mach and dynamic pressure
 			// I'm used to english units so I am using LB/FT^2 for the pressures
-			mach = (totalVelocity_FPS) / sqrt(1.4 * 1716.3 * tempR);
 			dynamicPressure_LBFT2 = .5 * rho * pow(totalVelocity_FPS, 2);
 		}
 
@@ -112,6 +96,29 @@ namespace F16
 		{
 			return altitude * F16::meterToFoot; // meters to feet
 		}
+		double getTotalVelocityFPS() const
+		{
+			// to feets per second
+			double totalVelocity_FPS = totalVelocity * F16::meterToFoot;
+			if (totalVelocity_FPS < 0.01)
+			{
+				totalVelocity_FPS = 0.01;
+			}
+			return totalVelocity_FPS;
+		}
+		double getAmbientPressureLBFTSQ() const
+		{
+			return ambientPressure * Nm_sq_to_lbft_sq; // (N/m^2) to (lb/ft^2)
+		}
+
+		double getMachSpeed() const
+		{
+			double tempR = kelvinToRankine(ambientTemperature_DegK); // In Deg Rankine
+			double totalVelocity_FPS = getTotalVelocityFPS();
+			double mach = (totalVelocity_FPS) / sqrt(1.4 * 1716.3 * tempR);
+			return mach;
+		}
+
 		void getAirspeed(Vec3 &airSpeed) const
 		{
 			airSpeed = m_airspeed;

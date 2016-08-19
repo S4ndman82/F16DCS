@@ -939,10 +939,10 @@ namespace F16
 		//---------------------------------------------
 		void updateFrame(double dynamicPressure_LBFT2, double frametime)
 		{
-			const double totalVelocity_FPS = pAtmos->totalVelocity_FPS;
+			const double totalVelocity_FPS = pAtmos->getTotalVelocityFPS();
 
 			// only place this is needed for now..
-			const double ps_LBFT2 = pAtmos->ambientPressure * 0.020885434273; // (N/m^2) to (lb/ft^2)
+			const double ps_LBFT2 = pAtmos->getAmbientPressureLBFTSQ(); // (N/m^2) to (lb/ft^2)
 
 
 			//if (airbrakeExtended != airbrakeSwitch)

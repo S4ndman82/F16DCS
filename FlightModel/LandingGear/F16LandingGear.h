@@ -58,10 +58,8 @@ namespace F16
 
 		F16LandingGear() 
 			: gearLevelUp(false)
-			//, gearDownAngle(0)
 			, nosewheelSteering(true) // <- enable by default until button mapping works
 			, noseGearTurnAngle(0)
-			//, CDGearAero(0)
 			, CzGearAero(0)
 			, CxGearAero(0)
 			, actNose(0.25, 0, 1.0)
@@ -200,7 +198,6 @@ namespace F16
 		void initGearsDown()
 		{
 			gearLevelUp = false;
-			//gearDownAngle = 1.0;
 			actNose.m_current = 1.0;
 			actLeft.m_current = 1.0;
 			actRight.m_current = 1.0;
@@ -211,7 +208,6 @@ namespace F16
 		void initGearsUp()
 		{
 			gearLevelUp = true;
-			//gearDownAngle = 0;
 			actNose.m_current = 0;
 			actLeft.m_current = 0;
 			actRight.m_current = 0;

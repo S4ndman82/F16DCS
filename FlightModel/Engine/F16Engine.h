@@ -495,14 +495,14 @@ namespace F16
 			// throttle setting, airspeed (windmilling effect)
 		}
 
-		void updateFrame(const double mach, double alt, double frameTime);
+		void updateFrame(double alt, double frameTime);
 
 	};
 
 
 
 	// Coded from the simulator study document
-	void F16Engine::updateFrame(const double mach, double alt, double frameTime)
+	void F16Engine::updateFrame(double alt, double frameTime)
 	{
 		AirData air;
 		// calculate intake airflow/pressure
@@ -602,7 +602,8 @@ namespace F16
 
 		//From Simulator Study document (use 0 altitude values for now)
 		//TODO: This should really be a look-up table per the document reference but this is sufficient for now...
-		double altTemp = (alt/55000.0);
+		double mach = pAtmos->getMachSpeed();
+		double altTemp = (alt / 55000.0);
 		double altTemp2 = (alt/50000.0);
 		double machLimited = limit(mach,0.2,1.0);
 		double Tidle = (-24976.0 * machLimited + 9091.5) + (altTemp * 12000.0);

@@ -239,7 +239,7 @@ void ed_fm_simulate(double dt)
 	F16::Ground.updateFrame(frametime);
 
 	// update thrust
-	F16::Engine.updateFrame(F16::Atmos.mach, F16::Atmos.getAltitudeFeet(), frametime);
+	F16::Engine.updateFrame(F16::Atmos.getAltitudeFeet(), frametime);
 
 	// update amount of fuel used and change in mass
 	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);
@@ -264,7 +264,7 @@ void ed_fm_simulate(double dt)
 	F16::FlightControls.updateFrame(F16::Atmos.dynamicPressure_LBFT2, frametime);
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::FlightControls.flightSurface.elevator_DEG, frametime);
-	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 
+	F16::Aero.computeTotals(F16::Atmos.getTotalVelocityFPS(),
 		F16::FlightControls.flightSurface.flap_PCT, 
 		F16::FlightControls.flightSurface.leadingEdgeFlap_PCT, 
 		F16::FlightControls.flightSurface.aileron_PCT, 
