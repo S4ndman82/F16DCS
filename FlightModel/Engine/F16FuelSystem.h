@@ -176,6 +176,8 @@ namespace F16
 			addition = LeftWing.addFuel(addition);
 			addition = RightWing.addFuel(addition);
 		}
+
+		// total internal fuel in kg
 		double getInternalFuel() const
 		{
 			return (FwdFus.fuel + AftFus.fuel + LeftWing.fuel + RightWing.fuel);

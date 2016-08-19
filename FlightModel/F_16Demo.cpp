@@ -243,6 +243,7 @@ void ed_fm_simulate(double dt)
 
 	// update amount of fuel used and change in mass
 	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);
+	F16::Motion.updateFuelMass(F16::Fuel.getInternalFuel()); // <- update total fuel weight
 
 	// update oxygen provided to pilot: tanks, bleed air from engine etc.
 	F16::EnvCS.updateFrame(F16::Atmos.ambientPressure, F16::Atmos.getAltitudeFeet(), frametime);
@@ -256,7 +257,8 @@ void ed_fm_simulate(double dt)
 
 	// TODO:! give ground speed to calculate wheel slip/grip!
 	// we use total velocity for now..
-	F16::LandingGear.updateFrame(F16::Atmos.totalVelocity, F16::Motion.getWeightN(), frametime);
+	// use "dry" weight and internal fuel weight (TODO: take care of it in motion)
+	F16::LandingGear.updateFrame(F16::Atmos.totalVelocity, F16::Motion.getTotalWeightN(), frametime);
 
 	//-----CONTROL DYNAMICS------------------------
 	// landing gear "down&locked" affects some logic
@@ -342,7 +344,7 @@ void ed_fm_set_atmosphere(	double h,//altitude above sea level			(meters)
 	F16::Atmos.setAtmosphere(t, ro, a, h, p);
 }
 
-void ed_fm_set_current_mass_state ( double mass,
+void ed_fm_set_current_mass_state ( double mass, // "dry" mass in kg (not including fuel)
 									double center_of_mass_x,
 									double center_of_mass_y,
 									double center_of_mass_z,
@@ -655,11 +657,7 @@ bool ed_fm_change_mass(double & delta_mass,
 */
 void ed_fm_set_internal_fuel(double fuel)
 {
-	/*
-	swprintf(dbgmsg, 255, L" F16::set internal fuel: %f \r\n", fuel);
-	::OutputDebugString(dbgmsg);
-	*/
-
+	// internal fuel in kg
 	F16::Fuel.setInternalFuel(fuel);
 }
 
@@ -680,11 +678,6 @@ void ed_fm_set_external_fuel(int station,
 								double y,
 								double z)
 {
-	/*
-	swprintf(dbgmsg, 255, L" F16::set external fuel: %f station: %d \r\n", fuel, station);
-	::OutputDebugString(dbgmsg);
-	*/
-
 	F16::Fuel.setExternalFuel(station, fuel, x, y, z);
 }
 

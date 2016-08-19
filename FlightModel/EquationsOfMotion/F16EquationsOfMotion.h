@@ -58,7 +58,9 @@ namespace F16
 		//double kinetic_energy;
 
 		double fuel_mass_delta; // change in fuel mass since last frame
-		double mass_kg;
+		double mass_kg; // "dry" weight in kg
+
+		double total_mass_kg; // total weight, including fuel, in kg
 
 		//double weight_N; // Weight force of aircraft (N)
 
@@ -70,6 +72,7 @@ namespace F16
 			, inertia()
 			, fuel_mass_delta(0)
 			, mass_kg(0)
+			, total_mass_kg(0)
 			//, weight_N(0)
 		{}
 		~F16Motion() {}
@@ -150,6 +153,8 @@ namespace F16
 						double moment_of_inertia_y,
 						double moment_of_inertia_z)
 		{
+			// note: mass from DCS might be "dry" (empty) weight
+			// -> 9 tons, without fuel
 			mass_kg = mass;
 
 			center_of_gravity.x  = center_of_mass_x;
@@ -339,9 +344,21 @@ namespace F16
 			fuel_mass_delta = mass_delta;
 		}
 
+		void updateFuelMass(double fuelmass)
+		{
+			total_mass_kg = mass_kg + fuelmass;
+		}
+
+		// "dry" weight
 		double getWeightN() const
 		{
 			return mass_kg * kg_to_newtons;
+		}
+
+		// including fuel
+		double getTotalWeightN() const
+		{
+			return total_mass_kg * kg_to_newtons;
 		}
 	};
 }
