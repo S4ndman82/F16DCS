@@ -139,6 +139,9 @@ namespace F16
 		double engineRPM; // rounds per minute: non-zero if shutdown in air?
 		//double drag; // amount of drag if not running while in air? windmilling effect?
 
+		// rotational inertia of engine
+		double inertia;
+		double coreinertia;
 		
 		double lpcRotation; // low pressure compressor rotation speed
 		double hpcRotation; // high pressure compressor rotation speed
@@ -385,6 +388,14 @@ namespace F16
 			return false;
 		}
 
+		// combustor blow-out
+		bool isBlowout()
+		{
+			// TODO: determine conditions
+
+			return false;
+		}
+
 		// low pressure compressor stages
 		double lpcStage(double airpressure, double airvelocity, double frameTime)
 		{
@@ -464,25 +475,24 @@ namespace F16
 		}
 
 
-		void airstart(double frameTime);
+		// airstart essentially needs enough airflow/pressure to rotate engine
+		// (UFC, BUC)
+		void airstart(double frameTime)
+		{
+			// check conditions if engine can ignite
+
+			// when rpm within 25-40 percent, airstart possible (30 degree dive)
+			// (spooldown)
+
+			// another way is use of JFS
+
+			// throttle setting, airspeed (windmilling effect)
+		}
 
 		void updateFrame(const double mach, double alt, double frameTime);
 
 	};
 
-	// airstart essentially needs enough airflow/pressure to rotate engine
-	// (UFC, BUC)
-	void F16Engine::airstart(double frameTime)
-	{
-		// check conditions if engine can ignite
-
-		// when rpm within 25-40 percent, airstart possible (30 degree dive)
-		// (spooldown)
-
-		// another way is use of JFS
-
-		// throttle setting, airspeed (windmilling effect)
-	}
 
 
 	// Coded from the simulator study document

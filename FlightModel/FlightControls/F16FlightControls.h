@@ -217,8 +217,6 @@ namespace F16
 
 		// note: airbrake limit different when landing gear down (prevent strike to runway)
 		// cx_brk = 0.08, --coefficient, drag, breaks <- for airbrake?
-		//double airbrakeAngle; // 0 = off (in percentage)
-		//double airbrakeRate; // movement rate
 		bool airbrakeSwitch; // switch status
 		F16Actuator airbrakeActuator;
 		double airbrakeDrag;
@@ -272,7 +270,6 @@ namespace F16
 			, leading_edge_flap_rate(0)
 			, leading_edge_flap_integrated_gained(0)
 			, leading_edge_flap_integrated_gained_biased(0)
-			//, airbrakeAngle(0)
 			, airbrakeSwitch(false)
 			, airbrakeActuator(1.0, 0, 1.0) //
 			, airbrakeDrag(0)
