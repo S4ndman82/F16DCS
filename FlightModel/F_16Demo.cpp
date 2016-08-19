@@ -139,7 +139,7 @@ namespace F16
 	F16EPU Epu;
 	F16Engine Engine(&Atmos);
 	F16HydraulicSystem Hydraulics; 
-	F16FlightControls FlightControls;
+	F16FlightControls FlightControls(&Atmos);
 	F16FuelSystem Fuel;
 	F16LandingGear LandingGear;
 	F16Airframe Airframe;
@@ -245,7 +245,7 @@ void ed_fm_simulate(double dt)
 	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);
 
 	// update oxygen provided to pilot: tanks, bleed air from engine etc.
-	F16::EnvCS.updateFrame(F16::Atmos.ps_LBFT2, F16::Atmos.getAltitudeFeet(), frametime);
+	F16::EnvCS.updateFrame(F16::Atmos.ambientPressure, F16::Atmos.getAltitudeFeet(), frametime);
 
 	// use RPM for now 
 	// TODO: switch to torque if/when necessary/available
@@ -261,7 +261,7 @@ void ed_fm_simulate(double dt)
 	//-----CONTROL DYNAMICS------------------------
 	// landing gear "down&locked" affects some logic
 	F16::FlightControls.setIsGearDown(F16::LandingGear.isGearDownLocked());
-	F16::FlightControls.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Atmos.dynamicPressure_LBFT2, F16::Atmos.ps_LBFT2, frametime);
+	F16::FlightControls.updateFrame(F16::Atmos.totalVelocity_FPS, F16::Atmos.dynamicPressure_LBFT2, frametime);
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::FlightControls.flightSurface.elevator_DEG, frametime);
 	F16::Aero.computeTotals(F16::Atmos.totalVelocity_FPS, 

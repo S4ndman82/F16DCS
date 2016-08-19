@@ -9,6 +9,7 @@
 #include "DummyFilter.h"
 
 #include "Inputs/F16AnalogInput.h"
+#include "Atmosphere/F16Atmosphere.h"
 
 
 namespace F16
@@ -262,8 +263,10 @@ namespace F16
 		F16BodyState bodyState;
 		F16FlightSurface flightSurface;
 
+		F16Atmosphere *pAtmos;
+
 	public:
-		F16FlightControls() 
+		F16FlightControls(F16Atmosphere *atmos)
 			: simInitialized(false)
 			, leading_edge_flap_integral(0)
 			, leading_edge_flap_integrated(0)
@@ -299,6 +302,7 @@ namespace F16
 			, yawServoFilter()
 			, bodyState()
 			, flightSurface()
+			, pAtmos(atmos)
 		{
 			// just do this once when constructing
 			initialize(0);
@@ -933,8 +937,12 @@ namespace F16
 		//---------------------------------------------
 		//-----CONTROL DYNAMICS------------------------
 		//---------------------------------------------
-		void updateFrame(double totalVelocity_FPS, double dynamicPressure_LBFT2, double ps_LBFT2, double frametime)
+		void updateFrame(double totalVelocity_FPS, double dynamicPressure_LBFT2, double frametime)
 		{
+			// only place this is needed for now..
+			const double ps_LBFT2 = pAtmos->ambientPressure * 0.020885434273; // (N/m^2) to (lb/ft^2)
+
+
 			//if (airbrakeExtended != airbrakeSwitch)
 			// -> actuator movement by frame step
 			updateAirBrake(totalVelocity_FPS, dynamicPressure_LBFT2, ps_LBFT2, frametime);

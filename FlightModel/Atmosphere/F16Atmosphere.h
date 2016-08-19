@@ -40,9 +40,9 @@ namespace F16
 		double		dynamicPressure_LBFT2;		// Dynamic pressure (lb/ft^2)
 		double		speed_of_sound;				// (meters/sec)
 		double		mach; // Well..Mach, yeah
-
+		double		ambientPressure;	// atmosphere pressure (N/m^2)
 		double		altitude;		// Absolute altitude MSL (meters)
-		double		ps_LBFT2;			// Ambient calculated pressure (lb/ft^2)
+		double		totalVelocity;
 		double		totalVelocity_FPS;	// Total velocity (always positive) (ft/s)
 
 		F16Atmosphere() 
@@ -55,8 +55,9 @@ namespace F16
 			, dynamicPressure_LBFT2(0)
 			, speed_of_sound(0)
 			, mach(0)
+			, ambientPressure(0)
 			, altitude(0)
-			, ps_LBFT2(0)
+			, totalVelocity(0)
 			, totalVelocity_FPS(0)
 		{}
 		~F16Atmosphere() {}
@@ -66,7 +67,7 @@ namespace F16
 			ambientTemperature_DegK = temperature;
 			ambientDensity_KgPerM3 = density; 
 			altitude = alt;
-			ps_LBFT2 = pressure * 0.020885434273; // (N/m^2) to (lb/ft^2)
+			ambientPressure = pressure;
 			speed_of_sound = soundspeed;
 
 			// calculate some helpers already
@@ -90,9 +91,10 @@ namespace F16
 			m_airspeed.z = velocity_world_cs.z - wind.z;
 		}
 
-		void updateFrame(double frameTime)
+		void updateFrame(const double frameTime)
 		{
-			totalVelocity_FPS = sqrt(m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z) * F16::meterToFoot;
+			totalVelocity = sqrt(m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z);
+			totalVelocity_FPS = totalVelocity * F16::meterToFoot;
 			if (totalVelocity_FPS < 0.01)
 			{
 				totalVelocity_FPS = 0.01;

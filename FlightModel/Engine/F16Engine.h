@@ -397,7 +397,7 @@ namespace F16
 		}
 
 		// low pressure compressor stages
-		double lpcStage(double airpressure, double airvelocity, double frameTime)
+		double lpcStage(AirData &air, double frameTime)
 		{
 			// no lpc stages?
 			/*
@@ -408,11 +408,11 @@ namespace F16
 			*/
 
 			// no stages -> output same as input
-			return airpressure;
+			return air.pressure;
 		}
 
 		// high pressure compressor stages
-		double hpcStage(double airpressure, double airvelocity, double frameTime)
+		double hpcStage(AirData &air, double frameTime)
 		{
 			/*
 			if (isCompressorStall(airvelocity, hpcRotation) == true)
@@ -429,27 +429,33 @@ namespace F16
 			double stages[] = { 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01 };
 
 			// multiply pressure by each compression stage
-			double press = airpressure;
+			//double press = air.pressure;
 			for (double d : stages) // <- C++11 supported
 			{
-				press *= d;
+				air.pressure *= d;
 			}
-			return press;
+			return air.pressure;
 		}
 
 		// combustion stage
-		double combustionStage(double fuel, double airpressure, double airvelocity, double frameTime)
+		double combustionStage(double fuel, AirData &air, double frameTime)
 		{
+			// TODO:
+			//if (isBlowout() == true)
+
 			// fuel/air mixture: rich/lean mixture of fuel, temperature, volume (pressure)
 			// -> combustion gas to turbines
 
-			// assuming doubling the pressure after combustion
+			// assuming doubling the pressure after combustion?
 			// TODO: replace with something suitable according to conditions
-			return airpressure*2;
+			//return airpressure*2;
+
+			//return exhaustpressure; //?
+			return 0;
 		}
 
 		// both hpt and lpt stages as one
-		double turbineStage(double pressure, double frameTime)
+		double turbineStage(double exhaustpressure, AirData &air, double frameTime)
 		{
 			// exhaust gas temperature: after hpt, before lpt
 
@@ -463,15 +469,15 @@ namespace F16
 			//double lptstages[] = {}
 			// -> low pressure compressor rotation speed
 
-			return pressure;
+			return 0;
 		}
 
-		double exhaustStage(double exhaustpressure, double frameTime)
+		double exhaustStage(double exhaustpressure, AirData &air, double frameTime)
 		{
 			// bypass air injection?
 
 			// exhaust -> thrust, AB
-			return exhaustpressure;
+			return 0;
 		}
 
 
@@ -512,6 +518,7 @@ namespace F16
 		//air.volume = inletArea * air.pressure;
 		//air.massflow = air.volume * air.density;
 
+		air.pressure = pAtmos->ambientPressure;
 		/*
 		double pressure = ambientpressure;
 		pressure = lpcStage(dynpressure, inletvelocity, frameTime);
