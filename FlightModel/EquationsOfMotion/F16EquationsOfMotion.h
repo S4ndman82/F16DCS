@@ -11,11 +11,15 @@
 #include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "include/F16Constants.h"		// Common constants used throughout this DLL
 
+#include "Atmosphere/F16Atmosphere.h"			//Atmosphere model functions
+
 namespace F16
 {
 	class F16Motion
 	{
 	protected:
+		F16Atmosphere *pAtmos;
+
 		//-----------------------------------------------------------------
 		// This variable is very important.  Make sure you set this
 		// to 0 at the beginning of each frame time or else the moments
@@ -64,9 +68,11 @@ namespace F16
 
 		//double weight_N; // Weight force of aircraft (N)
 
+
 	public:
-		F16Motion() 
-			: common_moment()
+		F16Motion(F16Atmosphere *atmos)
+			: pAtmos(atmos)
+			, common_moment()
 			, common_force()
 			, center_of_gravity()
 			, inertia()
@@ -231,11 +237,16 @@ namespace F16
 		// to units.  All prior forces calculated in lb*ft, needs
 		// to be converted into N*m
 		//----------------------------------------------------------------
-		void updateAeroForces(const double Cy_total, const double Cx_total, const double Cz_total, const double Cl_total, const double Cm_total, const double Cn_total, const double dynamicPressure_LBFT2)
+		void updateAeroForces(const double Cy_total, const double Cx_total, const double Cz_total, const double Cl_total, const double Cm_total, const double Cn_total)
 		{
 			// precalculate some terms
-			const double wingPressureN = F16::wingArea_FT2 * dynamicPressure_LBFT2 * 4.44822162825;
-			const double wingPressureNm = F16::wingArea_FT2 * dynamicPressure_LBFT2 * 1.35581795;
+			const double wingPressureFT = F16::wingArea_FT2 * pAtmos->dynamicPressure_LBFT2;
+			const double wingPressureN = wingPressureFT * 4.44822162825;
+			const double wingPressureNm = wingPressureFT * 1.35581795;
+
+
+			// check
+			//const double wingPressureNm = F16::wingArea_m2 * pAtmos->dynamicPressure;
 
 			// Cy	(force out the right wing)
 			Vec3 cy_force(0.0, 0.0, Cy_total * wingPressureN);		// Output force in Newtons

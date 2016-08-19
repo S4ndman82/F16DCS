@@ -143,7 +143,7 @@ namespace F16
 	F16FuelSystem Fuel;
 	F16LandingGear LandingGear;
 	F16Airframe Airframe;
-	F16Motion Motion;
+	F16Motion Motion(&Atmos);
 	F16ElectricSystem Electrics;
 	F16EnvControlSystem EnvCS;
 
@@ -287,8 +287,7 @@ void ed_fm_simulate(double dt)
 	//----------------------------------------------------------------
 
 	F16::Motion.updateAeroForces(F16::Aero.getCyTotal(), F16::Aero.getCxTotal(), F16::Aero.getCzTotal(), 
-								F16::Aero.getClTotal(), F16::Aero.getCmTotal(), F16::Aero.getCnTotal(), 
-								F16::Atmos.dynamicPressure_LBFT2);
+								F16::Aero.getClTotal(), F16::Aero.getCmTotal(), F16::Aero.getCnTotal());
 
 	F16::Motion.updateEngineForces(F16::Engine.getThrustN());
 	F16::Motion.updateFuelUsageMass(F16::Fuel.getUsageSinceLastFrame(), 0, 0, 0);
