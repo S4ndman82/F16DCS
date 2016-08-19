@@ -130,13 +130,13 @@ namespace F16
 		F16FuelSystem() 
 			: is_unlimited_fuel(false)
 			, previous_usage(0)
-			, FwdFus(3100 / 2.2046) // lb to kg
-			, AftFus(2800 / 2.2046) 
-			, LeftWing(525 / 2.2046)
-			, RightWing(525 / 2.2046)
-			, ext_Center(1800 / 2.2046)
-			, ext_LWing(2300 / 2.2046)
-			, ext_RWing(2300 / 2.2046)
+			, FwdFus(3100 * lb_to_kg) // lb to kg
+			, AftFus(2800 * lb_to_kg)
+			, LeftWing(525 * lb_to_kg)
+			, RightWing(525 * lb_to_kg)
+			, ext_Center(1800 * lb_to_kg)
+			, ext_LWing(2300 * lb_to_kg)
+			, ext_RWing(2300 * lb_to_kg)
 		{}
 		~F16FuelSystem() {}
 

@@ -52,6 +52,7 @@ namespace F16
 			if (surfaceHeightWithObj > surfaceHeight)
 			{
 				// ground effect disrupted by object (or uneven surface?)
+				// TODO: more detailed version
 				return;
 			}
 
@@ -69,7 +70,7 @@ namespace F16
 
 			// TODO: check height, set for ground effect simulation?
 			// also if weight on wheels?
-			if (F16::wingSpan_FT >= (F16::meterToFoot*surfaceHeight) /*&& F16::LandingGear.isWoW() == false*/)
+			if (F16::wingSpan_m >= surfaceHeight /*&& F16::LandingGear.isWoW() == false*/)
 			{
 				// in ground effect with the surface?
 				// flying above ground, no weight on wheels?

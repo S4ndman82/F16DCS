@@ -55,8 +55,6 @@ namespace F16
 		//-----------------------------------------------------------------
 		Vec3	inertia;
 
-		// current total mass (including fuel)
-		//double mass;
 
 		// mass times speed
 		//double kinetic_energy;
