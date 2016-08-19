@@ -937,8 +937,10 @@ namespace F16
 		//---------------------------------------------
 		//-----CONTROL DYNAMICS------------------------
 		//---------------------------------------------
-		void updateFrame(double totalVelocity_FPS, double dynamicPressure_LBFT2, double frametime)
+		void updateFrame(double dynamicPressure_LBFT2, double frametime)
 		{
+			const double totalVelocity_FPS = pAtmos->totalVelocity_FPS;
+
 			// only place this is needed for now..
 			const double ps_LBFT2 = pAtmos->ambientPressure * 0.020885434273; // (N/m^2) to (lb/ft^2)
 

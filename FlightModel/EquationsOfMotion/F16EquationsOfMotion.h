@@ -58,8 +58,9 @@ namespace F16
 		//double kinetic_energy;
 
 		double fuel_mass_delta; // change in fuel mass since last frame
+		double mass_kg;
 
-		double weight_N; // Weight force of aircraft (N)
+		//double weight_N; // Weight force of aircraft (N)
 
 	public:
 		F16Motion() 
@@ -68,7 +69,8 @@ namespace F16
 			, center_of_gravity()
 			, inertia()
 			, fuel_mass_delta(0)
-			, weight_N(0)
+			, mass_kg(0)
+			//, weight_N(0)
 		{}
 		~F16Motion() {}
 
@@ -148,7 +150,7 @@ namespace F16
 						double moment_of_inertia_y,
 						double moment_of_inertia_z)
 		{
-			weight_N = mass * 9.80665002864;
+			mass_kg = mass;
 
 			center_of_gravity.x  = center_of_mass_x;
 			center_of_gravity.y  = center_of_mass_y;
@@ -339,7 +341,7 @@ namespace F16
 
 		double getWeightN() const
 		{
-			return weight_N;
+			return mass_kg * kg_to_newtons;
 		}
 	};
 }

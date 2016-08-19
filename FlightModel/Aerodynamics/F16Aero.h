@@ -785,7 +785,7 @@ namespace F16
 						const double CxAirbrake)
 		{
 			// precalculate some terms to simplify statements
-			const double totalVelocity_FPS = 2*AtmosTotalVelocity_FPS;
+			const double totalVelocity_FPS = 2*AtmosTotalVelocity_FPS; // <- is this a bug?
 			const double meanChordFPS = (F16::meanChord_FT / totalVelocity_FPS);
 			const double wingSpanFPS = (F16::wingSpan_FT / totalVelocity_FPS);
 
