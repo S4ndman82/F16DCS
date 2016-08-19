@@ -96,6 +96,7 @@ namespace F16
 		double volume;
 		double temperature;
 		double humidity;
+		double massflow;
 
 		AirData() {}
 		~AirData() {}
@@ -142,6 +143,7 @@ namespace F16
 		double lpcRotation; // low pressure compressor rotation speed
 		double hpcRotation; // high pressure compressor rotation speed
 
+		double inletArea; // area of inlet (can we use fan cross section?)
 
 		bool starting; // "spooling up"
 		bool stopping; // "spooling down"
@@ -163,6 +165,7 @@ namespace F16
 			, engineRPM(0)
 			, lpcRotation(0)
 			, hpcRotation(0)
+			, inletArea(0)
 			, starting(false)
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
@@ -454,6 +457,8 @@ namespace F16
 
 		double exhaustStage(double exhaustpressure, double frameTime)
 		{
+			// bypass air injection?
+
 			// exhaust -> thrust, AB
 			return exhaustpressure;
 		}
@@ -487,6 +492,15 @@ namespace F16
 		// calculate intake airflow/pressure
 		// -> windmilling if engine stopped
 		// -> compressor stall?
+
+		// at subsonic speed, inlet does not matter
+		// at supersonic speeds, inlet must reduce shockwaves
+
+		// so, inlet area * pressure gives volume of air
+		// volume * density gives mass of air flow
+		// right?
+		//air.volume = inletArea * air.pressure;
+		//air.massflow = air.volume * air.density;
 
 		/*
 		double pressure = ambientpressure;
