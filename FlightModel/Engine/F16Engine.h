@@ -80,7 +80,32 @@ namespace F16
 		double humidity;
 		double massflow;
 
-		GasData() {}
+		GasData() 
+			: pressure(0), density(0), velocity(0), 
+			volume(0), temperature(0), humidity(0), massflow(0)
+		{}
+		GasData(double press, double dens, double temp)
+			: pressure(press), density(dens), velocity(0), 
+			volume(0), temperature(temp), humidity(0), massflow(0)
+		{}
+		GasData(const GasData &other)
+			: pressure(other.pressure), density(other.density), velocity(other.velocity), 
+			volume(other.volume), temperature(other.temperature), humidity(other.humidity), massflow(other.massflow)
+		{}
+
+		GasData& operator=(const GasData &other)
+		{
+			if (this == &other) { return *this; }
+			pressure = other.pressure;
+			density = other.density;
+			velocity = other.velocity;
+			volume = other.volume;
+			temperature = other.temperature;
+			humidity = other.humidity;
+			massflow = other.massflow;
+			return *this;
+		}
+
 		~GasData() {}
 	};
 
@@ -558,7 +583,6 @@ namespace F16
 	// Coded from the simulator study document
 	void F16Engine::updateFrame(double alt, double frameTime)
 	{
-		GasData gas;
 		// calculate intake airflow/pressure
 		// -> windmilling if engine stopped
 		// -> compressor stall?
@@ -567,9 +591,9 @@ namespace F16
 		// at supersonic speeds, inlet must reduce shockwaves
 
 		// start by setting ambient conditions
-		gas.pressure = pAtmos->ambientPressure;
-		gas.temperature = pAtmos->ambientTemperature_DegK;
-		gas.density = pAtmos->ambientDensity;
+		GasData gas(pAtmos->ambientPressure, pAtmos->ambientDensity, pAtmos->ambientTemperature_DegK);
+		GasData bypass(gas); // <- according to bypass ratio, injection back to engine
+		//bypass.volume = gas.volume * bypassratio;
 
 		inletStage(gas, frameTime);
 		lpcStage(gas, frameTime);
