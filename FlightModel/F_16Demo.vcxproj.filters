@@ -115,6 +115,9 @@
     <ClInclude Include="Inputs\F16AnalogInput.h">
       <Filter>Inputs</Filter>
     </ClInclude>
+    <ClInclude Include="EquationsOfMotion\F16WeightBalance.h">
+      <Filter>EquationsOfMotion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

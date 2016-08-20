@@ -249,16 +249,16 @@ namespace F16
 
 			// Cy	(force out the right wing)
 			Vec3 cy_force(0.0, 0.0, Cy_total * wingPressureN);		// Output force in Newtons
-			Vec3 cy_force_pos(0.0,0,0); //0.01437
+			Vec3 cy_force_pos(0.0, 0, 0); //0.01437
 			add_local_force_cg(cy_force /*,cy_force_pos*/);	
 
 			// Cx (force out the nose)
 			Vec3 cx_force(Cx_total * wingPressureN, 0, 0 );		// Output force in Newtons
-			Vec3 cx_force_pos(0, 0.0,0.0);
+			Vec3 cx_force_pos(0, 0.0, 0.0);
 			add_local_force_cg(cx_force /*,cx_force_pos*/);
 
 			// Cz (force down the bottom of the aircraft)
-			Vec3 cz_force(0.0,  -Cz_total * wingPressureN, 0.0 );	// Output force in Newtons
+			Vec3 cz_force(0.0, -Cz_total * wingPressureN, 0.0);	// Output force in Newtons
 			Vec3 cz_force_pos(0,0,0);
 			add_local_force_cg(cz_force /*,cz_force_pos*/);
 
@@ -318,8 +318,8 @@ namespace F16
 			// better approach in progress
 
 			/*
-			Vec3 cxr_wheel_friction_force(rightBrakeForce, 0.0, 0.0);
-			Vec3 cxl_wheel_friction_force(leftBrakeForce, 0.0, 0.0);
+			Vec3 cxr_wheel_friction_force(-rightBrakeForce, 0.0, 0.0);
+			Vec3 cxl_wheel_friction_force(-leftBrakeForce, 0.0, 0.0);
 			if (common_force.x < rightBrakeForce)
 			{
 				// silly hack, remove this 
