@@ -9,6 +9,8 @@
 
  -> air conditioning (cabin pressure, cockpit temperature)
 
+ -> anti-ice
+
  F100-PW-200
  -> to AB fuel pump (driven by this)
  (low) -> fan duct (avoid compressor stall)

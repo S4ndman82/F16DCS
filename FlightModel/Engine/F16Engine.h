@@ -301,6 +301,7 @@ namespace F16
 		// torque from engine can be used
 		// on gearbox-connected equipment:
 		// some threshold must be exceeded for them to function
+		/*
 		double getEngineTorque() const
 		{
 			if (isIgnited == false) // ignore throttle setting if engine is not running
@@ -311,6 +312,7 @@ namespace F16
 			// no idea of the value currently, just have non-zero value for now
 			return 1;
 		}
+		*/
 
 		double getEngineRpm() const
 		{
@@ -512,6 +514,9 @@ namespace F16
 			}
 			*/
 
+			// note: some rotors here have variable vanes here so compression could change..
+			// depends on fuel control mode, throttle position and fuel pressure from AB pump
+
 			/*
 			// 10 or 9 hpc stages depending on engine
 			//double stages[] = {}; // <- compression ratios
@@ -533,6 +538,10 @@ namespace F16
 			// -> use that for now
 
 			gas.pressure *= 32;
+
+			// part of air directed to bleed air -> AB fuel pump etc.
+
+			// pressurization and dump valve control
 
 			return gas.pressure;
 		}
@@ -576,6 +585,8 @@ namespace F16
 		double exhaustStage(GasData &gas, double frameTime)
 		{
 			// bypass air injection?
+
+			// nozzle control (CENC)
 
 			// exhaust -> thrust, AB
 			return 0;
