@@ -65,25 +65,6 @@ GE	F110-GE-129			F-16C/D			17,000	29,000	-		1.900	270			30.7	-		0.76	-		2		3		-	
 
 namespace F16
 {
-	// Engine: Pratt & Whitney F100-PW-129 or General Electric F110-GE-129
-	// Thrust: Pratt & Whitney: 65 kN, AB 106 kN; General Electric: 76 kN, AB 129 kN
-	// -> adapt to support either one?
-	// Turbine inlet temperature: 1,350 °C (2,460 °F)
-
-	// other engines: F100-PW-220, F110-GE-100
-
-	enum EngineType
-	{
-		ET_F110GE100,	// F110-GE-100 // F-16 C/D
-		ET_F110GE129,	// F110-GE-129 // F-16 C/D
-		ET_F100PW200,	// F100-PW-200 // F-16A/B
-		ET_F100PW220,	// F100-PW-220 // F-16A/B/C/D
-		ET_F100PW220E,	// F100-PW-220E // F-16A/B/C/D
-		ET_F100PW229,	// F100-PW-229 // F-16 C/D
-		ET_F100PW229A,	// F100-PW-229A // F-16 C/D
-		ET_Reserved
-	};
-
 	// air data as it passes through engine:
 	// air is compressed, fuel added and ignited, various parameters affect burning
 	// and air parameters change when passing through engine
@@ -101,6 +82,44 @@ namespace F16
 		AirData() {}
 		~AirData() {}
 	};
+
+	// Engine: Pratt & Whitney F100-PW-129 or General Electric F110-GE-129
+	// Thrust: Pratt & Whitney: 65 kN, AB 106 kN; General Electric: 76 kN, AB 129 kN
+	// -> adapt to support either one?
+	// Turbine inlet temperature: 1,350 °C (2,460 °F)
+
+	// other engines: F100-PW-220, F110-GE-100
+
+	/*
+	enum EngineType
+	{
+		ET_F110GE100,	// F110-GE-100 // F-16 C/D
+		ET_F110GE129,	// F110-GE-129 // F-16 C/D
+		ET_F100PW200,	// F100-PW-200 // F-16A/B
+		ET_F100PW220,	// F100-PW-220 // F-16A/B/C/D
+		ET_F100PW220E,	// F100-PW-220E // F-16A/B/C/D
+		ET_F100PW229,	// F100-PW-229 // F-16 C/D
+		ET_F100PW229A,	// F100-PW-229A // F-16 C/D
+		ET_Reserved
+	};
+
+	// parameters for each engine (remove unnecessary ones later)
+	class F16EngineType
+	{
+		// for F110-GE-129, according to datasheet by GE Aviation:
+		double bypassRatio = 0.76;
+		double airflow = 122.4; // kg/sec
+		double maxDiameter = 1.2; // m
+		double maxDiameter = 46.5; // in
+
+		// for F100-PW-220?
+		double inletDiameter = 34.8; // in
+		double maxDiameter = 46.5; // in
+		double bypassRatio = 0.36; //
+		//double overallPressureRatio = 32:1;
+	};
+	*/
+
 
 	class F16Engine
 	{
@@ -122,11 +141,6 @@ namespace F16
 		// range 0 - 80,000pph (instruments)
 
 		// amount of air bypassing compressor and engine core
-
-		// for F110-GE-129, according to datasheet by GE Aviation:
-		double bypassRatio = 0.76;
-		double airflow = 122.4; // kg/sec
-		double maxDiameter = 1.2; // m
 
 		// oil pressure: 0-100 psi
 		// directly related to engine rpm?
