@@ -146,7 +146,8 @@ namespace F16
 		double maxDiameter; // cm
 		double inletDiameter; // cm
 
-		// differences
+		// differences, likely calculated differently:
+		// amount bypassed vs. amount for normal intake
 		double bypassRatio;
 
 		F16EngineParameters(EngineType engine)
