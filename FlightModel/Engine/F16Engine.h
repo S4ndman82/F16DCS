@@ -68,7 +68,8 @@ namespace F16
 	// air data as it passes through engine:
 	// air is compressed, fuel added and ignited, various parameters affect burning
 	// and air parameters change when passing through engine
-	class AirData
+	// -> air, air&fuel, exhaust gas
+	class GasData
 	{
 	public:
 		double pressure;
@@ -79,8 +80,8 @@ namespace F16
 		double humidity;
 		double massflow;
 
-		AirData() {}
-		~AirData() {}
+		GasData() {}
+		~GasData() {}
 	};
 
 	// Engine: Pratt & Whitney F100-PW-129 or General Electric F110-GE-129
@@ -425,22 +426,22 @@ namespace F16
 		}
 
 		// inlet stage, variable control (CIVV), air temperature
-		double inletStage(AirData &air, double frameTime)
+		double inletStage(GasData &gas, double frameTime)
 		{
 			// so, inlet area * pressure gives volume of air
 			// volume * density gives mass of air flow
 			// right?
-			air.volume = inletArea * air.pressure;
-			air.massflow = air.volume * air.density;
+			gas.volume = inletArea * gas.pressure;
+			gas.massflow = gas.volume * gas.density;
 
 			// three fans at this stage?
 			// -> functionality
 
-			return air.pressure;
+			return gas.pressure;
 		}
 
 		// low pressure compressor stages
-		double lpcStage(AirData &air, double frameTime)
+		double lpcStage(GasData &gas, double frameTime)
 		{
 			// no lpc stages?
 			/*
@@ -451,11 +452,11 @@ namespace F16
 			*/
 
 			// no stages -> output same as input
-			return air.pressure;
+			return gas.pressure;
 		}
 
 		// high pressure compressor stages
-		double hpcStage(AirData &air, double frameTime)
+		double hpcStage(GasData &gas, double frameTime)
 		{
 			/*
 			if (isCompressorStall(airvelocity, hpcRotation) == true)
@@ -473,10 +474,10 @@ namespace F16
 			double stages[] = { 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01 };
 
 			// multiply pressure by each compression stage
-			//double press = air.pressure;
+			//double press = gas.pressure;
 			for (double d : stages) // <- C++11 supported
 			{
-				air.pressure *= d;
+				gas.pressure *= d;
 			}
 			*/
 
@@ -484,13 +485,13 @@ namespace F16
 			// but PW brochure says 32:1 compression 
 			// -> use that for now
 
-			air.pressure *= 32;
+			gas.pressure *= 32;
 
-			return air.pressure;
+			return gas.pressure;
 		}
 
 		// combustion stage
-		double combustionStage(double fuel, AirData &air, double frameTime)
+		double combustionStage(double fuel, GasData &gas, double frameTime)
 		{
 			// TODO:
 			//if (isBlowout() == true)
@@ -508,7 +509,7 @@ namespace F16
 		}
 
 		// both hpt and lpt stages as one
-		double turbineStage(double exhaustpressure, AirData &air, double frameTime)
+		double turbineStage(GasData &gas, double frameTime)
 		{
 			// exhaust gas temperature: after hpt, before lpt
 
@@ -525,7 +526,7 @@ namespace F16
 			return 0;
 		}
 
-		double exhaustStage(double exhaustpressure, AirData &air, double frameTime)
+		double exhaustStage(GasData &gas, double frameTime)
 		{
 			// bypass air injection?
 
@@ -557,7 +558,7 @@ namespace F16
 	// Coded from the simulator study document
 	void F16Engine::updateFrame(double alt, double frameTime)
 	{
-		AirData air;
+		GasData gas;
 		// calculate intake airflow/pressure
 		// -> windmilling if engine stopped
 		// -> compressor stall?
@@ -566,23 +567,23 @@ namespace F16
 		// at supersonic speeds, inlet must reduce shockwaves
 
 		// start by setting ambient conditions
-		air.pressure = pAtmos->ambientPressure;
-		air.temperature = pAtmos->ambientTemperature_DegK;
-		air.density = pAtmos->ambientDensity;
+		gas.pressure = pAtmos->ambientPressure;
+		gas.temperature = pAtmos->ambientTemperature_DegK;
+		gas.density = pAtmos->ambientDensity;
 
-		inletStage(air, frameTime);
-		lpcStage(air, frameTime);
-		hpcStage(air, frameTime);
+		inletStage(gas, frameTime);
+		lpcStage(gas, frameTime);
+		hpcStage(gas, frameTime);
 
 		// TODO: usage by actual engine ?
 		// -> mixture by throttle and air massflow -> determine mixture
 		//
 		fuelPerFrame = 10 * frameTime; //10 kg persecond
 		
-		double exhaust = combustionStage(fuelPerFrame, air, frameTime);
+		combustionStage(fuelPerFrame, gas, frameTime);
 
-		turbineStage(exhaust, air, frameTime);
-		exhaustStage(exhaust, air, frameTime);
+		turbineStage(gas, frameTime);
+		exhaustStage(gas, frameTime);
 
 		/*
 
