@@ -271,7 +271,7 @@ namespace F16
 			add_local_moment(cm_moment);
 
 			// Cn	(Output force in N/m)
-			Vec3 cn_moment(0.0, -Cn_total * wingPressureNm * F16::wingSpan_FT,  0.0);
+			Vec3 cn_moment(0.0, -Cn_total * wingPressureNm * F16::wingSpan_FT, 0.0);
 			add_local_moment(cn_moment);	
 		}
 
@@ -331,9 +331,9 @@ namespace F16
 				cxl_wheel_friction_force.x = -common_force.x;
 			}
 
-			Vec3 cxr_wheel_friction_pos(0.0, 0.0, -5.0); // TODO: check offset!
+			Vec3 cxr_wheel_friction_pos(0.0, -5.0, 0.0); // TODO: check offset!
 			add_local_force(cxr_wheel_friction_force, cxr_wheel_friction_pos);
-			Vec3 cxl_wheel_friction_pos(0.0, 0.0, 5.0); // TODO: check offset!
+			Vec3 cxl_wheel_friction_pos(0.0, 5.0, 0.0); // TODO: check offset!
 			add_local_force(cxl_wheel_friction_force, cxl_wheel_friction_pos);
 			*/
 		}
