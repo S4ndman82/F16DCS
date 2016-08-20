@@ -1,3 +1,11 @@
+/*
+Sources of data:
+- http://www.geaviation.com/military/engines/f110/
+- https://www.grc.nasa.gov/WWW/K-12/airplane/burnth.html
+-
+
+*/
+
 #ifndef _F16ENGINE_H_
 #define _F16ENGINE_H_
 
@@ -116,7 +124,6 @@ namespace F16
 
 	// other engines: F100-PW-220, F110-GE-100
 
-	/*
 	enum EngineType
 	{
 		ET_F110GE100,	// F110-GE-100 // F-16 C/D
@@ -130,21 +137,35 @@ namespace F16
 	};
 
 	// parameters for each engine (remove unnecessary ones later)
-	class F16EngineType
+	class F16EngineParameters
 	{
-		// for F110-GE-129, according to datasheet by GE Aviation:
-		double bypassRatio = 0.76;
-		double airflow = 122.4; // kg/sec
-		double maxDiameter = 1.2; // m
-		double maxDiameter = 46.5; // in
+	public:
+		EngineType engineType;
 
-		// for F100-PW-220?
-		double inletDiameter = 34.8; // in
-		double maxDiameter = 46.5; // in
-		double bypassRatio = 0.36; //
-		//double overallPressureRatio = 32:1;
+		// same
+		double maxDiameter; // cm
+		double inletDiameter; // cm
+
+		// differences
+		double bypassRatio;
+
+		F16EngineParameters(EngineType engine)
+			: engineType(engine)
+			, maxDiameter(46.5 * inchesToCentim) // in -> cm
+			, inletDiameter(34.8 * inchesToCentim) // in -> cm
+			, bypassRatio(0)
+		{
+			if (engineType == ET_F110GE129)
+			{
+				bypassRatio = 0.76;
+			}
+			else
+			{
+				bypassRatio = 0.36; //
+			}
+		}
+		~F16EngineParameters() {}
 	};
-	*/
 
 
 	class F16Engine
@@ -195,7 +216,6 @@ namespace F16
 		double lpcRotation; // low pressure compressor rotation speed
 		double hpcRotation; // high pressure compressor rotation speed
 
-		const double inletDiameter; // in 
 		double inletArea; // area of inlet
 
 		bool starting; // "spooling up"
@@ -205,6 +225,7 @@ namespace F16
 
 		bool inhibitAbIgnition; // condition if AB is restricted 
 
+		F16EngineParameters engineParams;
 		F16Atmosphere *pAtmos;
 
 		F16Engine(F16Atmosphere *atmos)
@@ -220,12 +241,12 @@ namespace F16
 			, engineRPM(0)
 			, lpcRotation(0)
 			, hpcRotation(0)
-			, inletDiameter(34.8 * inchesToCentim) // -> cm
 			, inletArea(0.613643025) // -> m^3
 			, starting(false)
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
 			, inhibitAbIgnition(false)
+			, engineParams(ET_F100PW200)
 			, pAtmos(atmos)
 		{}
 		~F16Engine() {}
@@ -593,9 +614,11 @@ namespace F16
 		// start by setting ambient conditions
 		GasData gas(pAtmos->ambientPressure, pAtmos->ambientDensity, pAtmos->ambientTemperature_DegK);
 		GasData bypass(gas); // <- according to bypass ratio, injection back to engine
-		//bypass.volume = gas.volume * bypassratio;
 
 		inletStage(gas, frameTime);
+		bypass.volume = gas.volume * engineParams.bypassRatio; // after normal inlet calculated
+		bypass.massflow = gas.massflow * engineParams.bypassRatio;
+
 		lpcStage(gas, frameTime);
 		hpcStage(gas, frameTime);
 
