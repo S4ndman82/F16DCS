@@ -13,6 +13,8 @@
 
 namespace F16
 {
+	// mostly amount of fuel at different stations matter here
+	// (unless we start adding payload support into flight model)
 	class F16WeightBalance
 	{
 	public:

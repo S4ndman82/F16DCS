@@ -122,7 +122,11 @@ namespace F16
 		// range 0 - 80,000pph (instruments)
 
 		// amount of air bypassing compressor and engine core
-		//double bypassRatio;
+
+		// for F110-GE-129, according to datasheet by GE Aviation:
+		double bypassRatio = 0.76;
+		double airflow = 122.4; // kg/sec
+		double maxDiameter = 1.2; // m
 
 		// oil pressure: 0-100 psi
 		// directly related to engine rpm?
