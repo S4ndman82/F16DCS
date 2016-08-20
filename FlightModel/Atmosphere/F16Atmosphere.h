@@ -35,7 +35,6 @@ namespace F16
 		double		ambientTemperature_DegK;	// Ambient temperature (kelvin)
 		double		ambientDensity;		// Ambient density (kg/m^3)
 		double		dynamicPressure;		// Dynamic pressure (Pa)
-		double		dynamicPressure_LBFT2;		// Dynamic pressure (lb/ft^2)
 		double		speed_of_sound;				// (meters/sec)
 		double		ambientPressure;	// atmosphere pressure (N/m^2)
 		double		altitude;		// Absolute altitude MSL (meters)
@@ -48,7 +47,6 @@ namespace F16
 			, ambientTemperature_DegK(0)
 			, ambientDensity(0)
 			, dynamicPressure(0)
-			, dynamicPressure_LBFT2(0)
 			, speed_of_sound(0)
 			, ambientPressure(0)
 			, altitude(0)
@@ -86,12 +84,6 @@ namespace F16
 		{
 			totalVelocity = sqrt(m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z);
 			dynamicPressure = .5 * ambientDensity * pow(totalVelocity, 2);
-
-			// Call the atmosphere model to get mach and dynamic pressure
-			// I'm used to english units so I am using LB/FT^2 for the pressures
-			double totalVelocity_FPS = getTotalVelocityFPS();
-			double rho = ambientDensity * 0.00194032033;
-			dynamicPressure_LBFT2 = .5 * rho * pow(totalVelocity_FPS, 2);
 		}
 
 		double getAltitudeFeet() const
@@ -111,6 +103,15 @@ namespace F16
 		double getAmbientPressureLBFTSQ() const
 		{
 			return ambientPressure * Nm_sq_to_lbft_sq; // (N/m^2) to (lb/ft^2)
+		}
+		double getDynamicPressureLBFTSQ() const
+		{
+			// Call the atmosphere model to get mach and dynamic pressure
+			// I'm used to english units so I am using LB/FT^2 for the pressures
+			double totalVelocity_FPS = getTotalVelocityFPS();
+			double rho = ambientDensity * 0.00194032033;
+			double dynamicPressure_LBFT2 = .5 * rho * pow(totalVelocity_FPS, 2);
+			return dynamicPressure_LBFT2;
 		}
 
 		double getMachSpeed() const

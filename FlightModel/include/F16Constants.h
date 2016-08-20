@@ -18,12 +18,13 @@ namespace F16
 	const double		wingArea_FT2			= 300.0;		// F-16 wing area (ft^2)
 	const double		wingArea_m2				= 27.87;		// F-16 wing area (m^2)
 
-	const double		length_m = 15.03;
-	const double		height_m = 5.09;
+	const double		length_m				= 15.03;
+	const double		height_m				= 5.09;
 
 	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft)
+	const double		meanChord_m				= 3.450336;		// mean aerodynamic chord (m)
 
-	const double		airbrakeArea_FT2		= 14.62;
+	const double		airbrakeArea_FT2		= 14.26;
 	const double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord
 	const double		actualCG_PCT			= 0.30;			// Actual CG as a % of wing chord
 	const double		inertia_Ix_KGM2			= 12874.0;		// Reference moment of inertia (kg/m^2)
@@ -51,7 +52,7 @@ namespace F16
 	double kelvinToRankine(double kelvin) { return kelvin * 1.8; }
 
 	// alternative, by division
-	double lbToKg(double lb) { return lb / 2.2046; }
+	double lbtokg(double lb) { return lb / 2.2046; }
 	double fttom(double ft) { return ft / 3.2808; }
 }
 

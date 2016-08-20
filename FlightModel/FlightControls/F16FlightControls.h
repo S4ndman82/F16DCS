@@ -937,12 +937,13 @@ namespace F16
 		//---------------------------------------------
 		//-----CONTROL DYNAMICS------------------------
 		//---------------------------------------------
-		void updateFrame(double dynamicPressure_LBFT2, double frametime)
+		void updateFrame(double frametime)
 		{
 			const double totalVelocity_FPS = pAtmos->getTotalVelocityFPS();
 
 			// only place this is needed for now..
 			const double ps_LBFT2 = pAtmos->getAmbientPressureLBFTSQ(); // (N/m^2) to (lb/ft^2)
+			const double dynamicPressure_LBFT2 = pAtmos->getDynamicPressureLBFTSQ(); // LB/FT^2
 
 
 			//if (airbrakeExtended != airbrakeSwitch)

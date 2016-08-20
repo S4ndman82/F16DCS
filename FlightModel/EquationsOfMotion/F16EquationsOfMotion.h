@@ -238,13 +238,14 @@ namespace F16
 		void updateAeroForces(const double Cy_total, const double Cx_total, const double Cz_total, const double Cl_total, const double Cm_total, const double Cn_total)
 		{
 			// precalculate some terms
-			const double wingPressureFT = F16::wingArea_FT2 * pAtmos->dynamicPressure_LBFT2;
+			const double wingPressureFT = F16::wingArea_FT2 * pAtmos->getDynamicPressureLBFTSQ();
 			const double wingPressureN = wingPressureFT * 4.44822162825;
 			const double wingPressureNm = wingPressureFT * 1.35581795;
 
 
 			// check
 			//const double wingPressureNm = F16::wingArea_m2 * pAtmos->dynamicPressure;
+			//const double wingPressureN = pAtmos->dynamicPressure / F16::wingArea_m2;
 
 			// Cy	(force out the right wing)
 			Vec3 cy_force(0.0, 0.0, Cy_total * wingPressureN);		// Output force in Newtons

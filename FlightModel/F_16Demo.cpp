@@ -263,7 +263,7 @@ void ed_fm_simulate(double dt)
 	//-----CONTROL DYNAMICS------------------------
 	// landing gear "down&locked" affects some logic
 	F16::FlightControls.setIsGearDown(F16::LandingGear.isGearDownLocked());
-	F16::FlightControls.updateFrame(F16::Atmos.dynamicPressure_LBFT2, frametime);
+	F16::FlightControls.updateFrame(frametime);
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::FlightControls.flightSurface.elevator_DEG, frametime);
 	F16::Aero.computeTotals(F16::Atmos.getTotalVelocityFPS(),
