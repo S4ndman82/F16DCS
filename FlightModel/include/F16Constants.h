@@ -33,6 +33,7 @@ namespace F16
 
 	const double		meterToFoot				= 3.28084;		// Meter to foot conversion factor
 	const double		feetToMeter				= 0.3048;		// multiplier, ft to m
+	const double		inchesToCentim			= 2.54;			// multiplier, in to cm
 
 	const double		kg_to_newtons			= 9.80665002864;
 	const double		Nm_sq_to_lbft_sq		= 0.020885434273; // (N/m^2) to (lb/ft^2);
@@ -54,6 +55,7 @@ namespace F16
 	// alternative, by division
 	double lbtokg(double lb) { return lb / 2.2046; }
 	double fttom(double ft) { return ft / 3.2808; }
+	double intocm(double in) { return in / 0.39370; }
 }
 
 #endif // ifndef _F16CONSTANTS_H_

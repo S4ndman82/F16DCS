@@ -122,6 +122,10 @@ namespace F16
 		F16FuelTank ext_LWing;
 		F16FuelTank ext_RWing;
 
+		// TODO: settings:
+		// - crossfeed
+		// - booster pumps
+
 	public:
 		// TODO: check units !! (pounds)
 		// 0.45359237 (1/2.2046)

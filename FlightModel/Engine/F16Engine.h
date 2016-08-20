@@ -153,6 +153,11 @@ namespace F16
 		// likely we need calculation of each section separately?
 		// cockpit gauge: 300..900 range
 		double engineTemperature;
+		double inletTemperature;
+		double combustionPressure; // combustion chamber
+
+		//CIVV : compressor inlet variable vanes
+		// -> modify inlet
 
 		double engineRPM; // rounds per minute: non-zero if shutdown in air?
 		//double drag; // amount of drag if not running while in air? windmilling effect?
@@ -164,12 +169,15 @@ namespace F16
 		double lpcRotation; // low pressure compressor rotation speed
 		double hpcRotation; // high pressure compressor rotation speed
 
-		double inletArea; // area of inlet (can we use fan cross section?)
+		const double inletDiameter; // in 
+		double inletArea; // area of inlet
 
 		bool starting; // "spooling up"
 		bool stopping; // "spooling down"
 
 		bool isIgnited; // if it is really running or just rotating from airflow? (out of fuel mid-air?)
+
+		bool inhibitAbIgnition; // condition if AB is restricted 
 
 		F16Atmosphere *pAtmos;
 
@@ -186,10 +194,12 @@ namespace F16
 			, engineRPM(0)
 			, lpcRotation(0)
 			, hpcRotation(0)
-			, inletArea(0)
+			, inletDiameter(34.8 * inchesToCentim) // -> cm
+			, inletArea(0.613643025) // -> m^3
 			, starting(false)
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
+			, inhibitAbIgnition(false)
 			, pAtmos(atmos)
 		{}
 		~F16Engine() {}
@@ -414,6 +424,21 @@ namespace F16
 			return false;
 		}
 
+		// inlet stage, variable control (CIVV), air temperature
+		double inletStage(AirData &air, double frameTime)
+		{
+			// so, inlet area * pressure gives volume of air
+			// volume * density gives mass of air flow
+			// right?
+			air.volume = inletArea * air.pressure;
+			air.massflow = air.volume * air.density;
+
+			// three fans at this stage?
+			// -> functionality
+
+			return air.pressure;
+		}
+
 		// low pressure compressor stages
 		double lpcStage(AirData &air, double frameTime)
 		{
@@ -439,6 +464,7 @@ namespace F16
 			}
 			*/
 
+			/*
 			// 10 or 9 hpc stages depending on engine
 			//double stages[] = {}; // <- compression ratios
 			// -> just for one engine now..
@@ -452,6 +478,14 @@ namespace F16
 			{
 				air.pressure *= d;
 			}
+			*/
+
+			// we don't know the ratios of each rotor,
+			// but PW brochure says 32:1 compression 
+			// -> use that for now
+
+			air.pressure *= 32;
+
 			return air.pressure;
 		}
 
@@ -464,11 +498,12 @@ namespace F16
 			// fuel/air mixture: rich/lean mixture of fuel, temperature, volume (pressure)
 			// -> combustion gas to turbines
 
-			// assuming doubling the pressure after combustion?
-			// TODO: replace with something suitable according to conditions
-			//return airpressure*2;
+			// throttle-input -> ECU -> fuel injection amount for mixture:
+			// fuel to airmassflow ratio * efficiency * (fuel properties) -> temperature
 
-			//return exhaustpressure; //?
+			// we need exhaust gas volume for turbine power and thrust output?
+
+
 			return 0;
 		}
 
@@ -530,15 +565,27 @@ namespace F16
 		// at subsonic speed, inlet does not matter
 		// at supersonic speeds, inlet must reduce shockwaves
 
-		// so, inlet area * pressure gives volume of air
-		// volume * density gives mass of air flow
-		// right?
-		//air.volume = inletArea * air.pressure;
-		//air.massflow = air.volume * air.density;
-
+		// start by setting ambient conditions
 		air.pressure = pAtmos->ambientPressure;
+		air.temperature = pAtmos->ambientTemperature_DegK;
+		air.density = pAtmos->ambientDensity;
+
+		inletStage(air, frameTime);
+		lpcStage(air, frameTime);
+		hpcStage(air, frameTime);
+
+		// TODO: usage by actual engine ?
+		// -> mixture by throttle and air massflow -> determine mixture
+		//
+		fuelPerFrame = 10 * frameTime; //10 kg persecond
+		
+		double exhaust = combustionStage(fuelPerFrame, air, frameTime);
+
+		turbineStage(exhaust, air, frameTime);
+		exhaustStage(exhaust, air, frameTime);
+
 		/*
-		double pressure = ambientpressure;
+
 		pressure = lpcStage(dynpressure, inletvelocity, frameTime);
 		pressure = hpcStage(pressure, frameTime);
 
@@ -639,10 +686,6 @@ namespace F16
 		}
 
 		thrust_N = limit(thrustTmp,0.0,129000.0);
-
-		// TODO: usage by actual engine ?
-		//fuelPerFrame =  10 * throttleInput * frameTime; //10 kg persecond
-		fuelPerFrame =  10 * frameTime; //10 kg persecond
 	}
 
 	/*
