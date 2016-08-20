@@ -564,14 +564,17 @@ void ed_fm_set_command(int command, float value)
 		F16::Airframe.canopyToggle();
 		break;
 
+
 	case 215: // trimstop command (key up)
 		break;
 
+		/**/
 	case 2142:
 	case 2143:
 		// ignore these, they are noisy
 		// (mouse x & y?)
 		break;
+		/**/
 
 	default:
 		{

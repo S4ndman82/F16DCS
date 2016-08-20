@@ -3,6 +3,9 @@
 
 #include "../stdafx.h"
 
+// for actuator code
+#include "FlightControls/F16FlightControls.h"
+
 namespace F16
 {
 	// - canopy status
@@ -18,7 +21,9 @@ namespace F16
 	class F16Airframe
 	{
 	protected:
-		double canopyAngle;		// Canopy status/angle {0=closed;0.9=elevated;1=no draw}
+		//Canopy status/angle {0=closed;0.9=elevated;1=no draw}
+		F16Actuator actCanopy;
+
 		bool canopySwitchDown; // up/down
 		bool canopyGone; // simplify some code
 
@@ -47,7 +52,7 @@ namespace F16
 
 	public:
 		F16Airframe()
-			: canopyAngle(0)
+			: actCanopy(0.5, 0, 0.9)
 			, canopySwitchDown(false)
 			, canopyGone(false)
 			, leftWingLamp(0)
@@ -68,13 +73,15 @@ namespace F16
 		void initCanopyOpen()
 		{
 			canopySwitchDown = false;
-			canopyAngle = 0.9; // up
+			//canopyAngle = 0.9; // up
+			actCanopy.m_commanded = actCanopy.m_maxLimit;
 			canopyGone = false;
 		}
 		void initCanopyClosed()
 		{
 			canopySwitchDown = true;
-			canopyAngle = 0; // down
+			//canopyAngle = 0; // down
+			actCanopy.m_commanded = actCanopy.m_minLimit;
 			canopyGone = false;
 		}
 
@@ -94,7 +101,6 @@ namespace F16
 
 		void canopyJettison() // <- no binding yet
 		{
-			canopyAngle = 1.0; // gone
 			canopyGone = true;
 		}
 
@@ -103,14 +109,17 @@ namespace F16
 		{
 			// just set it gone for now
 			// -> pressure to ambient pressure
-			canopyAngle = 1.0; // gone
 			canopyGone = true;
 		}
 
 		// draw angle of canopy {0=closed;0.9=elevated;1=no draw}
 		float getCanopyAngle() const
 		{
-			return (float)canopyAngle;
+			if (canopyGone == true)
+			{
+				return 1.0; // gone
+			}
+			return (float)actCanopy.m_current;
 		}
 
 		// update aero drag from canopy when gone
@@ -178,7 +187,7 @@ namespace F16
 			// is zero "no fault" or "fully broken"? 
 			::memset(elementIntegrity, 0, 336*sizeof(double));
 			canopyGone = false;
-			canopyAngle = 0;
+			actCanopy.m_commanded = actCanopy.m_minLimit;
 		}
 
 		bool isRepairNeeded() const
@@ -206,17 +215,15 @@ namespace F16
 		{
 			if (canopyGone == false)
 			{
-				if (canopySwitchDown == false && canopyAngle < 0.9)
+				if (canopySwitchDown == false)
 				{
-					// move up -> increase angle
-					canopyAngle += (frameTime / 10);
+					actCanopy.m_commanded = actCanopy.m_maxLimit;
 				}
-				else if (canopySwitchDown == true && canopyAngle > 0)
+				else
 				{
-					// move down -> decrease angle
-					canopyAngle -= (frameTime / 10);
+					actCanopy.m_commanded = actCanopy.m_minLimit;
 				}
-				canopyAngle = limit(canopyAngle, 0, 0.9);
+				actCanopy.updateFrame(frameTime);
 			}
 
 			// aero drag in case canopy is gone
