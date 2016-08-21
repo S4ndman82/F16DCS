@@ -17,9 +17,39 @@ namespace F16
 	// (unless we start adding payload support into flight model)
 	class F16WeightBalance
 	{
+	protected:
+
+		// calculate new center of gravity
+		// for using in motion calculations
+		Vec3 balanced_center_of_gravity;
+		//double total_mass_kg; // new "wet" mass with balance
+
+		Vec3 original_cog;
+
+		// dry mass used with original cog
+		double dry_mass_kg;
+
 	public:
-		F16WeightBalance() {}
+		F16WeightBalance() 
+			: balanced_center_of_gravity()
+			, original_cog()
+			, dry_mass_kg(0)
+		{}
 		~F16WeightBalance() {}
+
+		// used to initialize
+		void setMassState(double mass_kg, Vec3 &center_of_gravity)
+		{
+			dry_mass_kg = mass_kg;
+			original_cog = center_of_gravity;
+			balanced_center_of_gravity = center_of_gravity;
+		}
+
+		void balance(double mass, Vec3 &position, Vec3 &size)
+		{
+			// update cog with given mass, position and bounding size
+			// 
+		}
 
 	};
 }

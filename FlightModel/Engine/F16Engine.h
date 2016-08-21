@@ -54,6 +54,8 @@ Sources of data:
 				[17] = 	{3.9,	50000,	200000},
 			}, -- end of table_data
 		}, -- end of engine
+
+		average_fuel_consumption 	= 0.245, -- this is highly relative, but good estimates are 36-40l/min = 28-31kg/min = 0.47-0.52kg/s -- 45l/min = 35kg/min = 0.583kg/s
 */
 
 /*

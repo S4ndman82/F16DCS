@@ -13,6 +13,8 @@
 
 #include "Atmosphere/F16Atmosphere.h"			//Atmosphere model functions
 
+#include "F16WeightBalance.h" // for calculating new center of gravity, according to mass distribution
+
 namespace F16
 {
 	class F16Motion
@@ -66,6 +68,7 @@ namespace F16
 
 		//double weight_N; // Weight force of aircraft (N)
 
+		F16WeightBalance weightBalance;
 
 	public:
 		F16Motion(F16Atmosphere *atmos)
@@ -78,6 +81,7 @@ namespace F16
 			, mass_kg(0)
 			, total_mass_kg(0)
 			//, weight_N(0)
+			, weightBalance()
 		{}
 		~F16Motion() {}
 
@@ -168,6 +172,8 @@ namespace F16
 			inertia.x = moment_of_inertia_x;
 			inertia.y = moment_of_inertia_y;
 			inertia.z = moment_of_inertia_z;
+
+			weightBalance.setMassState(mass_kg, center_of_gravity);
 		}
 
 		void getLocalForce(double &x,double &y,double &z,double &pos_x,double &pos_y,double &pos_z)
