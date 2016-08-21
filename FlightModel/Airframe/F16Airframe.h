@@ -22,7 +22,7 @@ namespace F16
 	class F16LightBlinker
 	{
 	public:
-		float sequence[] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+		//float sequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
 		float blinkrate = 1.0f; // 
 
 		float current = 0;
