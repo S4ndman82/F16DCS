@@ -189,7 +189,7 @@ namespace F16
 		double	throttleInput;	// Throttle input command normalized (-1 to 1)
 
 		double percentPower;
-		double afterburner;
+		double afterburnerDraw; // just draw argument
 
 		// amount of fuel used in this engine setting in current flight conditions (temperature, airspeed..)
 		double fuelPerFrame;
@@ -244,7 +244,7 @@ namespace F16
 			, thrust_N(0)
 			, throttleInput(0)
 			, percentPower(0)
-			, afterburner(0)
+			, afterburnerDraw(0)
 			, fuelPerFrame(0)
 			, oilPressure(100)
 			, oilPressureWarning(false)
@@ -621,6 +621,11 @@ namespace F16
 
 		void updateFrame(double alt, double frameTime);
 
+		float getAfterburnerDraw() const
+		{
+			return (float)afterburnerDraw;
+		}
+
 	};
 
 
@@ -673,7 +678,9 @@ namespace F16
 		// calculate bleed air pressure at current engine rpm:
 		// must rotate AB fuel pump at sufficient speed
 
-		afterburner = (throttleInput - 80.0) / 20.0;
+		afterburnerDraw = (throttleInput - 80.0) / 20.0;
+		afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
+
 		if(throttleInput < 78.0)
 		{
 			percentPower = throttleInput * 0.6923;
