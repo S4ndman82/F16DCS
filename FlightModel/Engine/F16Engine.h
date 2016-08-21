@@ -687,6 +687,8 @@ namespace F16
 		// must rotate AB fuel pump at sufficient speed
 
 		afterburnerDraw = (throttleInput - 80.0) / 20.0;
+		afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
+		/*
 		if (inhibitAbIgnition == false)
 		{
 			afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
@@ -699,6 +701,7 @@ namespace F16
 			// limit nozzle to under AB ignition?
 			afterburnerDraw = limit(afterburnerDraw, 0.0, .8); // just draw argument
 		}
+		*/
 
 		if(throttleInput < 78.0)
 		{
