@@ -626,6 +626,14 @@ namespace F16
 			return (float)afterburnerDraw;
 		}
 
+		// TODO: we'll need to control nozzle position:
+		// for example, landing gear out -> open nozzle more 
+		// to reduce possibility of power loss
+		float getNozzlePos() const
+		{
+			return 0;
+		}
+
 	};
 
 
