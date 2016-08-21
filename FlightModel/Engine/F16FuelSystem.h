@@ -3,6 +3,9 @@
 
 #include "../stdafx.h"
 
+#include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
+#include "include/F16Constants.h"		// Common constants used throughout this DLL
+
 namespace F16
 {
 	// we need fuel usage curve for the used engine here
@@ -50,17 +53,15 @@ namespace F16
 		double volume; // capacity of tank
 		double fuel; // amount of fuel in tank
 
-		double x;
-		double y;
-		double z;
+		Vec3 position;
+		Vec3 size; // bounding box
 
 		F16FuelTank(double _volume = 0, double _fuel = 0)
 			: station(0)
 			, volume(_volume)
 			, fuel(_fuel)
-			, x(0)
-			, y(0)
-			, z(0)
+			, position()
+			, size()
 		{}
 		~F16FuelTank() {}
 
