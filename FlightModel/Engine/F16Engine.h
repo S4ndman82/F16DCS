@@ -686,8 +686,16 @@ namespace F16
 		// calculate bleed air pressure at current engine rpm:
 		// must rotate AB fuel pump at sufficient speed
 
-		afterburnerDraw = (throttleInput - 80.0) / 20.0;
-		afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
+		if (inhibitAbIgnition == false)
+		{
+			afterburnerDraw = (throttleInput - 80.0) / 20.0;
+			afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
+		}
+		else
+		{
+			// AB ignition inhibited -> no draw
+			afterburnerDraw = 0;
+		}
 
 		if(throttleInput < 78.0)
 		{
