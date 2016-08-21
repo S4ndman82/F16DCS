@@ -231,6 +231,8 @@ namespace F16
 		AnalogInput		latStickInput; // bank normalized
 		AnalogInput		pedInput;		// Pedal input command normalized (-1 to 1)
 
+		F16Actuator		rudderActuator;
+
 		// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 		bool manualPitchOverride;
 
@@ -244,6 +246,7 @@ namespace F16
 		double		m_alphaFiltered;
 		double		m_longStickForce;
 
+		/**/
 		// Control filters (general filters to easily code up when compared to report block diagrams)
 		DummyFilter	pitchRateWashout;
 		DummyFilter	pitchIntegrator;
@@ -259,6 +262,7 @@ namespace F16
 		DummyFilter	yawRateWashout;
 		DummyFilter	yawRateFilter;
 		DummyFilter	yawServoFilter;
+		/**/
 
 		F16BodyState bodyState;
 		F16FlightSurface flightSurface;
@@ -281,11 +285,13 @@ namespace F16
 			, longStickInput(-1.0, 1.0)
 			, latStickInput(-1.0, 1.0)
 			, pedInput(-1.0, 1.0)
+			, rudderActuator(1.0, -30.0, 30.0)
 			, manualPitchOverride(false)
 			, gearRelatedFlaps(false)
 			, m_stickCommandPosFiltered(0)
 			, m_alphaFiltered(0)
 			, m_longStickForce(0)
+			/**/
 			, pitchRateWashout()
 			, pitchIntegrator()
 			, pitchPreActuatorFilter()
@@ -300,6 +306,7 @@ namespace F16
 			, yawRateWashout()
 			, yawRateFilter()
 			, yawServoFilter()
+			/**/
 			, bodyState()
 			, flightSurface()
 			, pAtmos(atmos)
@@ -637,7 +644,7 @@ namespace F16
 			double alphaLimitedRate = 10.0 * (alphaLimited - m_alphaFiltered);
 			m_alphaFiltered += (alphaLimitedRate * dt);
 
-			double pitchRateWashedOut = pitchRateWashout.Filter(dt,pitch_rate);
+			double pitchRateWashedOut = pitchRateWashout.Filter(dt, pitch_rate);
 			double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;		
 
 			double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
