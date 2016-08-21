@@ -18,6 +18,19 @@ namespace F16
 	// - damage in sections? 
 	// - accumulated over-g stress?
 
+
+	class F16LightBlinker
+	{
+	public:
+		float sequence[] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+		float blinkrate = 1.0f; // 
+
+		float current = 0;
+
+		F16LightBlinker() {}
+		~F16LightBlinker() {}
+	};
+
 	class F16Airframe
 	{
 	protected:
