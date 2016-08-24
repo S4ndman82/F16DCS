@@ -41,6 +41,9 @@ namespace F16
 		F16FuelSystem *pFuel;
 		F16Engine Engine;
 
+		// logic for EPU/JFS/main engine torque
+		F16Gearbox Gearbox;
+
 		//F16BleedAirSystem BleedAir;
 		//BleedAir.pEpu = &Epu;
 
@@ -49,6 +52,7 @@ namespace F16
 			: pAtmos(atmos)
 			, pFuel(fuels)
 			, Engine(atmos)
+			, Gearbox()
 		{}
 		~F16EngineManagementSystem() {}
 
@@ -123,6 +127,7 @@ namespace F16
 		{
 			Epu.updateFrame(frameTime);
 			JFS.updateFrame(frameTime);
+			Gearbox.updateFrame(frameTime);
 
 			//pFuel->updateFrame(frameTime);
 			Engine.updateFrame(frameTime);

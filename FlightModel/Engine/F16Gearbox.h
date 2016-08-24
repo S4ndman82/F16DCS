@@ -14,8 +14,8 @@ namespace F16
 {
 	class F16Gearbox
 	{
-	protected:
-		double engineTorque;
+	public:
+		//double engineTorque;
 		double engineRpm;
 
 		//F16FuelPump *pFuelPump;
@@ -23,12 +23,16 @@ namespace F16
 		//F16HydraulicSystem *pHydrPump;
 
 	public:
-		F16Gearbox() {}
+		F16Gearbox() 
+			: engineRpm(0)
+		{}
 		~F16Gearbox() {}
 
 		// update with engine/APU rpm/torque
-		// and power consumption
-		void updateFrame(const double engineRPM, const double frameTime)
+		// and power consumption:
+		// logic for EPU/JFS/main engine torque distribution
+		// to various systems (hydraulics etc)
+		void updateFrame(const double frameTime)
 		{
 			// APU (JFS) torque -> to engine for starting
 			// without APU, engine -> auxiliary systems
