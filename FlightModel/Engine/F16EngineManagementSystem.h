@@ -39,26 +39,84 @@ namespace F16
 
 		F16Atmosphere *pAtmos;
 		F16FuelSystem *pFuel;
-		F16Engine *pEngine;
+		F16Engine Engine;
 
 		//F16BleedAirSystem BleedAir;
 		//BleedAir.pEpu = &Epu;
 
 	public:
-		F16EngineManagementSystem(F16Atmosphere *atmos, F16FuelSystem *fuels, F16Engine *engine) 
+		F16EngineManagementSystem(F16Atmosphere *atmos, F16FuelSystem *fuels) 
 			: pAtmos(atmos)
 			, pFuel(fuels)
-			, pEngine(engine)
+			, Engine(atmos)
 		{}
 		~F16EngineManagementSystem() {}
+
+		void initEngineOff()
+		{
+			Engine.throttleInput = 0;
+			Engine.fuelPerFrame = 0;
+
+			Engine.starting = false;
+			Engine.stopping = false;
+
+			// temporary for testing
+			Engine.isIgnited = false;
+		}
+		void initEngineIdle()
+		{
+			Engine.throttleInput = 1;
+			Engine.fuelPerFrame = 1;
+
+			Engine.starting = false;
+			Engine.stopping = false;
+
+			// temporary for testing
+			Engine.isIgnited = true;
+		}
+		void initEngineCruise()
+		{
+			Engine.throttleInput = 50;
+			Engine.fuelPerFrame = 10;
+
+			Engine.starting = false;
+			Engine.stopping = false;
+
+			// temporary for testing
+			Engine.isIgnited = true;
+		}
 
 		void JfsStart()
 		{
 			// just direct start for now..
-			//pEngine->startEngine();
+			startEngine();
 		}
 		void JfsStop()
 		{
+		}
+
+		void startEngine()
+		{
+			Engine.starting = true;
+			Engine.stopping = false;
+
+			// temporary for testing
+			Engine.isIgnited = true;
+		}
+		void stopEngine()
+		{
+			Engine.stopping = true;
+			Engine.starting = false;
+
+			// temporary for testing
+			Engine.isIgnited = false;
+			Engine.fuelPerFrame = 0;
+		}
+
+
+		double getFuelPerFrame() const
+		{
+			return Engine.getFuelPerFrame();
 		}
 
 		void updateFrame(const double frameTime)
@@ -67,7 +125,7 @@ namespace F16
 			JFS.updateFrame(frameTime);
 
 			//pFuel->updateFrame(frameTime);
-			//pEngine->updateFrame(frameTime);
+			Engine.updateFrame(frameTime);
 		}
 
 	};

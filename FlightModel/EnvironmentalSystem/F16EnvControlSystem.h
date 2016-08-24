@@ -3,8 +3,11 @@
 
 #include "../stdafx.h"
 
-#include "F16AirConditioning.h"
-#include "F16OxygenSystem.h"
+#include "Atmosphere/F16Atmosphere.h"			//Atmosphere model functions
+
+#include "EnvironmentalSystem/F16AirConditioning.h"
+#include "EnvironmentalSystem/F16OxygenSystem.h"
+
 
 // ENVIRONMENTAL CONTROL SYSTEM (ECS)
 // cockpit pressure, temperature, sealing, defogging, G-suit pressure, fuel tank pressure, equipment cooling
@@ -30,13 +33,16 @@ namespace F16
 		F16AirConditioning AirCond;
 		F16OxygenSystem Oxy;
 
+		F16Atmosphere *pAtmos;
+
 	public:
-		F16EnvControlSystem()
+		F16EnvControlSystem(F16Atmosphere *atmos)
 			: lowpressure(0)
 			, highpressure(0)
 			, cockpitPressure(0)
 			, AirCond()
 			, Oxy()
+			, pAtmos(atmos)
 		{}
 		~F16EnvControlSystem() {}
 
@@ -48,8 +54,11 @@ namespace F16
 			return cockpitPressure;
 		}
 
-		void updateFrame(const double ambientPressure, const double altitude, const double frameTime)
+		void updateFrame(const double frameTime)
 		{
+			const double ambientPressure = pAtmos->ambientPressure;
+			const double altitude = pAtmos->getAltitudeFeet();
+
 			// logic of using high/low pressure of bleed air?
 			
 			Oxy.updateFrame(ambientPressure, altitude, frameTime);

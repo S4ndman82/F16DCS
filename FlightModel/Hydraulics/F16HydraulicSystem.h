@@ -59,10 +59,13 @@ namespace F16
 
 		// need either engine torque or RPM here for pump operating information,
 		// use RPM for now, also add power usage in actuators
-		void updateFrame(const double engineRPM, const double frameTime)
+		void updateFrame(const double frameTime)
 		{
+			/*
+			const double engineRPM = pEngine->getRpm();
 			pumpA->updateFrame(engineRPM, frameTime);
 			pumpB->updateFrame(engineRPM, frameTime);
+			*/
 		}
 
 	};

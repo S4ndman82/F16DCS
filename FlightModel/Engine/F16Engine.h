@@ -357,60 +357,6 @@ namespace F16
 			return (throttleInput/100.0);
 		}
 
-		void initEngineOff()
-		{
-			throttleInput = 0;
-			fuelPerFrame = 0;
-
-			starting = false;
-			stopping = false;
-
-			// temporary for testing
-			isIgnited = false;
-		}
-		void initEngineIdle()
-		{
-			throttleInput = 1;
-			fuelPerFrame = 1;
-
-			starting = false;
-			stopping = false;
-
-			// temporary for testing
-			isIgnited = true;
-		}
-		void initEngineCruise()
-		{
-			throttleInput = 50;
-			fuelPerFrame = 10;
-
-			starting = false;
-			stopping = false;
-
-			// temporary for testing
-			isIgnited = true;
-		}
-
-		void startEngine()
-		{
-			//throttleInput = 0;
-			//fuelPerFrame = 0;
-
-			starting = true;
-			stopping = false;
-
-			// temporary for testing
-			isIgnited = true;
-		}
-		void stopEngine()
-		{
-			stopping = true;
-			starting = false;
-
-			// temporary for testing
-			isIgnited = false;
-			fuelPerFrame = 0;
-		}
 
 		double getLowPressureBleedAir() const
 		{

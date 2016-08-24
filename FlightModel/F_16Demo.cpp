@@ -134,16 +134,15 @@ namespace F16
 	F16Atmosphere Atmos;
 	F16GroundSurface Ground(&Atmos);
 	F16Aero Aero;
-	F16Engine Engine(&Atmos);
 	F16FuelSystem Fuel;
-	F16EngineManagementSystem EMS(&Atmos, &Fuel, &Engine);
+	F16EngineManagementSystem EMS(&Atmos, &Fuel);
 	F16HydraulicSystem Hydraulics; 
 	F16FlightControls FlightControls(&Atmos);
 	F16LandingGear LandingGear;
 	F16Airframe Airframe;
 	F16Motion Motion(&Atmos);
 	F16ElectricSystem Electrics;
-	F16EnvControlSystem EnvCS;
+	F16EnvControlSystem EnvCS(&Atmos);
 }
 
 // This is where the simulation send the accumulated forces to the DCS Simulation
@@ -233,20 +232,18 @@ void ed_fm_simulate(double dt)
 	F16::Atmos.updateFrame(frametime);
 	F16::Ground.updateFrame(frametime);
 
-	// update thrust
+	// update thrust, engine management
 	F16::EMS.updateFrame(frametime);
-	F16::Engine.updateFrame(frametime);
 
 	// update amount of fuel used and change in mass
-	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);
+	F16::Fuel.updateFrame(F16::EMS.getFuelPerFrame(), frametime);
 	F16::Motion.updateFuelMass(F16::Fuel.getInternalFuel()); // <- update total fuel weight
 
 	// update oxygen provided to pilot: tanks, bleed air from engine etc.
-	F16::EnvCS.updateFrame(F16::Atmos.ambientPressure, F16::Atmos.getAltitudeFeet(), frametime);
+	F16::EnvCS.updateFrame(frametime);
 
-	// use RPM for now 
-	// TODO: switch to torque if/when necessary/available
-	F16::Hydraulics.updateFrame(F16::Engine.getEngineRpm(), frametime);
+	// TODO: engine power to hydraulics
+	F16::Hydraulics.updateFrame(frametime);
 
 	F16::Electrics.updateFrame(frametime);
 	F16::Airframe.updateFrame(frametime);
@@ -285,7 +282,7 @@ void ed_fm_simulate(double dt)
 	F16::Motion.updateAeroForces(F16::Aero.getCyTotal(), F16::Aero.getCxTotal(), F16::Aero.getCzTotal(), 
 								F16::Aero.getClTotal(), F16::Aero.getCmTotal(), F16::Aero.getCnTotal());
 
-	F16::Motion.updateEngineForces(F16::Engine.getThrustN());
+	F16::Motion.updateEngineForces(F16::EMS.Engine.getThrustN());
 	F16::Motion.updateFuelUsageMass(F16::Fuel.getUsageSinceLastFrame(), 0, 0, 0);
 	F16::Fuel.clearUsageSinceLastFrame();
 
@@ -439,7 +436,7 @@ void ed_fm_set_command(int command, float value)
 		break;
 
 	case JoystickThrottle:
-		F16::Engine.setThrottleInputRaw(value);
+		F16::EMS.Engine.setThrottleInputRaw(value);
 		break;
 
 	case ApuStart:
@@ -449,9 +446,6 @@ void ed_fm_set_command(int command, float value)
 		*/
 
 		F16::EMS.JfsStart();
-
-		// just direct start for now..
-		F16::Engine.startEngine();
 		break;
 	case ApuStop:
 		/*
@@ -462,11 +456,11 @@ void ed_fm_set_command(int command, float value)
 		F16::EMS.JfsStop();
 		break;
 
-	case EnginesStart:
-		F16::Engine.startEngine();
+	case EnginesStart: // "quickstart" shortcut
+		F16::EMS.startEngine();
 		break;
-	case EnginesStop:
-		F16::Engine.stopEngine();
+	case EnginesStop: // "quickstop" shortcut
+		F16::EMS.stopEngine();
 		break;
 
 	case PowerOnOff:
@@ -738,8 +732,7 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 
 	drawargs[22].f = (float)F16::Airframe.getRefuelingDoorAngle(); // refueling door (not implemented)
 
-	drawargs[28].f = (float)F16::Engine.getAfterburnerDraw(); // afterburner right engine
-	//drawargs[29].f = (float)F16::Engine.getAfterburnerDraw(); // afterburner left engine
+	drawargs[28].f = (float)F16::EMS.Engine.getAfterburnerDraw(); // afterburner right engine
 
 	drawargs[38].f = (float)F16::Airframe.getCanopyAngle(); // draw angle of canopy {0=closed;0.9=elevated;1=no draw}
 
@@ -866,28 +859,27 @@ double ed_fm_get_param(unsigned param_enum)
 		return F16::EMS.JFS.getFuelFlow();
 
 	case ED_FM_ENGINE_1_RPM:
-		return F16::Engine.getEngineRpm();
+		return F16::EMS.Engine.getEngineRpm();
 	case ED_FM_ENGINE_1_RELATED_RPM:
-		return F16::Engine.getEngineRelatedRpm();
+		return F16::EMS.Engine.getEngineRelatedRpm();
 	case ED_FM_ENGINE_1_THRUST:
-		return F16::Engine.getEngineThrust();
+		return F16::EMS.Engine.getEngineThrust();
 	case ED_FM_ENGINE_1_RELATED_THRUST:
-		return F16::Engine.getEngineRelatedThrust();
+		return F16::EMS.Engine.getEngineRelatedThrust();
 	case ED_FM_ENGINE_1_CORE_RPM:
-		return F16::Engine.getEngineRpm();
+		return F16::EMS.Engine.getEngineRpm();
 	case ED_FM_ENGINE_1_CORE_RELATED_RPM:
-		return F16::Engine.getEngineRelatedRpm();
+		return F16::EMS.Engine.getEngineRelatedRpm();
 	case ED_FM_ENGINE_1_CORE_THRUST:
-		return F16::Engine.getEngineThrust();
+		return F16::EMS.Engine.getEngineThrust();
 	case ED_FM_ENGINE_1_CORE_RELATED_THRUST:
-		return F16::Engine.getEngineRelatedThrust();
-
+		return F16::EMS.Engine.getEngineRelatedThrust();
 	case ED_FM_ENGINE_1_TEMPERATURE:
-		return F16::Engine.getEngineTemperature();
+		return F16::EMS.Engine.getEngineTemperature();
 	case ED_FM_ENGINE_1_OIL_PRESSURE:
-		return F16::Engine.getOilPressure();
+		return F16::EMS.Engine.getOilPressure();
 	case ED_FM_ENGINE_1_FUEL_FLOW:
-		return F16::Engine.getFuelFlow();
+		return F16::EMS.Engine.getFuelFlow();
 	case ED_FM_ENGINE_1_COMBUSTION:
 		// not implemented now
 		return 0;
@@ -977,9 +969,6 @@ void ed_fm_cold_start()
 	// canopy open
 	// electrics off
 	// engine off
-	/*
-	F16::Engine.stopEngine();
-	*/
 
 	// input does not work correctly yet
 	F16::LandingGear.initGearsDown();
@@ -987,7 +976,7 @@ void ed_fm_cold_start()
 	F16::FlightControls.initAirBrakeOff();
 	F16::FlightControls.setIsGearDown(true);
 	F16::Electrics.setElectricsOn(); // <- off
-	F16::Engine.initEngineOff(); // <- stop
+	F16::EMS.initEngineOff(); // <- stop
 
 	if (locateCockpitDll() == true)
 	{
@@ -1010,7 +999,7 @@ void ed_fm_hot_start()
 	F16::FlightControls.initAirBrakeOff();
 	F16::FlightControls.setIsGearDown(true);
 	F16::Electrics.setElectricsOn();
-	F16::Engine.initEngineIdle();
+	F16::EMS.initEngineIdle();
 
 	if (locateCockpitDll() == true)
 	{
@@ -1033,7 +1022,7 @@ void ed_fm_hot_start_in_air()
 	F16::FlightControls.initAirBrakeOff();
 	F16::FlightControls.setIsGearDown(false);
 	F16::Electrics.setElectricsOn();
-	F16::Engine.initEngineCruise();
+	F16::EMS.initEngineCruise();
 
 	if (locateCockpitDll() == true)
 	{
