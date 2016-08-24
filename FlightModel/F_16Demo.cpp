@@ -436,7 +436,7 @@ void ed_fm_set_command(int command, float value)
 		break;
 
 	case JoystickThrottle:
-		F16::EMS.Engine.setThrottleInputRaw(value);
+		F16::EMS.setThrottleInput(value);
 		break;
 
 	case ApuStart:
@@ -810,6 +810,8 @@ void ed_fm_set_fc3_cockpit_draw_args(EdDrawArgument * drawargs,size_t size)
 	// currently you can use this to check joystick vs. in-cockpit movement
 	drawargs[2].f = (float)F16::longStickInputRaw;
 	drawargs[3].f = (float)F16::latStickInputRaw;
+
+	//F16::EMS.getThrottleInput()
 
 }
 

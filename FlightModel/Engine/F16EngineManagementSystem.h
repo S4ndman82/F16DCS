@@ -117,6 +117,32 @@ namespace F16
 			Engine.fuelPerFrame = 0;
 		}
 
+		// MaksRUD	=	0.85, -- Military power state of the throttle
+		// ForsRUD	=	0.91, -- Afterburner state of the throttle
+		void setThrottleInput(double value)
+		{
+			// old code, see if we need changes..
+			double limited = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
+
+			// --------------------------- OLD STUFF
+			// Coded from the simulator study document
+			Engine.throttleInput = limited;
+			if (Engine.throttleInput < 78.0)
+			{
+				Engine.percentPower = Engine.throttleInput * 0.6923;
+			}
+			else
+			{
+				Engine.percentPower = Engine.throttleInput *4.5455 - 354.55;
+			}
+			Engine.percentPower = limit(Engine.percentPower, 0.0, 100.0);
+		}
+		/*
+		double getThrottleInput() const
+		{
+			return Engine.throttleInput;
+		}
+		*/
 
 		double getFuelPerFrame() const
 		{

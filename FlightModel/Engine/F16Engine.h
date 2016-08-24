@@ -273,19 +273,6 @@ namespace F16
 		{
 		}
 
-		// MaksRUD	=	0.85, -- Military power state of the throttle
-		// ForsRUD	=	0.91, -- Afterburner state of the throttle
-		void setThrottleInputRaw(double value)
-		{
-			// old code, see if we need changes..
-			double limited = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
-
-			throttleInput = limited;
-		}
-		double getThrottleInput() const
-		{
-			return throttleInput;
-		}
 
 		double getOilPressure() const
 		{
@@ -586,7 +573,6 @@ namespace F16
 
 
 
-	// Coded from the simulator study document
 	void F16Engine::updateFrame(double frameTime)
 	{
 		// calculate intake airflow/pressure
@@ -621,24 +607,11 @@ namespace F16
 		// must rotate AB fuel pump at sufficient speed
 
 
-		if(throttleInput < 78.0)
-		{
-			percentPower = throttleInput * 0.6923;
-		}
-		else
-		{
-			percentPower = throttleInput *4.5455 - 354.55;
-		}
-		percentPower = limit(percentPower,0.0,100.0);
-
+		// --------------------------- OLD STUFF
+		// Coded from the simulator study document
 		double power1 = percentPower;
 		double power2 = 0.0;
 		double power3rate = 0.0;
-
-		//if(!(F16::simInitialized))
-		//{
-		//	m_power3 = power1;
-		//}
 
 		if(power1 < 50.0)
 		{
