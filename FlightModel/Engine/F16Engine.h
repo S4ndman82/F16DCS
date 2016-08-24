@@ -72,6 +72,15 @@ PW	F100-PW-220E		F-16A/B/C/D		14,670	23,830	-		2.100	-			25.0	-		-		-		2		3		-		
 GE	F110-GE-100			F-16C/D			16,600	28,000	0.745	1.971	264			29.0	2.98	0.87	-		2		3		-		9		1		-		2		-		182.3	46.5	3,920	
 GE	F110-GE-129			F-16C/D			17,000	29,000	-		1.900	270			30.7	-		0.76	-		2		3		-		9		1		-		2		-		181.9	46.5	3,980	
 */
+/*
+A table I read said that the F-16 C expended 415 kg of fuel per minute at mach .5 at sea level,
+310 kg/min at mach .8 at 15,000 feet,
+and was at peak fuel efficiency of 260 kg/min at mach 1.4 at 36,000 feet
+
+//if (afterburner -> 23 gallons per minute?
+
+-> speed, altitude, throttle -> fuel usage?
+*/
 
 namespace F16
 {
@@ -568,129 +577,122 @@ namespace F16
 		}
 
 
-		void updateFrame(double frameTime);
-	};
+		void updateFrame(double frameTime)
+		{
+			// calculate intake airflow/pressure
+			// -> windmilling if engine stopped
+			// -> compressor stall?
 
+			// at subsonic speed, inlet does not matter
+			// at supersonic speeds, inlet must reduce shockwaves
 
+			// start by setting ambient conditions
+			GasData gas(pAtmos->ambientPressure, pAtmos->ambientDensity, pAtmos->ambientTemperature_DegK);
+			GasData bypass(gas); // <- according to bypass ratio, injection back to engine
 
-	void F16Engine::updateFrame(double frameTime)
-	{
-		// calculate intake airflow/pressure
-		// -> windmilling if engine stopped
-		// -> compressor stall?
+			inletStage(gas, frameTime);
+			bypass.volume = gas.volume * engineParams.bypassRatio; // after normal inlet calculated
+			bypass.massflow = gas.massflow * engineParams.bypassRatio;
 
-		// at subsonic speed, inlet does not matter
-		// at supersonic speeds, inlet must reduce shockwaves
+			lpcStage(gas, frameTime);
+			hpcStage(gas, frameTime);
 
-		// start by setting ambient conditions
-		GasData gas(pAtmos->ambientPressure, pAtmos->ambientDensity, pAtmos->ambientTemperature_DegK);
-		GasData bypass(gas); // <- according to bypass ratio, injection back to engine
-
-		inletStage(gas, frameTime);
-		bypass.volume = gas.volume * engineParams.bypassRatio; // after normal inlet calculated
-		bypass.massflow = gas.massflow * engineParams.bypassRatio;
-
-		lpcStage(gas, frameTime);
-		hpcStage(gas, frameTime);
-
-		// TODO: usage by actual engine ?
-		// -> mixture by throttle and air massflow -> determine mixture
-		//
-		fuelPerFrame = 10 * frameTime; //10 kg persecond
+			// TODO: usage by actual engine ?
+			// -> mixture by throttle and air massflow -> determine mixture
+			//
+			fuelPerFrame = 10 * frameTime; //10 kg persecond
 		
-		combustionStage(fuelPerFrame, gas, frameTime);
+			combustionStage(fuelPerFrame, gas, frameTime);
 
-		turbineStage(gas, frameTime);
-		exhaustStage(gas, frameTime);
+			turbineStage(gas, frameTime);
+			exhaustStage(gas, frameTime);
 
-		// calculate bleed air pressure at current engine rpm:
-		// must rotate AB fuel pump at sufficient speed
+			// calculate bleed air pressure at current engine rpm:
+			// must rotate AB fuel pump at sufficient speed
 
 
-		// --------------------------- OLD STUFF
-		// Coded from the simulator study document
-		double power1 = percentPower;
-		double power2 = 0.0;
-		double power3rate = 0.0;
+			updateOldStuff(frameTime);
+		}
 
-		if(power1 < 50.0)
+		void updateOldStuff(double frameTime)
 		{
-			if(m_power3 < 50.0)
+
+			// --------------------------- OLD STUFF
+			// Coded from the simulator study document
+			double power1 = percentPower;
+			double power2 = 0.0;
+			double power3rate = 0.0;
+
+			if(power1 < 50.0)
 			{
-				power2 = power1;
-				if((power2-m_power3) < 40.0)
+				if(m_power3 < 50.0)
 				{
-					power3rate = 1.0 * (power2 - m_power3);
+					power2 = power1;
+					if((power2-m_power3) < 40.0)
+					{
+						power3rate = 1.0 * (power2 - m_power3);
+					}
+					else
+					{
+						power3rate = 0.1 * (power2 - m_power3);
+					}
 				}
 				else
 				{
-					power3rate = 0.1 * (power2 - m_power3);
+					power2 = 40.0;
+					power3rate = 5.0 * (power2 - m_power3);
 				}
 			}
 			else
 			{
-				power2 = 40.0;
-				power3rate = 5.0 * (power2 - m_power3);
-			}
-		}
-		else
-		{
-			if(m_power3 < 50.0)
-			{
-				power2 = 60.0;
-				if((power2-m_power3) < 40.0)
+				if(m_power3 < 50.0)
 				{
-					power3rate = 1.0 * (power2 - m_power3);
+					power2 = 60.0;
+					if((power2-m_power3) < 40.0)
+					{
+						power3rate = 1.0 * (power2 - m_power3);
+					}
+					else
+					{
+						power3rate = 0.1 * (power2 - m_power3);
+					}
 				}
 				else
 				{
-					power3rate = 0.1 * (power2 - m_power3);
+					power2 = power1;
+					power3rate = 5.0 * (power2 - m_power3);
 				}
+			}
+
+			m_power3 += (power3rate * frameTime);
+			m_power3 = limit(m_power3,0.0,100.0);
+
+			double altFeet = pAtmos->getAltitudeFeet();
+
+			//From Simulator Study document (use 0 altitude values for now)
+			//TODO: This should really be a look-up table per the document reference but this is sufficient for now...
+			double mach = pAtmos->getMachSpeed();
+			double altTemp = (altFeet / 55000.0);
+			double altTemp2 = (altFeet/50000.0);
+			double machLimited = limit(mach,0.2,1.0);
+			double Tidle = (-24976.0 * machLimited + 9091.5) + (altTemp * 12000.0);
+			double Tmil = (-25958.0 * pow(machLimited,3.0) + 34336.0 * pow(machLimited,2.0) - 14575.0 * machLimited + 58137.0) + (altTemp2 * -42000.0);
+			double Tmax = (26702.0 * pow(machLimited,2.0) + 8661.4 * machLimited + 92756.0) + (altTemp2 * -100000.0);
+
+			double thrustTmp = 0.0;
+			if(m_power3 < 50.0)
+			{
+				thrustTmp = Tidle + (Tmil-Tidle)*(m_power3/50.0);
 			}
 			else
 			{
-				power2 = power1;
-				power3rate = 5.0 * (power2 - m_power3);
+				thrustTmp = Tmil + (Tmax-Tmil)*(m_power3 - 50.0)/50.0;
 			}
+
+			thrust_N = limit(thrustTmp,0.0,129000.0);
+
 		}
-
-		m_power3 += (power3rate * frameTime);
-		m_power3 = limit(m_power3,0.0,100.0);
-
-		double altFeet = pAtmos->getAltitudeFeet();
-
-		//From Simulator Study document (use 0 altitude values for now)
-		//TODO: This should really be a look-up table per the document reference but this is sufficient for now...
-		double mach = pAtmos->getMachSpeed();
-		double altTemp = (altFeet / 55000.0);
-		double altTemp2 = (altFeet/50000.0);
-		double machLimited = limit(mach,0.2,1.0);
-		double Tidle = (-24976.0 * machLimited + 9091.5) + (altTemp * 12000.0);
-		double Tmil = (-25958.0 * pow(machLimited,3.0) + 34336.0 * pow(machLimited,2.0) - 14575.0 * machLimited + 58137.0) + (altTemp2 * -42000.0);
-		double Tmax = (26702.0 * pow(machLimited,2.0) + 8661.4 * machLimited + 92756.0) + (altTemp2 * -100000.0);
-
-		double thrustTmp = 0.0;
-		if(m_power3 < 50.0)
-		{
-			thrustTmp = Tidle + (Tmil-Tidle)*(m_power3/50.0);
-		}
-		else
-		{
-			thrustTmp = Tmil + (Tmax-Tmil)*(m_power3 - 50.0)/50.0;
-		}
-
-		thrust_N = limit(thrustTmp,0.0,129000.0);
-	}
-
-	/*
-	A table I read said that the F-16 C expended 415 kg of fuel per minute at mach .5 at sea level, 
-	310 kg/min at mach .8 at 15,000 feet, 
-	and was at peak fuel efficiency of 260 kg/min at mach 1.4 at 36,000 feet
-
-	//if (afterburner -> 23 gallons per minute?
-
-	-> speed, altitude, throttle -> fuel usage?
-	*/
+	};
 }
 
 #endif // ifndef _F16ENGINE_H_
