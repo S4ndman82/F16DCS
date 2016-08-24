@@ -63,6 +63,11 @@ namespace F16
 
 		void updateFrame(const double frameTime)
 		{
+			Epu.updateFrame(frameTime);
+			JFS.updateFrame(frameTime);
+
+			//pFuel->updateFrame(frameTime);
+			//pEngine->updateFrame(frameTime);
 		}
 
 	};

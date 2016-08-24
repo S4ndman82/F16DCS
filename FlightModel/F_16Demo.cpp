@@ -234,7 +234,8 @@ void ed_fm_simulate(double dt)
 	F16::Ground.updateFrame(frametime);
 
 	// update thrust
-	F16::Engine.updateFrame(F16::Atmos.getAltitudeFeet(), frametime);
+	F16::EMS.updateFrame(frametime);
+	F16::Engine.updateFrame(frametime);
 
 	// update amount of fuel used and change in mass
 	F16::Fuel.updateFrame(F16::Engine.getFuelPerFrame(), frametime);

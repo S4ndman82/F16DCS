@@ -611,8 +611,6 @@ namespace F16
 			// throttle setting, airspeed (windmilling effect)
 		}
 
-		void updateFrame(double alt, double frameTime);
-
 		float getAfterburnerDraw() const
 		{
 			return (float)afterburnerDraw;
@@ -626,12 +624,13 @@ namespace F16
 			return 0;
 		}
 
+		void updateFrame(double frameTime);
 	};
 
 
 
 	// Coded from the simulator study document
-	void F16Engine::updateFrame(double alt, double frameTime)
+	void F16Engine::updateFrame(double frameTime)
 	{
 		// calculate intake airflow/pressure
 		// -> windmilling if engine stopped
@@ -758,11 +757,13 @@ namespace F16
 		m_power3 += (power3rate * frameTime);
 		m_power3 = limit(m_power3,0.0,100.0);
 
+		double altFeet = pAtmos->getAltitudeFeet();
+
 		//From Simulator Study document (use 0 altitude values for now)
 		//TODO: This should really be a look-up table per the document reference but this is sufficient for now...
 		double mach = pAtmos->getMachSpeed();
-		double altTemp = (alt / 55000.0);
-		double altTemp2 = (alt/50000.0);
+		double altTemp = (altFeet / 55000.0);
+		double altTemp2 = (altFeet/50000.0);
 		double machLimited = limit(mach,0.2,1.0);
 		double Tidle = (-24976.0 * machLimited + 9091.5) + (altTemp * 12000.0);
 		double Tmil = (-25958.0 * pow(machLimited,3.0) + 34336.0 * pow(machLimited,2.0) - 14575.0 * machLimited + 58137.0) + (altTemp2 * -42000.0);
