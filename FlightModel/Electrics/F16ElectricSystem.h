@@ -3,7 +3,10 @@
 
 #include "../stdafx.h"
 
-#include "F16ElectricBus.h"
+#include "Electrics/F16AcDcConverter.h"
+#include "Electrics/F16Battery.h"
+#include "Electrics/F16ElectricBus.h"
+#include "Electrics/F16MainGenerator.h"
 
 namespace F16
 {

@@ -13,6 +13,8 @@
 
 #include "Engine/F16JFS.h"						//APU
 #include "Engine/F16EPU.h"						//Emergency Power Unit (electric&hydraulic power)
+#include "Engine/F16BleedAirSystem.h"
+#include "Engine/F16Gearbox.h"
 
 namespace F16
 {
