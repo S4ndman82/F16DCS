@@ -18,7 +18,16 @@ namespace F16
 	{
 	public:
 		//double pressure;
+		//double compressibility;
 		//double heat_release;
+
+		// fuel/air mixture ignition limits:
+		// amount air required for fuel to burn (lean/rich)
+		//
+		//double minIgnition;
+		//double maxIgnition;
+		//double flamepoint; // heatpoint for automatic ignition?
+
 		double weight; // weight in kg/l
 
 		FuelData() 
@@ -74,6 +83,8 @@ namespace F16
 
 		double volume; // capacity of tank
 		double fuel; // amount of fuel in tank
+
+		//double pressurization; // how pressure tank causes for fuel?
 
 		Vec3 position;
 		Vec3 size; // bounding box

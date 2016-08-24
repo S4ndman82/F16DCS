@@ -97,8 +97,7 @@
 #include "Hydraulics/F16HydraulicSystem.h"
 #include "FlightControls/F16FlightControls.h"	//Flight Controls model functions
 
-#include "Engine/F16EPU.h"						//Emergency Power Unit (electric&hydraulic power)
-#include "Engine/F16JFS.h"						//APU
+#include "Engine/F16EngineManagementSystem.h"
 #include "Engine/F16Engine.h"					//Engine model functions
 #include "Engine/F16FuelSystem.h"				//Fuel usage and tank usage functions
 
@@ -135,20 +134,16 @@ namespace F16
 	F16Atmosphere Atmos;
 	F16GroundSurface Ground(&Atmos);
 	F16Aero Aero;
-	F16JFS JFS;
-	F16EPU Epu;
 	F16Engine Engine(&Atmos);
+	F16FuelSystem Fuel;
+	F16EngineManagementSystem EMS(&Atmos, &Fuel, &Engine);
 	F16HydraulicSystem Hydraulics; 
 	F16FlightControls FlightControls(&Atmos);
-	F16FuelSystem Fuel;
 	F16LandingGear LandingGear;
 	F16Airframe Airframe;
 	F16Motion Motion(&Atmos);
 	F16ElectricSystem Electrics;
 	F16EnvControlSystem EnvCS;
-
-	//F16BleedAirSystem BleedAir;
-	//BleedAir.pEpu = &Epu;
 }
 
 // This is where the simulation send the accumulated forces to the DCS Simulation
@@ -452,7 +447,7 @@ void ed_fm_set_command(int command, float value)
 		::OutputDebugString(dbgmsg);
 		*/
 
-		F16::JFS.start();
+		F16::EMS.JfsStart();
 
 		// just direct start for now..
 		F16::Engine.startEngine();
@@ -463,7 +458,7 @@ void ed_fm_set_command(int command, float value)
 		::OutputDebugString(dbgmsg);
 		*/
 
-		F16::JFS.stop();
+		F16::EMS.JfsStop();
 		break;
 
 	case EnginesStart:
@@ -851,9 +846,9 @@ double ed_fm_get_param(unsigned param_enum)
 	{
 		// APU parameters at engine index 0
 	case ED_FM_ENGINE_0_RPM:
-		return F16::JFS.getRpm();
+		return F16::EMS.JFS.getRpm();
 	case ED_FM_ENGINE_0_RELATED_RPM:
-		return F16::JFS.getRelatedRpm();
+		return F16::EMS.JFS.getRelatedRpm();
 	case ED_FM_ENGINE_0_CORE_RPM:
 	case ED_FM_ENGINE_0_CORE_RELATED_RPM:
 	case ED_FM_ENGINE_0_THRUST:
@@ -863,11 +858,11 @@ double ed_fm_get_param(unsigned param_enum)
 		// not implemented now
 		return 0;
 	case ED_FM_ENGINE_0_TEMPERATURE:
-		return F16::JFS.getTemperature();
+		return F16::EMS.JFS.getTemperature();
 	case ED_FM_ENGINE_0_OIL_PRESSURE:
-		return F16::JFS.getOilPressure();
+		return F16::EMS.JFS.getOilPressure();
 	case ED_FM_ENGINE_0_FUEL_FLOW:
-		return F16::JFS.getFuelFlow();
+		return F16::EMS.JFS.getFuelFlow();
 
 	case ED_FM_ENGINE_1_RPM:
 		return F16::Engine.getEngineRpm();
