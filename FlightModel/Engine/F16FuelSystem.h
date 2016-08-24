@@ -8,14 +8,27 @@
 
 namespace F16
 {
-	/* // properties of fuel (ignition point, energy released, weight)
+	/*
+	average_fuel_consumption 	= 0.245, -- this is highly relative, but good estimates are 36-40l/min = 28-31kg/min = 0.47-0.52kg/s -- 45l/min = 35kg/min = 0.583kg/s
+	~0,775 kg/l?
+	*/
+
+	/* // properties of fuel (ignition point, energy released, weight) */
 	class FuelData
 	{
 	public:
-		double pressure;
-		double heat_release;
+		//double pressure;
+		//double heat_release;
+		double weight; // weight in kg/l
+
+		FuelData() 
+			: weight(0.775) // kg/l
+		{}
+		~FuelData() {}
+
+
 	};
-	*/
+	/**/
 
 	// we need fuel usage curve for the used engine here
 	// also calculation for the mass of the fuel and position of it
@@ -136,6 +149,8 @@ namespace F16
 		// - crossfeed
 		// - booster pumps
 
+		FuelData fuel;
+
 	public:
 		// TODO: check units !! (pounds)
 		// 0.45359237 (1/2.2046)
@@ -151,6 +166,7 @@ namespace F16
 			, ext_Center(1800 * lb_to_kg)
 			, ext_LWing(2300 * lb_to_kg)
 			, ext_RWing(2300 * lb_to_kg)
+			, fuel()
 		{}
 		~F16FuelSystem() {}
 
@@ -160,8 +176,13 @@ namespace F16
 		double getFuelMass()
 		{
 			// JP8 weight 6.65lbs/gal ?
+			// -> ~0,775 kg/l?
 			//return getInternalFuel() * weightconstant;
-			return 0;
+			//fuel.weight * getInternalFuel();
+
+			// since we are calculating fuel in weight instead of volume
+			// -> return total mass
+			return getInternalFuel();
 		}
 		*/
 

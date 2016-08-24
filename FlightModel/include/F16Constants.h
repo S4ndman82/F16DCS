@@ -43,6 +43,8 @@ namespace F16
 	const double		weight_empty_kg			= 9207.9;
 	const double		internal_fuel_kg		= 2685.2;
 
+	const double		gallon_to_litre			= 3.7854118;
+
 	////////////////////
 	// some additional stuff that should be used as functions perhaps (see if we need them)
 	// VS2013 does not yet support constexpr though, need upgrade to 2015.. :(
