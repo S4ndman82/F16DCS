@@ -497,6 +497,10 @@ namespace F16
 		// combustion stage
 		double combustionStage(double fuel, GasData &gas, double frameTime)
 		{
+			// core temperature for self-ignition?
+			// -> need to have external ignition support if too cold
+			// -> windmilling (airstart) cooling engine?
+
 			// TODO:
 			//if (isBlowout() == true)
 

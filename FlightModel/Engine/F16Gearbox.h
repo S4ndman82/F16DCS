@@ -37,6 +37,7 @@ namespace F16
 			// APU (JFS) torque -> to engine for starting
 			// without APU, engine -> auxiliary systems
 			// airstart when engine rotating? (disconnect aux systems?)
+			// reduction in rpm when windmilling -> limiting on airstart?
 
 			/*
 			if (engineTorque > threshold)
