@@ -8,6 +8,15 @@
 
 namespace F16
 {
+	/* // properties of fuel (ignition point, energy released, weight)
+	class FuelData
+	{
+	public:
+		double pressure;
+		double heat_release;
+	};
+	*/
+
 	// we need fuel usage curve for the used engine here
 	// also calculation for the mass of the fuel and position of it
 

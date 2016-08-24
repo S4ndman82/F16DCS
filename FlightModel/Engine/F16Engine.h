@@ -75,16 +75,6 @@ GE	F110-GE-129			F-16C/D			17,000	29,000	-		1.900	270			30.7	-		0.76	-		2		3		-	
 
 namespace F16
 {
-	/*
-	class FuelData
-	{
-	public:
-		double pressure;
-		double heat_release;
-	};
-	*/
-
-
 	// air data as it passes through engine:
 	// air is compressed, fuel added and ignited, various parameters affect burning
 	// and air parameters change when passing through engine
