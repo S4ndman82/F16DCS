@@ -732,7 +732,11 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 
 	drawargs[22].f = (float)F16::Airframe.getRefuelingDoorAngle(); // refueling door (not implemented)
 
-	drawargs[28].f = (float)F16::EMS.Engine.getAfterburnerDraw(); // afterburner right engine
+	drawargs[28].f = (float)F16::EMS.getAfterburnerDraw(); // afterburner right engine
+	//drawargs[290..291].f // nozzle rotation?
+	//drawargs[290].f = (float)F16::EMS.getNozzlePos(); // nozzle rotation?
+	//drawargs[291].f = (float)F16::EMS.getNozzlePos(); // nozzle rotation?
+
 
 	drawargs[38].f = (float)F16::Airframe.getCanopyAngle(); // draw angle of canopy {0=closed;0.9=elevated;1=no draw}
 

@@ -133,6 +133,20 @@ namespace F16
 			Engine.updateFrame(frameTime);
 		}
 
+
+		float getAfterburnerDraw() const
+		{
+			return (float)Engine.afterburnerDraw;
+		}
+
+		// TODO: we'll need to control nozzle position:
+		// for example, landing gear out -> open nozzle more 
+		// to reduce possibility of power loss
+		float getNozzlePos() const
+		{
+			return (float)Engine.afterburnerDraw;
+		}
+
 	};
 }
 

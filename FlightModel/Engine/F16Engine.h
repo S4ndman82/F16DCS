@@ -543,6 +543,25 @@ namespace F16
 			// nozzle control (CENC)
 
 			// exhaust -> thrust, AB
+
+			// TODO: afterburner effect on thrust and fuel usage
+			// condition check: is AB fuel pump running?
+			// exhaust flow -> additional fuel amount?
+			if (inhibitAbIgnition == true)
+			{
+				// nozzle should be fully open?
+				// no afterburner
+				afterburnerDraw = 0;
+
+			}
+			else
+			{
+				// TODO: determine AB effect on thrust and fuel usage,
+				// 
+				afterburnerDraw = (throttleInput - 80.0) / 20.0;
+				afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
+			}
+
 			return 0;
 		}
 
@@ -561,18 +580,6 @@ namespace F16
 			// throttle setting, airspeed (windmilling effect)
 		}
 
-		float getAfterburnerDraw() const
-		{
-			return (float)afterburnerDraw;
-		}
-
-		// TODO: we'll need to control nozzle position:
-		// for example, landing gear out -> open nozzle more 
-		// to reduce possibility of power loss
-		float getNozzlePos() const
-		{
-			return 0;
-		}
 
 		void updateFrame(double frameTime);
 	};
@@ -610,39 +617,9 @@ namespace F16
 		turbineStage(gas, frameTime);
 		exhaustStage(gas, frameTime);
 
-		/*
-
-		pressure = lpcStage(dynpressure, inletvelocity, frameTime);
-		pressure = hpcStage(pressure, frameTime);
-
-
-		double fuel = (throttleInput -> fuel mixture setting)
-		pressure = combustionStage(fuel, pressure, frameTime);
-
-		pressure = turbineStage(pressure, frameTime);
-		pressure = exhaustStage(pressure, frameTime);
-		*/
-
-
 		// calculate bleed air pressure at current engine rpm:
 		// must rotate AB fuel pump at sufficient speed
 
-		afterburnerDraw = (throttleInput - 80.0) / 20.0;
-		afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
-		/*
-		if (inhibitAbIgnition == false)
-		{
-			afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
-		}
-		else
-		{
-			// TODO: same argument controls nozzle position.. 
-			// AB ignition inhibited -> no draw
-
-			// limit nozzle to under AB ignition?
-			afterburnerDraw = limit(afterburnerDraw, 0.0, .8); // just draw argument
-		}
-		*/
 
 		if(throttleInput < 78.0)
 		{
