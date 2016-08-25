@@ -449,7 +449,7 @@ namespace F16
 			// -> just for one engine now..
 			// TODO: replace with correct ratios after testing,
 			// ratios should be relative to previous stage?
-			double stages[] = { 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01, 1.01 };
+			double stages[] = { 1.01, 1.02, ... };
 
 			// multiply pressure by each compression stage
 			//double press = gas.pressure;

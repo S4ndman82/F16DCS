@@ -27,6 +27,7 @@ namespace F16
 		//double minIgnition;
 		//double maxIgnition;
 		//double flamepoint; // heatpoint for automatic ignition?
+		//double freezepoint; // point where fuel freezes
 
 		double weight; // weight in kg/l
 
