@@ -3,6 +3,9 @@
 
 #include "../stdafx.h"
 
+#include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
+#include "include/F16Constants.h"		// Common constants used throughout this DLL
+
 // for actuator code
 #include "FlightControls/F16FlightControls.h"
 
@@ -19,16 +22,64 @@ namespace F16
 	// - accumulated over-g stress?
 
 
+	// simple helper for different lights and sequences of blinking:
+	// set length of sequence (amount of states), time for each state (in seconds)
+	// and set sequence that is desired, for example: 0, 1, 0, 0, 1, 1 (start to end)
 	class F16LightBlinker
 	{
+	protected:
+		int index = 0;
+		double elapsed = 0;
+
 	public:
-		//float sequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-		float blinkrate = 1.0f; // 
+		int sequenceCount = 0;
+		float *pSequence; // ex. { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+		double blinkRate = 1.0f; // in seconds
+		bool isEnabled = false; // if blinker is active
 
-		float current = 0;
+		F16LightBlinker(const int seqCount, const double blinker) 
+			: sequenceCount(seqCount)
+			, pSequence(nullptr)
+			, blinkRate(blinker)
+		{
+			pSequence = new float[seqCount];
+			::memset(pSequence, 0, sizeof(float)*seqCount);
+		}
+		~F16LightBlinker() 
+		{
+			if (pSequence != nullptr)
+			{
+				delete pSequence;
+				pSequence = nullptr;
+			}
+		}
 
-		F16LightBlinker() {}
-		~F16LightBlinker() {}
+		float getCurrent() const
+		{
+			return pSequence[index];
+		}
+
+		void updateFrame(const double frameTime)
+		{
+			if (isEnabled == false)
+			{
+				return;
+			}
+
+			elapsed += frameTime;
+			if (elapsed < blinkRate)
+			{
+				return;
+			}
+			index++;
+			if (index >= sequenceCount)
+			{
+				// back to start
+				index = 0;
+			}
+			// until next step
+			elapsed = 0;
+		}
 	};
 
 	class F16Airframe
@@ -36,9 +87,12 @@ namespace F16
 	protected:
 		//Canopy status/angle {0=closed;0.9=elevated;1=no draw}
 		F16Actuator actCanopy;
+		F16Actuator actRefuelingDoor; // trapdoor in the back
 
 		bool canopySwitchDown; // up/down
 		bool canopyGone; // simplify some code
+
+		bool refuelingDoorOpen; // open/close switch
 
 
 		// TODO: support for each lamp in lights?
@@ -66,8 +120,10 @@ namespace F16
 	public:
 		F16Airframe()
 			: actCanopy(0.5, 0, 0.9)
+			, actRefuelingDoor(0.5, 0, 1)
 			, canopySwitchDown(false)
 			, canopyGone(false)
+			, refuelingDoorOpen(false)
 			, leftWingLamp(0)
 			, rightWingLamp(0)
 			, backTailLamp(0)
@@ -141,11 +197,16 @@ namespace F16
 		{
 		}
 
+		void toggleRefuelingDoor()
+		{
+			refuelingDoorOpen = !refuelingDoorOpen;
+		}
+
 		// animation support for refueling door at the back
 		float getRefuelingDoorAngle() const
 		{
-			// not yet implemented
-			return 0;
+			// not yet implemented in 3D mesh
+			return (float)actRefuelingDoor.m_current;
 		}
 
 		float isNavigationLight() const
@@ -238,6 +299,18 @@ namespace F16
 				}
 				actCanopy.updateFrame(frameTime);
 			}
+
+			if (refuelingDoorOpen == true)
+			{
+				actRefuelingDoor.m_commanded = 1;
+			}
+			else
+			{
+				actRefuelingDoor.m_commanded = 0;
+			}
+
+			// TODO: refueling door support
+			actRefuelingDoor.updateFrame(frameTime);
 
 			// aero drag in case canopy is gone
 			updateCanopyDrag(frameTime);
