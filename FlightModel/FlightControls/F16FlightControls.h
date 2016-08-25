@@ -40,6 +40,9 @@ namespace F16
 		// This is "idealized" mathematical model more than actual
 		// representation. Hence things like movement geometry is missing.
 		// No calculation for the required force, either.
+		// -> add torque
+		// -> add servo
+		// -> add sensor and delay (lag)
 
 		double m_moveRate; // "slowness"
 		double m_commanded; // target movement
