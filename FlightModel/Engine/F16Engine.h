@@ -77,7 +77,7 @@ A table I read said that the F-16 C expended 415 kg of fuel per minute at mach .
 310 kg/min at mach .8 at 15,000 feet,
 and was at peak fuel efficiency of 260 kg/min at mach 1.4 at 36,000 feet
 
-//if (afterburner -> 23 gallons per minute?
+//if (afterburner -> 23 gallons per minute? ~87,0644714l/min -> 1,45107452.. l/s
 
 -> speed, altitude, throttle -> fuel usage?
 */

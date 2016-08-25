@@ -232,6 +232,14 @@ namespace F16
 		AnalogInput		pedInput;		// Pedal input command normalized (-1 to 1)
 
 		F16Actuator		rudderActuator;
+		/*
+		F16Actuator		elevatorActuatorLeft;
+		F16Actuator		elevatorActuatorRight;
+		F16Actuator		flaperonActuatorLeft;
+		F16Actuator		flaperonActuatorRight;
+		F16Actuator		leadingedgeActuatorLeft;
+		F16Actuator		leadingedgeActuatorRight;
+		*/
 
 		// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 		bool manualPitchOverride;
