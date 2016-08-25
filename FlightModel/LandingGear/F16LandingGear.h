@@ -33,6 +33,10 @@ namespace F16
 		//double gearDownAngle;	// Is the gear currently down? (If not, what angle is it?)
 		//bool gearDownLocked; // gear down and locked?
 
+		// alteranate pneumatic emergency system to force LG down?
+		// -> single-use thing only
+		//bool altLandingGearSwitch;
+
 	public:
 
 		bool nosewheelSteering; // is active/not

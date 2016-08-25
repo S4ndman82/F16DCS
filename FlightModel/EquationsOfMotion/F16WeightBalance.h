@@ -2,7 +2,8 @@
 	weight balance calculations, determine center of gravity
 
 sources:
-- 68548, Model of F-16 Fighter Aircraft - Equation of Motions - Ying Huo
+- 68548, Model of F-16 Fighter Aircraft - Equation of Motions
+
 */
 
 #ifndef _F16WEIGHTBALANCE_H_

@@ -21,15 +21,17 @@ namespace F16
 	const double		length_m				= 15.03;
 	const double		height_m				= 5.09;
 
-	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft)
-	const double		meanChord_m				= 3.450336;		// mean aerodynamic chord (m)
+	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft) // 10.94 in one source?
+	const double		meanChord_m				= 3.450336;		// mean aerodynamic chord (m) // 3.335 in one source?
 
 	const double		airbrakeArea_FT2		= 14.26;
 	const double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord
 	const double		actualCG_PCT			= 0.30;			// Actual CG as a % of wing chord
-	const double		inertia_Ix_KGM2			= 12874.0;		// Reference moment of inertia (kg/m^2)
-	const double		inertia_Iy_KGM2			= 75673.6;		// Reference moment of inertia (kg/m^2)
-	const double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2)
+
+	const double		inertia_Ix_KGM2			= 12874.0;		// Reference moment of inertia (kg/m^2) // 12662 in one source?
+	const double		inertia_Iy_KGM2			= 75673.6;		// Reference moment of inertia (kg/m^2) // 53147 in one source?
+	const double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2) // 63035 in one source?
+	const double		inertia_Ixz_KGM2		= 179.0;		// Reference moment of inertia (kg/m^2) 
 
 	const double		meterToFoot				= 3.28084;		// Meter to foot conversion factor
 	const double		feetToMeter				= 0.3048;		// multiplier, ft to m

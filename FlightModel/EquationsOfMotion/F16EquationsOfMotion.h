@@ -2,7 +2,7 @@
 	physics integrator
 
 sources:
-- 68548, Model of F-16 Fighter Aircraft - Equation of Motions - Ying Huo
+- 68548, Model of F-16 Fighter Aircraft - Equation of Motions
 
 */
 
