@@ -529,7 +529,7 @@ namespace F16
 			// 
 			// anyway, combustion:
 			// -> calculate exhaust volume, thrust, temperature etc.
-			double fuelToBurn = (gas.massflow * throttleInput) * Fuel.weight;
+			double fuelToBurn = (gas.massflow * percentPower) * Fuel.weight;
 
 			return fuelToBurn;
 		}
