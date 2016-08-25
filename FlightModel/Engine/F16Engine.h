@@ -150,7 +150,7 @@ namespace F16
 	{
 		ET_F110GE100,	// F110-GE-100 // F-16 C/D
 		ET_F110GE129,	// F110-GE-129 // F-16 C/D
-		ET_F100PW200,	// F100-PW-200 // F-16A/B
+		ET_F100PW200,	// F100-PW-200 // F-16A/B // worst of the bunch
 		ET_F100PW220,	// F100-PW-220 // F-16A/B/C/D
 		ET_F100PW220E,	// F100-PW-220E // F-16A/B/C/D
 		ET_F100PW229,	// F100-PW-229 // F-16 C/D
@@ -182,7 +182,7 @@ namespace F16
 			{
 				bypassRatio = 0.76;
 			}
-			else
+			else if (engineType == ET_F100PW200)
 			{
 				bypassRatio = 0.36; //
 			}

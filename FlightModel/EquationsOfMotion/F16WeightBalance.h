@@ -1,5 +1,8 @@
 /*
 	weight balance calculations, determine center of gravity
+
+sources:
+- 68548, Model of F-16 Fighter Aircraft - Equation of Motions - Ying Huo
 */
 
 #ifndef _F16WEIGHTBALANCE_H_
@@ -24,6 +27,7 @@ namespace F16
 		Vec3 balanced_center_of_gravity;
 		//double total_mass_kg; // new "wet" mass with balance
 
+		// reference location (0.35)
 		Vec3 original_cog;
 
 		// dry mass used with original cog
