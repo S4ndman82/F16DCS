@@ -429,6 +429,8 @@ namespace F16
 			}
 			*/
 
+			// TODO: windmilling effect when engine is not running
+
 			// note: some rotors here have variable vanes here so compression could change..
 			// depends on fuel control mode, throttle position and fuel pressure from AB pump
 
@@ -462,7 +464,7 @@ namespace F16
 		}
 
 		// combustion stage
-		double combustionStage(FuelData &Fuel, GasData &gas, double frameTime)
+		double combustionStage(FuelData &Fuel, GasData &gas, double &thrustN, double frameTime)
 		{
 			// core temperature for self-ignition?
 			// -> need to have external ignition support if too cold
@@ -487,15 +489,17 @@ namespace F16
 			// engine management and throttle should determine mixture,
 			// amount of air determine how much fuel is required for the mixture? (or sensors elsewhere?)
 			// 
-			// anyway, combustion:
+			// anyway, combustion, TODO:
 			// -> calculate exhaust volume, thrust, temperature etc.
 			double fuelToBurn = (gas.massflow * percentPower) * Fuel.weight;
+
+			//thrustN = ??
 
 			return fuelToBurn;
 		}
 
 		// both hpt and lpt stages as one
-		double turbineStage(GasData &gas, double frameTime)
+		double turbineStage(GasData &gas, double &thrustN, double frameTime)
 		{
 			// exhaust gas temperature: after hpt, before lpt
 
@@ -513,10 +517,12 @@ namespace F16
 			// and turbine parameters
 			// should give use the rotation speed for engine?
 
+			// reduction in usable thrust?
+
 			return 0;
 		}
 
-		double exhaustStage(FuelData &Fuel, GasData &gas, double frameTime)
+		double exhaustStage(FuelData &Fuel, GasData &gas, double &thrustN, double frameTime)
 		{
 			// bypass air injection?
 
@@ -542,6 +548,11 @@ namespace F16
 
 			// TODO: calculate additional fuel usage when afterburner is used
 			//Fuel.weight * 
+
+			// AB increase of thrust:
+			// 41 - 53 kN (PW - GE)
+			// without further details, just add:
+			//thrustN += 41;
 
 			return 0;
 		}
@@ -592,20 +603,24 @@ namespace F16
 			// temporary, should be given by engine management system
 			FuelData fuel;
 
+			// temp, check what to use on the methods/members properly
+			double thrustN = 0;
+
+
 			// TODO: determine how we get parameter for mixture and amount of fuel to use,
 			// airmass sensors? throttle input and mixture calculation?
 			//
 			// something like this to get actual amount of fuel used?
 			// -> engine management system should give mixture ratio
 			// according to throttle input?
-			fuelPerFrame = combustionStage(fuel, gas, frameTime);
+			fuelPerFrame = combustionStage(fuel, gas, thrustN, frameTime);
 
 			// calculate turbine effect
 			// for compressor running
-			turbineStage(gas, frameTime);
+			turbineStage(gas, thrustN, frameTime);
 
 			// additional fuel usage by afterburner (when ignited)
-			fuelPerFrame += exhaustStage(fuel, gas, frameTime);
+			fuelPerFrame += exhaustStage(fuel, gas, thrustN, frameTime);
 
 			// calculate bleed air pressure at current engine rpm:
 			// must rotate AB fuel pump at sufficient speed
