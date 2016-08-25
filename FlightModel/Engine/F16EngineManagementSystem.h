@@ -220,6 +220,13 @@ namespace F16
 			return (float)Engine.afterburnerDraw;
 		}
 
+		// return gyroscopic effect of engine for motions,
+		// use angular momentum directly now
+		double getGyroscopicEffect() const
+		{
+			return Engine.engineParams.angular_momentum;
+		}
+
 	};
 }
 
