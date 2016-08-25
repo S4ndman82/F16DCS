@@ -6,7 +6,7 @@ Sources of data:
 - NASA TP 1538
 - F16S04
 - a202599
-- 88218main_H-1679 (NASA contractor report)
+- NASA CR-179447 (NASA contractor report)
 - 20030093721 development of turbofan engine simulation
 - 19990064011 FLIGHT RESEARCH USING F100 ENGINE P680063 IN THE NASA F-15 AIRPLANE
 - NASA_NTRS_Archive_19860015875 NASA LEWIS FlOO ENGINE TESTING 
@@ -196,6 +196,8 @@ namespace F16
 	protected:
 		double m_power3;
 
+		// TODO: stress and cycle counting for malfunctions, need of repairs etc.
+
 	public:
 		double	m_thrust_N; // Engine thrust (N)
 		double	throttleInput;	// Throttle input command normalized (-1 to 1)
@@ -329,7 +331,7 @@ namespace F16
 		{
 			// output pressure 
 			// as a simple function of engine RPM?
-			// (seventh-stage)
+			// (seventh-stage), WBI
 			// -> fan duct, inlet anti-icing
 			return 0;
 		}
