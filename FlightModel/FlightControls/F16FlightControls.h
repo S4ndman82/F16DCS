@@ -160,11 +160,11 @@ namespace F16
 
 		double getAccZPerG() const
 		{
-			return accz / 9.81;
+			return accz / standard_gravity;
 		}
 		double getAccYPerG() const
 		{
-			return accy / 9.81;
+			return accy / standard_gravity;
 		}
 	};
 

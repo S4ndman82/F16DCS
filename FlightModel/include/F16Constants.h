@@ -35,7 +35,7 @@ namespace F16
 	const double		feetToMeter				= 0.3048;		// multiplier, ft to m
 	const double		inchesToCentim			= 2.54;			// multiplier, in to cm
 
-	const double		kg_to_newtons			= 9.80665002864;
+	//const double		kg_to_newtons			= 9.80665002864;
 	const double		Nm_sq_to_lbft_sq		= 0.020885434273; // (N/m^2) to (lb/ft^2);
 
 	const double		lb_to_kg				= 0.45359237; // multiplier, lb to kg
@@ -44,6 +44,8 @@ namespace F16
 	const double		internal_fuel_kg		= 2685.2;
 
 	const double		gallon_to_litre			= 3.7854118;
+
+	const double		standard_gravity		= 9.80665; // "average", m/s^2
 
 	////////////////////
 	// some additional stuff that should be used as functions perhaps (see if we need them)

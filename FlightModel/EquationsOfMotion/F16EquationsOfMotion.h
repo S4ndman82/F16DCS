@@ -368,13 +368,13 @@ namespace F16
 		// "dry" weight
 		double getWeightN() const
 		{
-			return mass_kg * kg_to_newtons;
+			return mass_kg * standard_gravity;
 		}
 
 		// including fuel
 		double getTotalWeightN() const
 		{
-			return total_mass_kg * kg_to_newtons;
+			return total_mass_kg * standard_gravity;
 		}
 	};
 }
