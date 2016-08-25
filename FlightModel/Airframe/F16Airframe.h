@@ -331,6 +331,8 @@ namespace F16
 			// pilot and seat gone
 			ejectingSeat = false;
 			canopyGone = true;
+			actCanopy.m_current = 1.0;
+			actCanopy.m_isWorking = false;
 		}
 
 		void onAirframeDamage(int Element, double element_integrity_factor)

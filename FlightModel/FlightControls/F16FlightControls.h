@@ -40,23 +40,30 @@ namespace F16
 		double m_maxLimit;
 		bool m_haveLimits;
 
+		bool m_isWorking;
+
 	public:
 		F16Actuator() 
 			: m_moveRate(1.0), m_commanded(0), m_current(0),
-			m_minLimit(0), m_maxLimit(0), m_haveLimits(false)
+			m_minLimit(0), m_maxLimit(0), m_haveLimits(false), m_isWorking(true)
 		{}
 		F16Actuator(const double moverate)
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
-			m_minLimit(0), m_maxLimit(0), m_haveLimits(false)
+			m_minLimit(0), m_maxLimit(0), m_haveLimits(false), m_isWorking(true)
 		{}
 		F16Actuator(const double moverate, const double minLimit, const double maxLimit)
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
-			m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true)
+			m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true), m_isWorking(true)
 		{}
 		~F16Actuator() {}
 
 		void updateFrame(const double frameTime)
 		{
+			if (m_isWorking == false)
+			{
+				return;
+			}
+
 			double movementPerFrame = m_moveRate*frameTime;
 			double diff = m_commanded - m_current;
 
