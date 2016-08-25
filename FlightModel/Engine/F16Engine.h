@@ -193,11 +193,11 @@ namespace F16
 		double	m_thrust_N; // Engine thrust (N)
 		double	throttleInput;	// Throttle input command normalized (-1 to 1)
 
-		double percentPower;
+		double m_percentPower;
 		double afterburnerDraw; // just draw argument
 
 		// amount of fuel used in this engine setting in current flight conditions (temperature, airspeed..)
-		double fuelPerFrame;
+		double m_fuelPerFrame;
 
 		// fuel flow: LEAN - RICH
 		// -> 100pph increase?
@@ -248,9 +248,9 @@ namespace F16
 			: m_power3(0)
 			, m_thrust_N(0)
 			, throttleInput(0)
-			, percentPower(0)
+			, m_percentPower(0)
 			, afterburnerDraw(0)
-			, fuelPerFrame(0)
+			, m_fuelPerFrame(0)
 			, oilPressure(100)
 			, oilPressureWarning(false)
 			, engineTemperature(900)
@@ -297,7 +297,7 @@ namespace F16
 		}
 		double getFuelFlow() const
 		{
-			return fuelPerFrame;
+			return m_fuelPerFrame;
 		}
 
 		// torque from engine can be used
@@ -338,7 +338,7 @@ namespace F16
 		// fuel use per frame in current conditions
 		double getFuelPerFrame() const
 		{
-			return fuelPerFrame;
+			return m_fuelPerFrame;
 		}
 		double getThrustN() const
 		{
@@ -491,7 +491,7 @@ namespace F16
 			// 
 			// anyway, combustion, TODO:
 			// -> calculate exhaust volume, thrust, temperature etc.
-			double fuelToBurn = (gas.massflow * percentPower) * Fuel.weight;
+			double fuelToBurn = (gas.massflow * m_percentPower) * Fuel.weight;
 
 			//thrustN = ??
 
@@ -613,14 +613,14 @@ namespace F16
 			// something like this to get actual amount of fuel used?
 			// -> engine management system should give mixture ratio
 			// according to throttle input?
-			fuelPerFrame = combustionStage(fuel, gas, thrustN, frameTime);
+			m_fuelPerFrame = combustionStage(fuel, gas, thrustN, frameTime);
 
 			// calculate turbine effect
 			// for compressor running
 			turbineStage(gas, thrustN, frameTime);
 
 			// additional fuel usage by afterburner (when ignited)
-			fuelPerFrame += exhaustStage(fuel, gas, thrustN, frameTime);
+			m_fuelPerFrame += exhaustStage(fuel, gas, thrustN, frameTime);
 
 			// calculate bleed air pressure at current engine rpm:
 			// must rotate AB fuel pump at sufficient speed
@@ -634,7 +634,7 @@ namespace F16
 
 			// --------------------------- OLD STUFF
 			// Coded from the simulator study document
-			double power1 = percentPower;
+			double power1 = m_percentPower;
 			double power2 = 0.0;
 			double power3rate = 0.0;
 

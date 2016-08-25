@@ -61,7 +61,7 @@ namespace F16
 		void initEngineOff()
 		{
 			Engine.throttleInput = 0;
-			Engine.fuelPerFrame = 0;
+			Engine.m_fuelPerFrame = 0;
 
 			Engine.starting = false;
 			Engine.stopping = false;
@@ -72,7 +72,7 @@ namespace F16
 		void initEngineIdle()
 		{
 			Engine.throttleInput = 1;
-			Engine.fuelPerFrame = 1;
+			Engine.m_fuelPerFrame = 1;
 
 			Engine.starting = false;
 			Engine.stopping = false;
@@ -83,7 +83,7 @@ namespace F16
 		void initEngineCruise()
 		{
 			Engine.throttleInput = 50;
-			Engine.fuelPerFrame = 10;
+			Engine.m_fuelPerFrame = 10;
 
 			Engine.starting = false;
 			Engine.stopping = false;
@@ -116,7 +116,7 @@ namespace F16
 
 			// temporary for testing
 			Engine.isIgnited = false;
-			Engine.fuelPerFrame = 0;
+			Engine.m_fuelPerFrame = 0;
 		}
 
 		// MaksRUD	=	0.85, -- Military power state of the throttle
@@ -131,13 +131,15 @@ namespace F16
 			Engine.throttleInput = limited;
 			if (Engine.throttleInput < 78.0)
 			{
-				Engine.percentPower = Engine.throttleInput * 0.6923;
+				Engine.m_percentPower = Engine.throttleInput * 0.6923;
 			}
 			else
 			{
-				Engine.percentPower = Engine.throttleInput *4.5455 - 354.55;
+				Engine.m_percentPower = Engine.throttleInput *4.5455 - 354.55;
 			}
-			Engine.percentPower = limit(Engine.percentPower, 0.0, 100.0);
+			Engine.m_percentPower = limit(Engine.m_percentPower, 0.0, 100.0);
+
+			// TODO: calculate fuel mixture needed for given throttle setting and flight conditions
 		}
 
 		double getEngineRpm() const
