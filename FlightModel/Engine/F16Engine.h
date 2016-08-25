@@ -2,7 +2,9 @@
 Sources of data:
 - http://www.geaviation.com/military/engines/f110/
 - https://www.grc.nasa.gov/WWW/K-12/airplane/burnth.html
--
+- N3618
+- NASA TP 1538
+- F16S04
 
 */
 

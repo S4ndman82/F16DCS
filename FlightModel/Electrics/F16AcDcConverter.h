@@ -5,10 +5,20 @@
 
 #include "Electrics/AbstractElectricDevice.h"
 
+
+/*
 // also inverter/regulator?
+// also transformer rectifier (TR) ? (500VA)
+
+sources:
+- NASA TP 2857
+
+*/
 
 namespace F16
 {
+
+
 	class F16AcDcConverter : public AbstractElectricDevice
 	{
 	public:

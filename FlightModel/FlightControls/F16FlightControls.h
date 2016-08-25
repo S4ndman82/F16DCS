@@ -11,6 +11,15 @@
 #include "Inputs/F16AnalogInput.h"
 #include "Atmosphere/F16Atmosphere.h"
 
+/*
+sources:
+- NASA TP 1538
+- NASA TP 2857
+- NASA TN D-8176
+- NASA TM 74097
+- ADA055417
+
+*/
 
 namespace F16
 {

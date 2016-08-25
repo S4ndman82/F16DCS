@@ -5,13 +5,30 @@
 
 #include "Electrics/AbstractElectricDevice.h"
 
+/*
+
+sources:
+- NASA TP 2857
+
+*/
+
 namespace F16
 {
-	class F16Battery : public AbstractElectricDevice
+	class F16Battery //: public AbstractElectricDevice
 	{
 	public:
-		F16Battery(void *_parentSystem) 
-			: AbstractElectricDevice(_parentSystem)
+		// 28V DC?
+
+		// battery "storage" values
+		// discharge rate
+		// charging rate
+
+		// if battery power turned on
+		bool m_isOn;
+
+	public:
+		F16Battery() 
+			: m_isOn(false)
 		{}
 		~F16Battery() {}
 

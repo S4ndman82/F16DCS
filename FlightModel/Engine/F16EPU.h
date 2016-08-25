@@ -9,6 +9,12 @@ EPU = emergency power unit
 -> get bleed air from engine and/or use hydrazine
 -> emergency hydraulic pressure to system A
 -> emergency electrical power
+
+5kVA ?
+
+sources:
+- NASA TP 2857
+
 */
 
 namespace F16
@@ -16,6 +22,8 @@ namespace F16
 	class F16EPU
 	{
 	protected:
+		bool m_isRunning;
+
 		// if EPU/GEN test switch is used
 		bool testSwitch;
 
@@ -35,7 +43,8 @@ namespace F16
 
 	public:
 		F16EPU() 
-			: testSwitch(false)
+			: m_isRunning(false)
+			, testSwitch(false)
 			, highBleedAir(0)
 			, hydrPress(0)
 			, hydrazineLight(false)

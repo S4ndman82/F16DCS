@@ -24,8 +24,6 @@ namespace F16
 
 	//class F16FuelControl
 
-	//class F16EEC
-
 	/*
 	class F16Alternator
 	{};
@@ -197,6 +195,9 @@ namespace F16
 
 		void updateFrame(const double frameTime)
 		{
+			// 
+			//Engine CIVV control
+
 			Epu.updateFrame(frameTime);
 			JFS.updateFrame(frameTime);
 			Gearbox.updateFrame(frameTime);

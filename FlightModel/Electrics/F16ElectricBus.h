@@ -5,13 +5,20 @@
 
 //#include "Electrics/AbstractElectricDevice.h"
 
+/*
+
+sources:
+- NASA TP 2857
+
+*/
+
 namespace F16
 {
 	class F16ElectricBus
 	{
 	protected:
 		// type: AC no 1, AC no 2, DC "battery" bus
-		// voltage
+		// voltage: 28V DC?
 		// on/off
 		// battery/generator status?
 

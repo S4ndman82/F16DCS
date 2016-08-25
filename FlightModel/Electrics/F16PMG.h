@@ -7,6 +7,10 @@
 
 /*
 permanent magnetic generator
+
+sources:
+- NASA TP 2857
+
 */
 
 namespace F16
