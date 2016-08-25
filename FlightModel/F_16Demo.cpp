@@ -738,7 +738,7 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	//drawargs[291].f = (float)F16::EMS.getNozzlePos(); // nozzle rotation?
 
 
-	drawargs[38].f = (float)F16::Airframe.getCanopyAngle(); // draw angle of canopy {0=closed;0.9=elevated;1=no draw}
+	drawargs[38].f = F16::Airframe.getCanopyAngle(); // draw angle of canopy {0=closed;0.9=elevated;1=no draw}
 
 	drawargs[50].f = F16::Airframe.getEjectingSeatDraw(); // ejecting seat in plane
 

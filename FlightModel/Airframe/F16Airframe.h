@@ -25,6 +25,7 @@ namespace F16
 	// simple helper for different lights and sequences of blinking:
 	// set length of sequence (amount of states), time for each state (in seconds)
 	// and set sequence that is desired, for example: 0, 1, 0, 0, 1, 1 (start to end)
+	// (0=off, 1=on)
 	class F16LightBlinker
 	{
 	protected:
@@ -104,9 +105,10 @@ namespace F16
 		// current 3D model has three lights:
 		// left, right and back (tail)
 		// 0=off, 1=on
-		float leftWingLamp;
-		float rightWingLamp;
-		float backTailLamp;
+		// likely would need more of these but 3D model has some things linked for now
+		F16LightBlinker leftBlinker;
+		F16LightBlinker rightBlinker;
+		F16LightBlinker backBlinker;
 
 		bool navigationLights;
 		bool formationLights;
@@ -126,9 +128,9 @@ namespace F16
 			, canopyGone(false)
 			, refuelingDoorOpen(false)
 			, ejectingSeat(true)
-			, leftWingLamp(0)
-			, rightWingLamp(0)
-			, backTailLamp(0)
+			, leftBlinker(5, 1.5)
+			, rightBlinker(5, 1.5)
+			, backBlinker(5, 1.5)
 			, navigationLights(false)
 			, formationLights(false)
 			, landingLights(false)
@@ -138,6 +140,13 @@ namespace F16
 			// TODO: check values, size (how many we need)
 			// is zero "no fault" or "fully broken"? 
 			::memset(elementIntegrity, 0, 336*sizeof(double));
+
+			// let's use this sequence for all cases now,
+			// would need different sequences maybe..
+			float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+			::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float)*5);
+			::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
 		}
 		~F16Airframe() {}
 
@@ -223,6 +232,52 @@ namespace F16
 			return 1;
 		}
 
+		void setNavigationLights()
+		{
+			/*
+			// let's use this sequence for all cases now,
+			// would need different sequences maybe..
+			float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+			::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			*/
+			navigationLights = true;
+			leftBlinker.isEnabled = true;
+			rightBlinker.isEnabled = true;
+			backBlinker.isEnabled = true;
+		}
+		void setFormationLights()
+		{
+			/*
+			// let's use this sequence for all cases now,
+			// would need different sequences maybe..
+			float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+			::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			*/
+			formationLights = true;
+			leftBlinker.isEnabled = true;
+			rightBlinker.isEnabled = true;
+			backBlinker.isEnabled = true;
+		}
+		void setLandingLights()
+		{
+			/*
+			// let's use this sequence for all cases now,
+			// would need different sequences maybe..
+			float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+			::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			*/
+			landingLights = true;
+			leftBlinker.isEnabled = true;
+			rightBlinker.isEnabled = true;
+			backBlinker.isEnabled = true;
+		}
+
 		float isNavigationLight() const
 		{
 			return (navigationLights == true) ? 1.0f : 0.0f;
@@ -244,15 +299,15 @@ namespace F16
 		// left, right and back (tail)
 		float getLeftLight() const
 		{
-			return leftWingLamp;
+			return leftBlinker.getCurrent();
 		}
 		float getRightLight() const
 		{
-			return rightWingLamp;
+			return rightBlinker.getCurrent();
 		}
 		float getBackLight() const
 		{
-			return backTailLamp;
+			return backBlinker.getCurrent();
 		}
 
 		/*
@@ -338,7 +393,9 @@ namespace F16
 
 			// TODO: some light switching logic on/off?
 
-
+			leftBlinker.updateFrame(frameTime);
+			rightBlinker.updateFrame(frameTime);
+			backBlinker.updateFrame(frameTime);
 		}
 	};
 }
