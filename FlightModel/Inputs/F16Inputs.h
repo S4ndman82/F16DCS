@@ -66,9 +66,14 @@ enum F16InputCommands
 	//{combos = {{key = 'L', reformers = {'RShift'}}}, down = iCommandPowerOnOff, name = _('Electric Power Switch'), category = _('Systems')},
 	PowerOnOff			= 315, // Electric power switch (FC3 style)
 
-	//NavigationLights;
+	// {combos = {{key = 'L', reformers = {'RCtrl'}}}, down = iCommandPlaneLightsOnOff, name = _('Navigation lights'), category = _('Systems')},
+	NavigationLights	= 175,
 	//FormationLights;
 	//LandingLights;
+
+	// {combos = {{key = 'E', reformers = {'LCtrl'}}}, down = iCommandPlaneEject, name = _('Eject (3 times)'), category = _('Systems')},
+	EjectPlane = 83,
+
 
 	// joystick axis commands
 	//{action = iCommandWheelBrake,		name = _('Wheel Brake')},

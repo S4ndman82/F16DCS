@@ -140,13 +140,6 @@ namespace F16
 			// TODO: check values, size (how many we need)
 			// is zero "no fault" or "fully broken"? 
 			::memset(elementIntegrity, 0, 336*sizeof(double));
-
-			// let's use this sequence for all cases now,
-			// would need different sequences maybe..
-			float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-			::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float)*5);
-			::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
 		}
 		~F16Airframe() {}
 
@@ -232,50 +225,53 @@ namespace F16
 			return 1;
 		}
 
-		void setNavigationLights()
+		void setNavigationLights(bool onoff)
 		{
-			/*
-			// let's use this sequence for all cases now,
-			// would need different sequences maybe..
-			float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-			::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			*/
-			navigationLights = true;
-			leftBlinker.isEnabled = true;
-			rightBlinker.isEnabled = true;
-			backBlinker.isEnabled = true;
+			if (onoff == true)
+			{
+				// let's use this sequence for all cases now,
+				// would need different sequences maybe..
+				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+				::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+				::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+				::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			}
+			navigationLights = onoff;
+			leftBlinker.isEnabled = onoff;
+			rightBlinker.isEnabled = onoff;
+			backBlinker.isEnabled = onoff;
 		}
-		void setFormationLights()
+		void setFormationLights(bool onoff)
 		{
-			/*
-			// let's use this sequence for all cases now,
-			// would need different sequences maybe..
-			float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-			::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			*/
-			formationLights = true;
-			leftBlinker.isEnabled = true;
-			rightBlinker.isEnabled = true;
-			backBlinker.isEnabled = true;
+			if (onoff == true)
+			{
+				// let's use this sequence for all cases now,
+				// would need different sequences maybe..
+				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+				::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+				::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+				::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			}
+			formationLights = onoff;
+			leftBlinker.isEnabled = onoff;
+			rightBlinker.isEnabled = onoff;
+			backBlinker.isEnabled = onoff;
 		}
-		void setLandingLights()
+		void setLandingLights(bool onoff)
 		{
-			/*
-			// let's use this sequence for all cases now,
-			// would need different sequences maybe..
-			float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-			::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-			*/
-			landingLights = true;
-			leftBlinker.isEnabled = true;
-			rightBlinker.isEnabled = true;
-			backBlinker.isEnabled = true;
+			if (onoff == true)
+			{
+				// let's use this sequence for all cases now,
+				// would need different sequences maybe..
+				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+				::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+				::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+				::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+			}
+			landingLights = onoff;
+			leftBlinker.isEnabled = onoff;
+			rightBlinker.isEnabled = onoff;
+			backBlinker.isEnabled = onoff;
 		}
 
 		float isNavigationLight() const
@@ -314,6 +310,26 @@ namespace F16
 		bool draggingChuteCap() const
 		{}
 		*/
+
+		void toggleNavigationLights()
+		{
+			setNavigationLights(!navigationLights);
+		}
+		void toggleFormationLights()
+		{
+			setFormationLights(!formationLights);
+		}
+		void toggleLandingLights()
+		{
+			setLandingLights(!landingLights);
+		}
+
+		void onEject()
+		{
+			// pilot and seat gone
+			ejectingSeat = false;
+			canopyGone = true;
+		}
 
 		void onAirframeDamage(int Element, double element_integrity_factor)
 		{

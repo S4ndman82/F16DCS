@@ -549,14 +549,23 @@ void ed_fm_set_command(int command, float value)
 		F16::FlightControls.trimState.yawRight();
 		break;
 
+	case 215: // trimstop command (key up)
+		break;
+
+	case NavigationLights:
+		F16::Airframe.toggleNavigationLights();
+		break;
+
 	case Canopy:
 		// on/off toggle (needs some actuator support as well)
 		F16::Airframe.canopyToggle();
 		break;
 
-
-	case 215: // trimstop command (key up)
+	case EjectPlane:
+		// pilot ejected
+		F16::Airframe.onEject();
 		break;
+
 
 		/**/
 	case 2142:
