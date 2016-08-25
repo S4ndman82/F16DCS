@@ -39,6 +39,8 @@ namespace F16
 
 		F16Atmosphere *pAtmos;
 		F16FuelSystem *pFuel;
+
+		// main engine: turbofan with AB
 		F16Engine Engine;
 
 		// logic for EPU/JFS/main engine torque
@@ -51,7 +53,7 @@ namespace F16
 		F16EngineManagementSystem(F16Atmosphere *atmos, F16FuelSystem *fuels) 
 			: pAtmos(atmos)
 			, pFuel(fuels)
-			, Engine(atmos)
+			, Engine(ET_F100PW200, atmos)
 			, Gearbox()
 		{}
 		~F16EngineManagementSystem() {}

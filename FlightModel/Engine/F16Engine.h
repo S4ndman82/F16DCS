@@ -244,7 +244,7 @@ namespace F16
 		F16EngineParameters engineParams;
 		F16Atmosphere *pAtmos;
 
-		F16Engine(F16Atmosphere *atmos)
+		F16Engine(EngineType engine, F16Atmosphere *atmos)
 			: m_power3(0)
 			, thrust_N(0)
 			, throttleInput(0)
@@ -262,7 +262,7 @@ namespace F16
 			, stopping(false)
 			, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
 			, inhibitAbIgnition(false)
-			, engineParams(ET_F100PW200)
+			, engineParams(engine)
 			, pAtmos(atmos)
 		{}
 		~F16Engine() {}
