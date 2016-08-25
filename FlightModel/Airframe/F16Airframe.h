@@ -351,6 +351,7 @@ namespace F16
 			::memset(elementIntegrity, 0, 336*sizeof(double));
 			canopyGone = false;
 			actCanopy.m_commanded = actCanopy.m_minLimit;
+			actCanopy.m_isWorking = true;
 		}
 
 		bool isRepairNeeded() const
@@ -411,8 +412,8 @@ namespace F16
 			// TODO: if in flight and canopy open -> canopy gone
 			// also, if sealing is not working and internal pressure exceeds external -> canopy gone
 
-			// TODO: some light switching logic on/off?
-
+			// some light blinking pattern/sequence support here,
+			// set parameters where light is enabled
 			leftBlinker.updateFrame(frameTime);
 			rightBlinker.updateFrame(frameTime);
 			backBlinker.updateFrame(frameTime);
