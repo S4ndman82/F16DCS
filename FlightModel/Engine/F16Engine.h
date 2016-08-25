@@ -5,6 +5,9 @@ Sources of data:
 - N3618
 - NASA TP 1538
 - F16S04
+- a202599
+- 88218main_H-1679 (NASA contractor report)
+- 20030093721 development of turbofan engine simulation
 
 */
 
