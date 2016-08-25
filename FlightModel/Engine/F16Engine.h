@@ -13,7 +13,9 @@ Sources of data:
 
 #include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "include/F16Constants.h"		// Common constants used throughout this DLL
+
 #include "Atmosphere/F16Atmosphere.h"
+#include "Engine/F16FuelSystem.h"				//Fuel usage and tank usage functions
 
 /*
 		engine = 
@@ -493,7 +495,7 @@ namespace F16
 		}
 
 		// combustion stage
-		double combustionStage(double fuel, GasData &gas, double frameTime)
+		double combustionStage(FuelData &Fuel, GasData &gas, double frameTime)
 		{
 			// core temperature for self-ignition?
 			// -> need to have external ignition support if too cold
@@ -513,7 +515,16 @@ namespace F16
 			// burn efficiency multiplier?
 			// also fuel properties
 
-			return 0;
+
+			// something like this to calculate amount of fuel used during combustion?
+			// engine management and throttle should determine mixture,
+			// amount of air determine how much fuel is required for the mixture? (or sensors elsewhere?)
+			// 
+			// anyway, combustion:
+			// -> calculate exhaust volume, thrust, temperature etc.
+			double fuelToBurn = (gas.massflow * throttleInput) * Fuel.weight;
+
+			return fuelToBurn;
 		}
 
 		// both hpt and lpt stages as one
@@ -588,6 +599,12 @@ namespace F16
 			// at subsonic speed, inlet does not matter
 			// at supersonic speeds, inlet must reduce shockwaves
 
+			// this is temporary
+			// TODO: usage by actual engine ?
+			// -> mixture by throttle and air massflow -> determine mixture
+			//
+			//fuelPerFrame = 10 * frameTime; //10 kg persecond
+
 			// start by setting ambient conditions
 			GasData gas(pAtmos->ambientPressure, pAtmos->ambientDensity, pAtmos->ambientTemperature_DegK);
 			GasData bypass(gas); // <- according to bypass ratio, injection back to engine
@@ -599,12 +616,16 @@ namespace F16
 			lpcStage(gas, frameTime);
 			hpcStage(gas, frameTime);
 
-			// TODO: usage by actual engine ?
-			// -> mixture by throttle and air massflow -> determine mixture
+			// temporary, should be given by engine management system
+			FuelData Fuel;
+
+			// TODO: determine how we get parameter for mixture and amount of fuel to use,
+			// airmass sensors? throttle input and mixture calculation?
 			//
-			fuelPerFrame = 10 * frameTime; //10 kg persecond
-		
-			combustionStage(fuelPerFrame, gas, frameTime);
+			// something like this to get actual amount of fuel used?
+			// -> engine management system should give mixture ratio
+			// according to throttle input?
+			fuelPerFrame = combustionStage(Fuel, gas, frameTime);
 
 			turbineStage(gas, frameTime);
 			exhaustStage(gas, frameTime);
