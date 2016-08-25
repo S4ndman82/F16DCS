@@ -509,6 +509,10 @@ namespace F16
 			//double lptstages[] = {}
 			// -> low pressure compressor rotation speed
 
+			// gas flow/volume from combustion stage
+			// and turbine parameters
+			// should give use the rotation speed for engine?
+
 			return 0;
 		}
 
