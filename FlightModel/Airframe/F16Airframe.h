@@ -326,6 +326,8 @@ namespace F16
 
 		void onEject()
 		{
+			// TODO: check for three times in quick succession before doing more here
+
 			// pilot and seat gone
 			ejectingSeat = false;
 			canopyGone = true;
