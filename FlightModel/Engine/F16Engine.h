@@ -440,6 +440,10 @@ namespace F16
 		// low pressure compressor stages
 		double lpcStage(GasData &gas, double frameTime)
 		{
+			// TODO: turbine effect on compressor rotation
+			// (lpt, hpt)
+			// -> no lpc stages?
+
 			// no lpc stages?
 			/*
 			if (isCompressorStall(airvelocity, lpcRotation) == true)
@@ -455,6 +459,9 @@ namespace F16
 		// high pressure compressor stages
 		double hpcStage(GasData &gas, double frameTime)
 		{
+			// TODO: turbine effect on compressor rotation
+			// (lpt, hpt)
+
 			/*
 			if (isCompressorStall(airvelocity, hpcRotation) == true)
 			{
@@ -545,7 +552,7 @@ namespace F16
 			return 0;
 		}
 
-		double exhaustStage(GasData &gas, double frameTime)
+		double exhaustStage(FuelData &Fuel, GasData &gas, double frameTime)
 		{
 			// bypass air injection?
 
@@ -561,15 +568,16 @@ namespace F16
 				// nozzle should be fully open?
 				// no afterburner
 				afterburnerDraw = 0;
+				return 0;
+			}
 
-			}
-			else
-			{
-				// TODO: determine AB effect on thrust and fuel usage,
-				// 
-				afterburnerDraw = (throttleInput - 80.0) / 20.0;
-				afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
-			}
+			// TODO: determine AB effect on thrust and fuel usage,
+			// 
+			afterburnerDraw = (throttleInput - 80.0) / 20.0;
+			afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
+
+			// TODO: calculate additional fuel usage when afterburner is used
+			//Fuel.weight * 
 
 			return 0;
 		}
@@ -613,11 +621,12 @@ namespace F16
 			bypass.volume = gas.volume * engineParams.bypassRatio; // after normal inlet calculated
 			bypass.massflow = gas.massflow * engineParams.bypassRatio;
 
+			// compressor stages: low pressure compressor and high pressure compressor
 			lpcStage(gas, frameTime);
 			hpcStage(gas, frameTime);
 
 			// temporary, should be given by engine management system
-			FuelData Fuel;
+			FuelData fuel;
 
 			// TODO: determine how we get parameter for mixture and amount of fuel to use,
 			// airmass sensors? throttle input and mixture calculation?
@@ -625,10 +634,14 @@ namespace F16
 			// something like this to get actual amount of fuel used?
 			// -> engine management system should give mixture ratio
 			// according to throttle input?
-			fuelPerFrame = combustionStage(Fuel, gas, frameTime);
+			fuelPerFrame = combustionStage(fuel, gas, frameTime);
 
+			// calculate turbine effect
+			// for compressor running
 			turbineStage(gas, frameTime);
-			exhaustStage(gas, frameTime);
+
+			// additional fuel usage by afterburner (when ignited)
+			fuelPerFrame += exhaustStage(fuel, gas, frameTime);
 
 			// calculate bleed air pressure at current engine rpm:
 			// must rotate AB fuel pump at sufficient speed
