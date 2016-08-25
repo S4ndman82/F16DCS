@@ -740,7 +740,7 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 
 	drawargs[38].f = (float)F16::Airframe.getCanopyAngle(); // draw angle of canopy {0=closed;0.9=elevated;1=no draw}
 
-	//drawargs[50].f // ejecting seat
+	drawargs[50].f = F16::Airframe.getEjectingSeatDraw(); // ejecting seat in plane
 
 	//drawargs[182].f // right-side brake flaps 0..1
 	//drawargs[186].f // left-side brake flaps 0..1
@@ -767,6 +767,7 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[196].f = F16::Airframe.getRightLight();
 	drawargs[203].f = F16::Airframe.getBackLight();
 
+	// following are not all implemented
 	//drawargs[190..199].f // nav light #1..10
 	//drawargs[200..207].f // formation light #1..8
 	//drawargs[208..212].f // landing lamp #1..5

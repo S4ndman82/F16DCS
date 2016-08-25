@@ -94,6 +94,7 @@ namespace F16
 
 		bool refuelingDoorOpen; // open/close switch
 
+		bool ejectingSeat; // ejecting seat in place/gone
 
 		// TODO: support for each lamp in lights?
 		//bool navigationLight[10];
@@ -124,6 +125,7 @@ namespace F16
 			, canopySwitchDown(false)
 			, canopyGone(false)
 			, refuelingDoorOpen(false)
+			, ejectingSeat(true)
 			, leftWingLamp(0)
 			, rightWingLamp(0)
 			, backTailLamp(0)
@@ -207,6 +209,18 @@ namespace F16
 		{
 			// not yet implemented in 3D mesh
 			return (float)actRefuelingDoor.m_current;
+		}
+
+		float getEjectingSeatDraw() const
+		{
+			if (ejectingSeat == true)
+			{
+				// pilot and seat in plane
+				return 0;
+			}
+			// could have 0.5 == pilot gone, seat in place?
+			// 1 == seat gone
+			return 1;
 		}
 
 		float isNavigationLight() const
