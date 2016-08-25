@@ -45,7 +45,15 @@ namespace F16
 				pAux->update(engineTorque, engineRpm)
 			}
 			**/
-		
+			/*
+			// JFS will provide assistance to main engine in some cases
+			// in addition to starting power
+			if (engineTorque < threshold)
+			{
+				pJfs->update(pEngine)
+			}
+			*/
+
 		}
 
 
