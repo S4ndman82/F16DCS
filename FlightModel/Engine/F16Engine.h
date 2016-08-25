@@ -148,13 +148,13 @@ namespace F16
 
 	enum EngineType
 	{
-		ET_F110GE100,	// F110-GE-100 // F-16 C/D
-		ET_F110GE129,	// F110-GE-129 // F-16 C/D
 		ET_F100PW200,	// F100-PW-200 // F-16A/B // worst of the bunch
 		ET_F100PW220,	// F100-PW-220 // F-16A/B/C/D
 		ET_F100PW220E,	// F100-PW-220E // F-16A/B/C/D
 		ET_F100PW229,	// F100-PW-229 // F-16 C/D
 		ET_F100PW229A,	// F100-PW-229A // F-16 C/D
+		ET_F110GE100,	// F110-GE-100 // F-16 C/D
+		ET_F110GE129,	// F110-GE-129 // F-16 C/D
 		ET_Reserved
 	};
 
@@ -163,6 +163,12 @@ namespace F16
 	{
 	public:
 		EngineType engineType;
+
+		double angular_momentum; // kg-m^2/s for gyroscopic effects of engine, assume fixed value
+
+		// rotational inertia of engine
+		//double inertia;
+		//double coreinertia;
 
 		// same
 		double maxDiameter; // cm
@@ -174,11 +180,13 @@ namespace F16
 
 		F16EngineParameters(EngineType engine)
 			: engineType(engine)
+			, angular_momentum(216.9)
 			, maxDiameter(46.5 * inchesToCentim) // in -> cm
 			, inletDiameter(34.8 * inchesToCentim) // in -> cm
 			, bypassRatio(0)
 		{
-			if (engineType == ET_F110GE129)
+			if (engineType == ET_F110GE100
+				|| engineType == ET_F110GE129)
 			{
 				bypassRatio = 0.76;
 			}
@@ -234,10 +242,6 @@ namespace F16
 		double engineRPM; // rounds per minute: non-zero if shutdown in air?
 		//double drag; // amount of drag if not running while in air? windmilling effect?
 
-		// rotational inertia of engine
-		double inertia;
-		double coreinertia;
-		
 		double lpcRotation; // low pressure compressor rotation speed
 		double hpcRotation; // high pressure compressor rotation speed
 
