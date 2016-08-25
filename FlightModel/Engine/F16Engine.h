@@ -190,7 +190,7 @@ namespace F16
 		double m_power3;
 
 	public:
-		double	thrust_N; // Engine thrust (N)
+		double	m_thrust_N; // Engine thrust (N)
 		double	throttleInput;	// Throttle input command normalized (-1 to 1)
 
 		double percentPower;
@@ -246,7 +246,7 @@ namespace F16
 
 		F16Engine(EngineType engine, F16Atmosphere *atmos)
 			: m_power3(0)
-			, thrust_N(0)
+			, m_thrust_N(0)
 			, throttleInput(0)
 			, percentPower(0)
 			, afterburnerDraw(0)
@@ -342,7 +342,7 @@ namespace F16
 		}
 		double getThrustN() const
 		{
-			return thrust_N;
+			return m_thrust_N;
 		}
 
 		// spool up when starting engine normally (with JFS, upto idle)
@@ -552,7 +552,7 @@ namespace F16
 			// AB increase of thrust:
 			// 41 - 53 kN (PW - GE)
 			// without further details, just add:
-			//thrustN += 41;
+			//thrustN += 41000;
 
 			return 0;
 		}
@@ -704,7 +704,7 @@ namespace F16
 				thrustTmp = Tmil + (Tmax-Tmil)*(m_power3 - 50.0)/50.0;
 			}
 
-			thrust_N = limit(thrustTmp,0.0,129000.0);
+			m_thrust_N = limit(thrustTmp,0.0,129000.0);
 
 		}
 	};
