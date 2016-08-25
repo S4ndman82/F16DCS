@@ -139,6 +139,48 @@ namespace F16
 			}
 			Engine.percentPower = limit(Engine.percentPower, 0.0, 100.0);
 		}
+
+		double getEngineRpm() const
+		{
+			if (Engine.isIgnited == false) // ignore throttle setting if engine is not running
+			{
+				return 0;
+			}
+
+			// ED_FM_ENGINE_1_RPM:
+			return (Engine.throttleInput / 100.0) * 3000;
+		}
+		double getEngineRelatedRpm() const
+		{
+			if (Engine.isIgnited == false)
+			{
+				return 0;
+			}
+
+			// ED_FM_ENGINE_1_RELATED_RPM:
+			return (Engine.throttleInput / 100.0);
+		}
+		double getEngineThrust() const
+		{
+			if (Engine.isIgnited == false)
+			{
+				return 0;
+			}
+
+			// ED_FM_ENGINE_1_THRUST:
+			return (Engine.throttleInput / 100.0) * 5000 * 9.81;
+		}
+		double getEngineRelatedThrust() const
+		{
+			if (Engine.isIgnited == false)
+			{
+				return 0;
+			}
+
+			// ED_FM_ENGINE_1_RELATED_THRUST:
+			return (Engine.throttleInput / 100.0);
+		}
+
 		/*
 		double getThrottleInput() const
 		{

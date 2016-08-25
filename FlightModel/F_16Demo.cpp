@@ -865,21 +865,21 @@ double ed_fm_get_param(unsigned param_enum)
 		return F16::EMS.JFS.getFuelFlow();
 
 	case ED_FM_ENGINE_1_RPM:
-		return F16::EMS.Engine.getEngineRpm();
+		return F16::EMS.getEngineRpm();
 	case ED_FM_ENGINE_1_RELATED_RPM:
-		return F16::EMS.Engine.getEngineRelatedRpm();
+		return F16::EMS.getEngineRelatedRpm();
 	case ED_FM_ENGINE_1_THRUST:
-		return F16::EMS.Engine.getEngineThrust();
+		return F16::EMS.getEngineThrust();
 	case ED_FM_ENGINE_1_RELATED_THRUST:
-		return F16::EMS.Engine.getEngineRelatedThrust();
+		return F16::EMS.getEngineRelatedThrust();
 	case ED_FM_ENGINE_1_CORE_RPM:
-		return F16::EMS.Engine.getEngineRpm();
+		return F16::EMS.getEngineRpm();
 	case ED_FM_ENGINE_1_CORE_RELATED_RPM:
-		return F16::EMS.Engine.getEngineRelatedRpm();
+		return F16::EMS.getEngineRelatedRpm();
 	case ED_FM_ENGINE_1_CORE_THRUST:
-		return F16::EMS.Engine.getEngineThrust();
+		return F16::EMS.getEngineThrust();
 	case ED_FM_ENGINE_1_CORE_RELATED_THRUST:
-		return F16::EMS.Engine.getEngineRelatedThrust();
+		return F16::EMS.getEngineRelatedThrust();
 	case ED_FM_ENGINE_1_TEMPERATURE:
 		return F16::EMS.Engine.getEngineTemperature();
 	case ED_FM_ENGINE_1_OIL_PRESSURE:

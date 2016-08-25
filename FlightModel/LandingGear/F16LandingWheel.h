@@ -5,6 +5,12 @@
 
 #include "Inputs/F16AnalogInput.h"
 
+/*
+ some sources to use for wheel and tyre dynamics:
+ - Vehicle Dynamics - Fundamentals and Modeling Aspects, SHORT COURSE, Prof. Dr. Georg Rill, Brasil, August 2007
+
+*/
+
 namespace F16
 {
 	// nosewheel steering (NWS) limited to 32 degrees in each direction
@@ -148,6 +154,9 @@ namespace F16
 			{
 				return;
 			}
+
+			// TODO: calculate angular velocity (omega) by ground speed and wheel diameter,
+			// then apply rolling friction (Dinamica_de_Veiculos)
 
 			// TODO: also if wheel rotation is slower than speed relative to ground
 			// -> apply sliding friction factor

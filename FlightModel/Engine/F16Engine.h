@@ -316,46 +316,6 @@ namespace F16
 		}
 		*/
 
-		double getEngineRpm() const
-		{
-			if (isIgnited == false) // ignore throttle setting if engine is not running
-			{
-				return 0;
-			}
-
-			// ED_FM_ENGINE_1_RPM:
-			return (throttleInput/100.0) * 3000;
-		}
-		double getEngineRelatedRpm() const
-		{
-			if (isIgnited == false)
-			{
-				return 0;
-			}
-
-			// ED_FM_ENGINE_1_RELATED_RPM:
-			return (throttleInput/100.0);
-		}
-		double getEngineThrust() const
-		{
-			if (isIgnited == false)
-			{
-				return 0;
-			}
-
-			// ED_FM_ENGINE_1_THRUST:
-			return (throttleInput/100.0) * 5000 * 9.81;
-		}
-		double getEngineRelatedThrust() const
-		{
-			if (isIgnited == false)
-			{
-				return 0;
-			}
-
-			// ED_FM_ENGINE_1_RELATED_THRUST:
-			return (throttleInput/100.0);
-		}
 
 
 		double getLowPressureBleedAir() const
