@@ -17,6 +17,12 @@ namespace F16
 	class FuelData
 	{
 	public:
+		enum eFuelType
+		{
+			JP8
+		};
+		eFuelType type;
+
 		//double pressure;
 		//double compressibility;
 		//double heat_release;
@@ -35,7 +41,8 @@ namespace F16
 		// since they have different compressibility..
 
 		FuelData() 
-			: weight(0.775) // kg/l
+			: type(JP8)
+			, weight(0.775) // kg/l
 		{}
 		~FuelData() {}
 
