@@ -358,8 +358,20 @@ namespace F16
 			//add_local_force(nosewheelDirection, cx_wheel_pos);
 		}
 
+		void updateWetMassCg(double mass, Vec3 &pos, Vec3 &size)
+		{
+			weightBalance.balance(mass, pos, size);
+		}
+
+		void commitWetMassCg()
+		{
+			// something like this to use new balance?
+			// -> we should check order of operations so that changes all match correctly..
+			center_of_gravity = weightBalance.balanced_center_of_gravity;
+		}
+
 		// 
-		void updateFuelUsageMass(double mass_delta, double posX, double posY, double posZ)
+		void updateFuelMassDelta(double mass_delta)
 		{
 			fuel_mass_delta = mass_delta;
 		}

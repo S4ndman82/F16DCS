@@ -31,6 +31,9 @@ namespace F16
 
 		double weight; // weight in kg/l
 
+		// TODO: use fuel weight in calculating how fits in tank
+		// since they have different compressibility..
+
 		FuelData() 
 			: weight(0.775) // kg/l
 		{}
@@ -82,8 +85,8 @@ namespace F16
 	public:
 		int station; // do we need this here or not?
 
-		double volume; // capacity of tank
-		double fuel; // amount of fuel in tank
+		double volume; // capacity of tank (in kg)
+		double fuel; // amount of fuel in tank (in kg)
 
 		//double pressurization; // how pressure tank causes for fuel?
 
@@ -139,12 +142,15 @@ namespace F16
 		bool is_unlimited_fuel;
 		double previous_usage;
 
+	public:
+
 		// Internal fuel as calculated by the EFM fuel system modeling
 		//F16FuelTank FwdFus1; // foward fuselage 1
 		//F16FuelTank FwdFus2; // forward fuselage 2
 		//F16FuelTank FwdRes; // forward reservoir
 		//F16FuelTank AftFus1; // aft fuselage
 		//F16FuelTank AftRes; // aft reservoir
+
 
 		F16FuelTank FwdFus; // forward combined
 		F16FuelTank AftFus; // aft combined
@@ -161,7 +167,8 @@ namespace F16
 		// - crossfeed
 		// - booster pumps
 
-		FuelData fuel;
+		// liquid mass parameters
+		FuelData fuelData;
 
 	public:
 		// TODO: check units !! (pounds)
@@ -178,7 +185,7 @@ namespace F16
 			, ext_Center(1800 * lb_to_kg)
 			, ext_LWing(2300 * lb_to_kg)
 			, ext_RWing(2300 * lb_to_kg)
-			, fuel()
+			, fuelData()
 		{}
 		~F16FuelSystem() {}
 

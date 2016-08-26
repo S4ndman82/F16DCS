@@ -21,7 +21,7 @@ namespace F16
 	// (unless we start adding payload support into flight model)
 	class F16WeightBalance
 	{
-	protected:
+	public:
 
 		// calculate new center of gravity
 		// for using in motion calculations
@@ -53,7 +53,21 @@ namespace F16
 		void balance(double mass, Vec3 &position, Vec3 &size)
 		{
 			// update cog with given mass, position and bounding size
-			// 
+
+			// force of the mass
+			double force_N = mass * standard_gravity;
+
+			// vector "torque" for force
+			Vec3 force_vec;
+			force_vec.x = position.x * force_N;
+			force_vec.y = position.y * force_N;
+			force_vec.z = position.z * force_N;
+
+			// new center of gravity relative to original reference
+			//balanced_center_of_gravity = cross(center_of_gravity, force_vec);
+
+			// combine in case of multiple masses
+			balanced_center_of_gravity = cross(balanced_center_of_gravity, force_vec);
 		}
 
 	};

@@ -283,7 +283,15 @@ void ed_fm_simulate(double dt)
 								F16::Aero.getClTotal(), F16::Aero.getCmTotal(), F16::Aero.getCnTotal());
 
 	F16::Motion.updateEngineForces(F16::EMS.Engine.getThrustN());
-	F16::Motion.updateFuelUsageMass(F16::Fuel.getUsageSinceLastFrame(), 0, 0, 0);
+
+	// just internal fuel for now, payload and external tanks later
+	F16::Motion.updateWetMassCg(F16::Fuel.FwdFus.fuel, F16::Fuel.FwdFus.position, F16::Fuel.FwdFus.size);
+	F16::Motion.updateWetMassCg(F16::Fuel.AftFus.fuel, F16::Fuel.AftFus.position, F16::Fuel.AftFus.size);
+	F16::Motion.updateWetMassCg(F16::Fuel.LeftWing.fuel, F16::Fuel.LeftWing.position, F16::Fuel.LeftWing.size);
+	F16::Motion.updateWetMassCg(F16::Fuel.RightWing.fuel, F16::Fuel.RightWing.position, F16::Fuel.RightWing.size);
+	F16::Motion.commitWetMassCg();
+
+	F16::Motion.updateFuelMassDelta(F16::Fuel.getUsageSinceLastFrame());
 	F16::Fuel.clearUsageSinceLastFrame();
 
 	if (F16::LandingGear.isWoW() == true)
