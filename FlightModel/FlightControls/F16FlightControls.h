@@ -44,28 +44,57 @@ namespace F16
 		// -> add servo
 		// -> add sensor and delay (lag)
 
-		double m_moveRate; // "slowness"
-		double m_commanded; // target movement
-		double m_current; // current position
+		// "Command" is the position into which actuator should move.
+		// "Current" is where the actuator is at the moment (consider: if move finished within time or not).
+		// "Moverate" is simply "step per frame" the actuator can take.
+		// Movement values can be angles, radians, inches, meters etc. 
+		// Just as long as caller takes care that units match.
+		//
+		// Limits are there to check that calculations won't overrun.
+		// 
+		double m_moveRate;		// "slowness"
+		double m_commanded;		// target movement
+		double m_current;		// current position
+		double m_minLimit;		// lower limit
+		double m_maxLimit;		// upper limit
+		bool m_haveLimits;		// if limits are defined
 
-		double m_minLimit;
-		double m_maxLimit;
-		bool m_haveLimits;
+		// Force threshold needed to move either way:
+		// provided force must exceed required force to be able to move in that direction.
+		//
+		// For example, if there is no more hydraulic power (engine out of fuel)
+		// but reservoir still has enough to push landing gear down but not enough to pull back in.
+		//
+		// Actuator code works for any unit this moment: N, V etc.
+		// Caller just has to make sure to provide values in same unit each time
+		//
+		double m_forceThresholdInc;		// force threshold to move towards upper limit
+		double m_forceThresholdDec;		// force threshold to move towards lower limit
+		double m_forceProvided;			// amount of force provided to actuator to operate
 
+		// is in working condition/damaged
 		bool m_isWorking;
 
 	public:
+		/*
 		F16Actuator() 
 			: m_moveRate(1.0), m_commanded(0), m_current(0),
-			m_minLimit(0), m_maxLimit(0), m_haveLimits(false), m_isWorking(true)
+			m_minLimit(0), m_maxLimit(0), m_haveLimits(false), 
+			m_isWorking(true)
 		{}
+		*/
+
 		F16Actuator(const double moverate)
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
-			m_minLimit(0), m_maxLimit(0), m_haveLimits(false), m_isWorking(true)
+			m_minLimit(0), m_maxLimit(0), m_haveLimits(false), 
+			m_forceThresholdInc(0), m_forceThresholdDec(0), m_forceProvided(0),
+			m_isWorking(true)
 		{}
 		F16Actuator(const double moverate, const double minLimit, const double maxLimit)
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
-			m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true), m_isWorking(true)
+			m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true), 
+			m_forceThresholdInc(0), m_forceThresholdDec(0), m_forceProvided(0),
+			m_isWorking(true)
 		{}
 		~F16Actuator() {}
 
@@ -86,10 +115,14 @@ namespace F16
 				// moving direction from whatever position we are in
 				if (diff > 0)
 				{
+					//if (m_forceProvided >= m_forceThresholdInc)
+
 					m_current += movementPerFrame;
 				}
 				else if (diff < 0)
 				{
+					//if (m_forceProvided >= m_forceThresholdDec)
+
 					m_current -= movementPerFrame;
 				}
 			}

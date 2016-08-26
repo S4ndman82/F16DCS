@@ -169,6 +169,7 @@ namespace F16
 			// -> 9 tons, without fuel
 			mass_kg = mass;
 
+			// 	center_of_mass		=	{ 0.183 , 0.261 , 0.0},		-- center of mass position relative to object 3d model 
 			center_of_gravity.x  = center_of_mass_x;
 			center_of_gravity.y  = center_of_mass_y;
 			center_of_gravity.z  = center_of_mass_z;
