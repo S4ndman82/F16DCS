@@ -98,6 +98,40 @@ namespace F16
 		{}
 		~F16Actuator() {}
 
+		// TODO: improve upon this before using
+		bool forceThresholdMove(const double movementPerFrame, const double diff, const double frameTime)
+		{
+			/* this is still crude.. don't do this..
+
+			// if force threshold defined
+			if (diff > 0 && m_forceProvided < m_forceThresholdInc && m_forceThresholdInc > 0)
+			{
+				// movement towards upper limit:
+				// not enough force -> can't continue
+				return;
+			}
+			// if force threshold defined
+			if (diff < 0 && m_forceProvided < m_forceThresholdDec && m_forceThresholdDec > 0)
+			{
+				// movement towards lower limit:
+				// not enough force -> can't continue
+				return;
+			}
+
+			TODO: something like this instead?
+			if ((m_forceProvided * movementPerFrame) > m_forceThresholdInc && diff > 0)
+			{
+				m_current += m_forceProvided * movementPerFrame;
+			}
+			if ((m_forceProvided * movementPerFrame) > m_forceThresholdDec && diff < 0)
+			{
+				m_current += m_forceProvided * movementPerFrame;
+			}
+			*/
+
+			return true;
+		}
+
 		void updateFrame(const double frameTime)
 		{
 			if (m_isWorking == false)
@@ -108,6 +142,14 @@ namespace F16
 			double movementPerFrame = m_moveRate*frameTime;
 			double diff = m_commanded - m_current;
 
+
+			// not enough force provided to complete movement -> end
+			if (forceThresholdMove(movementPerFrame, diff, frameTime) == false)
+			{
+				return;
+			}
+
+
 			// if movement per frame is small enough (either direction),
 			// it can be done in one frame
 			if (movementPerFrame < abs(diff))
@@ -115,14 +157,10 @@ namespace F16
 				// moving direction from whatever position we are in
 				if (diff > 0)
 				{
-					//if (m_forceProvided >= m_forceThresholdInc)
-
 					m_current += movementPerFrame;
 				}
 				else if (diff < 0)
 				{
-					//if (m_forceProvided >= m_forceThresholdDec)
-
 					m_current -= movementPerFrame;
 				}
 			}
