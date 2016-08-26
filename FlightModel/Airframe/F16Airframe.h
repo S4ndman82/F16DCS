@@ -28,6 +28,11 @@ namespace F16
 	// (0=off, 1=on)
 	class F16LightBlinker
 	{
+	private:
+		// disallow direct copying
+		F16LightBlinker(const F16LightBlinker &other);
+		F16LightBlinker& operator=(const F16LightBlinker &other);
+
 	protected:
 		int index = 0;
 		double elapsed = 0;
@@ -58,6 +63,17 @@ namespace F16
 		float getCurrent() const
 		{
 			return pSequence[index];
+		}
+
+		void setPattern(const int newCount, const float *newSequence)
+		{
+			if (newCount != sequenceCount && pSequence != nullptr)
+			{
+				delete pSequence;
+				pSequence = new float[newCount];
+				sequenceCount = newCount;
+			}
+			::memcpy(pSequence, newSequence, sizeof(float) * newCount);
 		}
 
 		void updateFrame(const double frameTime)
@@ -232,9 +248,10 @@ namespace F16
 				// let's use this sequence for all cases now,
 				// would need different sequences maybe..
 				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-				::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-				::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-				::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+
+				leftBlinker.setPattern(5, blinkerSequence);
+				rightBlinker.setPattern(5, blinkerSequence);
+				backBlinker.setPattern(5, blinkerSequence);
 			}
 			navigationLights = onoff;
 			leftBlinker.isEnabled = onoff;
@@ -248,9 +265,10 @@ namespace F16
 				// let's use this sequence for all cases now,
 				// would need different sequences maybe..
 				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-				::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-				::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-				::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+
+				leftBlinker.setPattern(5, blinkerSequence);
+				rightBlinker.setPattern(5, blinkerSequence);
+				backBlinker.setPattern(5, blinkerSequence);
 			}
 			formationLights = onoff;
 			leftBlinker.isEnabled = onoff;
@@ -264,9 +282,10 @@ namespace F16
 				// let's use this sequence for all cases now,
 				// would need different sequences maybe..
 				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
-				::memcpy(leftBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-				::memcpy(rightBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
-				::memcpy(backBlinker.pSequence, blinkerSequence, sizeof(float) * 5);
+
+				leftBlinker.setPattern(5, blinkerSequence);
+				rightBlinker.setPattern(5, blinkerSequence);
+				backBlinker.setPattern(5, blinkerSequence);
 			}
 			landingLights = onoff;
 			leftBlinker.isEnabled = onoff;
