@@ -245,8 +245,7 @@ namespace F16
 		{
 			if (onoff == true)
 			{
-				// let's use this sequence for all cases now,
-				// would need different sequences maybe..
+				// just some example pattern for testing
 				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
 
 				leftBlinker.setPattern(5, blinkerSequence);
@@ -262,9 +261,8 @@ namespace F16
 		{
 			if (onoff == true)
 			{
-				// let's use this sequence for all cases now,
-				// would need different sequences maybe..
-				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+				// just some example pattern for testing
+				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 1.0f, 1.0f };
 
 				leftBlinker.setPattern(5, blinkerSequence);
 				rightBlinker.setPattern(5, blinkerSequence);
@@ -279,13 +277,12 @@ namespace F16
 		{
 			if (onoff == true)
 			{
-				// let's use this sequence for all cases now,
-				// would need different sequences maybe..
-				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+				// use shorter simple pattern for testing in this case
+				float blinkerSequence[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
-				leftBlinker.setPattern(5, blinkerSequence);
-				rightBlinker.setPattern(5, blinkerSequence);
-				backBlinker.setPattern(5, blinkerSequence);
+				leftBlinker.setPattern(4, blinkerSequence);
+				rightBlinker.setPattern(4, blinkerSequence);
+				backBlinker.setPattern(4, blinkerSequence);
 			}
 			landingLights = onoff;
 			leftBlinker.isEnabled = onoff;
