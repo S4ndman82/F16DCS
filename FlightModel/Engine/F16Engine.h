@@ -10,7 +10,7 @@ Sources of data:
 - 20030093721 development of turbofan engine simulation
 - 19990064011 FLIGHT RESEARCH USING F100 ENGINE P680063 IN THE NASA F-15 AIRPLANE
 - NASA_NTRS_Archive_19860015875 NASA LEWIS FlOO ENGINE TESTING 
-
+- DTIC_ADA033302.pdf (YJ1O1-GE.100)
 */
 
 #ifndef _F16ENGINE_H_
@@ -91,6 +91,87 @@ and was at peak fuel efficiency of 260 kg/min at mach 1.4 at 36,000 feet
 //if (afterburner -> 23 gallons per minute? ~87,0644714l/min -> 1,45107452.. l/s
 
 -> speed, altitude, throttle -> fuel usage?
+*/
+
+/*
+- Turbofan and Turbojet Engines: Database Handbook, Elodie Roux
+
+F100-PW-200
+Composition: 3 / - / 10 / 2 / - / 2
+Dfan = 0.884m D = 1.181m Nb shafts = 2
+Weng = 1375kg L = 4.986m
+
+static sea level:
+Tssl = 65255N Tabssl = 106001N
+SFCssl = 2.03*10^-5(kg/s)/N, SFCabssl = 5.95*10^-5(kg/s)/N
+wssl = 105.2kg/s
+BPR = 0.71
+OPR = 25
+
+F100-PW-220
+Composition: 3 / - / 10 / 2 / - / 2
+
+static sea level:
+Tssl = 65255N Tabssl = 106001N
+wssl = 103.4kg/s
+BPR = 0.71
+OPR = 25
+
+F100-PW-220E
+Composition: 3 / - / 10 / 2 / - / 2
+
+static sea level:
+Tssl = 65255N Tabssl = 106001N
+SFCssl, SFCabssl = 5.95*10^-5(kg/s)/N
+OPR = 25
+
+F100-PW-229
+Composition: 3 / - / 10 / 2 / - / 2
+
+static sea level:
+Tssl = 79178N Tabssl = 128998N
+SFCssl = 2.1*10^-5(kg/s)/N, SFCabssl = 5.81*10^-5(kg/s)/N
+wssl = 112.5kg/s
+BPR = 0.36
+OPR = 32.4
+FPR = 3.8
+TET = 1755K
+
+cruise:
+OPRcr = 23
+
+F100-PW-229A
+Composition: 3 / - / 10 / 2 / - / 2
+
+static sea level:
+Tssl = 79178N Tabssl = 144567N
+SFCssl, SFCabssl = 5.41*10^-5(kg/s)/N
+OPR = 35
+
+
+F110-GE-100
+Composition: 3 / - / 9 / 1 / - / 2
+
+static sea level:
+Tssl = 81536N Tabssl = 127308N
+SFCssl = 2.11*10^-5(kg/s)/N, SFCabssl = 5.89*10^-5(kg/s)/N
+wssl = 115.2kg/s
+BPR = 0.87
+OPR = 30.4
+FPR = 2.98
+
+F110-GE-129
+Composition: 3 / - / 9 / 1 / - / 2
+Dfan = 0.905m D = 1.181m Nb shafts = 2
+Weng = 1805kg L = 4.62m
+
+static sea level:
+Tssl = 75619N Tabssl = 128998N 
+SFCssl, SFCabssl = 5.38*10^-5(kg/s)/N
+wssl = 122.5kg/s
+BPR = 0.76 
+OPR = 30.7
+
 */
 
 namespace F16
