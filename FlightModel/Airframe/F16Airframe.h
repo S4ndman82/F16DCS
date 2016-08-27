@@ -243,7 +243,7 @@ namespace F16
 
 		void setNavigationLights(bool onoff)
 		{
-			if (onoff == true)
+			if (onoff == true && navigationLights == false)
 			{
 				// just some example pattern for testing
 				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 0.0f, 1.0f };
@@ -259,7 +259,7 @@ namespace F16
 		}
 		void setFormationLights(bool onoff)
 		{
-			if (onoff == true)
+			if (onoff == true && formationLights == false)
 			{
 				// just some example pattern for testing
 				float blinkerSequence[5] = { 0.0f, 1.0f, 0.0f, 1.0f, 1.0f };
@@ -275,7 +275,7 @@ namespace F16
 		}
 		void setLandingLights(bool onoff)
 		{
-			if (onoff == true)
+			if (onoff == true && landingLights == false)
 			{
 				// use shorter simple pattern for testing in this case
 				float blinkerSequence[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
