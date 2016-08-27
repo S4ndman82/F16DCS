@@ -11,8 +11,7 @@
 #include "Atmosphere/F16Atmosphere.h"
 #include "Atmosphere/F16GroundSurface.h"
 
-// for actuator code
-#include "FlightControls/F16FlightControls.h"
+#include "FlightControls/F16Actuator.h"
 
 namespace F16
 {

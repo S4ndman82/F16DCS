@@ -118,6 +118,9 @@
     <ClInclude Include="EquationsOfMotion\F16WeightBalance.h">
       <Filter>EquationsOfMotion</Filter>
     </ClInclude>
+    <ClInclude Include="FlightControls\F16Actuator.h">
+      <Filter>FlightControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
