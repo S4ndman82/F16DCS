@@ -17,8 +17,13 @@ sources:
 - NASA TN D-8176
 - NASA TP 2857
 - NASA TM 74097
-- ADA055417
-
+- AD-A055 417
+- AD-A274 057
+- AD-A202 599
+- AD-A230 517
+- NASA Technical Paper 3355
+- NASA Technical Memorandum 86026
+- WL-TR-97-3091
 */
 
 namespace F16
