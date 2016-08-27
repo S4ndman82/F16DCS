@@ -18,6 +18,12 @@ namespace F16
 	const double		wingArea_FT2			= 300.0;		// F-16 wing area (ft^2)
 	const double		wingArea_m2				= 27.87;		// F-16 wing area (m^2)
 
+	const double		wing_wetted_area_FT2				= 341.1; // from JSBSIM readme
+	const double		ventral_fin_each_wetted_area_FT2	= 15.3; // from JSBSIM readme
+	const double		horiz_tail_wetted_area_FT2			= 127.8; // from JSBSIM readme
+	const double		vertical_tail_wetted_area_FT2		= 128.7; // from JSBSIM readme
+	const double		fuselage_wetted_area_FT2			= 775.8; // from JSBSIM readme
+
 	const double		length_m				= 15.03;
 	const double		height_m				= 5.09;
 
