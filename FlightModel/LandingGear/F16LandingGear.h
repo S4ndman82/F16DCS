@@ -250,19 +250,29 @@ namespace F16
 
 		// need current weight of the whole aircraft
 		// and speed relative to ground (static, sliding or rolling friction of each wheel)
-		void updateFrame(const double groundSpeed, const double weightN, double frameTime)
+		void updateFrame(const double airSpeed, const double groundSpeed, const double weightN, double frameTime)
 		{
 			wheelNose.clearForceTotal();
 			wheelLeft.clearForceTotal();
 			wheelRight.clearForceTotal();
 
-			// TODO: angle for each wheel individually
+			// TODO: if gears are not fully up,
+			// calculate force required to pull them up
+			// something like this?
+			//forceReq = airSpeed * pressure;
+			// then set required force to gear
+			//actNose.m_forceThresholdDec = forceReq;
+			//actLeft.m_forceThresholdDec = forceReq;
+			//actRight.m_forceThresholdDec = forceReq;
+			// also set force provided by hydraulic system (TODO)
+
 
 			// if there is weight on wheels -> do nothing
 			if (isWoW() == false)
 			{
 				if (gearLevelUp == true)
 				{
+					// lever up -> command to pull wheels up (decrement act.)
 					actNose.m_commanded = 0;
 					actLeft.m_commanded = 0;
 					actRight.m_commanded = 0;
