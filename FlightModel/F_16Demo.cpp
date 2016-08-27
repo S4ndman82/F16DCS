@@ -138,7 +138,7 @@ namespace F16
 	F16EngineManagementSystem EMS(&Atmos, &Fuel);
 	F16HydraulicSystem Hydraulics; 
 	F16FlightControls FlightControls(&Atmos);
-	F16LandingGear LandingGear;
+	F16LandingGear LandingGear(&Atmos, &Ground);
 	F16Airframe Airframe;
 	F16Motion Motion(&Atmos);
 	F16ElectricSystem Electrics;
@@ -251,7 +251,7 @@ void ed_fm_simulate(double dt)
 	// TODO:! give ground speed to calculate wheel slip/grip!
 	// we use total velocity for now..
 	// use "dry" weight and internal fuel weight (TODO: take care of it in motion)
-	F16::LandingGear.updateFrame(F16::Atmos.totalVelocity, F16::Atmos.totalVelocity, F16::Motion.getTotalWeightN(), frametime);
+	F16::LandingGear.updateFrame(F16::Motion.getTotalWeightN(), frametime);
 
 	//-----CONTROL DYNAMICS------------------------
 	// landing gear "down&locked" affects some logic

@@ -3,7 +3,13 @@
 
 #include "../stdafx.h"
 
+#include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
+#include "include/F16Constants.h"		// Common constants used throughout this DLL
+
 #include "F16LandingWheel.h"
+
+#include "Atmosphere/F16Atmosphere.h"
+#include "Atmosphere/F16GroundSurface.h"
 
 // for actuator code
 #include "FlightControls/F16FlightControls.h"
@@ -59,8 +65,11 @@ namespace F16
 		bool antiSkidOn;
 
 		//F16HydraulicSystem *pHydSys; // parent system providing force
+		F16Atmosphere *pAtmos;
+		F16GroundSurface *pGrounds;
 
-		F16LandingGear() 
+	public:
+		F16LandingGear(F16Atmosphere *atmos, F16GroundSurface *grounds)
 			: gearLevelUp(false)
 			, nosewheelSteering(true) // <- enable by default until button mapping works
 			, noseGearTurnAngle(0)
@@ -74,6 +83,8 @@ namespace F16
 			, wheelRight(0.68, 3.6)
 			, parkingBreakOn(false)
 			, antiSkidOn(false)
+			, pAtmos(atmos)
+			, pGrounds(grounds)
 		{
 		}
 		~F16LandingGear() {}
@@ -250,8 +261,13 @@ namespace F16
 
 		// need current weight of the whole aircraft
 		// and speed relative to ground (static, sliding or rolling friction of each wheel)
-		void updateFrame(const double airSpeed, const double groundSpeed, const double weightN, double frameTime)
+		void updateFrame(const double weightN, double frameTime)
 		{
+			//const double airSpeed = ;
+			const double groundSpeed = pAtmos->totalVelocity;
+			//pGrounds->
+
+
 			wheelNose.clearForceTotal();
 			wheelLeft.clearForceTotal();
 			wheelRight.clearForceTotal();
