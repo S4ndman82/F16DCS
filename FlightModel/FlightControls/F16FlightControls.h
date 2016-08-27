@@ -68,8 +68,8 @@ namespace F16
 		// Actuator code works for any unit this moment: N, V etc.
 		// Caller just has to make sure to provide values in same unit each time
 		//
-		double m_forceThresholdInc;		// force threshold to move towards upper limit
-		double m_forceThresholdDec;		// force threshold to move towards lower limit
+		double m_forceResistsInc;		// force threshold to move towards upper limit
+		double m_forceResistsDec;		// force threshold to move towards lower limit
 		double m_forceProvided;			// amount of force provided to actuator to operate
 
 		// is in working condition/damaged
@@ -87,13 +87,13 @@ namespace F16
 		F16Actuator(const double moverate)
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
 			m_minLimit(0), m_maxLimit(0), m_haveLimits(false), 
-			m_forceThresholdInc(0), m_forceThresholdDec(0), m_forceProvided(0),
+			m_forceResistsInc(0), m_forceResistsDec(0), m_forceProvided(0),
 			m_isWorking(true)
 		{}
 		F16Actuator(const double moverate, const double minLimit, const double maxLimit)
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
 			m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true), 
-			m_forceThresholdInc(0), m_forceThresholdDec(0), m_forceProvided(0),
+			m_forceResistsInc(0), m_forceResistsDec(0), m_forceProvided(0),
 			m_isWorking(true)
 		{}
 		~F16Actuator() {}
@@ -104,14 +104,14 @@ namespace F16
 			/* this is still crude.. don't do this..
 
 			// if force threshold defined
-			if (diff > 0 && m_forceProvided < m_forceThresholdInc && m_forceThresholdInc > 0)
+			if (diff > 0 && m_forceProvided < m_forceResistsInc && m_forceResistsInc > 0)
 			{
 				// movement towards upper limit:
 				// not enough force -> can't continue
 				return;
 			}
 			// if force threshold defined
-			if (diff < 0 && m_forceProvided < m_forceThresholdDec && m_forceThresholdDec > 0)
+			if (diff < 0 && m_forceProvided < m_forceResistsDec && m_forceResistsDec > 0)
 			{
 				// movement towards lower limit:
 				// not enough force -> can't continue
@@ -119,11 +119,11 @@ namespace F16
 			}
 
 			TODO: something like this instead?
-			if ((m_forceProvided * movementPerFrame) > m_forceThresholdInc && diff > 0)
+			if ((m_forceProvided * movementPerFrame) > m_forceResistsInc && diff > 0)
 			{
 				m_current += m_forceProvided * movementPerFrame;
 			}
-			if ((m_forceProvided * movementPerFrame) > m_forceThresholdDec && diff < 0)
+			if ((m_forceProvided * movementPerFrame) > m_forceResistsDec && diff < 0)
 			{
 				m_current += m_forceProvided * movementPerFrame;
 			}
