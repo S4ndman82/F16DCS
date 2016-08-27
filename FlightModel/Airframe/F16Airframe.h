@@ -7,7 +7,7 @@
 #include "include/F16Constants.h"		// Common constants used throughout this DLL
 
 // for actuator code
-#include "FlightControls/F16FlightControls.h"
+#include "FlightControls/F16Actuator.h"
 
 namespace F16
 {
