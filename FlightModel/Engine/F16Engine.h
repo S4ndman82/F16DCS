@@ -210,6 +210,13 @@ FPR = 3.2
 TET = 1643K
 
 */
+/* https://en.wikipedia.org/wiki/General_Electric_F110
+F110-GE-129
+
+Overall pressure ratio: 29.9:1 - 30.4:1
+Turbine inlet temperature: 2750F (1510C)
+
+*/
 
 namespace F16
 {
