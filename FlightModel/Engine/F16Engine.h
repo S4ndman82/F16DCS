@@ -275,9 +275,9 @@ namespace F16
 	{
 		ET_F100PW200,	// F100-PW-200 // F-16A/B // worst of the bunch
 		ET_F100PW220,	// F100-PW-220 // F-16A/B/C/D
-		ET_F100PW220E,	// F100-PW-220E // F-16A/B/C/D
+		//ET_F100PW220E,	// F100-PW-220E // F-16A/B/C/D
 		ET_F100PW229,	// F100-PW-229 // F-16 C/D
-		ET_F100PW229A,	// F100-PW-229A // F-16 C/D
+		//ET_F100PW229A,	// F100-PW-229A // F-16 C/D
 		ET_F110GE100,	// F110-GE-100 // F-16 C/D
 		ET_F110GE129,	// F110-GE-129 // F-16 C/D
 		ET_Reserved
@@ -303,8 +303,10 @@ namespace F16
 		// amount bypassed vs. amount for normal intake
 		double bypassRatio;
 
-		// maximum amount of compression
-		//double maxCompress;
+		// maximum amount of compression:
+		// differences in engines..
+		double minCompress;
+		double maxCompress;
 
 		// at turbine stage
 		//double maxTemperature;
@@ -319,16 +321,28 @@ namespace F16
 			, maxDiameter(46.5 * inchesToCentim) // in -> cm
 			, inletDiameter(34.8 * inchesToCentim) // in -> cm
 			, bypassRatio(0)
+			, minCompress(0)
+			, maxCompress(0)
 			, maxRpmN2(14459) // <- F110-GE-400 limit, until better one is found..
 		{
-			if (engineType == ET_F110GE100
-				|| engineType == ET_F110GE129)
+			switch (engineType)
 			{
+			case ET_F110GE100:
+			case ET_F110GE129:
 				bypassRatio = 0.76;
-			}
-			else if (engineType == ET_F100PW200)
-			{
+				minCompress = 29.9; // GE-129
+				maxCompress = 30.4; // GE-129
+				break;
+
+			case ET_F100PW200:
+			case ET_F100PW220:
+			case ET_F100PW229:
 				bypassRatio = 0.36; //
+				maxCompress = 32; // PW-220 -> PW-229 ?
+				break;
+
+			default:
+				break;
 			}
 		}
 		~F16EngineParameters() {}
@@ -602,8 +616,10 @@ namespace F16
 			// we don't know the ratios of each rotor,
 			// but PW brochure says 32:1 compression 
 			// -> use that for now
+			//gas.pressure *= 32;
 
-			gas.pressure *= 32;
+			// TODO: handling of min/max in EMS according to air pressure (sea level?)
+			gas.pressure *= engineParams.maxCompress;
 
 			// part of air directed to bleed air -> AB fuel pump etc.
 
