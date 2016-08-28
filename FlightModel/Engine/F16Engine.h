@@ -11,6 +11,7 @@ Sources of data:
 - 19990064011 FLIGHT RESEARCH USING F100 ENGINE P680063 IN THE NASA F-15 AIRPLANE
 - NASA_NTRS_Archive_19860015875 NASA LEWIS FlOO ENGINE TESTING 
 - DTIC_ADA033302.pdf (YJ1O1-GE.100)
+- NASA Technical Memorandum 104326 
 */
 
 #ifndef _F16ENGINE_H_
@@ -174,6 +175,42 @@ OPR = 30.7
 
 */
 
+/* http://www.bga-aeroweb.com/Engines/General-Electric-F110.html
+Thrust: F110-GE-129: 29,500 pounds; F110-GE-132: 32,000 pounds
+Overall Pressure Ratio at Maximum Power: F110-GE-129: 30.7; F110-GE-132: 33.3
+Thrust-to-Weight Ratio: F110-GE-129: 7.29; F110-GE-132: 7.90
+Compressor: Two spool, axial flow, three-stage fan
+LP-HP Compressor Stages: 0-9
+HP-LP Turbine Stages: 1-2
+Combustor Type: Annular
+Length: 182.3 in (4.63 m)
+Diameter: 46.5 in (118 cm)
+Dry Weight: F110-GE-129: 3,980 lbs (1,805 kg); F110-GE-132: 4,050 lbs (1,837 kg)
+*/
+
+/* http://www.ausairpower.net/PDF-A/engines.pdf
+
+F110-GE-400
+RPM (HPC/LPC)
+max 14666 / 8257
+intm. 14673 / 14666
+maxcont. 14459 / 8038
+
+Composition: 3 / - / 9 / 1 / - / 2
+Dfan = 0.905m D = 1.181m Nb shafts = 2
+Weng = 1526kg L = 5.08m
+
+static sea level:
+Tssl = 75600N Tabssl = 124500N
+SFCssl = 1.86*10^-5(kg/s)/N, SFCabssl = 5.69*10^-5(kg/s)/N
+wssl = 121.6kg/s
+BPR = 0.87
+OPR = 30.3
+FPR = 3.2
+TET = 1643K
+
+*/
+
 namespace F16
 {
 	// air data as it passes through engine:
@@ -258,6 +295,10 @@ namespace F16
 		// differences, likely calculated differently:
 		// amount bypassed vs. amount for normal intake
 		double bypassRatio;
+
+		// varies by conditions (temperature, compression),
+		// different for N1, N2
+		double maxRpm;
 
 		F16EngineParameters(EngineType engine)
 			: engineType(engine)
