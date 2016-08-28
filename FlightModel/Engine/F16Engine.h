@@ -296,9 +296,15 @@ namespace F16
 		// amount bypassed vs. amount for normal intake
 		double bypassRatio;
 
+		// maximum amount of compression
+		//double maxCompress;
+
+		// at turbine stage
+		//double maxTemperature;
+
 		// varies by conditions (temperature, compression),
 		// different for N1, N2
-		double maxRpm;
+		double maxRpmN2;
 
 		F16EngineParameters(EngineType engine)
 			: engineType(engine)
@@ -306,6 +312,7 @@ namespace F16
 			, maxDiameter(46.5 * inchesToCentim) // in -> cm
 			, inletDiameter(34.8 * inchesToCentim) // in -> cm
 			, bypassRatio(0)
+			, maxRpmN2(14459) // <- F110-GE-400 limit, until better one is found..
 		{
 			if (engineType == ET_F110GE100
 				|| engineType == ET_F110GE129)

@@ -30,13 +30,53 @@ sources:
 
 namespace F16
 {
-	// TODO! real actuator support
+	// TODO! combine controllers with real actuator support
 
 	class F16FcsController
 	{
 	public:
 		F16FcsController() {}
 		~F16FcsController() {}
+
+		virtual bool initialize()
+		{
+			return true;
+		}
+
+		virtual void updateFrame(const double frameTime) = 0;
+	};
+
+	class F16YawController : public F16FcsController
+	{
+	public:
+		F16YawController()
+			: F16FcsController()
+		{}
+		~F16YawController() {}
+
+		virtual void updateFrame(const double frameTime) {};
+	};
+
+	class F16PitchController : public F16FcsController
+	{
+	public:
+		F16PitchController() 
+			: F16FcsController() 
+		{}
+		~F16PitchController() {}
+
+		virtual void updateFrame(const double frameTime) {};
+	};
+
+	class F16RollController : public F16FcsController
+	{
+	public:
+		F16RollController()
+			: F16FcsController()
+		{}
+		~F16RollController() {}
+
+		virtual void updateFrame(const double frameTime) {};
 	};
 
 	// if/when trimming support is needed,
@@ -578,6 +618,9 @@ namespace F16
 		// Angle of attack limiter logic
 		double angle_of_attack_limiter(const double alphaFiltered, const double pitchRateCommand) const
 		{
+			// TODO: 
+			//if (manualPitchOverride == true)
+	
 			double topLimit = limit((alphaFiltered - 22.5) * 0.69, 0.0, 99999.0);
 			double bottomLimit = limit((alphaFiltered - 15.0 + pitchRateCommand) * 0.322, 0.0, 99999.0);
 
@@ -727,6 +770,9 @@ namespace F16
 		// Passive flap schedule for the F-16...nominal for now from flight manual comments
 		double fcs_flap_controller(double airspeed_FPS)
 		{
+			// TODO: 
+			//if (gearRelatedFlaps == true)
+
 			double airspeed_KTS = 0.5924838012958964 * airspeed_FPS;
 			double trailing_edge_flap_deflection = 0.0;
 
