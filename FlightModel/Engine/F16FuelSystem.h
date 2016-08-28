@@ -151,6 +151,9 @@ namespace F16
 
 	public:
 
+		// setting for "bingo fuel"
+		double m_fuelWarningLimit; // in kg
+
 		// Internal fuel as calculated by the EFM fuel system modeling
 		//F16FuelTank FwdFus1; // foward fuselage 1
 		//F16FuelTank FwdFus2; // forward fuselage 2
@@ -185,6 +188,7 @@ namespace F16
 		F16FuelSystem() 
 			: is_unlimited_fuel(false)
 			, previous_usage(0)
+			, m_fuelWarningLimit(500.0) // in kg
 			, FwdFus(3100 * lb_to_kg) // lb to kg
 			, AftFus(2800 * lb_to_kg)
 			, LeftWing(525 * lb_to_kg)
@@ -216,7 +220,7 @@ namespace F16
 		bool isLowFuel() const
 		{
 			// check remining fuel
-			if (getInternalFuel() <= 500)
+			if (getInternalFuel() <= m_fuelWarningLimit)
 			{
 				return true;
 			}

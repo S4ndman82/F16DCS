@@ -840,6 +840,7 @@ namespace F16
 			Cl_total = Cl + Cl_delta_lef*leadingEdgeFlap_PCT + dLdail*aileron_PCT + Cl_delta_r30*rudder_PCT + dLdR*yawRate_RPS + dLdP*rollRate_RPS + Cl_delta_beta*beta_DEG;
 		}
 
+
 		double getCxTotal() const { return Cx_total; }
 		double getCzTotal() const { return Cz_total; }
 		double getCmTotal() const { return Cm_total; }
