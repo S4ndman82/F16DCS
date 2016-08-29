@@ -48,6 +48,13 @@ namespace F16
 		double m_forceResistsDec;		// force threshold to move towards lower limit
 		double m_forceProvided;			// amount of force provided to actuator to operate
 
+		// Amount of dampening actuator provides against external forces.
+		// For example, airflow acting on control surface.
+		double m_dampeningRate;
+
+		// External force affecting actuator
+		double m_externalForce;
+
 		// is in working condition/damaged
 		bool m_isWorking;
 
@@ -64,17 +71,19 @@ namespace F16
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
 			m_minLimit(0), m_maxLimit(0), m_haveLimits(false), 
 			m_forceResistsInc(0), m_forceResistsDec(0), m_forceProvided(0),
-			m_isWorking(true)
+			m_dampeningRate(0), m_externalForce(0), m_isWorking(true)
 		{}
 		F16Actuator(const double moverate, const double minLimit, const double maxLimit)
 			: m_moveRate(moverate), m_commanded(0), m_current(0),
 			m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true), 
 			m_forceResistsInc(0), m_forceResistsDec(0), m_forceProvided(0),
-			m_isWorking(true)
+			m_dampeningRate(0), m_externalForce(0), m_isWorking(true)
 		{}
 		~F16Actuator() {}
 
 		// TODO: improve upon this before using
+		// this should be non-linear function to give actual movement when resisting force increases near limit?
+		// or are all actuators expected work exactly to limit and then stop?
 		bool forceThresholdMove(const double movementPerFrame, const double diff, const double frameTime)
 		{
 			/* this is still crude.. don't do this..

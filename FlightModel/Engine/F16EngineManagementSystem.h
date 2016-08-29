@@ -33,6 +33,15 @@ namespace F16
 	{};
 	*/
 
+	// PRI / SEC
+	enum eABResetSwitch
+	{
+		AB_RESET,
+		AB_NORM,
+		ENGDATA
+	};
+
+
 	class F16EngineManagementSystem
 	{
 	public:
@@ -202,12 +211,19 @@ namespace F16
 			// 
 			//Engine CIVV control
 
+			//pFuel->updateFrame(frameTime);
+			Engine.updateFrame(frameTime);
+
+			/*
+			if (getEngineRpm() < minRpm)
+			{
+				Epu.start();
+			}
+			*/
+
 			Epu.updateFrame(frameTime);
 			JFS.updateFrame(frameTime);
 			Gearbox.updateFrame(frameTime);
-
-			//pFuel->updateFrame(frameTime);
-			Engine.updateFrame(frameTime);
 		}
 
 

@@ -4,6 +4,9 @@
 #include "../stdafx.h"
 
 /*
+sources:
+- https://www.coursehero.com/flashcards/669965/F-16-PW-220-Engine/
+
 JFS = Jet Fuel Starter,
 gas turbine -> auxiliary drive gearbox -> clutch -> engine starter and maintains rpm
 */
@@ -19,8 +22,30 @@ namespace F16
 	// ..
 	class F16JFS
 	{
+	protected:
+
+		// keeps running until switched off,
+		// may provide additional power
+		bool m_switchOn;
+
+		// see conditions for light illumination
+		bool m_runLight;
+
+		// while spooldown in progress, cannot restart JFS
+		bool m_spoolDown;
+		bool m_spoolUp;
+
+		double m_currentRpm;
+		double m_currentTemperature;
+
 	public:
-		F16JFS() {}
+		F16JFS() 
+			: m_switchOn(false)
+			, m_runLight(false)
+			, m_spoolDown(false)
+			, m_spoolUp(false)
+			, m_currentRpm(0)
+		{}
 		~F16JFS() {}
 
 		double getRpm() const
@@ -47,13 +72,40 @@ namespace F16
 
 		void start()
 		{
+			m_switchOn = true;
+			if (m_spoolDown == false)
+			{
+				// -> starting
+				m_spoolUp = true;
+			}
+
 		}
 		void stop()
 		{
+			// start spooldown
+			if (m_switchOn == true)
+			{
+				m_spoolDown = true;
+			}
+			m_switchOn = false;
 		}
 
 		void updateFrame(const double frameTime)
 		{
+			// when ground start
+			// if (m_currentRpm >= 12%) -> charge accumulators
+			// if (m_currentRpm >= 50%) -> light goes out (shutdown?)
+
+			// when airstart
+			// if (m_currentRpm >= 70%) -> charge accumulators
+			// 3-4 sec -> run light on
+
+			if (m_spoolDown == true && m_currentRpm == 0)
+			{
+				// just check if we have reached 0 rpm
+				// -> can start again
+				m_spoolDown = false;
+			}
 		}
 
 	};

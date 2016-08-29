@@ -338,7 +338,7 @@ namespace F16
 			case ET_F100PW220:
 			case ET_F100PW229:
 				bypassRatio = 0.36; //
-				maxCompress = 32; // PW-220 -> PW-229 ?
+				maxCompress = 32; // PW-220 -> PW-229 ? (pw.utc.com)
 				break;
 
 			default:

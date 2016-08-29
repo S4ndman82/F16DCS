@@ -51,6 +51,19 @@ namespace F16
 		{}
 		~F16EPU() {}
 
+		void setHighPressureBleedAir(const double value)
+		{
+			highBleedAir = value;
+		}
+
+		// EMS may order to start if engine RPM too low
+		void start()
+		{
+		}
+		void stop()
+		{
+		}
+
 		void updateFrame(const double frameTime)
 		{
 			//if (testSwitch)
@@ -59,10 +72,6 @@ namespace F16
 			//-> augment with hydrazine
 		}
 
-		void setHighPressureBleedAir(const double value)
-		{
-			highBleedAir = value;
-		}
 	};
 }
 
