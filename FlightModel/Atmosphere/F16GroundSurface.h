@@ -47,8 +47,15 @@ namespace F16
 			m_surfaceNormal = sfcNormal;
 		}
 
-		void updateFrame(double frameTime)
+		void groundEffect(double frameTime)
 		{
+			// downwash at entire trailing edge of wing,
+			// also wingtip vortices
+			// -> lift increase
+			// -> reduced drag
+			// wingspan, altitude, angle of attack
+
+
 			if (surfaceHeightWithObj > surfaceHeight)
 			{
 				// ground effect disrupted by object (or uneven surface?)
@@ -79,7 +86,11 @@ namespace F16
 
 			}
 
+		}
 
+		void updateFrame(double frameTime)
+		{
+			groundEffect(frameTime);
 		}
 	};
 }

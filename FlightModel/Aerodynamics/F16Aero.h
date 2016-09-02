@@ -35,7 +35,7 @@ namespace F16
 		//double *xPar; // parameters for interpolation (1-3 pars)
 		double m_result; // result value
 
-		AERO_Function()
+		AERO_Function(const int nDimension)
 			: indexVector()
 			, ndinfo()
 			, m_Xmat(NULL)
@@ -46,8 +46,12 @@ namespace F16
 			//, xPar(NULL)
 			, m_result(0)
 		{
-			ndinfo.nDimension = 0;
+			ndinfo.nDimension = nDimension;
 		}
+		AERO_Function()
+			: AERO_Function(0) // <- constructor inheritance, until finished with changes
+		{}
+
 
 		~AERO_Function()
 		{
@@ -94,6 +98,11 @@ namespace F16
 			// preallocate another temporary buffer to reuse
 			indexVector.getVec(ndinfo.nDimension);
 		}
+
+		/*
+		void setDatapoint(const int index, int size, )
+		{}
+		*/
 
 		double interpnf(const double *xPar)
 		{

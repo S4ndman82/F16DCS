@@ -57,7 +57,8 @@ namespace F16
 		// logic for EPU/JFS/main engine torque
 		F16Gearbox Gearbox;
 
-		//F16BleedAirSystem BleedAir;
+		// logic for bleed air to env system, anti-ice, back to engine etc.
+		F16BleedAirSystem BleedAir;
 		//BleedAir.pEpu = &Epu;
 
 	public:
@@ -66,6 +67,7 @@ namespace F16
 			, pFuel(fuels)
 			, Engine(ET_F100PW200, atmos)
 			, Gearbox()
+			, BleedAir()
 		{}
 		~F16EngineManagementSystem() {}
 
@@ -224,6 +226,7 @@ namespace F16
 			Epu.updateFrame(frameTime);
 			JFS.updateFrame(frameTime);
 			Gearbox.updateFrame(frameTime);
+			BleedAir.updateFrame(frameTime);
 		}
 
 
