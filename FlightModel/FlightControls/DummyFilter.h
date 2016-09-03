@@ -1,7 +1,6 @@
 #ifndef _DUMMYFILTER_H_
 #define _DUMMYFILTER_H_
 
-#include "../stdafx.h"
 #include <memory.h>
 #include "../UtilityFunctions.h"
 //#include "../include/general_filter.h"

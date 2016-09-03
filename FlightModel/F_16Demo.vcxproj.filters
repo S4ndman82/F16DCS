@@ -7,7 +7,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="F_16Demo.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UtilityFunctions.h" />
     <ClInclude Include="Aerodynamics\F16Aero.h">
@@ -121,6 +120,7 @@
     <ClInclude Include="FlightControls\F16Actuator.h">
       <Filter>FlightControls</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
