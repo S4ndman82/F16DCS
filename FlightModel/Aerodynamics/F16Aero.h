@@ -33,6 +33,9 @@ namespace F16
 		UtilMatrix<int> m_indexMat; // used in interpolation, reduce reallocation
 
 		//double *xPar; // parameters for interpolation (1-3 pars)
+		double xPar1Limit; // upper limit for X-parameter 1 in functions
+		bool hasXPar1Limit; // if limit is defined
+
 		double m_result; // result value
 
 		AERO_Function(const int nDimension, double *Ydata)
@@ -44,6 +47,8 @@ namespace F16
 			, m_xPointMat()
 			, m_indexMat()
 			//, xPar(NULL)
+			, xPar1Limit(0)
+			, hasXPar1Limit(false)
 			, m_result(0)
 		{
 			ndinfo.nDimension = nDimension;

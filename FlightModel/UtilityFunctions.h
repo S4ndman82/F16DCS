@@ -309,6 +309,7 @@ double interpn(UtilBuffer<int> &indexVector, double **Xmat, const double *Y, con
 }
 // End of Utility Functions
 
+
 // Simple upper and lower limiter
 double limit(double input, double lower_limit, double upper_limit)
 {
@@ -325,5 +326,24 @@ double limit(double input, double lower_limit, double upper_limit)
 		return input;
 	}
 }
+
+// check if there's need to keep configurable limits somewhere..
+class Limiter
+{
+public:
+	double lower_limit;
+	double upper_limit;
+
+	Limiter(double lower, double upper)
+		: lower_limit(lower), upper_limit(upper) 
+	{}
+	~Limiter() {}
+
+	double limit(double input)
+	{
+		return ::limit(input, lower_limit, upper_limit);
+	}
+};
+
 
 #endif
