@@ -264,25 +264,6 @@ namespace F16
 			return fn_Cl.interpnf3(alpha, beta, dele);
 		}
 
-		double _Cx_lef(double alpha,double beta)
-		{
-			//CX0820_ALPHA2_BETA1_202.dat
-			return fn_Cx_lef.interpnf2Lim(alpha, beta);
-		}
-
-		double _Cz_lef(double alpha,double beta)
-		{
-			//CZ0820_ALPHA2_BETA1_302.dat
-			return fn_Cz_lef.interpnf2Lim(alpha, beta);
-		}
-
-		double _Cm_lef(double alpha,double beta)
-		{
-			//CM0820_ALPHA2_BETA1_102.dat
-
-			return fn_Cm_lef.interpnf2Lim(alpha, beta);
-		}
-
 
 		/*
 		double _delta_Cm_ds(double alpha, double el){
@@ -328,11 +309,14 @@ namespace F16
 			fn_Cn_lef.interpnf2Lim(alpha, beta); //CN0820_ALPHA2_BETA1_502.dat
 			fn_Cl_lef.interpnf2Lim(alpha, beta);
 
-
 			/* hifi_C_lef */
-			Cx_delta_lef = _Cx_lef(alpha, beta) - _Cx(alpha, beta, 0);
-			Cz_delta_lef = _Cz_lef(alpha, beta) - _Cz(alpha, beta, 0);
-			Cm_delta_lef = _Cm_lef(alpha, beta) - _Cm(alpha, beta, 0);
+			fn_Cx_lef.interpnf2Lim(alpha, beta); //CX0820_ALPHA2_BETA1_202.dat
+			fn_Cz_lef.interpnf2Lim(alpha, beta); //CZ0820_ALPHA2_BETA1_302.dat
+			fn_Cm_lef.interpnf2Lim(alpha, beta); //CM0820_ALPHA2_BETA1_102.dat
+
+			Cx_delta_lef = fn_Cx_lef.m_result - _Cx(alpha, beta, 0);
+			Cz_delta_lef = fn_Cz_lef.m_result - _Cz(alpha, beta, 0);
+			Cm_delta_lef = fn_Cm_lef.m_result - _Cm(alpha, beta, 0);
 			Cy_delta_lef = fn_Cy_lef.m_result - _Cy(alpha, beta);
 			Cn_delta_lef = fn_Cn_lef.m_result - _Cn(alpha, beta, 0);
 			Cl_delta_lef = fn_Cl_lef.m_result - _Cl(alpha, beta, 0);
