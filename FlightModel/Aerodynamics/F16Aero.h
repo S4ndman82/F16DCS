@@ -292,26 +292,6 @@ namespace F16
 			return fn_Cm_lef.interpnf2Lim(alpha, beta);
 		}
 
-		double _Cy_lef(double alpha,double beta)
-		{
-			//CY0820_ALPHA2_BETA1_402.dat
-
-			return fn_Cy_lef.interpnf2Lim(alpha, beta);
-		}
-
-		double _Cn_lef(double alpha,double beta)
-		{
-			//CN0820_ALPHA2_BETA1_502.dat
-
-
-			return fn_Cn_lef.interpnf2Lim(alpha, beta);
-		}
-
-		double _Cl_lef(double alpha,double beta)
-		{
-			return fn_Cl_lef.interpnf2Lim(alpha, beta);
-		}
-
 		double _delta_CXq_lef(double alpha)
 		{
 			//CX1420_ALPHA2_205.dat
@@ -416,13 +396,18 @@ namespace F16
 			fn_CNr.interpnf1(alpha); //CN1320_ALPHA1_506.dat
 			fn_CNp.interpnf1(alpha); //CN1220_ALPHA1_508.dat
 
+			fn_Cy_lef.interpnf2Lim(alpha, beta); //CY0820_ALPHA2_BETA1_402.dat
+			fn_Cn_lef.interpnf2Lim(alpha, beta); //CN0820_ALPHA2_BETA1_502.dat
+			fn_Cl_lef.interpnf2Lim(alpha, beta);
+
+
 			/* hifi_C_lef */
 			Cx_delta_lef = _Cx_lef(alpha, beta) - _Cx(alpha, beta, 0);
 			Cz_delta_lef = _Cz_lef(alpha, beta) - _Cz(alpha, beta, 0);
 			Cm_delta_lef = _Cm_lef(alpha, beta) - _Cm(alpha, beta, 0);
-			Cy_delta_lef = _Cy_lef(alpha, beta) - _Cy(alpha, beta);
-			Cn_delta_lef = _Cn_lef(alpha, beta) - _Cn(alpha, beta, 0);
-			Cl_delta_lef = _Cl_lef(alpha, beta) - _Cl(alpha, beta, 0);
+			Cy_delta_lef = fn_Cy_lef.m_result - _Cy(alpha, beta);
+			Cn_delta_lef = fn_Cn_lef.m_result - _Cn(alpha, beta, 0);
+			Cl_delta_lef = fn_Cl_lef.m_result - _Cl(alpha, beta, 0);
 
 			/* hifi_damping_lef */
 			Cxq_delta_lef = _delta_CXq_lef(alpha);
@@ -457,11 +442,11 @@ namespace F16
 			fn_Cl_a20_lef.interpnf2Lim(alpha, beta); //CL0920_ALPHA2_BETA1_605.dat
 
 			Cy_delta_a20 = fn_Cy_a20.m_result - _Cy(alpha, beta);
-			Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - _Cy_lef(alpha, beta) - Cy_delta_a20;
+			Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - fn_Cy_lef.m_result - Cy_delta_a20;
 			Cn_delta_a20 = fn_Cn_a20.m_result - _Cn(alpha, beta, 0);
-			Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - _Cn_lef(alpha, beta) - Cn_delta_a20;
+			Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - fn_Cn_lef.m_result - Cn_delta_a20;
 			Cl_delta_a20 = fn_Cl_a20.m_result - _Cl(alpha, beta, 0);
-			Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - _Cl_lef(alpha, beta) - Cl_delta_a20;
+			Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - fn_Cl_lef.m_result - Cl_delta_a20;
 
 			/* hifi_other_coeffs */
 
