@@ -374,25 +374,6 @@ namespace F16
 			return fn_delta_CNp_lef.interpnf1Lim(alpha);
 		}
 
-		double _Cy_a20_lef(double alpha, double beta)
-		{
-			//CY0920_ALPHA2_BETA1_404.dat
-
-			return fn_Cy_a20_lef.interpnf2Lim(alpha, beta);
-		}
-
-		double _Cn_a20_lef(double alpha, double beta)
-		{
-			//CN0920_ALPHA2_BETA1_505.dat
-			return fn_Cn_a20_lef.interpnf2Lim(alpha, beta);
-		}
-
-		double _Cl_a20_lef(double alpha, double beta)
-		{
-			//CL0920_ALPHA2_BETA1_605.dat
-
-			return fn_Cl_a20_lef.interpnf2Lim(alpha, beta);
-		}
 
 
 		/*
@@ -467,19 +448,20 @@ namespace F16
 			Cl_delta_r30 = fn_Cl_r30.m_result - _Cl(alpha, beta, 0);
 
 			/* hifi_ailerons */
-			//CY0620_ALPHA1_BETA1_403.dat
-			fn_Cy_a20.interpnf2(alpha, beta);
-			//CN0620_ALPHA1_BETA1_504.dat
-			fn_Cn_a20.interpnf2(alpha, beta);
-			//CL0620_ALPHA1_BETA1_604.dat
-			fn_Cl_a20.interpnf2(alpha, beta);
+			fn_Cy_a20.interpnf2(alpha, beta); //CY0620_ALPHA1_BETA1_403.dat
+			fn_Cn_a20.interpnf2(alpha, beta); //CN0620_ALPHA1_BETA1_504.dat
+			fn_Cl_a20.interpnf2(alpha, beta); //CL0620_ALPHA1_BETA1_604.dat
+
+			fn_Cy_a20_lef.interpnf2Lim(alpha, beta); //CY0920_ALPHA2_BETA1_404.dat
+			fn_Cn_a20_lef.interpnf2Lim(alpha, beta); //CN0920_ALPHA2_BETA1_505.dat
+			fn_Cl_a20_lef.interpnf2Lim(alpha, beta); //CL0920_ALPHA2_BETA1_605.dat
 
 			Cy_delta_a20 = fn_Cy_a20.m_result - _Cy(alpha, beta);
-			Cy_delta_a20_lef = _Cy_a20_lef(alpha, beta) - _Cy_lef(alpha, beta) - Cy_delta_a20;
+			Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - _Cy_lef(alpha, beta) - Cy_delta_a20;
 			Cn_delta_a20 = fn_Cn_a20.m_result - _Cn(alpha, beta, 0);
-			Cn_delta_a20_lef = _Cn_a20_lef(alpha, beta) - _Cn_lef(alpha, beta) - Cn_delta_a20;
+			Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - _Cn_lef(alpha, beta) - Cn_delta_a20;
 			Cl_delta_a20 = fn_Cl_a20.m_result - _Cl(alpha, beta, 0);
-			Cl_delta_a20_lef = _Cl_a20_lef(alpha, beta) - _Cl_lef(alpha, beta) - Cl_delta_a20;
+			Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - _Cl_lef(alpha, beta) - Cl_delta_a20;
 
 			/* hifi_other_coeffs */
 
