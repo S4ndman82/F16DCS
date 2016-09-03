@@ -33,25 +33,21 @@ namespace F16
 		UtilMatrix<int> m_indexMat; // used in interpolation, reduce reallocation
 
 		//double *xPar; // parameters for interpolation (1-3 pars)
-		double m_result; // result value
+		//double m_result; // result value
 
-		AERO_Function(const int nDimension)
+		AERO_Function(const int nDimension, double *Ydata)
 			: indexVector()
 			, ndinfo()
 			, m_Xmat(NULL)
-			, m_Ydata(NULL)
+			, m_Ydata(Ydata)
 			, m_Tbuf()
 			, m_xPointMat()
 			, m_indexMat()
 			//, xPar(NULL)
-			, m_result(0)
+			//, m_result(0)
 		{
 			ndinfo.nDimension = nDimension;
 		}
-		AERO_Function()
-			: AERO_Function(0) // <- constructor inheritance, until finished with changes
-		{}
-
 
 		~AERO_Function()
 		{
@@ -77,18 +73,14 @@ namespace F16
 			indexVector.release();
 		}
 
-		void init(const int nDimension, double *Ydata)
+		void init()
 		{
-			m_Ydata = Ydata;
-			m_result = 0;
-
-			ndinfo.nDimension = nDimension;
 			ndinfo.nPoints = (int*)malloc(ndinfo.nDimension*sizeof(int));
 
 			// just array of pointers to static data
 			m_Xmat = (double **)malloc(ndinfo.nDimension*sizeof(double*));
 
-			int nVertices = (1<<nDimension);
+			int nVertices = (1 << ndinfo.nDimension);
 			m_Tbuf.getVec(nVertices); // preallocate
 
 			// preallocate
@@ -99,15 +91,37 @@ namespace F16
 			indexVector.getVec(ndinfo.nDimension);
 		}
 
+
 		/*
 		void setDatapoint(const int index, int size, )
 		{}
 		*/
 
+		double interpnf1(const double par1)
+		{
+			double x[1];
+			x[0] = par1;
+			return interpnf(x);
+		}
+		double interpnf2(const double par1, const double par2)
+		{
+			double x[2];
+			x[0] = par1;
+			x[1] = par2;
+			return interpnf(x);
+		}
+		double interpnf3(const double par1, const double par2, const double par3)
+		{
+			double x[3];
+			x[0] = par1;
+			x[1] = par2;
+			x[2] = par3;
+			return interpnf(x);
+		}
+
 		double interpnf(const double *xPar)
 		{
-			m_result = interpn(indexVector, m_Xmat, m_Ydata, xPar, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
-			return m_result;
+			return interpn(indexVector, m_Xmat, m_Ydata, xPar, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 		}
 	};
 
@@ -214,62 +228,36 @@ namespace F16
 		double _Cx(double alpha,double beta,double dele)
 		{
 			//CX0120_ALPHA1_BETA1_DH1_201.dat
-			double x[3];	
-			x[0] = alpha;
-			x[1] = beta;
-			x[2] = dele;
-			return fn_Cx.interpnf(x);
+			return fn_Cx.interpnf3(alpha, beta, dele);
 		}
 
 		double _Cz(double alpha,double beta, double dele)
 		{
 			//CZ0120_ALPHA1_BETA1_DH1_301.dat
-			double x[3];	/* Number of dimension */
-			x[0] = alpha;
-			x[1] = beta;
-			x[2] = dele;
-			return fn_Cz.interpnf(x);
+			return fn_Cz.interpnf3(alpha, beta, dele);
 		}
 
 		double _Cm(double alpha,double beta,double dele)
 		{
 			//CM0120_ALPHA1_BETA1_DH1_101.dat
-		
-			double x[3];	
-			x[0] = alpha;
-			x[1] = beta;
-			x[2] = dele;
-			return fn_Cm.interpnf(x);
+			return fn_Cm.interpnf3(alpha, beta, dele);
 		}
 
 		double _Cy(double alpha,double beta)
 		{
 			// CY0320_ALPHA1_BETA1_401.dat
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cy.interpnf(x);
+			return fn_Cy.interpnf2(alpha, beta);
 		}
 
 		double _Cn(double alpha, double beta, double dele)
 		{
 			//CN0120_ALPHA1_BETA1_DH2_501.dat
-
-			double x[3];	
-			x[0] = alpha;
-			x[1] = beta;
-			x[2] = dele;
-			return fn_Cn.interpnf(x);
+			return fn_Cn.interpnf3(alpha, beta, dele);
 		}
 
 		double _Cl(double alpha, double beta,double dele)
 		{
-			double x[3];
-			x[0] = alpha;
-			x[1] = beta;
-			x[2] = dele;
-			return fn_Cl.interpnf(x);
+			return fn_Cl.interpnf3(alpha, beta, dele);
 		}
 
 		double _Cx_lef(double alpha,double beta)
@@ -280,11 +268,7 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cx_lef.interpnf(x);
+			return fn_Cx_lef.interpnf2(alpha, beta);
 		}
 
 		double _Cz_lef(double alpha,double beta)
@@ -296,10 +280,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cz_lef.interpnf(x);
+			return fn_Cz_lef.interpnf2(alpha, beta);
 		}
 
 		double _Cm_lef(double alpha,double beta)
@@ -311,10 +292,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cm_lef.interpnf(x);
+			return fn_Cm_lef.interpnf2(alpha, beta);
 		}
 
 		double _Cy_lef(double alpha,double beta)
@@ -326,10 +304,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cy_lef.interpnf(x);
+			return fn_Cy_lef.interpnf2(alpha, beta);
 		}
 
 		double _Cn_lef(double alpha,double beta)
@@ -341,10 +316,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cn_lef.interpnf(x);
+			return fn_Cn_lef.interpnf2(alpha, beta);
 		}
 
 		double _Cl_lef(double alpha,double beta)
@@ -354,91 +326,61 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[2];
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cl_lef.interpnf(x);
+			return fn_Cl_lef.interpnf2(alpha, beta);
 		}
 
 		double _CXq(double alpha)
 		{
 			//CX1120_ALPHA1_204.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CXq.interpnf(x);
+			return fn_CXq.interpnf1(alpha);
 		}
 
 		double _CZq(double alpha)
 		{
 			//CZ1120_ALPHA1_304.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CZq.interpnf(x);
+			return fn_CZq.interpnf1(alpha);
 		}
 
 		double _CMq(double alpha)
 		{
 			//CM1120_ALPHA1_104.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CMq.interpnf(x);
+			return fn_CMq.interpnf1(alpha);
 		}
 
 		double _CYp(double alpha)
 		{
 			//CY1220_ALPHA1_408.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CYp.interpnf(x);
+			return fn_CYp.interpnf1(alpha);
 		}
 
 		double _CYr(double alpha)
 		{
 			//CY1320_ALPHA1_406.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CYr.interpnf(x);
+			return fn_CYr.interpnf1(alpha);
 		}
 
 		double _CNr(double alpha)
 		{
 			//CN1320_ALPHA1_506.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CNr.interpnf(x);
+			return fn_CNr.interpnf1(alpha);
 		}
 
 		double _CNp(double alpha)
 		{
 			//CN1220_ALPHA1_508.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CNp.interpnf(x);
+			return fn_CNp.interpnf1(alpha);
 		}
 
 		double _CLp(double alpha)
 		{
 			//CL1220_ALPHA1_608.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CLp.interpnf(x);
+			return fn_CLp.interpnf1(alpha);
 		}
 
 		double _CLr(double alpha)
 		{
 			//CL1320_ALPHA1_606.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_CLr.interpnf(x);
+			return fn_CLr.interpnf1(alpha);
 		}
 
 		double _delta_CXq_lef(double alpha)
@@ -449,10 +391,7 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CXq_lef.interpnf(x);
+			return fn_delta_CXq_lef.interpnf1(alpha);
 		}
 
 		double _delta_CYr_lef(double alpha)
@@ -463,10 +402,7 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CYr_lef.interpnf(x);
+			return fn_delta_CYr_lef.interpnf1(alpha);
 		}
 
 		double _delta_CYp_lef(double alpha)
@@ -477,10 +413,7 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CYp_lef.interpnf(x);
+			return fn_delta_CYp_lef.interpnf1(alpha);
 		}
 
 		double _delta_CZq_lef(double alpha)
@@ -492,9 +425,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CZq_lef.interpnf(x);
+			return fn_delta_CZq_lef.interpnf1(alpha);
 		}
 
 		double _delta_CLr_lef(double alpha)
@@ -506,9 +437,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CLr_lef.interpnf(x);
+			return fn_delta_CLr_lef.interpnf1(alpha);
 		}
 
 		double _delta_CLp_lef(double alpha)
@@ -520,9 +449,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CLp_lef.interpnf(x);
+			return fn_delta_CLp_lef.interpnf1(alpha);
 		}
 
 		double _delta_CMq_lef(double alpha)
@@ -534,9 +461,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CMq_lef.interpnf(x);
+			return fn_delta_CMq_lef.interpnf1(alpha);
 		}
 
 		double _delta_CNr_lef(double alpha)
@@ -548,9 +473,7 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CNr_lef.interpnf(x);
+			return fn_delta_CNr_lef.interpnf1(alpha);
 		}
 
 		double _delta_CNp_lef(double alpha)
@@ -562,49 +485,31 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CNp_lef.interpnf(x);
+			return fn_delta_CNp_lef.interpnf1(alpha);
 		}
 
 		double _Cy_r30(double alpha, double beta)
 		{
 			//CY0720_ALPHA1_BETA1_405.dat
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cy_r30.interpnf(x);
+			return fn_Cy_r30.interpnf2(alpha, beta);
 		}
 
 		double _Cn_r30(double alpha, double beta)
 		{
 			//CN0720_ALPHA1_BETA1_503.dat
-
-			double x[2];
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cn_r30.interpnf(x);
+			return fn_Cn_r30.interpnf2(alpha, beta);
 		}
 
 		double _Cl_r30(double alpha, double beta)
 		{
 			//CL0720_ALPHA1_BETA1_603.dat
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cl_r30.interpnf(x);
+			return fn_Cl_r30.interpnf2(alpha, beta);
 		}
 
 		double _Cy_a20(double alpha, double beta)
 		{
 			//CY0620_ALPHA1_BETA1_403.dat
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cy_a20.interpnf(x);
+			return fn_Cy_a20.interpnf2(alpha, beta);
 		}
 
 		double _Cy_a20_lef(double alpha, double beta)
@@ -615,21 +520,13 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cy_a20_lef.interpnf(x);
+			return fn_Cy_a20_lef.interpnf2(alpha, beta);
 		}
 
 		double _Cn_a20(double alpha, double beta)
 		{
 			//CN0620_ALPHA1_BETA1_504.dat
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cn_a20.interpnf(x);
+			return fn_Cn_a20.interpnf2(alpha, beta);
 		}
 
 		double _Cn_a20_lef(double alpha, double beta)
@@ -640,21 +537,13 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cn_a20_lef.interpnf(x);
+			return fn_Cn_a20_lef.interpnf2(alpha, beta);
 		}
 
 		double _Cl_a20(double alpha, double beta)
 		{
 			//CL0620_ALPHA1_BETA1_604.dat
-
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cl_a20.interpnf(x);
+			return fn_Cl_a20.interpnf2(alpha, beta);
 		}
 
 		double _Cl_a20_lef(double alpha, double beta)
@@ -666,45 +555,31 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			double x[2];	
-			x[0] = alpha;
-			x[1] = beta;
-			return fn_Cl_a20_lef.interpnf(x);
+			return fn_Cl_a20_lef.interpnf2(alpha, beta);
 		}
 
 		double _delta_CNbeta(double alpha)
 		{
 			//CN9999_ALPHA1_brett.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CNbeta.interpnf(x);
+			return fn_delta_CNbeta.interpnf1(alpha);
 		}
 
 		double _delta_CLbeta(double alpha)
 		{
 			//CL9999_ALPHA1_brett.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_CLbeta.interpnf(x);
+			return fn_delta_CLbeta.interpnf1(alpha);
 		}
 
 		double _delta_Cm(double alpha)
 		{
 			//CM9999_ALPHA1_brett.dat
-
-			double x[1];	
-			x[0] = alpha;
-			return fn_delta_Cm.interpnf(x);
+			return fn_delta_Cm.interpnf1(alpha);
 		}
 
 		double _eta_el(double el)
 		{
 			//ETA_DH1_brett.dat
-			double x[1];	
-			x[0] = el;
-			return fn_eta_el.interpnf(x);
+			return fn_eta_el.interpnf1(el);
 		}
 
 
@@ -911,49 +786,49 @@ namespace F16
 		Clp(0),				
 		Clp_delta_lef(0),
 		eta_el(0),
-		fn_Cx(),
-		fn_Cz(),
-		fn_Cm(),
-		fn_Cy(),
-		fn_Cn(),
-		fn_Cl(),
-		fn_Cx_lef(),
-		fn_Cz_lef(),
-		fn_Cm_lef(),
-		fn_Cy_lef(),
-		fn_Cn_lef(),
-		fn_Cl_lef(),
-		fn_CXq(),
-		fn_CZq(),
-		fn_CMq(),
-		fn_CYp(),
-		fn_CYr(),
-		fn_CNr(),
-		fn_CNp(),
-		fn_CLp(),
-		fn_CLr(),
-		fn_delta_CXq_lef(),
-		fn_delta_CYr_lef(),
-		fn_delta_CYp_lef(),
-		fn_delta_CZq_lef(),
-		fn_delta_CLr_lef(),
-		fn_delta_CLp_lef(),
-		fn_delta_CMq_lef(),
-		fn_delta_CNr_lef(),
-		fn_delta_CNp_lef(),
-		fn_Cy_r30(),
-		fn_Cn_r30(),
-		fn_Cl_r30(),
-		fn_Cy_a20(),
-		fn_Cy_a20_lef(),
-		fn_Cn_a20(),
-		fn_Cn_a20_lef(),
-		fn_Cl_a20(),
-		fn_Cl_a20_lef(),
-		fn_delta_CNbeta(),
-		fn_delta_CLbeta(),
-		fn_delta_Cm(),
-		fn_eta_el()
+		fn_Cx(3, _CxData),
+		fn_Cz(3, _CzData),
+		fn_Cm(3, _CmData),
+		fn_Cy(2, _CyData),
+		fn_Cn(3, _CnData),
+		fn_Cl(3, _ClData),
+		fn_Cx_lef(2, _Cx_lefData),
+		fn_Cz_lef(2, _Cz_lefData),
+		fn_Cm_lef(2, _Cm_lefData),
+		fn_Cy_lef(2, _Cy_lefData),
+		fn_Cn_lef(2, _Cn_lefData),
+		fn_Cl_lef(2, _Cl_lefData),
+		fn_CXq(1, _CxqData),
+		fn_CZq(1, _CzqData),
+		fn_CMq(1, _CmqData),
+		fn_CYp(1, _CypData),
+		fn_CYr(1, _CyrData),
+		fn_CNr(1, _CnrData),
+		fn_CNp(1, _CnpData),
+		fn_CLp(1, _ClpData),
+		fn_CLr(1, _ClrData),
+		fn_delta_CXq_lef(1, _delta_CXq_lefData),
+		fn_delta_CYr_lef(1, _delta_CYr_lefData),
+		fn_delta_CYp_lef(1, _delta_CYp_lefData),
+		fn_delta_CZq_lef(1, _delta_CZq_lefData),
+		fn_delta_CLr_lef(1, _delta_CLr_lefData),
+		fn_delta_CLp_lef(1, _delta_CLp_lefData),
+		fn_delta_CMq_lef(1, _delta_CMq_lefData),
+		fn_delta_CNr_lef(1, _delta_CNr_lefData),
+		fn_delta_CNp_lef(1, _delta_CNp_lefData),
+		fn_Cy_r30(2, _Cy_r30Data),
+		fn_Cn_r30(2, _Cn_r30Data),
+		fn_Cl_r30(2, _Cl_r30Data),
+		fn_Cy_a20(2, _Cy_a20Data),
+		fn_Cy_a20_lef(2, _Cy_a20_lefData),
+		fn_Cn_a20(2, _Cn_a20Data),
+		fn_Cn_a20_lef(2, _Cn_a20_lefData),
+		fn_Cl_a20(2, _Cl_a20Data),
+		fn_Cl_a20_lef(2, _Cl_a20_lefData),
+		fn_delta_CNbeta(1, _delta_CNbetaData),
+		fn_delta_CLbeta(1, _delta_CLbetaData),
+		fn_delta_Cm(1, _delta_CmData),
+		fn_eta_el(1, _eta_elData)
 	{
 		initfn();
 	}
@@ -964,7 +839,7 @@ namespace F16
 
 	void F16Aero::initfn()
 	{
-		fn_Cx.init(3, _CxData);
+		fn_Cx.init();
 		fn_Cx.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cx.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cx.ndinfo.nPoints[2] = dh1_size; 
@@ -972,7 +847,7 @@ namespace F16
 		fn_Cx.m_Xmat[1] = beta1;
 		fn_Cx.m_Xmat[2] = dh1;
 
-		fn_Cz.init(3, _CzData); /* alpha,beta,dele */
+		fn_Cz.init(); /* alpha,beta,dele */
 		fn_Cz.ndinfo.nPoints[0] = alpha1_size;	/* Alpha npoints */
 		fn_Cz.ndinfo.nPoints[1] = beta1_size; /* Beta npoints  */
 		fn_Cz.ndinfo.nPoints[2] = dh1_size;  /* dele npoints  */
@@ -980,7 +855,7 @@ namespace F16
 		fn_Cz.m_Xmat[1] = beta1;
 		fn_Cz.m_Xmat[2] = dh1;
 
-		fn_Cm.init(3, _CmData);
+		fn_Cm.init();
 		fn_Cm.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cm.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cm.ndinfo.nPoints[2] = dh1_size; 
@@ -988,13 +863,13 @@ namespace F16
 		fn_Cm.m_Xmat[1] = beta1;
 		fn_Cm.m_Xmat[2] = dh1;
 
-		fn_Cy.init(2, _CyData);
+		fn_Cy.init();
 		fn_Cy.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cy.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cy.m_Xmat[0] = alpha1;
 		fn_Cy.m_Xmat[1] = beta1;
 
-		fn_Cn.init(3, _CnData);
+		fn_Cn.init();
 		fn_Cn.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cn.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cn.ndinfo.nPoints[2] = dh2_size;
@@ -1002,7 +877,7 @@ namespace F16
 		fn_Cn.m_Xmat[1] = beta1;
 		fn_Cn.m_Xmat[2] = dh2;
 
-		fn_Cl.init(3, _ClData);
+		fn_Cl.init();
 		fn_Cl.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cl.ndinfo.nPoints[1] = beta1_size;
 		fn_Cl.ndinfo.nPoints[2] = dh2_size;
@@ -1010,181 +885,181 @@ namespace F16
 		fn_Cl.m_Xmat[1] = beta1;
 		fn_Cl.m_Xmat[2] = dh2;
 
-		fn_Cx_lef.init(2, _Cx_lefData);
+		fn_Cx_lef.init();
 		fn_Cx_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cx_lef.ndinfo.nPoints[1] = beta1_size;
 		fn_Cx_lef.m_Xmat[0] = alpha2;
 		fn_Cx_lef.m_Xmat[1] = beta1;
 
-		fn_Cz_lef.init(2, _Cz_lefData);
+		fn_Cz_lef.init();
 		fn_Cz_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cz_lef.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cz_lef.m_Xmat[0] = alpha2;
 		fn_Cz_lef.m_Xmat[1] = beta1;
 
-		fn_Cm_lef.init(2, _Cm_lefData);
+		fn_Cm_lef.init();
 		fn_Cm_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cm_lef.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cm_lef.m_Xmat[0] = alpha2;
 		fn_Cm_lef.m_Xmat[1] = beta1;
 
-		fn_Cy_lef.init(2, _Cy_lefData);
+		fn_Cy_lef.init();
 		fn_Cy_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cy_lef.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cy_lef.m_Xmat[0] = alpha2;
 		fn_Cy_lef.m_Xmat[1] = beta1;
 
-		fn_Cn_lef.init(2, _Cn_lefData);
+		fn_Cn_lef.init();
 		fn_Cn_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cn_lef.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cn_lef.m_Xmat[0] = alpha2;
 		fn_Cn_lef.m_Xmat[1] = beta1;
 
-		fn_Cl_lef.init(2, _Cl_lefData); /* alpha,beta*/
+		fn_Cl_lef.init(); /* alpha,beta*/
 		fn_Cl_lef.ndinfo.nPoints[0] = alpha2_size;	/* Alpha npoints */
 		fn_Cl_lef.ndinfo.nPoints[1] = beta1_size; /* Beta npoints  */
 		fn_Cl_lef.m_Xmat[0] = alpha2;
 		fn_Cl_lef.m_Xmat[1] = beta1;
 
-		fn_CXq.init(1, _CxqData);
+		fn_CXq.init();
 		fn_CXq.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CXq.m_Xmat[0] = alpha1;
 
-		fn_CZq.init(1, _CzqData);
+		fn_CZq.init();
 		fn_CZq.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CZq.m_Xmat[0] = alpha1;
 
-		fn_CMq.init(1, _CmqData);
+		fn_CMq.init();
 		fn_CMq.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CMq.m_Xmat[0] = alpha1;
 
-		fn_CYp.init(1, _CypData);
+		fn_CYp.init();
 		fn_CYp.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CYp.m_Xmat[0] = alpha1;
 
-		fn_CYr.init(1, _CyrData);
+		fn_CYr.init();
 		fn_CYr.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CYr.m_Xmat[0] = alpha1;
 
-		fn_CNr.init(1, _CnrData);
+		fn_CNr.init();
 		fn_CNr.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CNr.m_Xmat[0] = alpha1;
 
-		fn_CNp.init(1, _CnpData);
+		fn_CNp.init();
 		fn_CNp.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CNp.m_Xmat[0] = alpha1;
 
-		fn_CLp.init(1, _ClpData);
+		fn_CLp.init();
 		fn_CLp.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CLp.m_Xmat[0] = alpha1;
 
-		fn_CLr.init(1, _ClrData);
+		fn_CLr.init();
 		fn_CLr.ndinfo.nPoints[0] = alpha1_size;	
 		fn_CLr.m_Xmat[0] = alpha1;
 
-		fn_delta_CXq_lef.init(1, _delta_CXq_lefData);
+		fn_delta_CXq_lef.init();
 		fn_delta_CXq_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CXq_lef.m_Xmat[0] = alpha2;
 
-		fn_delta_CYr_lef.init(1, _delta_CYr_lefData);
+		fn_delta_CYr_lef.init();
 		fn_delta_CYr_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CYr_lef.m_Xmat[0] = alpha2;
 
-		fn_delta_CYp_lef.init(1, _delta_CYp_lefData);
+		fn_delta_CYp_lef.init();
 		fn_delta_CYp_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CYp_lef.m_Xmat[0] = alpha2;
 
-		fn_delta_CZq_lef.init(1, _delta_CZq_lefData);
+		fn_delta_CZq_lef.init();
 		fn_delta_CZq_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CZq_lef.m_Xmat[0] = alpha2;
 
-		fn_delta_CLr_lef.init(1, _delta_CLr_lefData);
+		fn_delta_CLr_lef.init();
 		fn_delta_CLr_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CLr_lef.m_Xmat[0] = alpha2;
 
-		fn_delta_CLp_lef.init(1, _delta_CLp_lefData);
+		fn_delta_CLp_lef.init();
 		fn_delta_CLp_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CLp_lef.m_Xmat[0] = alpha2;
 
-		fn_delta_CMq_lef.init(1, _delta_CMq_lefData);
+		fn_delta_CMq_lef.init();
 		fn_delta_CMq_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CMq_lef.m_Xmat[0] = alpha2;
 
-		fn_delta_CNr_lef.init(1, _delta_CNr_lefData);
+		fn_delta_CNr_lef.init();
 		fn_delta_CNr_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CNr_lef.m_Xmat[0] = alpha2;
 
-		fn_delta_CNp_lef.init(1, _delta_CNp_lefData);
+		fn_delta_CNp_lef.init();
 		fn_delta_CNp_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_delta_CNp_lef.m_Xmat[0] = alpha2;
 
-		fn_Cy_r30.init(2, _Cy_r30Data);
+		fn_Cy_r30.init();
 		fn_Cy_r30.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cy_r30.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cy_r30.m_Xmat[0] = alpha1;
 		fn_Cy_r30.m_Xmat[1] = beta1;
 
-		fn_Cn_r30.init(2, _Cn_r30Data);
+		fn_Cn_r30.init();
 		fn_Cn_r30.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cn_r30.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cn_r30.m_Xmat[0] = alpha1;
 		fn_Cn_r30.m_Xmat[1] = beta1;
 
-		fn_Cl_r30.init(2, _Cl_r30Data);
+		fn_Cl_r30.init();
 		fn_Cl_r30.ndinfo.nPoints[0] = alpha1_size;
 		fn_Cl_r30.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cl_r30.m_Xmat[0] = alpha1;
 		fn_Cl_r30.m_Xmat[1] = beta1;
 
-		fn_Cy_a20.init(2, _Cy_a20Data);
+		fn_Cy_a20.init();
 		fn_Cy_a20.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cy_a20.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cy_a20.m_Xmat[0] = alpha1;
 		fn_Cy_a20.m_Xmat[1] = beta1;
 
-		fn_Cy_a20_lef.init(2, _Cy_a20_lefData);
+		fn_Cy_a20_lef.init();
 		fn_Cy_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cy_a20_lef.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cy_a20_lef.m_Xmat[0] = alpha2;
 		fn_Cy_a20_lef.m_Xmat[1] = beta1;
 
-		fn_Cn_a20.init(2, _Cn_a20Data);
+		fn_Cn_a20.init();
 		fn_Cn_a20.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cn_a20.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cn_a20.m_Xmat[0] = alpha1;
 		fn_Cn_a20.m_Xmat[1] = beta1;
 
-		fn_Cn_a20_lef.init(2, _Cn_a20_lefData);
+		fn_Cn_a20_lef.init();
 		fn_Cn_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cn_a20_lef.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cn_a20_lef.m_Xmat[0] = alpha2;
 		fn_Cn_a20_lef.m_Xmat[1] = beta1;
 
-		fn_Cl_a20.init(2, _Cl_a20Data);
+		fn_Cl_a20.init();
 		fn_Cl_a20.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cl_a20.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cl_a20.m_Xmat[0] = alpha1;
 		fn_Cl_a20.m_Xmat[1] = beta1;
 
-		fn_Cl_a20_lef.init(2, _Cl_a20_lefData);
+		fn_Cl_a20_lef.init();
 		fn_Cl_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
 		fn_Cl_a20_lef.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cl_a20_lef.m_Xmat[0] = alpha2;
 		fn_Cl_a20_lef.m_Xmat[1] = beta1;
 
-		fn_delta_CNbeta.init(1, _delta_CNbetaData);
+		fn_delta_CNbeta.init();
 		fn_delta_CNbeta.ndinfo.nPoints[0] = alpha1_size;	
 		fn_delta_CNbeta.m_Xmat[0] = alpha1;
 
-		fn_delta_CLbeta.init(1, _delta_CLbetaData);
+		fn_delta_CLbeta.init();
 		fn_delta_CLbeta.ndinfo.nPoints[0] = alpha1_size;	
 		fn_delta_CLbeta.m_Xmat[0] = alpha1;
 
-		fn_delta_Cm.init(1, _delta_CmData);
+		fn_delta_Cm.init();
 		fn_delta_Cm.ndinfo.nPoints[0] = alpha1_size;	
 		fn_delta_Cm.m_Xmat[0] = alpha1;
 
-		fn_eta_el.init(1, _eta_elData);
+		fn_eta_el.init();
 		fn_eta_el.ndinfo.nPoints[0] = dh1_size;	
 		fn_eta_el.m_Xmat[0] = dh1;
 	} // F16Aero::initfn()
