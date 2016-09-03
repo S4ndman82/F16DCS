@@ -134,17 +134,14 @@ namespace F16
 		double		Cx_total;
 		double		Cx;
 		double		Cx_delta_lef;
-		double		Cxq;
 		double		Cxq_delta_lef;
 		double		Cz_total;
 		double		Cz;
 		double		Cz_delta_lef;
-		double		Czq;
 		double		Czq_delta_lef;
 		double		Cm_total;
 		double		Cm;
 		double		Cm_delta_lef;
-		double		Cmq;
 		double		Cmq_delta_lef;
 		double		Cy_total;
 		double		Cy;
@@ -152,9 +149,7 @@ namespace F16
 		double		Cy_delta_r30;
 		double		Cy_delta_a20;
 		double		Cy_delta_a20_lef;
-		double		Cyr;
 		double		Cyr_delta_lef;
-		double		Cyp;
 		double		Cyp_delta_lef;
 		double		Cn_total;
 		double		Cn;
@@ -162,9 +157,7 @@ namespace F16
 		double		Cn_delta_r30;
 		double		Cn_delta_a20;
 		double		Cn_delta_a20_lef;
-		double		Cnr;
 		double		Cnr_delta_lef;
-		double		Cnp;
 		double		Cnp_delta_lef;
 		double		Cl_total;
 		double		Cl;
@@ -172,9 +165,7 @@ namespace F16
 		double		Cl_delta_r30;
 		double		Cl_delta_a20;
 		double		Cl_delta_a20_lef;
-		double		Clr;
 		double		Clr_delta_lef;
-		double		Clp;
 		double		Clp_delta_lef;
 
 		AERO_Function fn_Cx;
@@ -495,15 +486,15 @@ namespace F16
 			Cl = _Cl(alpha, beta, el);
 
 			/* hifi_damping */
-			Cxq = fn_CXq.interpnf1(alpha);//CX1120_ALPHA1_204.dat
-			Cyr = fn_CYr.interpnf1(alpha);//CY1320_ALPHA1_406.dat
-			Cyp = fn_CYp.interpnf1(alpha);//CY1220_ALPHA1_408.dat
-			Czq = fn_CZq.interpnf1(alpha);//CZ1120_ALPHA1_304.dat
-			Clr = fn_CLr.interpnf1(alpha);//CL1320_ALPHA1_606.dat
-			Clp = fn_CLp.interpnf1(alpha);//CL1220_ALPHA1_608.dat
-			Cmq = fn_CMq.interpnf1(alpha);//CM1120_ALPHA1_104.dat
-			Cnr = fn_CNr.interpnf1(alpha);//CN1320_ALPHA1_506.dat
-			Cnp = fn_CNp.interpnf1(alpha);//CN1220_ALPHA1_508.dat
+			fn_CXq.interpnf1(alpha);//CX1120_ALPHA1_204.dat
+			fn_CYr.interpnf1(alpha);//CY1320_ALPHA1_406.dat
+			fn_CYp.interpnf1(alpha);//CY1220_ALPHA1_408.dat
+			fn_CZq.interpnf1(alpha);//CZ1120_ALPHA1_304.dat
+			fn_CLr.interpnf1(alpha);//CL1320_ALPHA1_606.dat
+			fn_CLp.interpnf1(alpha);//CL1220_ALPHA1_608.dat
+			fn_CMq.interpnf1(alpha);//CM1120_ALPHA1_104.dat
+			fn_CNr.interpnf1(alpha);//CN1320_ALPHA1_506.dat
+			fn_CNp.interpnf1(alpha);//CN1220_ALPHA1_508.dat
 
 			/* hifi_C_lef */
 			Cx_delta_lef = _Cx_lef(alpha, beta) - _Cx(alpha, beta, 0);
@@ -594,7 +585,7 @@ namespace F16
 			double CxFlaps = - (-CLFlaps * sin(alpha_DEG * F16::degtorad) + CDFlaps * cos(F16::degtorad));
 
 			/* XXXXXXXX Cx_tot XXXXXXXX */
-			double dXdQ = meanChordFPS * (Cxq + Cxq_delta_lef*leadingEdgeFlap_PCT);
+			double dXdQ = meanChordFPS * (fn_CXq.m_result + Cxq_delta_lef*leadingEdgeFlap_PCT);
 			Cx_total = Cx + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*pitchRate_RPS;
 			Cx_total += CxFlaps + LgCxGearAero;
 
@@ -602,33 +593,33 @@ namespace F16
 			Cx_total += CxAirbrake;
 
 			/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
-			double dZdQ = meanChordFPS * (Czq + Cz_delta_lef*leadingEdgeFlap_PCT);
+			double dZdQ = meanChordFPS * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
 			Cz_total = Cz + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*pitchRate_RPS;
 			Cz_total += CzFlaps + LgCzGearAero;
 
 			/* MMMMMMMM Cm_tot MMMMMMMM */ 
 			/* ignore deep-stall regime, delta_Cm_ds = 0 */
-			double dMdQ = meanChordFPS * (Cmq + Cmq_delta_lef*leadingEdgeFlap_PCT);
+			double dMdQ = meanChordFPS * (fn_CMq.m_result + Cmq_delta_lef*leadingEdgeFlap_PCT);
 			double CmDelta = fn_delta_Cm.m_result + 0; // Cm_delta + Cm_delta_ds (0)
 			Cm_total = Cm*fn_eta_el.m_result + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*pitchRate_RPS + CmDelta;
 
 			/* YYYYYYYY Cy_tot YYYYYYYY */
 			double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT;
-			double dYdR = wingSpanFPS * (Cyr + Cyr_delta_lef*leadingEdgeFlap_PCT);
-			double dYdP = wingSpanFPS * (Cyp + Cyp_delta_lef*leadingEdgeFlap_PCT);
+			double dYdR = wingSpanFPS * (fn_CYr.m_result + Cyr_delta_lef*leadingEdgeFlap_PCT);
+			double dYdP = wingSpanFPS * (fn_CYp.m_result + Cyp_delta_lef*leadingEdgeFlap_PCT);
 			Cy_total = Cy + Cy_delta_lef*leadingEdgeFlap_PCT + dYdail*aileron_PCT + Cy_delta_r30*rudder_PCT + dYdR*yawRate_RPS + dYdP*rollRate_RPS;
 	
 			/* NNNNNNNN Cn_tot NNNNNNNN */ 
 			double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT;
-			double dNdR = wingSpanFPS * (Cnr + Cnr_delta_lef*leadingEdgeFlap_PCT);
-			double dNdP = wingSpanFPS * (Cnp + Cnp_delta_lef*leadingEdgeFlap_PCT);
+			double dNdR = wingSpanFPS * (fn_CNr.m_result + Cnr_delta_lef*leadingEdgeFlap_PCT);
+			double dNdP = wingSpanFPS * (fn_CNp.m_result + Cnp_delta_lef*leadingEdgeFlap_PCT);
 			double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*beta_DEG;
 			Cn_total = Cn + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + dNdail*aileron_PCT + Cn_delta_r30*rudder_PCT + dNdR*yawRate_RPS + dNdP*rollRate_RPS + CnDeltaBetaDeg;
 
 			/* LLLLLLLL Cl_total LLLLLLLL */
 			double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT;
-			double dLdR = wingSpanFPS * (Clr + Clr_delta_lef*leadingEdgeFlap_PCT);
-			double dLdP = wingSpanFPS * (Clp + Clp_delta_lef*leadingEdgeFlap_PCT);
+			double dLdR = wingSpanFPS * (fn_CLr.m_result + Clr_delta_lef*leadingEdgeFlap_PCT);
+			double dLdP = wingSpanFPS * (fn_CLp.m_result + Clp_delta_lef*leadingEdgeFlap_PCT);
 			double ClDeltaBetaDeg = fn_delta_CLbeta.m_result*beta_DEG;
 			Cl_total = Cl + Cl_delta_lef*leadingEdgeFlap_PCT + dLdail*aileron_PCT + Cl_delta_r30*rudder_PCT + dLdR*yawRate_RPS + dLdP*rollRate_RPS + ClDeltaBetaDeg;
 		}
@@ -648,17 +639,14 @@ namespace F16
 		Cx_total(0),
 		Cx(0),				
 		Cx_delta_lef(0),	
-		Cxq(0),				
 		Cxq_delta_lef(0),	
 		Cz_total(0),		
 		Cz(0),				
 		Cz_delta_lef(0),	
-		Czq(0),				
 		Czq_delta_lef(0),	
 		Cm_total(0),		
 		Cm(0),				
 		Cm_delta_lef(0),	
-		Cmq(0),				
 		Cmq_delta_lef(0),	
 		Cy_total(0),		
 		Cy(0),				
@@ -666,9 +654,7 @@ namespace F16
 		Cy_delta_r30(0),	
 		Cy_delta_a20(0),	
 		Cy_delta_a20_lef(0),
-		Cyr(0),				
 		Cyr_delta_lef(0),	
-		Cyp(0),				
 		Cyp_delta_lef(0),	
 		Cn_total(0),		
 		Cn(0),				
@@ -676,9 +662,7 @@ namespace F16
 		Cn_delta_r30(0),	
 		Cn_delta_a20(0),	
 		Cn_delta_a20_lef(0),
-		Cnr(0),				
 		Cnr_delta_lef(0),	
-		Cnp(0),				
 		Cnp_delta_lef(0),	
 		Cl_total(0),		
 		Cl(0),				
@@ -686,9 +670,7 @@ namespace F16
 		Cl_delta_r30(0),	
 		Cl_delta_a20(0),	
 		Cl_delta_a20_lef(0),
-		Clr(0),				
 		Clr_delta_lef(0),	
-		Clp(0),				
 		Clp_delta_lef(0),
 		fn_Cx(3, _CxData),
 		fn_Cz(3, _CzData),
