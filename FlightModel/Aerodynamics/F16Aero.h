@@ -89,7 +89,7 @@ namespace F16
 
 		double interpnf1Lim(const double xPar1)
 		{
-			if (xPar1 > m_xPar1Limit)
+			if (xPar1 > m_xPar1Limit) // par 1 is normally alpha
 			{
 				// use limit
 				return interpnf1(m_xPar1Limit);
@@ -98,7 +98,7 @@ namespace F16
 		}
 		double interpnf2Lim(const double xPar1, const double xPar2)
 		{
-			if (xPar1 > m_xPar1Limit)
+			if (xPar1 > m_xPar1Limit) // par 1 is normally alpha
 			{
 				// use limit
 				return interpnf2(m_xPar1Limit, xPar2);
@@ -107,7 +107,7 @@ namespace F16
 		}
 		double interpnf3Lim(const double xPar1, const double xPar2, const double xPar3)
 		{
-			if (xPar1 > m_xPar1Limit)
+			if (xPar1 > m_xPar1Limit) // par 1 is normally alpha
 			{
 				// use limit
 				return interpnf3(m_xPar1Limit, xPar2, xPar3);
