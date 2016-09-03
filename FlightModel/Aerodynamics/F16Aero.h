@@ -152,13 +152,10 @@ namespace F16
 	{
 	protected:
 		double		Cx_total;
-		double		Cx;
 		double		Cx_delta_lef;
 		double		Cz_total;
-		double		Cz;
 		double		Cz_delta_lef;
 		double		Cm_total;
-		double		Cm;
 		double		Cm_delta_lef;
 		double		Cy_total;
 		double		Cy_delta_lef;
@@ -166,24 +163,27 @@ namespace F16
 		double		Cy_delta_a20;
 		double		Cy_delta_a20_lef;
 		double		Cn_total;
-		double		Cn;
 		double		Cn_delta_lef;
 		double		Cn_delta_r30;
 		double		Cn_delta_a20;
 		double		Cn_delta_a20_lef;
 		double		Cl_total;
-		double		Cl;
 		double		Cl_delta_lef;
 		double		Cl_delta_r30;
 		double		Cl_delta_a20;
 		double		Cl_delta_a20_lef;
 
 		AERO_Function fn_Cx;
+		AERO_Function fn_CxEle0;
 		AERO_Function fn_Cz;
+		AERO_Function fn_CzEle0;
 		AERO_Function fn_Cm;
+		AERO_Function fn_CmEle0;
 		AERO_Function fn_Cy;
 		AERO_Function fn_Cn;
+		AERO_Function fn_CnEle0;
 		AERO_Function fn_Cl;
+		AERO_Function fn_ClEle0;
 		AERO_Function fn_Cx_lef;
 		AERO_Function fn_Cz_lef;
 		AERO_Function fn_Cm_lef;
@@ -222,35 +222,6 @@ namespace F16
 		AERO_Function fn_delta_Cm;
 		AERO_Function fn_eta_el;
 
-		double _Cx(double alpha,double beta,double dele)
-		{
-			//CX0120_ALPHA1_BETA1_DH1_201.dat
-			return fn_Cx.interpnf3(alpha, beta, dele);
-		}
-
-		double _Cz(double alpha,double beta, double dele)
-		{
-			//CZ0120_ALPHA1_BETA1_DH1_301.dat
-			return fn_Cz.interpnf3(alpha, beta, dele);
-		}
-
-		double _Cm(double alpha,double beta,double dele)
-		{
-			//CM0120_ALPHA1_BETA1_DH1_101.dat
-			return fn_Cm.interpnf3(alpha, beta, dele);
-		}
-
-		double _Cn(double alpha, double beta, double dele)
-		{
-			//CN0120_ALPHA1_BETA1_DH2_501.dat
-			return fn_Cn.interpnf3(alpha, beta, dele);
-		}
-
-		double _Cl(double alpha, double beta,double dele)
-		{
-			return fn_Cl.interpnf3(alpha, beta, dele);
-		}
-
 
 		/*
 		double _delta_Cm_ds(double alpha, double el){
@@ -274,14 +245,20 @@ namespace F16
 			// TODO Speedbrakes aero (from JBSim F16.xml config)
 
 			/* hifi_C */
-			Cx = _Cx(alpha, beta, el);
-			Cz = _Cz(alpha, beta, el);
-			Cm = _Cm(alpha, beta, el);
-
+			fn_Cx.interpnf3(alpha, beta, el); //CX0120_ALPHA1_BETA1_DH1_201.dat
+			fn_Cz.interpnf3(alpha, beta, el); //CZ0120_ALPHA1_BETA1_DH1_301.dat
+			fn_Cm.interpnf3(alpha, beta, el); //CM0120_ALPHA1_BETA1_DH1_101.dat
 			fn_Cy.interpnf2(alpha, beta); // CY0320_ALPHA1_BETA1_401.dat
+			fn_Cn.interpnf3(alpha, beta, el); //CN0120_ALPHA1_BETA1_DH2_501.dat
+			fn_Cl.interpnf3(alpha, beta, el);
 
-			Cn = _Cn(alpha, beta, el);
-			Cl = _Cl(alpha, beta, el);
+			// also with zero elevator
+			fn_CxEle0.interpnf3(alpha, beta, 0); //CX0120_ALPHA1_BETA1_DH1_201.dat
+			fn_CzEle0.interpnf3(alpha, beta, 0); //CZ0120_ALPHA1_BETA1_DH1_301.dat
+			fn_CmEle0.interpnf3(alpha, beta, 0); //CM0120_ALPHA1_BETA1_DH1_101.dat
+			fn_CnEle0.interpnf3(alpha, beta, 0); //CN0120_ALPHA1_BETA1_DH2_501.dat
+			fn_ClEle0.interpnf3(alpha, beta, 0);
+
 
 			/* hifi_damping */
 			fn_CXq.interpnf1(alpha); //CX1120_ALPHA1_204.dat
@@ -303,12 +280,12 @@ namespace F16
 			fn_Cz_lef.interpnf2Lim(alpha, beta); //CZ0820_ALPHA2_BETA1_302.dat
 			fn_Cm_lef.interpnf2Lim(alpha, beta); //CM0820_ALPHA2_BETA1_102.dat
 
-			Cx_delta_lef = fn_Cx_lef.m_result - _Cx(alpha, beta, 0);
-			Cz_delta_lef = fn_Cz_lef.m_result - _Cz(alpha, beta, 0);
-			Cm_delta_lef = fn_Cm_lef.m_result - _Cm(alpha, beta, 0);
+			Cx_delta_lef = fn_Cx_lef.m_result - fn_CxEle0.m_result;
+			Cz_delta_lef = fn_Cz_lef.m_result - fn_CzEle0.m_result;
+			Cm_delta_lef = fn_Cm_lef.m_result - fn_CmEle0.m_result;
 			Cy_delta_lef = fn_Cy_lef.m_result - fn_Cy.m_result;
-			Cn_delta_lef = fn_Cn_lef.m_result - _Cn(alpha, beta, 0);
-			Cl_delta_lef = fn_Cl_lef.m_result - _Cl(alpha, beta, 0);
+			Cn_delta_lef = fn_Cn_lef.m_result - fn_CnEle0.m_result;
+			Cl_delta_lef = fn_Cl_lef.m_result - fn_ClEle0.m_result;
 
 			/* hifi_damping_lef */
 			fn_delta_CXq_lef.interpnf1Lim(alpha); //CX1420_ALPHA2_205.dat
@@ -327,8 +304,8 @@ namespace F16
 			fn_Cl_r30.interpnf2(alpha, beta); //CL0720_ALPHA1_BETA1_603.dat
 
 			Cy_delta_r30 = fn_Cy_r30.m_result - fn_Cy.m_result;
-			Cn_delta_r30 = fn_Cn_r30.m_result - _Cn(alpha, beta, 0);
-			Cl_delta_r30 = fn_Cl_r30.m_result - _Cl(alpha, beta, 0);
+			Cn_delta_r30 = fn_Cn_r30.m_result - fn_CnEle0.m_result;
+			Cl_delta_r30 = fn_Cl_r30.m_result - fn_ClEle0.m_result;
 
 			/* hifi_ailerons */
 			fn_Cy_a20.interpnf2(alpha, beta); //CY0620_ALPHA1_BETA1_403.dat
@@ -341,9 +318,9 @@ namespace F16
 
 			Cy_delta_a20 = fn_Cy_a20.m_result - fn_Cy.m_result;
 			Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - fn_Cy_lef.m_result - Cy_delta_a20;
-			Cn_delta_a20 = fn_Cn_a20.m_result - _Cn(alpha, beta, 0);
+			Cn_delta_a20 = fn_Cn_a20.m_result - fn_CnEle0.m_result;
 			Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - fn_Cn_lef.m_result - Cn_delta_a20;
-			Cl_delta_a20 = fn_Cl_a20.m_result - _Cl(alpha, beta, 0);
+			Cl_delta_a20 = fn_Cl_a20.m_result - fn_ClEle0.m_result;
 			Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - fn_Cl_lef.m_result - Cl_delta_a20;
 
 			/* hifi_other_coeffs */
@@ -390,7 +367,7 @@ namespace F16
 
 			/* XXXXXXXX Cx_tot XXXXXXXX */
 			double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
-			Cx_total = Cx + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*pitchRate_RPS;
+			Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*pitchRate_RPS;
 			Cx_total += CxFlaps + LgCxGearAero;
 
 			/* airbrake - testing now*/
@@ -398,14 +375,14 @@ namespace F16
 
 			/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
 			double dZdQ = meanChordFPS * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
-			Cz_total = Cz + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*pitchRate_RPS;
+			Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*pitchRate_RPS;
 			Cz_total += CzFlaps + LgCzGearAero;
 
 			/* MMMMMMMM Cm_tot MMMMMMMM */ 
 			/* ignore deep-stall regime, delta_Cm_ds = 0 */
 			double dMdQ = meanChordFPS * (fn_CMq.m_result + fn_delta_CMq_lef.m_result*leadingEdgeFlap_PCT);
 			double CmDelta = fn_delta_Cm.m_result + 0; // Cm_delta + Cm_delta_ds (0)
-			Cm_total = Cm*fn_eta_el.m_result + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*pitchRate_RPS + CmDelta;
+			Cm_total = fn_Cm.m_result*fn_eta_el.m_result + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*pitchRate_RPS + CmDelta;
 
 			/* YYYYYYYY Cy_tot YYYYYYYY */
 			double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT;
@@ -418,14 +395,14 @@ namespace F16
 			double dNdR = wingSpanFPS * (fn_CNr.m_result + fn_delta_CNr_lef.m_result*leadingEdgeFlap_PCT);
 			double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
 			double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*beta_DEG;
-			Cn_total = Cn + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + dNdail*aileron_PCT + Cn_delta_r30*rudder_PCT + dNdR*yawRate_RPS + dNdP*rollRate_RPS + CnDeltaBetaDeg;
+			Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + dNdail*aileron_PCT + Cn_delta_r30*rudder_PCT + dNdR*yawRate_RPS + dNdP*rollRate_RPS + CnDeltaBetaDeg;
 
 			/* LLLLLLLL Cl_total LLLLLLLL */
 			double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT;
 			double dLdR = wingSpanFPS * (fn_CLr.m_result + fn_delta_CLr_lef.m_result*leadingEdgeFlap_PCT);
 			double dLdP = wingSpanFPS * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
 			double ClDeltaBetaDeg = fn_delta_CLbeta.m_result*beta_DEG;
-			Cl_total = Cl + Cl_delta_lef*leadingEdgeFlap_PCT + dLdail*aileron_PCT + Cl_delta_r30*rudder_PCT + dLdR*yawRate_RPS + dLdP*rollRate_RPS + ClDeltaBetaDeg;
+			Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + dLdail*aileron_PCT + Cl_delta_r30*rudder_PCT + dLdR*yawRate_RPS + dLdP*rollRate_RPS + ClDeltaBetaDeg;
 		}
 
 
@@ -441,13 +418,10 @@ namespace F16
 	// constructor
 	F16Aero::F16Aero() :
 		Cx_total(0),
-		Cx(0),				
 		Cx_delta_lef(0),	
 		Cz_total(0),		
-		Cz(0),				
 		Cz_delta_lef(0),	
 		Cm_total(0),		
-		Cm(0),				
 		Cm_delta_lef(0),	
 		Cy_total(0),		
 		Cy_delta_lef(0),	
@@ -455,23 +429,26 @@ namespace F16
 		Cy_delta_a20(0),	
 		Cy_delta_a20_lef(0),
 		Cn_total(0),		
-		Cn(0),				
 		Cn_delta_lef(0),	
 		Cn_delta_r30(0),	
 		Cn_delta_a20(0),	
 		Cn_delta_a20_lef(0),
 		Cl_total(0),		
-		Cl(0),				
 		Cl_delta_lef(0),	
 		Cl_delta_r30(0),	
 		Cl_delta_a20(0),	
 		Cl_delta_a20_lef(0),
 		fn_Cx(3, _CxData),
+		fn_CxEle0(3, _CxData),
 		fn_Cz(3, _CzData),
+		fn_CzEle0(3, _CzData),
 		fn_Cm(3, _CmData),
+		fn_CmEle0(3, _CmData),
 		fn_Cy(2, _CyData),
 		fn_Cn(3, _CnData),
+		fn_CnEle0(3, _CnData),
 		fn_Cl(3, _ClData),
+		fn_ClEle0(3, _ClData),
 		fn_Cx_lef(2, _Cx_lefData),
 		fn_Cz_lef(2, _Cz_lefData),
 		fn_Cm_lef(2, _Cm_lefData),
@@ -527,6 +504,14 @@ namespace F16
 		fn_Cx.m_Xmat[1] = beta1;
 		fn_Cx.m_Xmat[2] = dh1;
 
+		fn_CxEle0.init();
+		fn_CxEle0.ndinfo.nPoints[0] = alpha1_size;
+		fn_CxEle0.ndinfo.nPoints[1] = beta1_size;
+		fn_CxEle0.ndinfo.nPoints[2] = dh1_size;
+		fn_CxEle0.m_Xmat[0] = alpha1;
+		fn_CxEle0.m_Xmat[1] = beta1;
+		fn_CxEle0.m_Xmat[2] = dh1;
+
 		fn_Cz.init(); /* alpha,beta,dele */
 		fn_Cz.ndinfo.nPoints[0] = alpha1_size;	/* Alpha npoints */
 		fn_Cz.ndinfo.nPoints[1] = beta1_size; /* Beta npoints  */
@@ -535,6 +520,14 @@ namespace F16
 		fn_Cz.m_Xmat[1] = beta1;
 		fn_Cz.m_Xmat[2] = dh1;
 
+		fn_CzEle0.init(); /* alpha,beta,dele */
+		fn_CzEle0.ndinfo.nPoints[0] = alpha1_size;	/* Alpha npoints */
+		fn_CzEle0.ndinfo.nPoints[1] = beta1_size; /* Beta npoints  */
+		fn_CzEle0.ndinfo.nPoints[2] = dh1_size;  /* dele npoints  */
+		fn_CzEle0.m_Xmat[0] = alpha1;
+		fn_CzEle0.m_Xmat[1] = beta1;
+		fn_CzEle0.m_Xmat[2] = dh1;
+
 		fn_Cm.init();
 		fn_Cm.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cm.ndinfo.nPoints[1] = beta1_size; 
@@ -542,6 +535,14 @@ namespace F16
 		fn_Cm.m_Xmat[0] = alpha1;
 		fn_Cm.m_Xmat[1] = beta1;
 		fn_Cm.m_Xmat[2] = dh1;
+
+		fn_CmEle0.init();
+		fn_CmEle0.ndinfo.nPoints[0] = alpha1_size;
+		fn_CmEle0.ndinfo.nPoints[1] = beta1_size;
+		fn_CmEle0.ndinfo.nPoints[2] = dh1_size;
+		fn_CmEle0.m_Xmat[0] = alpha1;
+		fn_CmEle0.m_Xmat[1] = beta1;
+		fn_CmEle0.m_Xmat[2] = dh1;
 
 		fn_Cy.init();
 		fn_Cy.ndinfo.nPoints[0] = alpha1_size;	
@@ -557,6 +558,14 @@ namespace F16
 		fn_Cn.m_Xmat[1] = beta1;
 		fn_Cn.m_Xmat[2] = dh2;
 
+		fn_CnEle0.init();
+		fn_CnEle0.ndinfo.nPoints[0] = alpha1_size;
+		fn_CnEle0.ndinfo.nPoints[1] = beta1_size;
+		fn_CnEle0.ndinfo.nPoints[2] = dh2_size;
+		fn_CnEle0.m_Xmat[0] = alpha1;
+		fn_CnEle0.m_Xmat[1] = beta1;
+		fn_CnEle0.m_Xmat[2] = dh2;
+
 		fn_Cl.init();
 		fn_Cl.ndinfo.nPoints[0] = alpha1_size;	
 		fn_Cl.ndinfo.nPoints[1] = beta1_size;
@@ -564,6 +573,14 @@ namespace F16
 		fn_Cl.m_Xmat[0] = alpha1;
 		fn_Cl.m_Xmat[1] = beta1;
 		fn_Cl.m_Xmat[2] = dh2;
+
+		fn_ClEle0.init();
+		fn_ClEle0.ndinfo.nPoints[0] = alpha1_size;
+		fn_ClEle0.ndinfo.nPoints[1] = beta1_size;
+		fn_ClEle0.ndinfo.nPoints[2] = dh2_size;
+		fn_ClEle0.m_Xmat[0] = alpha1;
+		fn_ClEle0.m_Xmat[1] = beta1;
+		fn_ClEle0.m_Xmat[2] = dh2;
 
 		fn_Cx_lef.init();
 		fn_Cx_lef.m_xPar1Limit = 45.0;
