@@ -314,6 +314,7 @@ namespace F16
 			const double meanChordFPS = (F16::meanChord_FT / totalVelocity_FPS);
 			const double wingSpanFPS = (F16::wingSpan_FT / totalVelocity_FPS);
 
+			// TODO: dynamic CG to calculations, uses hardcoded "real" position now
 			const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 			const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
 
