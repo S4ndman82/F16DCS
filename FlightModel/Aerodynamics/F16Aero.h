@@ -147,7 +147,6 @@ namespace F16
 	};
 
 
-	// this is temporary while sorting out the stuff in namespace..
 	class F16Aero
 	{
 	protected:
@@ -206,14 +205,6 @@ namespace F16
 		AERO_Function fn_delta_CLbeta;
 		AERO_Function fn_delta_Cm;
 		AERO_Function fn_eta_el;
-
-
-		/*
-		double _delta_Cm_ds(double alpha, double el){
-		...............
-		...............
-		} End of function(...) */
-
 
 	public:
 		F16Aero();
@@ -315,6 +306,7 @@ namespace F16
 			const double wingSpanFPS = (F16::wingSpan_FT / totalVelocity_FPS);
 
 			// TODO: dynamic CG to calculations, uses hardcoded "real" position now
+			// (check: does this actually consider the RSS lift at non-CG position?)
 			const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 			const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
 
