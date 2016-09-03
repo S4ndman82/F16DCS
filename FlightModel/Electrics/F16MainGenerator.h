@@ -1,7 +1,6 @@
 #ifndef _F16MAINGENERATOR_H_
 #define _F16MAINGENERATOR_H_
 
-#include "../stdafx.h"
 
 #include "Electrics/AbstractElectricDevice.h"
 

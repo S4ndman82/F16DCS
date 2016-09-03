@@ -1,7 +1,6 @@
 #ifndef _ABSTRACTHYDRAULICDEVICE_H_
 #define _ABSTRACTHYDRAULICDEVICE_H_
 
-#include "../stdafx.h"
 
 // base class for hydraulic device:
 // each device (actuator, sensor etc.) inherits from this 

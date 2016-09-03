@@ -1,7 +1,6 @@
 #ifndef _F16ACDCCONVERTER_H_
 #define _F16ACDCCONVERTER_H_
 
-#include "../stdafx.h"
 
 #include "Electrics/AbstractElectricDevice.h"
 

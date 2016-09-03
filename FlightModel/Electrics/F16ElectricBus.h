@@ -1,7 +1,6 @@
 #ifndef _F16ELECTRICBUS_H_
 #define _F16ELECTRICBUS_H_
 
-#include "../stdafx.h"
 
 //#include "Electrics/AbstractElectricDevice.h"
 

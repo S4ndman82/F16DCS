@@ -17,8 +17,6 @@ Sources of data:
 #ifndef _F16ENGINE_H_
 #define _F16ENGINE_H_
 
-#include "../stdafx.h"
-
 #include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "include/F16Constants.h"		// Common constants used throughout this DLL
 

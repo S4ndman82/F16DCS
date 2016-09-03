@@ -1,7 +1,7 @@
 #ifndef _F16LANDINGWHEEL_H_
 #define _F16LANDINGWHEEL_H_
 
-#include "../stdafx.h"
+#include <cmath>
 
 #include "Inputs/F16AnalogInput.h"
 

@@ -1,7 +1,6 @@
 #ifndef _F16GEARBOX_H_
 #define _F16GEARBOX_H_
 
-#include "../stdafx.h"
 
 /*
 main engine is connected to gearbox which powers 

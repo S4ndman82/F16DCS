@@ -7,7 +7,9 @@
 #ifndef _F16AERO_H_
 #define _F16AERO_H_
 
-#include "../stdafx.h"
+#include <cmath>
+
+#include "F16Constants.h"
 #include "F16AeroData.h"
 #include "../UtilityFunctions.h"
 

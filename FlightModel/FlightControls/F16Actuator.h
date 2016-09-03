@@ -1,7 +1,9 @@
 #ifndef _F16ACTUATOR_H_
 #define _F16ACTUATOR_H_
 
-#include "../stdafx.h"
+#include <cmath>
+
+#include <malloc.h>
 #include <memory.h>
 #include "../UtilityFunctions.h"
 

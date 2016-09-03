@@ -1,7 +1,6 @@
 #ifndef _F16PMG_H_
 #define _F16PMG_H_
 
-#include "../stdafx.h"
 
 #include "Electrics/AbstractElectricDevice.h"
 

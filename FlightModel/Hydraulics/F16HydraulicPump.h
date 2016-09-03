@@ -1,7 +1,6 @@
 #ifndef _F16HYDRAULICPUMP_H_
 #define _F16HYDRAULICPUMP_H_
 
-#include "../stdafx.h"
 #include "AbstractHydraulicDevice.h"
 
 namespace F16

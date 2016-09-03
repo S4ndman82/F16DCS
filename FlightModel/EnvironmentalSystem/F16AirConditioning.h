@@ -1,8 +1,6 @@
 #ifndef _F16AIRCONDITIONING_H_
 #define _F16AIRCONDITIONING_H_
 
-#include "../stdafx.h"
-
 
 namespace F16
 {

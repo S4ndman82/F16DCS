@@ -1,7 +1,6 @@
 #ifndef _F16JFS_H_
 #define _F16JFS_H_
 
-#include "../stdafx.h"
 
 /*
 sources:

@@ -1,7 +1,6 @@
 #ifndef _F16OXYGENSYSTEM_H_
 #define _F16OXYGENSYSTEM_H_
 
-#include "../stdafx.h"
 
 namespace F16
 {

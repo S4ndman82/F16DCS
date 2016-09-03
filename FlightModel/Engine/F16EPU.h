@@ -1,7 +1,6 @@
 #ifndef _F16EPU_H_
 #define _F16EPU_H_
 
-#include "../stdafx.h"
 
 /*
 EPU = emergency power unit

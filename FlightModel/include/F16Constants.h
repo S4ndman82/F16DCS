@@ -1,6 +1,8 @@
 #ifndef _F16CONSTANTS_H_
 #define _F16CONSTANTS_H_
 
+#include <cmath>
+
 //-------------------------------------------------------
 // Start of F-16 Simulation Variables
 // Probably doesn't need it's own namespace or anything

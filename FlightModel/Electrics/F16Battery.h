@@ -1,7 +1,6 @@
 #ifndef _F16BATTERY_H_
 #define _F16BATTERY_H_
 
-#include "../stdafx.h"
 
 #include "Electrics/AbstractElectricDevice.h"
 

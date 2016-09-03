@@ -1,8 +1,6 @@
 #ifndef _F16ELECTRICSYSTEM_H_
 #define _F16ELECTRICSYSTEM_H_
 
-#include "../stdafx.h"
-
 #include "Electrics/F16AcDcConverter.h"
 #include "Electrics/F16Battery.h"
 #include "Electrics/F16ElectricBus.h"

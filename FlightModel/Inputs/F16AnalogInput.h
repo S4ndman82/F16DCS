@@ -1,7 +1,9 @@
 #ifndef _F16ANALOGINPUT_H_
 #define _F16ANALOGINPUT_H_
 
-#include "../stdafx.h"
+#include <cmath>
+
+#include "../UtilityFunctions.h"
 
 namespace F16
 {

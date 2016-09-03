@@ -1,7 +1,6 @@
 #ifndef _ABSTRACTELECTRICDEVICE_H_
 #define _ABSTRACTELECTRICDEVICE_H_
 
-#include "../stdafx.h"
 
 // base class for electric device:
 // each device (battery, generator, sensor etc.) inherits from this 

@@ -1,7 +1,6 @@
 #ifndef _F16BLEEDAIRSYSTEM_H_
 #define _F16BLEEDAIRSYSTEM_H_
 
-#include "../stdafx.h"
 
 /*
  bleed air from jet engine can be used for various thing (anti-ice, oxygen generator..),
