@@ -1,6 +1,8 @@
 #ifndef _F16CONSTANTS_H_
 #define _F16CONSTANTS_H_
 
+#pragma once
+
 #include <cmath>
 
 //-------------------------------------------------------

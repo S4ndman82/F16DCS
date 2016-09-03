@@ -7,6 +7,8 @@
 // for actuator code
 #include "FlightControls/F16Actuator.h"
 
+#include "../UtilityFunctions.h"
+
 namespace F16
 {
 	// - canopy status

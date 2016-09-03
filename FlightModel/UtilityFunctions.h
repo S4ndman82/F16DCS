@@ -17,6 +17,8 @@
 #ifndef __UtilFunctions__
 #define __UtilFunctions__
 
+#pragma once
+
 #include <cmath>
 
 #include <malloc.h>
