@@ -97,25 +97,25 @@ namespace F16
 		{}
 		*/
 
-		double interpnf1(const double par1)
+		double interpnf1(const double xPar1)
 		{
 			double x[1];
-			x[0] = par1;
+			x[0] = xPar1;
 			return interpnf(x);
 		}
-		double interpnf2(const double par1, const double par2)
+		double interpnf2(const double xPar1, const double xPar2)
 		{
 			double x[2];
-			x[0] = par1;
-			x[1] = par2;
+			x[0] = xPar1;
+			x[1] = xPar2;
 			return interpnf(x);
 		}
-		double interpnf3(const double par1, const double par2, const double par3)
+		double interpnf3(const double xPar1, const double xPar2, const double xPar3)
 		{
 			double x[3];
-			x[0] = par1;
-			x[1] = par2;
-			x[2] = par3;
+			x[0] = xPar1;
+			x[1] = xPar2;
+			x[2] = xPar3;
 			return interpnf(x);
 		}
 
@@ -486,15 +486,15 @@ namespace F16
 			Cl = _Cl(alpha, beta, el);
 
 			/* hifi_damping */
-			fn_CXq.interpnf1(alpha);//CX1120_ALPHA1_204.dat
-			fn_CYr.interpnf1(alpha);//CY1320_ALPHA1_406.dat
-			fn_CYp.interpnf1(alpha);//CY1220_ALPHA1_408.dat
-			fn_CZq.interpnf1(alpha);//CZ1120_ALPHA1_304.dat
-			fn_CLr.interpnf1(alpha);//CL1320_ALPHA1_606.dat
-			fn_CLp.interpnf1(alpha);//CL1220_ALPHA1_608.dat
-			fn_CMq.interpnf1(alpha);//CM1120_ALPHA1_104.dat
-			fn_CNr.interpnf1(alpha);//CN1320_ALPHA1_506.dat
-			fn_CNp.interpnf1(alpha);//CN1220_ALPHA1_508.dat
+			fn_CXq.interpnf1(alpha); //CX1120_ALPHA1_204.dat
+			fn_CYr.interpnf1(alpha); //CY1320_ALPHA1_406.dat
+			fn_CYp.interpnf1(alpha); //CY1220_ALPHA1_408.dat
+			fn_CZq.interpnf1(alpha); //CZ1120_ALPHA1_304.dat
+			fn_CLr.interpnf1(alpha); //CL1320_ALPHA1_606.dat
+			fn_CLp.interpnf1(alpha); //CL1220_ALPHA1_608.dat
+			fn_CMq.interpnf1(alpha); //CM1120_ALPHA1_104.dat
+			fn_CNr.interpnf1(alpha); //CN1320_ALPHA1_506.dat
+			fn_CNp.interpnf1(alpha); //CN1220_ALPHA1_508.dat
 
 			/* hifi_C_lef */
 			Cx_delta_lef = _Cx_lef(alpha, beta) - _Cx(alpha, beta, 0);
