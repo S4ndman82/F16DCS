@@ -11,6 +11,9 @@
 // Windows Header Files:
 #include <windows.h>
 
+// might be good idea to have but does not matter when not using windows api directly..
+//#define _WIN32_WINNT 0x0600
+
 // Visual Studio is rather dumb at times..
 // -> moved to project settings
 /*#define _USE_MATH_DEFINES*/ 
