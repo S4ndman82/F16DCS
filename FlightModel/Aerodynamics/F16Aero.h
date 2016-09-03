@@ -87,12 +87,6 @@ namespace F16
 			indexVector.getVec(ndinfo.nDimension);
 		}
 
-
-		/*
-		void setDatapoint(const int index, int size, )
-		{}
-		*/
-
 		double interpnf1Lim(const double xPar1)
 		{
 			if (xPar1 > m_xPar1Limit)
@@ -123,31 +117,31 @@ namespace F16
 
 		double interpnf1(const double xPar1)
 		{
-			double x[1];
-			x[0] = xPar1;
-			return interpnf(x);
+			double Xpars[1];
+			Xpars[0] = xPar1;
+
+			m_result = interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
+			return m_result;
 		}
 
 		double interpnf2(const double xPar1, const double xPar2)
 		{
-			double x[2];
-			x[0] = xPar1;
-			x[1] = xPar2;
-			return interpnf(x);
+			double Xpars[2];
+			Xpars[0] = xPar1;
+			Xpars[1] = xPar2;
+
+			m_result = interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
+			return m_result;
 		}
 
 		double interpnf3(const double xPar1, const double xPar2, const double xPar3)
 		{
-			double x[3];
-			x[0] = xPar1;
-			x[1] = xPar2;
-			x[2] = xPar3;
-			return interpnf(x);
-		}
+			double Xpars[3];
+			Xpars[0] = xPar1;
+			Xpars[1] = xPar2;
+			Xpars[2] = xPar3;
 
-		double interpnf(const double *xPar)
-		{
-			m_result = interpn(indexVector, m_Xmat, m_Ydata, xPar, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
+			m_result = interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 			return m_result;
 		}
 	};
@@ -167,7 +161,6 @@ namespace F16
 		double		Cm;
 		double		Cm_delta_lef;
 		double		Cy_total;
-		double		Cy;
 		double		Cy_delta_lef;
 		double		Cy_delta_r30;
 		double		Cy_delta_a20;
@@ -247,12 +240,6 @@ namespace F16
 			return fn_Cm.interpnf3(alpha, beta, dele);
 		}
 
-		double _Cy(double alpha,double beta)
-		{
-			// CY0320_ALPHA1_BETA1_401.dat
-			return fn_Cy.interpnf2(alpha, beta);
-		}
-
 		double _Cn(double alpha, double beta, double dele)
 		{
 			//CN0120_ALPHA1_BETA1_DH2_501.dat
@@ -290,7 +277,9 @@ namespace F16
 			Cx = _Cx(alpha, beta, el);
 			Cz = _Cz(alpha, beta, el);
 			Cm = _Cm(alpha, beta, el);
-			Cy = _Cy(alpha, beta);
+
+			fn_Cy.interpnf2(alpha, beta); // CY0320_ALPHA1_BETA1_401.dat
+
 			Cn = _Cn(alpha, beta, el);
 			Cl = _Cl(alpha, beta, el);
 
@@ -317,7 +306,7 @@ namespace F16
 			Cx_delta_lef = fn_Cx_lef.m_result - _Cx(alpha, beta, 0);
 			Cz_delta_lef = fn_Cz_lef.m_result - _Cz(alpha, beta, 0);
 			Cm_delta_lef = fn_Cm_lef.m_result - _Cm(alpha, beta, 0);
-			Cy_delta_lef = fn_Cy_lef.m_result - _Cy(alpha, beta);
+			Cy_delta_lef = fn_Cy_lef.m_result - fn_Cy.m_result;
 			Cn_delta_lef = fn_Cn_lef.m_result - _Cn(alpha, beta, 0);
 			Cl_delta_lef = fn_Cl_lef.m_result - _Cl(alpha, beta, 0);
 
@@ -337,7 +326,7 @@ namespace F16
 			fn_Cn_r30.interpnf2(alpha, beta); //CN0720_ALPHA1_BETA1_503.dat
 			fn_Cl_r30.interpnf2(alpha, beta); //CL0720_ALPHA1_BETA1_603.dat
 
-			Cy_delta_r30 = fn_Cy_r30.m_result - _Cy(alpha, beta);
+			Cy_delta_r30 = fn_Cy_r30.m_result - fn_Cy.m_result;
 			Cn_delta_r30 = fn_Cn_r30.m_result - _Cn(alpha, beta, 0);
 			Cl_delta_r30 = fn_Cl_r30.m_result - _Cl(alpha, beta, 0);
 
@@ -350,7 +339,7 @@ namespace F16
 			fn_Cn_a20_lef.interpnf2Lim(alpha, beta); //CN0920_ALPHA2_BETA1_505.dat
 			fn_Cl_a20_lef.interpnf2Lim(alpha, beta); //CL0920_ALPHA2_BETA1_605.dat
 
-			Cy_delta_a20 = fn_Cy_a20.m_result - _Cy(alpha, beta);
+			Cy_delta_a20 = fn_Cy_a20.m_result - fn_Cy.m_result;
 			Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - fn_Cy_lef.m_result - Cy_delta_a20;
 			Cn_delta_a20 = fn_Cn_a20.m_result - _Cn(alpha, beta, 0);
 			Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - fn_Cn_lef.m_result - Cn_delta_a20;
@@ -422,7 +411,7 @@ namespace F16
 			double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT;
 			double dYdR = wingSpanFPS * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
 			double dYdP = wingSpanFPS * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
-			Cy_total = Cy + Cy_delta_lef*leadingEdgeFlap_PCT + dYdail*aileron_PCT + Cy_delta_r30*rudder_PCT + dYdR*yawRate_RPS + dYdP*rollRate_RPS;
+			Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + dYdail*aileron_PCT + Cy_delta_r30*rudder_PCT + dYdR*yawRate_RPS + dYdP*rollRate_RPS;
 	
 			/* NNNNNNNN Cn_tot NNNNNNNN */ 
 			double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT;
@@ -461,7 +450,6 @@ namespace F16
 		Cm(0),				
 		Cm_delta_lef(0),	
 		Cy_total(0),		
-		Cy(0),				
 		Cy_delta_lef(0),	
 		Cy_delta_r30(0),	
 		Cy_delta_a20(0),	
