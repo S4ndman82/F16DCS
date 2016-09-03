@@ -35,9 +35,9 @@ public:
 	{}
 	UtilBuffer(const size_t elements)
 		: m_vec(nullptr)
-		, capacity(0)
+		, capacity(elements)
 	{
-		getVec(elements);
+		m_vec = (T*)malloc(elements*sizeof(T));
 	}
 	~UtilBuffer() 
 	{
