@@ -558,30 +558,6 @@ namespace F16
 			return fn_Cl_a20_lef.interpnf2(alpha, beta);
 		}
 
-		double _delta_CNbeta(double alpha)
-		{
-			//CN9999_ALPHA1_brett.dat
-			return fn_delta_CNbeta.interpnf1(alpha);
-		}
-
-		double _delta_CLbeta(double alpha)
-		{
-			//CL9999_ALPHA1_brett.dat
-			return fn_delta_CLbeta.interpnf1(alpha);
-		}
-
-		double _delta_Cm(double alpha)
-		{
-			//CM9999_ALPHA1_brett.dat
-			return fn_delta_Cm.interpnf1(alpha);
-		}
-
-		double _eta_el(double el)
-		{
-			//ETA_DH1_brett.dat
-			return fn_eta_el.interpnf1(el);
-		}
-
 
 		/*
 		double _delta_Cm_ds(double alpha, double el){
@@ -656,10 +632,19 @@ namespace F16
 			Cl_delta_a20_lef = _Cl_a20_lef(alpha, beta) - _Cl_lef(alpha, beta) - Cl_delta_a20;
 
 			/* hifi_other_coeffs */
-			Cn_delta_beta = _delta_CNbeta(alpha);
-			Cl_delta_beta = _delta_CLbeta(alpha);
-			Cm_delta = _delta_Cm(alpha);
-			eta_el = _eta_el(el);
+
+			//CN9999_ALPHA1_brett.dat
+			Cn_delta_beta = fn_delta_CNbeta.interpnf1(alpha);
+
+			//CL9999_ALPHA1_brett.dat
+			Cl_delta_beta = fn_delta_CLbeta.interpnf1(alpha);
+
+			//CM9999_ALPHA1_brett.dat
+			Cm_delta = fn_delta_Cm.interpnf1(alpha);
+
+			//ETA_DH1_brett.dat
+			eta_el = fn_eta_el.interpnf1(el);
+
 			Cm_delta_ds = 0;       /* ignore deep-stall regime, delta_Cm_ds = 0 */
 
 		}
