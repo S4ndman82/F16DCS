@@ -176,7 +176,6 @@ namespace F16
 		double		Clr_delta_lef;
 		double		Clp;
 		double		Clp_delta_lef;
-		double		eta_el;
 
 		AERO_Function fn_Cx;
 		AERO_Function fn_Cz;
@@ -324,60 +323,6 @@ namespace F16
 			}
 
 			return fn_Cl_lef.interpnf2(alpha, beta);
-		}
-
-		double _CXq(double alpha)
-		{
-			//CX1120_ALPHA1_204.dat
-			return fn_CXq.interpnf1(alpha);
-		}
-
-		double _CZq(double alpha)
-		{
-			//CZ1120_ALPHA1_304.dat
-			return fn_CZq.interpnf1(alpha);
-		}
-
-		double _CMq(double alpha)
-		{
-			//CM1120_ALPHA1_104.dat
-			return fn_CMq.interpnf1(alpha);
-		}
-
-		double _CYp(double alpha)
-		{
-			//CY1220_ALPHA1_408.dat
-			return fn_CYp.interpnf1(alpha);
-		}
-
-		double _CYr(double alpha)
-		{
-			//CY1320_ALPHA1_406.dat
-			return fn_CYr.interpnf1(alpha);
-		}
-
-		double _CNr(double alpha)
-		{
-			//CN1320_ALPHA1_506.dat
-			return fn_CNr.interpnf1(alpha);
-		}
-
-		double _CNp(double alpha)
-		{
-			//CN1220_ALPHA1_508.dat
-			return fn_CNp.interpnf1(alpha);
-		}
-
-		double _CLp(double alpha)
-		{
-			//CL1220_ALPHA1_608.dat
-			return fn_CLp.interpnf1(alpha);
-		}
-
-		double _CLr(double alpha)
-		{
-			//CL1320_ALPHA1_606.dat
-			return fn_CLr.interpnf1(alpha);
 		}
 
 		double _delta_CXq_lef(double alpha)
@@ -586,15 +531,15 @@ namespace F16
 			Cl = _Cl(alpha, beta, el);
 
 			/* hifi_damping */
-			Cxq = _CXq(alpha);
-			Cyr = _CYr(alpha);
-			Cyp = _CYp(alpha);
-			Czq = _CZq(alpha);
-			Clr = _CLr(alpha);
-			Clp = _CLp(alpha);
-			Cmq = _CMq(alpha);
-			Cnr = _CNr(alpha);
-			Cnp = _CNp(alpha);
+			Cxq = fn_CXq.interpnf1(alpha);//CX1120_ALPHA1_204.dat
+			Cyr = fn_CYr.interpnf1(alpha);//CY1320_ALPHA1_406.dat
+			Cyp = fn_CYp.interpnf1(alpha);//CY1220_ALPHA1_408.dat
+			Czq = fn_CZq.interpnf1(alpha);//CZ1120_ALPHA1_304.dat
+			Clr = fn_CLr.interpnf1(alpha);//CL1320_ALPHA1_606.dat
+			Clp = fn_CLp.interpnf1(alpha);//CL1220_ALPHA1_608.dat
+			Cmq = fn_CMq.interpnf1(alpha);//CM1120_ALPHA1_104.dat
+			Cnr = fn_CNr.interpnf1(alpha);//CN1320_ALPHA1_506.dat
+			Cnp = fn_CNp.interpnf1(alpha);//CN1220_ALPHA1_508.dat
 
 			/* hifi_C_lef */
 			Cx_delta_lef = _Cx_lef(alpha, beta) - _Cx(alpha, beta, 0);
@@ -640,7 +585,7 @@ namespace F16
 			fn_delta_Cm.interpnf1(alpha);
 
 			//ETA_DH1_brett.dat
-			eta_el = fn_eta_el.interpnf1(el);
+			fn_eta_el.interpnf1(el);
 
 			//Cm_delta_ds = 0;       /* ignore deep-stall regime, delta_Cm_ds = 0 */
 
@@ -687,7 +632,7 @@ namespace F16
 			/* ignore deep-stall regime, delta_Cm_ds = 0 */
 			double dMdQ = meanChordFPS * (Cmq + Cmq_delta_lef*leadingEdgeFlap_PCT);
 			double CmDelta = fn_delta_Cm.m_result + 0; // Cm_delta + Cm_delta_ds (0)
-			Cm_total = Cm*eta_el + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*pitchRate_RPS + CmDelta;
+			Cm_total = Cm*fn_eta_el.m_result + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*pitchRate_RPS + CmDelta;
 
 			/* YYYYYYYY Cy_tot YYYYYYYY */
 			double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT;
@@ -767,7 +712,6 @@ namespace F16
 		Clr_delta_lef(0),	
 		Clp(0),				
 		Clp_delta_lef(0),
-		eta_el(0),
 		fn_Cx(3, _CxData),
 		fn_Cz(3, _CzData),
 		fn_Cm(3, _CmData),
