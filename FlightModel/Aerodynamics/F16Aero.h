@@ -152,26 +152,11 @@ namespace F16
 	{
 	protected:
 		double		Cx_total;
-		double		Cx_delta_lef;
 		double		Cz_total;
-		double		Cz_delta_lef;
 		double		Cm_total;
-		double		Cm_delta_lef;
 		double		Cy_total;
-		double		Cy_delta_lef;
-		double		Cy_delta_r30;
-		double		Cy_delta_a20;
-		double		Cy_delta_a20_lef;
 		double		Cn_total;
-		double		Cn_delta_lef;
-		double		Cn_delta_r30;
-		double		Cn_delta_a20;
-		double		Cn_delta_a20_lef;
 		double		Cl_total;
-		double		Cl_delta_lef;
-		double		Cl_delta_r30;
-		double		Cl_delta_a20;
-		double		Cl_delta_a20_lef;
 
 		AERO_Function fn_Cx;
 		AERO_Function fn_CxEle0;
@@ -259,7 +244,6 @@ namespace F16
 			fn_CnEle0.interpnf3(alpha, beta, 0); //CN0120_ALPHA1_BETA1_DH2_501.dat
 			fn_ClEle0.interpnf3(alpha, beta, 0);
 
-
 			/* hifi_damping */
 			fn_CXq.interpnf1(alpha); //CX1120_ALPHA1_204.dat
 			fn_CYr.interpnf1(alpha); //CY1320_ALPHA1_406.dat
@@ -280,13 +264,6 @@ namespace F16
 			fn_Cz_lef.interpnf2Lim(alpha, beta); //CZ0820_ALPHA2_BETA1_302.dat
 			fn_Cm_lef.interpnf2Lim(alpha, beta); //CM0820_ALPHA2_BETA1_102.dat
 
-			Cx_delta_lef = fn_Cx_lef.m_result - fn_CxEle0.m_result;
-			Cz_delta_lef = fn_Cz_lef.m_result - fn_CzEle0.m_result;
-			Cm_delta_lef = fn_Cm_lef.m_result - fn_CmEle0.m_result;
-			Cy_delta_lef = fn_Cy_lef.m_result - fn_Cy.m_result;
-			Cn_delta_lef = fn_Cn_lef.m_result - fn_CnEle0.m_result;
-			Cl_delta_lef = fn_Cl_lef.m_result - fn_ClEle0.m_result;
-
 			/* hifi_damping_lef */
 			fn_delta_CXq_lef.interpnf1Lim(alpha); //CX1420_ALPHA2_205.dat
 			fn_delta_CYr_lef.interpnf1Lim(alpha); //CY1620_ALPHA2_407.dat
@@ -303,10 +280,6 @@ namespace F16
 			fn_Cn_r30.interpnf2(alpha, beta); //CN0720_ALPHA1_BETA1_503.dat
 			fn_Cl_r30.interpnf2(alpha, beta); //CL0720_ALPHA1_BETA1_603.dat
 
-			Cy_delta_r30 = fn_Cy_r30.m_result - fn_Cy.m_result;
-			Cn_delta_r30 = fn_Cn_r30.m_result - fn_CnEle0.m_result;
-			Cl_delta_r30 = fn_Cl_r30.m_result - fn_ClEle0.m_result;
-
 			/* hifi_ailerons */
 			fn_Cy_a20.interpnf2(alpha, beta); //CY0620_ALPHA1_BETA1_403.dat
 			fn_Cn_a20.interpnf2(alpha, beta); //CN0620_ALPHA1_BETA1_504.dat
@@ -316,26 +289,11 @@ namespace F16
 			fn_Cn_a20_lef.interpnf2Lim(alpha, beta); //CN0920_ALPHA2_BETA1_505.dat
 			fn_Cl_a20_lef.interpnf2Lim(alpha, beta); //CL0920_ALPHA2_BETA1_605.dat
 
-			Cy_delta_a20 = fn_Cy_a20.m_result - fn_Cy.m_result;
-			Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - fn_Cy_lef.m_result - Cy_delta_a20;
-			Cn_delta_a20 = fn_Cn_a20.m_result - fn_CnEle0.m_result;
-			Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - fn_Cn_lef.m_result - Cn_delta_a20;
-			Cl_delta_a20 = fn_Cl_a20.m_result - fn_ClEle0.m_result;
-			Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - fn_Cl_lef.m_result - Cl_delta_a20;
-
 			/* hifi_other_coeffs */
-
-			//CN9999_ALPHA1_brett.dat
-			fn_delta_CNbeta.interpnf1(alpha);
-
-			//CL9999_ALPHA1_brett.dat
-			fn_delta_CLbeta.interpnf1(alpha);
-
-			//CM9999_ALPHA1_brett.dat
-			fn_delta_Cm.interpnf1(alpha);
-
-			//ETA_DH1_brett.dat
-			fn_eta_el.interpnf1(el);
+			fn_delta_CNbeta.interpnf1(alpha); //CN9999_ALPHA1_brett.dat
+			fn_delta_CLbeta.interpnf1(alpha); //CL9999_ALPHA1_brett.dat
+			fn_delta_Cm.interpnf1(alpha); //CM9999_ALPHA1_brett.dat
+			fn_eta_el.interpnf1(el); //ETA_DH1_brett.dat
 
 			//Cm_delta_ds = 0;       /* ignore deep-stall regime, delta_Cm_ds = 0 */
 
@@ -358,6 +316,25 @@ namespace F16
 
 			const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 			const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
+
+			// calculate values based on interpolation results
+			const double Cx_delta_lef = fn_Cx_lef.m_result - fn_CxEle0.m_result;
+			const double Cz_delta_lef = fn_Cz_lef.m_result - fn_CzEle0.m_result;
+			const double Cm_delta_lef = fn_Cm_lef.m_result - fn_CmEle0.m_result;
+			const double Cy_delta_lef = fn_Cy_lef.m_result - fn_Cy.m_result;
+			const double Cn_delta_lef = fn_Cn_lef.m_result - fn_CnEle0.m_result;
+			const double Cl_delta_lef = fn_Cl_lef.m_result - fn_ClEle0.m_result;
+
+			const double Cy_delta_r30 = fn_Cy_r30.m_result - fn_Cy.m_result;
+			const double Cn_delta_r30 = fn_Cn_r30.m_result - fn_CnEle0.m_result;
+			const double Cl_delta_r30 = fn_Cl_r30.m_result - fn_ClEle0.m_result;
+
+			const double Cy_delta_a20 = fn_Cy_a20.m_result - fn_Cy.m_result;
+			const double Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - fn_Cy_lef.m_result - Cy_delta_a20;
+			const double Cn_delta_a20 = fn_Cn_a20.m_result - fn_CnEle0.m_result;
+			const double Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - fn_Cn_lef.m_result - Cn_delta_a20;
+			const double Cl_delta_a20 = fn_Cl_a20.m_result - fn_ClEle0.m_result;
+			const double Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - fn_Cl_lef.m_result - Cl_delta_a20;
 
 			// FLAPS (From JBSim F16.xml config)
 			double CLFlaps = 0.35 * flap_PCT;
@@ -418,26 +395,11 @@ namespace F16
 	// constructor
 	F16Aero::F16Aero() :
 		Cx_total(0),
-		Cx_delta_lef(0),	
 		Cz_total(0),		
-		Cz_delta_lef(0),	
 		Cm_total(0),		
-		Cm_delta_lef(0),	
 		Cy_total(0),		
-		Cy_delta_lef(0),	
-		Cy_delta_r30(0),	
-		Cy_delta_a20(0),	
-		Cy_delta_a20_lef(0),
 		Cn_total(0),		
-		Cn_delta_lef(0),	
-		Cn_delta_r30(0),	
-		Cn_delta_a20(0),	
-		Cn_delta_a20_lef(0),
 		Cl_total(0),		
-		Cl_delta_lef(0),	
-		Cl_delta_r30(0),	
-		Cl_delta_a20(0),	
-		Cl_delta_a20_lef(0),
 		fn_Cx(3, _CxData),
 		fn_CxEle0(3, _CxData),
 		fn_Cz(3, _CzData),
