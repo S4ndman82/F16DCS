@@ -276,26 +276,12 @@ namespace F16
 		double _Cx_lef(double alpha,double beta)
 		{
 			//CX0820_ALPHA2_BETA1_202.dat
-
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_Cx_lef.m_xPar1Limit = 45.0;
 			return fn_Cx_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cz_lef(double alpha,double beta)
 		{
 			//CZ0820_ALPHA2_BETA1_302.dat
-		
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_Cz_lef.m_xPar1Limit = 45.0;
 			return fn_Cz_lef.interpnf2Lim(alpha, beta);
 		}
 
@@ -303,12 +289,6 @@ namespace F16
 		{
 			//CM0820_ALPHA2_BETA1_102.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_Cm_lef.m_xPar1Limit = 45.0;
 			return fn_Cm_lef.interpnf2Lim(alpha, beta);
 		}
 
@@ -316,12 +296,6 @@ namespace F16
 		{
 			//CY0820_ALPHA2_BETA1_402.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_Cy_lef.m_xPar1Limit = 45.0;
 			return fn_Cy_lef.interpnf2Lim(alpha, beta);
 		}
 
@@ -329,23 +303,12 @@ namespace F16
 		{
 			//CN0820_ALPHA2_BETA1_502.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
 
-			fn_Cn_lef.m_xPar1Limit = 45.0;
 			return fn_Cn_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cl_lef(double alpha,double beta)
 		{
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_Cl_lef.m_xPar1Limit = 45.0;
 			return fn_Cl_lef.interpnf2Lim(alpha, beta);
 		}
 
@@ -353,12 +316,6 @@ namespace F16
 		{
 			//CX1420_ALPHA2_205.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_delta_CXq_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CXq_lef.interpnf1Lim(alpha);
 		}
 
@@ -366,24 +323,12 @@ namespace F16
 		{
 			//CY1620_ALPHA2_407.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_delta_CYr_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CYr_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CYp_lef(double alpha)
 		{
 			//CY1520_ALPHA2_409.dat
-
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-			fn_delta_CYp_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CYp_lef.interpnf1Lim(alpha);
 		}
 
@@ -391,12 +336,6 @@ namespace F16
 		{
 			//CZ1420_ALPHA2_305.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_delta_CZq_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CZq_lef.interpnf1Lim(alpha);
 		}
 
@@ -404,12 +343,6 @@ namespace F16
 		{
 			//CL1620_ALPHA2_607.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_delta_CLr_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CLr_lef.interpnf1Lim(alpha);
 		}
 
@@ -417,12 +350,6 @@ namespace F16
 		{
 			//CL1520_ALPHA2_609.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_delta_CLp_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CLp_lef.interpnf1Lim(alpha);
 		}
 
@@ -430,12 +357,6 @@ namespace F16
 		{
 			//CM1420_ALPHA2_105.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_delta_CMq_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CMq_lef.interpnf1Lim(alpha);
 		}
 
@@ -443,12 +364,6 @@ namespace F16
 		{
 			//CN1620_ALPHA2_507.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_delta_CNr_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CNr_lef.interpnf1Lim(alpha);
 		}
 
@@ -456,12 +371,6 @@ namespace F16
 		{
 			//CN1520_ALPHA2_509.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-
-			fn_delta_CNp_lef.m_xPar1Limit = 45.0;
 			return fn_delta_CNp_lef.interpnf1Lim(alpha);
 		}
 
@@ -469,23 +378,12 @@ namespace F16
 		{
 			//CY0920_ALPHA2_BETA1_404.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-			fn_Cy_a20_lef.m_xPar1Limit = 45.0;
 			return fn_Cy_a20_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cn_a20_lef(double alpha, double beta)
 		{
 			//CN0920_ALPHA2_BETA1_505.dat
-
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-			fn_Cn_a20_lef.m_xPar1Limit = 45.0;
 			return fn_Cn_a20_lef.interpnf2Lim(alpha, beta);
 		}
 
@@ -493,11 +391,6 @@ namespace F16
 		{
 			//CL0920_ALPHA2_BETA1_605.dat
 
-			if(alpha > 45.0)
-			{
-				alpha = 45.0;
-			}
-			fn_Cl_a20_lef.m_xPar1Limit = 45.0;
 			return fn_Cl_a20_lef.interpnf2Lim(alpha, beta);
 		}
 
@@ -818,36 +711,42 @@ namespace F16
 		fn_Cl.m_Xmat[2] = dh2;
 
 		fn_Cx_lef.init();
-		fn_Cx_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_Cx_lef.m_xPar1Limit = 45.0;
+		fn_Cx_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_Cx_lef.ndinfo.nPoints[1] = beta1_size;
 		fn_Cx_lef.m_Xmat[0] = alpha2;
 		fn_Cx_lef.m_Xmat[1] = beta1;
 
 		fn_Cz_lef.init();
-		fn_Cz_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_Cz_lef.m_xPar1Limit = 45.0;
+		fn_Cz_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_Cz_lef.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cz_lef.m_Xmat[0] = alpha2;
 		fn_Cz_lef.m_Xmat[1] = beta1;
 
 		fn_Cm_lef.init();
-		fn_Cm_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_Cm_lef.m_xPar1Limit = 45.0;
+		fn_Cm_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_Cm_lef.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cm_lef.m_Xmat[0] = alpha2;
 		fn_Cm_lef.m_Xmat[1] = beta1;
 
 		fn_Cy_lef.init();
-		fn_Cy_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_Cy_lef.m_xPar1Limit = 45.0;
+		fn_Cy_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_Cy_lef.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cy_lef.m_Xmat[0] = alpha2;
 		fn_Cy_lef.m_Xmat[1] = beta1;
 
 		fn_Cn_lef.init();
-		fn_Cn_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_Cn_lef.m_xPar1Limit = 45.0;
+		fn_Cn_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_Cn_lef.ndinfo.nPoints[1] = beta1_size; 
 		fn_Cn_lef.m_Xmat[0] = alpha2;
 		fn_Cn_lef.m_Xmat[1] = beta1;
 
 		fn_Cl_lef.init(); /* alpha,beta*/
+		fn_Cl_lef.m_xPar1Limit = 45.0;
 		fn_Cl_lef.ndinfo.nPoints[0] = alpha2_size;	/* Alpha npoints */
 		fn_Cl_lef.ndinfo.nPoints[1] = beta1_size; /* Beta npoints  */
 		fn_Cl_lef.m_Xmat[0] = alpha2;
@@ -890,39 +789,48 @@ namespace F16
 		fn_CLr.m_Xmat[0] = alpha1;
 
 		fn_delta_CXq_lef.init();
-		fn_delta_CXq_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CXq_lef.m_xPar1Limit = 45.0;
+		fn_delta_CXq_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CXq_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CYr_lef.init();
-		fn_delta_CYr_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CYr_lef.m_xPar1Limit = 45.0;
+		fn_delta_CYr_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CYr_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CYp_lef.init();
-		fn_delta_CYp_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CYp_lef.m_xPar1Limit = 45.0;
+		fn_delta_CYp_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CYp_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CZq_lef.init();
-		fn_delta_CZq_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CZq_lef.m_xPar1Limit = 45.0;
+		fn_delta_CZq_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CZq_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CLr_lef.init();
-		fn_delta_CLr_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CLr_lef.m_xPar1Limit = 45.0;
+		fn_delta_CLr_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CLr_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CLp_lef.init();
-		fn_delta_CLp_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CLp_lef.m_xPar1Limit = 45.0;
+		fn_delta_CLp_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CLp_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CMq_lef.init();
-		fn_delta_CMq_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CMq_lef.m_xPar1Limit = 45.0;
+		fn_delta_CMq_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CMq_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CNr_lef.init();
-		fn_delta_CNr_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CNr_lef.m_xPar1Limit = 45.0;
+		fn_delta_CNr_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CNr_lef.m_Xmat[0] = alpha2;
 
 		fn_delta_CNp_lef.init();
-		fn_delta_CNp_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_delta_CNp_lef.m_xPar1Limit = 45.0;
+		fn_delta_CNp_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_delta_CNp_lef.m_Xmat[0] = alpha2;
 
 		fn_Cy_r30.init();
@@ -950,7 +858,8 @@ namespace F16
 		fn_Cy_a20.m_Xmat[1] = beta1;
 
 		fn_Cy_a20_lef.init();
-		fn_Cy_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_Cy_a20_lef.m_xPar1Limit = 45.0;
+		fn_Cy_a20_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_Cy_a20_lef.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cy_a20_lef.m_Xmat[0] = alpha2;
 		fn_Cy_a20_lef.m_Xmat[1] = beta1;
@@ -962,7 +871,8 @@ namespace F16
 		fn_Cn_a20.m_Xmat[1] = beta1;
 
 		fn_Cn_a20_lef.init();
-		fn_Cn_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_Cn_a20_lef.m_xPar1Limit = 45.0;
+		fn_Cn_a20_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_Cn_a20_lef.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cn_a20_lef.m_Xmat[0] = alpha2;
 		fn_Cn_a20_lef.m_Xmat[1] = beta1;
@@ -974,7 +884,8 @@ namespace F16
 		fn_Cl_a20.m_Xmat[1] = beta1;
 
 		fn_Cl_a20_lef.init();
-		fn_Cl_a20_lef.ndinfo.nPoints[0] = alpha2_size;	
+		fn_Cl_a20_lef.m_xPar1Limit = 45.0;
+		fn_Cl_a20_lef.ndinfo.nPoints[0] = alpha2_size;
 		fn_Cl_a20_lef.ndinfo.nPoints[1] = beta1_size;	
 		fn_Cl_a20_lef.m_Xmat[0] = alpha2;
 		fn_Cl_a20_lef.m_Xmat[1] = beta1;
