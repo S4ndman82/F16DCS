@@ -33,8 +33,7 @@ namespace F16
 		UtilMatrix<int> m_indexMat; // used in interpolation, reduce reallocation
 
 		//double *xPar; // parameters for interpolation (1-3 pars)
-		double xPar1Limit; // upper limit for X-parameter 1 in functions
-		bool hasXPar1Limit; // if limit is defined
+		double m_xPar1Limit; // upper limit for X-parameter 1 in functions (only upper and only for this)
 
 		double m_result; // result value
 
@@ -46,23 +45,15 @@ namespace F16
 			, m_Tbuf()
 			, m_xPointMat()
 			, m_indexMat()
-			//, xPar(NULL)
-			, xPar1Limit(0)
-			, hasXPar1Limit(false)
+			, m_xPar1Limit(0)
 			, m_result(0)
 		{
+			ndinfo.nPoints = NULL;
 			ndinfo.nDimension = nDimension;
 		}
 
 		~AERO_Function()
 		{
-			/*
-			if (xPar != NULL)
-			{
-				free(xPar);
-				xPar = NULL;
-			}
-			*/
 			m_indexMat.release();
 			m_xPointMat.release();
 			if (ndinfo.nPoints != NULL)
@@ -102,12 +93,41 @@ namespace F16
 		{}
 		*/
 
+		double interpnf1Lim(const double xPar1)
+		{
+			if (xPar1 > m_xPar1Limit)
+			{
+				// use limit
+				return interpnf1(m_xPar1Limit);
+			}
+			return interpnf1(xPar1);
+		}
+		double interpnf2Lim(const double xPar1, const double xPar2)
+		{
+			if (xPar1 > m_xPar1Limit)
+			{
+				// use limit
+				return interpnf2(m_xPar1Limit, xPar2);
+			}
+			return interpnf2(xPar1, xPar2);
+		}
+		double interpnf3Lim(const double xPar1, const double xPar2, const double xPar3)
+		{
+			if (xPar1 > m_xPar1Limit)
+			{
+				// use limit
+				return interpnf3(m_xPar1Limit, xPar2, xPar3);
+			}
+			return interpnf3(xPar1, xPar2, xPar3);
+		}
+
 		double interpnf1(const double xPar1)
 		{
 			double x[1];
 			x[0] = xPar1;
 			return interpnf(x);
 		}
+
 		double interpnf2(const double xPar1, const double xPar2)
 		{
 			double x[2];
@@ -115,6 +135,7 @@ namespace F16
 			x[1] = xPar2;
 			return interpnf(x);
 		}
+
 		double interpnf3(const double xPar1, const double xPar2, const double xPar3)
 		{
 			double x[3];
@@ -260,7 +281,9 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-			return fn_Cx_lef.interpnf2(alpha, beta);
+
+			fn_Cx_lef.m_xPar1Limit = 45.0;
+			return fn_Cx_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cz_lef(double alpha,double beta)
@@ -272,7 +295,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_Cz_lef.interpnf2(alpha, beta);
+			fn_Cz_lef.m_xPar1Limit = 45.0;
+			return fn_Cz_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cm_lef(double alpha,double beta)
@@ -284,7 +308,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_Cm_lef.interpnf2(alpha, beta);
+			fn_Cm_lef.m_xPar1Limit = 45.0;
+			return fn_Cm_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cy_lef(double alpha,double beta)
@@ -296,7 +321,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_Cy_lef.interpnf2(alpha, beta);
+			fn_Cy_lef.m_xPar1Limit = 45.0;
+			return fn_Cy_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cn_lef(double alpha,double beta)
@@ -308,7 +334,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_Cn_lef.interpnf2(alpha, beta);
+			fn_Cn_lef.m_xPar1Limit = 45.0;
+			return fn_Cn_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cl_lef(double alpha,double beta)
@@ -318,7 +345,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_Cl_lef.interpnf2(alpha, beta);
+			fn_Cl_lef.m_xPar1Limit = 45.0;
+			return fn_Cl_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _delta_CXq_lef(double alpha)
@@ -329,7 +357,9 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-			return fn_delta_CXq_lef.interpnf1(alpha);
+
+			fn_delta_CXq_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CXq_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CYr_lef(double alpha)
@@ -340,7 +370,9 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-			return fn_delta_CYr_lef.interpnf1(alpha);
+
+			fn_delta_CYr_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CYr_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CYp_lef(double alpha)
@@ -351,7 +383,8 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-			return fn_delta_CYp_lef.interpnf1(alpha);
+			fn_delta_CYp_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CYp_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CZq_lef(double alpha)
@@ -363,7 +396,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_delta_CZq_lef.interpnf1(alpha);
+			fn_delta_CZq_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CZq_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CLr_lef(double alpha)
@@ -375,7 +409,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_delta_CLr_lef.interpnf1(alpha);
+			fn_delta_CLr_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CLr_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CLp_lef(double alpha)
@@ -387,7 +422,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_delta_CLp_lef.interpnf1(alpha);
+			fn_delta_CLp_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CLp_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CMq_lef(double alpha)
@@ -399,7 +435,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_delta_CMq_lef.interpnf1(alpha);
+			fn_delta_CMq_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CMq_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CNr_lef(double alpha)
@@ -411,7 +448,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_delta_CNr_lef.interpnf1(alpha);
+			fn_delta_CNr_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CNr_lef.interpnf1Lim(alpha);
 		}
 
 		double _delta_CNp_lef(double alpha)
@@ -423,7 +461,8 @@ namespace F16
 				alpha = 45.0;
 			}
 
-			return fn_delta_CNp_lef.interpnf1(alpha);
+			fn_delta_CNp_lef.m_xPar1Limit = 45.0;
+			return fn_delta_CNp_lef.interpnf1Lim(alpha);
 		}
 
 		double _Cy_a20_lef(double alpha, double beta)
@@ -434,7 +473,8 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-			return fn_Cy_a20_lef.interpnf2(alpha, beta);
+			fn_Cy_a20_lef.m_xPar1Limit = 45.0;
+			return fn_Cy_a20_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cn_a20_lef(double alpha, double beta)
@@ -445,7 +485,8 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-			return fn_Cn_a20_lef.interpnf2(alpha, beta);
+			fn_Cn_a20_lef.m_xPar1Limit = 45.0;
+			return fn_Cn_a20_lef.interpnf2Lim(alpha, beta);
 		}
 
 		double _Cl_a20_lef(double alpha, double beta)
@@ -456,8 +497,8 @@ namespace F16
 			{
 				alpha = 45.0;
 			}
-
-			return fn_Cl_a20_lef.interpnf2(alpha, beta);
+			fn_Cl_a20_lef.m_xPar1Limit = 45.0;
+			return fn_Cl_a20_lef.interpnf2Lim(alpha, beta);
 		}
 
 
