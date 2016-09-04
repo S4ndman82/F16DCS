@@ -11,8 +11,8 @@ sources:
 
 #include <cmath>
 
-#include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
-#include "include/F16Constants.h"		// Common constants used throughout this DLL
+#include "ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
+#include "F16Constants.h"		// Common constants used throughout this DLL
 
 // mostly amount of fuel at different stations matter here
 // (unless we start adding payload support into flight model)

@@ -1,6 +1,7 @@
 #ifndef _F16ENVCONTROLSYSTEM_H_
 #define _F16ENVCONTROLSYSTEM_H_
 
+#include "F16Constants.h"
 
 #include "Atmosphere/F16Atmosphere.h"			//Atmosphere model functions
 

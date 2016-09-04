@@ -1,6 +1,7 @@
 #ifndef _F16HYDRAULICSYSTEM_H_
 #define _F16HYDRAULICSYSTEM_H_
 
+#include "F16Constants.h"
 
 #include "Hydraulics/F16HydraulicPump.h"
 

@@ -1,6 +1,8 @@
 #ifndef _F16HYDRAULICPUMP_H_
 #define _F16HYDRAULICPUMP_H_
 
+#include "F16Constants.h"
+
 #include "AbstractHydraulicDevice.h"
 
 // pump provides pressure to hydraulic system so that other devices can operate

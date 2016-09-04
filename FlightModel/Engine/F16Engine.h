@@ -17,8 +17,8 @@ Sources of data:
 #ifndef _F16ENGINE_H_
 #define _F16ENGINE_H_
 
-#include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
-#include "include/F16Constants.h"		// Common constants used throughout this DLL
+#include "ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
+#include "F16Constants.h"		// Common constants used throughout this DLL
 
 #include "Atmosphere/F16Atmosphere.h"
 #include "Engine/F16FuelSystem.h"				//Fuel usage and tank usage functions

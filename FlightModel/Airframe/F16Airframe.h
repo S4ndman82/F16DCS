@@ -1,8 +1,8 @@
 #ifndef _F16AIRFRAME_H_
 #define _F16AIRFRAME_H_
 
-#include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
-#include "include/F16Constants.h"		// Common constants used throughout this DLL
+#include "ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
+#include "F16Constants.h"		// Common constants used throughout this DLL
 
 // for actuator code
 #include "FlightControls/F16Actuator.h"
