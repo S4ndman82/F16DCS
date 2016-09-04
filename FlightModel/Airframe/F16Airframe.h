@@ -110,6 +110,7 @@ protected:
 	bool refuelingDoorOpen; // open/close switch
 
 	bool ejectingSeat; // ejecting seat in place/gone
+	int ejectCount; // times pressed eject
 
 	// TODO: support for each lamp in lights?
 	//bool navigationLight[10];
@@ -142,6 +143,7 @@ public:
 		, canopyGone(false)
 		, refuelingDoorOpen(false)
 		, ejectingSeat(true)
+		, ejectCount(0)
 		, leftBlinker(5, 1.5)
 		, rightBlinker(5, 1.5)
 		, backBlinker(5, 1.5)
@@ -162,6 +164,7 @@ public:
 		canopySwitchDown = false;
 		//canopyAngle = 0.9; // up
 		actCanopy.m_commanded = actCanopy.m_maxLimit;
+		actCanopy.m_current = actCanopy.m_commanded;
 		canopyGone = false;
 	}
 	void initCanopyClosed()
@@ -169,6 +172,7 @@ public:
 		canopySwitchDown = true;
 		//canopyAngle = 0; // down
 		actCanopy.m_commanded = actCanopy.m_minLimit;
+		actCanopy.m_current = actCanopy.m_commanded;
 		canopyGone = false;
 	}
 
@@ -341,6 +345,12 @@ public:
 	void onEject()
 	{
 		// TODO: check for three times in quick succession before doing more here
+		if (ejectCount < 3)
+		{
+			ejectCount++;
+			return;
+		}
+		// TODO: check time since first press (must be rapid)
 
 		// pilot and seat gone
 		ejectingSeat = false;
