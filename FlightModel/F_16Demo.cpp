@@ -424,30 +424,30 @@ void ed_fm_set_command(int command, float value)
 
 	switch (command)
 	{
-	case JoystickRoll:
+	case F16::JoystickRoll:
 		F16::latStickInputRaw = value; // just for cockpit anim
 
 		F16::FlightControls.setLatStickInput(value);
 		break;
 
-	case JoystickPitch:
+	case F16::JoystickPitch:
 		F16::longStickInputRaw = value; // just for cockpit anim
 
 		F16::FlightControls.setLongStickInput(value);
 		break;
 
-	case JoystickYaw:
+	case F16::JoystickYaw:
 		F16::pedInputRaw = value; // just for cockpit anim
 
 		F16::FlightControls.setPedInput(value);
 		F16::LandingGear.nosewheelTurn(value); // <- does nothing if not enabled or no weight on wheels
 		break;
 
-	case JoystickThrottle:
+	case F16::JoystickThrottle:
 		F16::EMS.setThrottleInput(value);
 		break;
 
-	case ApuStart:
+	case F16::ApuStart:
 		/*
 		swprintf(dbgmsg, 255, L" F16::APU start: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
@@ -455,7 +455,7 @@ void ed_fm_set_command(int command, float value)
 
 		F16::EMS.JfsStart();
 		break;
-	case ApuStop:
+	case F16::ApuStop:
 		/*
 		swprintf(dbgmsg, 255, L" F16::APU stop: %d value: %f \r\n", command, value);
 		::OutputDebugString(dbgmsg);
@@ -464,69 +464,70 @@ void ed_fm_set_command(int command, float value)
 		F16::EMS.JfsStop();
 		break;
 
-	case EnginesStart: // "quickstart" shortcut
+	case F16::EnginesStart: // "quickstart" shortcut
 		F16::EMS.startEngine();
 		break;
-	case EnginesStop: // "quickstop" shortcut
+	case F16::EnginesStop: // "quickstop" shortcut
 		F16::EMS.stopEngine();
 		break;
 
-	case PowerOnOff:
+	case F16::PowerOnOff:
 		// electric system
 		F16::Electrics.toggleElectrics();
 		break;
-	case BatteryPower:
+
+	case F16::BatteryPower:
 		break;
 
-	case AirBrake:
+	case F16::AirBrake:
 		F16::FlightControls.switchAirbrake();
 		break;
-	case AirBrakeOn:
+	case F16::AirBrakeOn:
 		F16::FlightControls.setAirbrakeON();
 		break;
-	case AirBrakeOff:
+	case F16::AirBrakeOff:
 		F16::FlightControls.setAirbrakeOFF();
 		break;
 
 		// analog input (axis)
-	case WheelBrake:
+	case F16::WheelBrake:
 		F16::LandingGear.setWheelBrakeLeft(value);
 		F16::LandingGear.setWheelBrakeRight(value);
 		break;
-	case WheelBrakeLeft:
+	case F16::WheelBrakeLeft:
 		F16::LandingGear.setWheelBrakeLeft(value);
 		break;
-	case WheelBrakeRight:
+	case F16::WheelBrakeRight:
 		F16::LandingGear.setWheelBrakeRight(value);
 		break;
 
 		// switch/button input (keyboard)
-	case WheelBrakesOn:
+	case F16::WheelBrakesOn:
 		F16::LandingGear.setWheelBrakesON();
 		// when button pressed (down)
 		break;
-	case WheelBrakesOff:
+	case F16::WheelBrakesOff:
 		F16::LandingGear.setWheelBrakesOFF();
 		// when button released (up)
 		break;
 
-	case Gear:
+	case F16::Gear:
 		F16::LandingGear.switchGearUpDown();
 		// also switch trailing-edge flaps position
 		//F16::FlightControls.setGearRelatedFlaps()
 		break;
-	case LandingGearUp:
+	case F16::LandingGearUp:
 		F16::LandingGear.setGearUp();
 		// also switch trailing-edge flaps position
 		//F16::FlightControls.setGearRelatedFlaps(true);
 		break;
-	case LandingGearDown:
+	case F16::LandingGearDown:
 		F16::LandingGear.setGearDown();
 		// also switch trailing-edge flaps position
 		//F16::FlightControls.setGearRelatedFlaps(false);
 		break;
 
-	case NoseWheelSteering:
+	case F16::NoseWheelSteering:
 		// value includes status of it?
 		F16::LandingGear.toggleNosewheelSteering();
 		// no animation for nosewheel yet?
@@ -536,40 +537,40 @@ void ed_fm_set_command(int command, float value)
 		*/
 		break;
 
-	case TrimPitchDown:
+	case F16::TrimPitchDown:
 		F16::FlightControls.trimState.pitchDown();
 		break;
-	case TrimPitchUp:
+	case F16::TrimPitchUp:
 		F16::FlightControls.trimState.pitchUp();
 		break;
 
-	case TrimRollCCW:
+	case F16::TrimRollCCW:
 		F16::FlightControls.trimState.rollCCW();
 		break;
-	case TrimRollCW:
+	case F16::TrimRollCW:
 		F16::FlightControls.trimState.rollCW();
 		break;
 
-	case TrimYawLeft:
+	case F16::TrimYawLeft:
 		F16::FlightControls.trimState.yawLeft();
 		break;
-	case TrimYawRight:
+	case F16::TrimYawRight:
 		F16::FlightControls.trimState.yawRight();
 		break;
 
 	case 215: // trimstop command (key up)
 		break;
 
-	case NavigationLights:
+	case F16::NavigationLights:
 		F16::Airframe.toggleNavigationLights();
 		break;
 
-	case Canopy:
+	case F16::Canopy:
 		// on/off toggle (needs some actuator support as well)
 		F16::Airframe.canopyToggle();
 		break;
 
-	case EjectPlane:
+	case F16::EjectPlane:
 		// pilot ejected
 		F16::Airframe.onEject();
 		break;
