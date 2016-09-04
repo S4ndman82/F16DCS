@@ -78,14 +78,9 @@
 // for debug use
 #include <wchar.h>
 #include <stdio.h>
-//#include <chrono>
-//#include <thread>
-//#include <ctime>
 
-#include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
-#include "UtilityFunctions.h"			// Utility help functions 
-
-#include "include/F16Constants.h"		// Common constants used throughout this DLL
+#include "ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
+#include "F16Constants.h"		// Common constants used throughout this DLL
 
 #include "Inputs/F16Inputs.h"			// just list of inputs: can get potentially long list
 
