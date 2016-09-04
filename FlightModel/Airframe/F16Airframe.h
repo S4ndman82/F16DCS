@@ -166,6 +166,7 @@ public:
 		actCanopy.m_commanded = actCanopy.m_maxLimit;
 		actCanopy.m_current = actCanopy.m_commanded;
 		canopyGone = false;
+		ejectCount = 0;
 	}
 	void initCanopyClosed()
 	{
@@ -174,6 +175,7 @@ public:
 		actCanopy.m_commanded = actCanopy.m_minLimit;
 		actCanopy.m_current = actCanopy.m_commanded;
 		canopyGone = false;
+		ejectCount = 0;
 	}
 
 	// canopy open/close toggle
