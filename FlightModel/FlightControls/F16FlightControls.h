@@ -279,7 +279,8 @@ public:
 		, airbrakeActuator(1.0, 0, 1.0) //
 		, airbrakeDrag(0)
 		, isGearDown(true)
-		, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
+		//, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
+		, trimState(0, 0, 0) 
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
