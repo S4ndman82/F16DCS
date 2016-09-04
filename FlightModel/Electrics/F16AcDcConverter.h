@@ -16,23 +16,19 @@ sources:
 
 */
 
-namespace F16
+class F16AcDcConverter : public AbstractElectricDevice
 {
+public:
+	F16AcDcConverter(void *_parentSystem) 
+		: AbstractElectricDevice(_parentSystem)
+	{}
+	~F16AcDcConverter() {}
 
-	class F16AcDcConverter : public AbstractElectricDevice
+	void updateFrame(const double frameTime)
 	{
-	public:
-		F16AcDcConverter(void *_parentSystem) 
-			: AbstractElectricDevice(_parentSystem)
-		{}
-		~F16AcDcConverter() {}
+	}
 
-		void updateFrame(const double frameTime)
-		{
-		}
-
-	};
-}
+};
 
 #endif // ifndef _F16ACDCCONVERTER_H_
 

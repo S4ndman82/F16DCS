@@ -3,60 +3,57 @@
 
 #include "AbstractHydraulicDevice.h"
 
-namespace F16
+// pump provides pressure to hydraulic system so that other devices can operate
+
+// TODO: need engine power to operate and generate pressure (ADG)
+
+// also reservoir?
+// maintain positive pressure at pump
+class F16HydraulicReservoir
 {
-	// pump provides pressure to hydraulic system so that other devices can operate
+public:
+	F16HydraulicReservoir() {}
+	~F16HydraulicReservoir() {}
+};
 
-	// TODO: need engine power to operate and generate pressure (ADG)
+class F16HydraulicPump : public AbstractHydraulicDevice
+{
+public:
+	// pressure provided for devices
+	// 3000 psi max?
+	double pressure;
 
-	// also reservoir?
-	// maintain positive pressure at pump
-	class F16HydraulicReservoir
+	F16HydraulicReservoir reservoir;
+
+	F16HydraulicPump(void *_parentSystem) 
+		: AbstractHydraulicDevice(_parentSystem)
+		, pressure(0)
+		, reservoir()
+	{}
+	~F16HydraulicPump() {}
+
+	bool isWarning() const
 	{
-	public:
-		F16HydraulicReservoir() {}
-		~F16HydraulicReservoir() {}
-	};
+		if (pressure < 1000)
+		{
+			return true;
+		}
+		return false;
+	}
 
-	class F16HydraulicPump : public AbstractHydraulicDevice
+	// engine RPM or torque here?
+	void updateFrame(const double engineRpm, const double frameTime)
 	{
-	public:
-		// pressure provided for devices
-		// 3000 psi max?
-		double pressure;
-
-		F16HydraulicReservoir reservoir;
-
-		F16HydraulicPump(void *_parentSystem) 
-			: AbstractHydraulicDevice(_parentSystem)
-			, pressure(0)
-			, reservoir()
-		{}
-		~F16HydraulicPump() {}
-
-		bool isWarning() const
+		if (engineRpm > 0)
 		{
-			if (pressure < 1000)
-			{
-				return true;
-			}
-			return false;
+			pressure = 3000;
 		}
-
-		// engine RPM or torque here?
-		void updateFrame(const double engineRpm, const double frameTime)
+		else
 		{
-			if (engineRpm > 0)
-			{
-				pressure = 3000;
-			}
-			else
-			{
-				pressure = 0;
-			}
+			pressure = 0;
 		}
-	};
-}
+	}
+};
 
 #endif // ifndef _F16HYDRAULICPUMP_H_
 

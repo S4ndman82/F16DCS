@@ -14,22 +14,19 @@ sources:
 
 */
 
-namespace F16
+class F16PMG : public AbstractElectricDevice
 {
-	class F16PMG : public AbstractElectricDevice
+public:
+	F16PMG(void *_parentSystem) 
+		: AbstractElectricDevice(_parentSystem)
+	{}
+	~F16PMG() {}
+
+	void updateFrame(const double frameTime)
 	{
-	public:
-		F16PMG(void *_parentSystem) 
-			: AbstractElectricDevice(_parentSystem)
-		{}
-		~F16PMG() {}
+	}
 
-		void updateFrame(const double frameTime)
-		{
-		}
-
-	};
-}
+};
 
 #endif // ifndef _F16PMG_H_
 

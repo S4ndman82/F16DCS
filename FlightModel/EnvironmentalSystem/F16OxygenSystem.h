@@ -4,53 +4,50 @@
 #include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "include/F16Constants.h"		// Common constants used throughout this DLL
 
-namespace F16
+// amount of bleed air from engine (oxygen generator)
+// oxygen tanks
+// valve open/not
+// pressurization
+
+// 5-liter liquid oxygen -> diluter (0..100 percent O2)
+
+class F16OxygenSystem
 {
-	// amount of bleed air from engine (oxygen generator)
-	// oxygen tanks
-	// valve open/not
-	// pressurization
+protected:
+	const double tank_volume; // whole volume of tank
+	double tank_usage; // amount used
+	double diluter_setting; // normal/100% ?
 
-	// 5-liter liquid oxygen -> diluter (0..100 percent O2)
+	double pressure; // pressure provided (pascals), used over ambient pressure
 
-	class F16OxygenSystem
+	// sensors? (for cockpit?)
+	// valves?
+
+public:
+	F16OxygenSystem() 
+		: tank_volume(5.0)
+		, tank_usage(5.0)
+		, diluter_setting(0) // <- off
+		, pressure(0)
+	{}
+	~F16OxygenSystem() {}
+
+	double getPressure() const
 	{
-	protected:
-		const double tank_volume; // whole volume of tank
-		double tank_usage; // amount used
-		double diluter_setting; // normal/100% ?
+		return pressure;
+	}
 
-		double pressure; // pressure provided (pascals), used over ambient pressure
+	void updateFrame(const double ambientPressure, const double altitude, const double frameTime)
+	{
+		// very rough usage
+		double use = frameTime * diluter_setting;
+		tank_usage -= use;
+		//tanks += o2_gen;
 
-		// sensors? (for cockpit?)
-		// valves?
-
-	public:
-		F16OxygenSystem() 
-			: tank_volume(5.0)
-			, tank_usage(5.0)
-			, diluter_setting(0) // <- off
-			, pressure(0)
-		{}
-		~F16OxygenSystem() {}
-
-		double getPressure() const
-		{
-			return pressure;
-		}
-
-		void updateFrame(const double ambientPressure, const double altitude, const double frameTime)
-		{
-			// very rough usage
-			double use = frameTime * diluter_setting;
-			tank_usage -= use;
-			//tanks += o2_gen;
-
-			// pressure provided depends on diluter setting
-			// and ambient pressure ?
-			//pressure
-		}
-	};
-}
+		// pressure provided depends on diluter setting
+		// and ambient pressure ?
+		//pressure
+	}
+};
 
 #endif // ifndef _F16OXYGENSYSTEM_H_

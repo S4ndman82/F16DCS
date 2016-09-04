@@ -13,29 +13,26 @@ sources:
 
 */
 
-namespace F16
+class F16ElectricBus
 {
-	class F16ElectricBus
-	{
-	protected:
-		// type: AC no 1, AC no 2, DC "battery" bus
-		// voltage: 28V DC?
-		// on/off
-		// battery/generator status?
+protected:
+	// type: AC no 1, AC no 2, DC "battery" bus
+	// voltage: 28V DC?
+	// on/off
+	// battery/generator status?
 
-		//AbstractElectricDevice devices[];
+	//AbstractElectricDevice devices[];
 
-	public:
-		F16ElectricBus() {}
-		~F16ElectricBus() {}
+public:
+	F16ElectricBus() {}
+	~F16ElectricBus() {}
 
 	
-		void updateFrame(const double frameTime)
-		{
-		}
+	void updateFrame(const double frameTime)
+	{
+	}
 
-	};
-}
+};
 
 #endif // ifndef _F16ELECTRICBUS_H_
 

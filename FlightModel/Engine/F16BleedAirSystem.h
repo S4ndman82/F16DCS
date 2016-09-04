@@ -30,61 +30,59 @@
  (high/low) -> ECS
 
 */
-namespace F16
+
+class F16BleedAirSystem
 {
-	class F16BleedAirSystem
+protected:
+	// 
+	//double currentEngineRpm;
+
+	double lowpressure;
+	double highpressure;
+
+	// TODO:
+	//F16FuelPump *pABFuelPump;
+	//F16EnvControlSystem *pEnvSystem;
+	//F16EPU *pEpu;
+
+public:
+	F16BleedAirSystem() 
+		: lowpressure(0)
+		, highpressure(0)
+	{}
+	~F16BleedAirSystem() {}
+
+	// update with engine/APU rpm/torque
+	// and power consumption
+	void updateFrame(const double frameTime)
 	{
-	protected:
-		// 
-		//double currentEngineRpm;
+		// add logic to system control:
+		// valves open/close etc. in various conditions
 
-		double lowpressure;
-		double highpressure;
+	}
 
-		// TODO:
-		//F16FuelPump *pABFuelPump;
-		//F16EnvControlSystem *pEnvSystem;
-		//F16EPU *pEpu;
+	/*
+	// we might need to calculate air pressure directly in engine code
+	// due to differences in engines?
+	void setEngineRpm(const double value)
+	{
+	}
+	*/
 
-	public:
-		F16BleedAirSystem() 
-			: lowpressure(0)
-			, highpressure(0)
-		{}
-		~F16BleedAirSystem() {}
+	// actually, there's "high" and "low" pressure from the engine
+	// -> set them from engine
+	void setLowPressureBleedAir(const double value)
+	{
+		// just a function of engine RPM?
+		lowpressure = value;
+	}
+	void setHighPressureBleedAir(const double value)
+	{
+		// just a function of engine RPM?
+		highpressure = value;
+	}
 
-		// update with engine/APU rpm/torque
-		// and power consumption
-		void updateFrame(const double frameTime)
-		{
-			// add logic to system control:
-			// valves open/close etc. in various conditions
-
-		}
-
-		/*
-		// we might need to calculate air pressure directly in engine code
-		// due to differences in engines?
-		void setEngineRpm(const double value)
-		{
-		}
-		*/
-
-		// actually, there's "high" and "low" pressure from the engine
-		// -> set them from engine
-		void setLowPressureBleedAir(const double value)
-		{
-			// just a function of engine RPM?
-			lowpressure = value;
-		}
-		void setHighPressureBleedAir(const double value)
-		{
-			// just a function of engine RPM?
-			highpressure = value;
-		}
-
-	};
-}
+};
 
 #endif // ifndef _F16BLEEDAIRSYSTEM_H_
 

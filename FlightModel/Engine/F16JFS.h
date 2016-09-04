@@ -13,105 +13,102 @@ JFS = Jet Fuel Starter,
 gas turbine -> auxiliary drive gearbox -> clutch -> engine starter and maintains rpm
 */
 
-namespace F16
+// two batteries "accumulators",
+// charged by hydraulic system
+//class F16JFSAccu
+
+// torque to main engine via ADG+clutch,
+// if engine "seized" clutch slippage
+// ..
+class F16JFS
 {
-	// two batteries "accumulators",
-	// charged by hydraulic system
-	//class F16JFSAccu
+protected:
 
-	// torque to main engine via ADG+clutch,
-	// if engine "seized" clutch slippage
-	// ..
-	class F16JFS
+	// keeps running until switched off,
+	// may provide additional power
+	bool m_switchOn;
+
+	// see conditions for light illumination
+	bool m_runLight;
+
+	// while spooldown in progress, cannot restart JFS
+	bool m_spoolDown;
+	bool m_spoolUp;
+
+	double m_currentRpm;
+	double m_currentTemperature;
+
+public:
+	F16JFS() 
+		: m_switchOn(false)
+		, m_runLight(false)
+		, m_spoolDown(false)
+		, m_spoolUp(false)
+		, m_currentRpm(0)
+	{}
+	~F16JFS() {}
+
+	double getRpm() const
 	{
-	protected:
+		return 0;
+	}
+	double getRelatedRpm() const
+	{
+		return 0;
+	}
 
-		// keeps running until switched off,
-		// may provide additional power
-		bool m_switchOn;
+	double getTemperature() const
+	{
+		return 0;
+	}
+	double getOilPressure() const
+	{
+		return 0;
+	}
+	double getFuelFlow() const
+	{
+		return 0;
+	}
 
-		// see conditions for light illumination
-		bool m_runLight;
-
-		// while spooldown in progress, cannot restart JFS
-		bool m_spoolDown;
-		bool m_spoolUp;
-
-		double m_currentRpm;
-		double m_currentTemperature;
-
-	public:
-		F16JFS() 
-			: m_switchOn(false)
-			, m_runLight(false)
-			, m_spoolDown(false)
-			, m_spoolUp(false)
-			, m_currentRpm(0)
-		{}
-		~F16JFS() {}
-
-		double getRpm() const
+	void start()
+	{
+		m_switchOn = true;
+		if (m_spoolDown == false)
 		{
-			return 0;
-		}
-		double getRelatedRpm() const
-		{
-			return 0;
+			// -> starting
+			m_spoolUp = true;
 		}
 
-		double getTemperature() const
+	}
+	void stop()
+	{
+		// start spooldown
+		if (m_switchOn == true)
 		{
-			return 0;
+			m_spoolDown = true;
 		}
-		double getOilPressure() const
+		m_switchOn = false;
+	}
+
+	void updateFrame(const double frameTime)
+	{
+		// when ground start
+		// if (m_currentRpm >= 12%) -> charge accumulators
+		// if (m_currentRpm >= 50%) -> light goes out (shutdown?)
+
+		// when airstart
+		// if (m_currentRpm >= 70%) -> charge accumulators
+		// 3-4 sec -> run light on
+
+		if (m_spoolDown == true && m_currentRpm == 0)
 		{
-			return 0;
+			// just check if we have reached 0 rpm
+			// -> can start again
+			m_spoolDown = false;
 		}
-		double getFuelFlow() const
-		{
-			return 0;
-		}
+	}
 
-		void start()
-		{
-			m_switchOn = true;
-			if (m_spoolDown == false)
-			{
-				// -> starting
-				m_spoolUp = true;
-			}
-
-		}
-		void stop()
-		{
-			// start spooldown
-			if (m_switchOn == true)
-			{
-				m_spoolDown = true;
-			}
-			m_switchOn = false;
-		}
-
-		void updateFrame(const double frameTime)
-		{
-			// when ground start
-			// if (m_currentRpm >= 12%) -> charge accumulators
-			// if (m_currentRpm >= 50%) -> light goes out (shutdown?)
-
-			// when airstart
-			// if (m_currentRpm >= 70%) -> charge accumulators
-			// 3-4 sec -> run light on
-
-			if (m_spoolDown == true && m_currentRpm == 0)
-			{
-				// just check if we have reached 0 rpm
-				// -> can start again
-				m_spoolDown = false;
-			}
-		}
-
-	};
-}
+};
 
 #endif // ifndef _F16JFS_H_
 

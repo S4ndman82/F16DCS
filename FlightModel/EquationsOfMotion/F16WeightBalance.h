@@ -14,62 +14,59 @@ sources:
 #include "include/ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "include/F16Constants.h"		// Common constants used throughout this DLL
 
-namespace F16
+// mostly amount of fuel at different stations matter here
+// (unless we start adding payload support into flight model)
+class F16WeightBalance
 {
-	// mostly amount of fuel at different stations matter here
-	// (unless we start adding payload support into flight model)
-	class F16WeightBalance
+public:
+
+	// calculate new center of gravity
+	// for using in motion calculations
+	Vec3 balanced_center_of_gravity;
+	//double total_mass_kg; // new "wet" mass with balance
+
+	// reference location (0.35)
+	Vec3 original_cog;
+
+	// dry mass used with original cog
+	double dry_mass_kg;
+
+public:
+	F16WeightBalance() 
+		: balanced_center_of_gravity()
+		, original_cog()
+		, dry_mass_kg(0)
+	{}
+	~F16WeightBalance() {}
+
+	// used to initialize
+	void setMassState(double mass_kg, Vec3 &center_of_gravity)
 	{
-	public:
+		dry_mass_kg = mass_kg;
+		original_cog = center_of_gravity;
+		balanced_center_of_gravity = center_of_gravity;
+	}
 
-		// calculate new center of gravity
-		// for using in motion calculations
-		Vec3 balanced_center_of_gravity;
-		//double total_mass_kg; // new "wet" mass with balance
+	void balance(double mass, Vec3 &position, Vec3 &size)
+	{
+		// update cog with given mass, position and bounding size
 
-		// reference location (0.35)
-		Vec3 original_cog;
+		// force of the mass
+		double force_N = mass * F16::standard_gravity;
 
-		// dry mass used with original cog
-		double dry_mass_kg;
+		// vector "torque" for force
+		Vec3 force_vec;
+		force_vec.x = position.x * force_N;
+		force_vec.y = position.y * force_N;
+		force_vec.z = position.z * force_N;
 
-	public:
-		F16WeightBalance() 
-			: balanced_center_of_gravity()
-			, original_cog()
-			, dry_mass_kg(0)
-		{}
-		~F16WeightBalance() {}
+		// new center of gravity relative to original reference
+		//balanced_center_of_gravity = cross(center_of_gravity, force_vec);
 
-		// used to initialize
-		void setMassState(double mass_kg, Vec3 &center_of_gravity)
-		{
-			dry_mass_kg = mass_kg;
-			original_cog = center_of_gravity;
-			balanced_center_of_gravity = center_of_gravity;
-		}
+		// combine in case of multiple masses
+		balanced_center_of_gravity = cross(balanced_center_of_gravity, force_vec);
+	}
 
-		void balance(double mass, Vec3 &position, Vec3 &size)
-		{
-			// update cog with given mass, position and bounding size
-
-			// force of the mass
-			double force_N = mass * standard_gravity;
-
-			// vector "torque" for force
-			Vec3 force_vec;
-			force_vec.x = position.x * force_N;
-			force_vec.y = position.y * force_N;
-			force_vec.z = position.z * force_N;
-
-			// new center of gravity relative to original reference
-			//balanced_center_of_gravity = cross(center_of_gravity, force_vec);
-
-			// combine in case of multiple masses
-			balanced_center_of_gravity = cross(balanced_center_of_gravity, force_vec);
-		}
-
-	};
-}
+};
 
 #endif // ifndef _F16WEIGHTBALANCE_H_

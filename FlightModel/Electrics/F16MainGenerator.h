@@ -14,25 +14,22 @@ sources:
 - NASA TP 2857
 */
 
-namespace F16
+// 40 kVA generator?
+
+// alternator
+class F16MainGenerator : public AbstractElectricDevice
 {
-	// 40 kVA generator?
+public:
+	F16MainGenerator(void *_parentSystem) 
+		: AbstractElectricDevice(_parentSystem)
+	{}
+	~F16MainGenerator() {}
 
-	// alternator
-	class F16MainGenerator : public AbstractElectricDevice
+	void updateFrame(const double frameTime)
 	{
-	public:
-		F16MainGenerator(void *_parentSystem) 
-			: AbstractElectricDevice(_parentSystem)
-		{}
-		~F16MainGenerator() {}
+	}
 
-		void updateFrame(const double frameTime)
-		{
-		}
-
-	};
-}
+};
 
 #endif // ifndef _F16MAINGENERATOR_H_
 

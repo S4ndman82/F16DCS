@@ -14,69 +14,65 @@
 
 // use high/low bleed air pressure from engine
 
-namespace F16
+// TODO: G-suit pressure..
+
+class F16EnvControlSystem
 {
+protected:
+	double lowpressure;
+	double highpressure;
 
-	// TODO: G-suit pressure..
+	// TODO: cockpit pressure in pascals over external (get update from oxygen system also)
+	double cockpitPressure;
 
-	class F16EnvControlSystem
+public:
+	F16AirConditioning AirCond;
+	F16OxygenSystem Oxy;
+
+	F16Atmosphere *pAtmos;
+
+public:
+	F16EnvControlSystem(F16Atmosphere *atmos)
+		: lowpressure(0)
+		, highpressure(0)
+		, cockpitPressure(0)
+		, AirCond()
+		, Oxy()
+		, pAtmos(atmos)
+	{}
+	~F16EnvControlSystem() {}
+
+	// TODO:
+	// get cockpit pressure in pascals over external (get update from oxygen system also)
+	// -> set to ambient pressure when canopy gone or failure in ECS
+	double getCockpitPressure() const
 	{
-	protected:
-		double lowpressure;
-		double highpressure;
+		return cockpitPressure;
+	}
 
-		// TODO: cockpit pressure in pascals over external (get update from oxygen system also)
-		double cockpitPressure;
+	void updateFrame(const double frameTime)
+	{
+		const double ambientPressure = pAtmos->ambientPressure;
+		const double altitude = pAtmos->getAltitudeFeet();
 
-	public:
-		F16AirConditioning AirCond;
-		F16OxygenSystem Oxy;
-
-		F16Atmosphere *pAtmos;
-
-	public:
-		F16EnvControlSystem(F16Atmosphere *atmos)
-			: lowpressure(0)
-			, highpressure(0)
-			, cockpitPressure(0)
-			, AirCond()
-			, Oxy()
-			, pAtmos(atmos)
-		{}
-		~F16EnvControlSystem() {}
-
-		// TODO:
-		// get cockpit pressure in pascals over external (get update from oxygen system also)
-		// -> set to ambient pressure when canopy gone or failure in ECS
-		double getCockpitPressure() const
-		{
-			return cockpitPressure;
-		}
-
-		void updateFrame(const double frameTime)
-		{
-			const double ambientPressure = pAtmos->ambientPressure;
-			const double altitude = pAtmos->getAltitudeFeet();
-
-			// logic of using high/low pressure of bleed air?
+		// logic of using high/low pressure of bleed air?
 			
-			Oxy.updateFrame(ambientPressure, altitude, frameTime);
+		Oxy.updateFrame(ambientPressure, altitude, frameTime);
 
-			// just use oxygen system pressure directly?
-			cockpitPressure = Oxy.getPressure();
+		// just use oxygen system pressure directly?
+		cockpitPressure = Oxy.getPressure();
 
-		}
+	}
 
-		// there's "high" and "low" pressure from the engine
-		void setLowPressureBleedAir(const double value)
-		{
-			lowpressure = value;
-		}
-		void setHighPressureBleedAir(const double value)
-		{
-			highpressure = value;
-		}
-	};
-}
+	// there's "high" and "low" pressure from the engine
+	void setLowPressureBleedAir(const double value)
+	{
+		lowpressure = value;
+	}
+	void setHighPressureBleedAir(const double value)
+	{
+		highpressure = value;
+	}
+};
 
 #endif // ifndef 
