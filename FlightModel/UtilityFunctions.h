@@ -350,4 +350,4 @@ public:
 };
 
 
-#endif
+#endif // ifndef __UtilFunctions__

@@ -40,7 +40,7 @@ public:
 	AERO_Function(const int nDimension, double *Ydata)
 		: indexVector()
 		, ndinfo()
-		, m_Xmat(NULL)
+		, m_Xmat(nullptr)
 		, m_Ydata(Ydata)
 		, m_Tbuf()
 		, m_xPointMat()
@@ -48,7 +48,7 @@ public:
 		, m_xPar1Limit(0)
 		, m_result(0)
 	{
-		ndinfo.nPoints = NULL;
+		ndinfo.nPoints = nullptr;
 		ndinfo.nDimension = nDimension;
 	}
 
@@ -56,15 +56,15 @@ public:
 	{
 		m_indexMat.release();
 		m_xPointMat.release();
-		if (ndinfo.nPoints != NULL)
+		if (ndinfo.nPoints != nullptr)
 		{
 			free(ndinfo.nPoints);
-			ndinfo.nPoints = NULL;
+			ndinfo.nPoints = nullptr;
 		}
-		if (m_Xmat != NULL)
+		if (m_Xmat != nullptr)
 		{
 			free(m_Xmat);
-			m_Xmat = NULL;
+			m_Xmat = nullptr;
 		}
 		indexVector.release();
 	}
