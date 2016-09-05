@@ -545,7 +545,7 @@ public:
 	}
 
 	// inlet stage, variable control (CIVV), air temperature
-	double inletStage(GasData &gas, double frameTime)
+	double inletStage(GasData &gas, GasData &bypass, double frameTime)
 	{
 		// so, inlet area * pressure gives volume of air
 		// volume * density gives mass of air flow
@@ -555,6 +555,10 @@ public:
 
 		// three fans at this stage?
 		// -> functionality
+
+		// bypass values (to be used later again)
+		bypass.volume = gas.volume * engineParams.bypassRatio; // after normal inlet calculated
+		bypass.massflow = gas.massflow * engineParams.bypassRatio;
 
 		return gas.pressure;
 	}
@@ -756,16 +760,15 @@ public:
 		GasData gas(pAtmos->ambientPressure, pAtmos->ambientDensity, pAtmos->ambientTemperature_DegK);
 		GasData bypass(gas); // <- according to bypass ratio, injection back to engine
 
-		inletStage(gas, frameTime);
-		bypass.volume = gas.volume * engineParams.bypassRatio; // after normal inlet calculated
-		bypass.massflow = gas.massflow * engineParams.bypassRatio;
+		// temporary, should be given by engine management system
+		FuelData fuel;
+
+		// calculations for inlet (airflow, temperature..)
+		inletStage(gas, bypass, frameTime);
 
 		// compressor stages: low pressure compressor and high pressure compressor
 		lpcStage(gas, frameTime);
 		hpcStage(gas, frameTime);
-
-		// temporary, should be given by engine management system
-		FuelData fuel;
 
 		// temp, check what to use on the methods/members properly
 		double thrustN = 0;
