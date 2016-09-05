@@ -29,7 +29,7 @@ sources:
 - AD-A202 599
 - AD-A230 517
 - NASA Technical Paper 3355
-- NASA Technical Memorandum 86026
+- NASA Technical Memorandum 86026 (AFTI Control laws)
 - WL-TR-97-3091
 */
 

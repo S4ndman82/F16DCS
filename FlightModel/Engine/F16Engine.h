@@ -307,8 +307,10 @@ public:
 	// at turbine stage
 	//double maxTemperature;
 
-	// varies by conditions (temperature, compression),
+	// RPM varies by conditions (temperature, compression),
 	// different for N1, N2
+	// These are "safe" limits, actual operation may differ
+	double maxRpmN1;
 	double maxRpmN2;
 
 	F16EngineParameters(EngineType engine)
@@ -319,6 +321,7 @@ public:
 		, bypassRatio(0)
 		, minCompress(0)
 		, maxCompress(0)
+		, maxRpmN1(11000) // <- some estimate on some forum post
 		, maxRpmN2(14459) // <- F110-GE-400 limit, until better one is found..
 	{
 		switch (engineType)
