@@ -130,6 +130,9 @@
     <ClInclude Include="FlightControls\F16FcsYawController.h">
       <Filter>FlightControls</Filter>
     </ClInclude>
+    <ClInclude Include="FlightControls\F16FcsCommon.h">
+      <Filter>FlightControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

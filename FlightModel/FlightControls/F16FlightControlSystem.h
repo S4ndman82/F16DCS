@@ -12,7 +12,9 @@
 #include "Inputs/F16AnalogInput.h"
 #include "Atmosphere/F16Atmosphere.h"
 
-#include "FlightControls/F16Actuator.h"
+#include "F16Actuator.h"
+
+#include "F16FcsCommon.h"
 
 #include "F16FcsPitchController.h"
 #include "F16FcsRollController.h"
@@ -36,122 +38,6 @@ sources:
 // TODO! combine controllers with real actuator support
 
 
-
-// if/when trimming support is needed,
-// keep settings in one place.
-class F16TrimState
-{
-public:
-	// TODO: limits of trimmer for each axis
-	//const double pitchLimit;
-	//const double rollLimit;
-	//const double yawLimit;
-
-	// increments per "notch" for each axis
-	const double pitchIncrement;
-	const double rollIncrement;
-	const double yawIncrement;
-
-	double trimPitch = 0.0;
-	double trimRoll = 0.0;
-	double trimYaw = 0.0;
-
-public:
-	F16TrimState(const double pitch, const double roll, const double yaw) 
-		//: pitchLimit(5.0), rollLimit(5.0), yawLimit(5.0)
-		: pitchIncrement(0.1), rollIncrement(0.1), yawIncrement(0.1)
-		, trimPitch(pitch), trimRoll(roll), trimYaw(yaw)
-	{}
-	~F16TrimState() {}
-
-	void pitchUp() 		{ trimPitch += pitchIncrement; }
-	void pitchDown()	{ trimPitch -= pitchIncrement; }
-
-	void rollCCW()		{ trimRoll -= rollIncrement; }
-	void rollCW()		{ trimRoll += rollIncrement; }
-
-	void yawLeft()		{ trimYaw += yawIncrement; }
-	void yawRight()		{ trimYaw -= yawIncrement; }
-};
-
-// just keep some things together in easily accessible way
-class F16BodyState
-{
-public:
-	double		alpha_DEG = 0.0;			// Angle of attack (deg)
-	double		beta_DEG = 0.0;			// Slideslip angle (deg)
-
-	double		rollRate_RPS = 0.0;			// Body roll rate (rad/sec)
-	double		pitchRate_RPS = 0.0;			// Body pitch rate (rad/sec)
-	double		yawRate_RPS = 0.0;			// Body yaw rate (rad/sec)
-
-	double		ay_world = 0.0;			// World referenced up/down acceleration (m/s^2)
-	double		accz = 0.0;			// Az (per normal direction convention) out the bottom of the a/c (m/s^2)
-	double		accy = 0.0;			// Ay (per normal direction convention) out the right wing (m/s^2)
-
-public:
-	F16BodyState() {}
-	~F16BodyState() {}
-
-	double getRollRateDegs() const
-	{
-		return rollRate_RPS * F16::radiansToDegrees;
-	}
-	double getPitchRateDegs() const
-	{
-		return pitchRate_RPS * F16::radiansToDegrees;
-	}
-	double getYawRateDegs() const
-	{
-		return yawRate_RPS * F16::radiansToDegrees;
-	}
-
-	double getAccZPerG() const
-	{
-		return accz / F16::standard_gravity;
-	}
-	double getAccYPerG() const
-	{
-		return accy / F16::standard_gravity;
-	}
-};
-
-// keep flight surface positions in one place
-class F16FlightSurface
-{
-public:
-	double		leadingEdgeFlap_DEG = 0.0;			// Leading edge flap deflection (deg)
-	double		leadingEdgeFlap_PCT = 0.0;			// Leading edge flap as a percent of maximum (0 to 1)
-
-	double		flap_DEG = 0.0;			// Trailing edge flap deflection (deg)
-	double		flap_PCT = 0.0;			// Trailing edge flap deflection (0 to 1)
-
-	double		elevator_DEG = 0.0;			// Elevator deflection (deg)
-	double		elevator_PCT = 0.0;			// Elevator deflection as a percent of maximum (-1 to 1)
-
-	double		aileron_DEG = 0.0;			// Aileron deflection (deg)
-	double		aileron_PCT = 0.0;			// Aileron deflection as a percent of maximum (-1 to 1)
-
-	double		rudder_DEG = 0.0;			// Rudder  deflection (deg)
-	double		rudder_PCT = 0.0;			// Rudder deflection as a percent of maximum (-1 to 1)
-
-public:
-	F16FlightSurface() 
-		: leadingEdgeFlap_DEG(0)
-		, leadingEdgeFlap_PCT(0)
-		, flap_DEG(0)
-		, flap_PCT(0)
-		, elevator_DEG(0)
-		, elevator_PCT(0)
-		, aileron_DEG(0)
-		, aileron_PCT(0)
-		, rudder_DEG(0)
-		, rudder_PCT(0)
-	{}
-	~F16FlightSurface() {}
-};
-
-
 class F16FlightControls
 {
 public:
@@ -163,6 +49,11 @@ public:
 	double		leading_edge_flap_rate;
 	double		leading_edge_flap_integrated_gained;
 	double		leading_edge_flap_integrated_gained_biased;
+
+	F16BodyState bodyState;
+	F16FlightSurface flightSurface;
+
+	F16Atmosphere *pAtmos;
 
 	// note: airbrake limit different when landing gear down (prevent strike to runway)
 	// cx_brk = 0.08, --coefficient, drag, breaks <- for airbrake?
@@ -202,30 +93,6 @@ public:
 	// gear go up -> trailing edge flaps go up
 	bool gearRelatedFlaps;
 
-	double		m_alphaFiltered;
-
-	/**/
-	// Control filters (general filters to easily code up when compared to report block diagrams)
-	DummyFilter	pitchRateWashout;
-	DummyFilter	pitchIntegrator;
-	DummyFilter	pitchPreActuatorFilter;
-	DummyFilter	pitchActuatorDynamicsFilter;
-	DummyFilter	accelFilter;
-	DummyFilter	latStickForceFilter;
-	DummyFilter	rollCommandFilter;
-	DummyFilter	rollActuatorDynamicsFilter;
-	DummyFilter	rollRateFilter1;
-	DummyFilter	rollRateFilter2;
-	DummyFilter	rudderCommandFilter;
-	DummyFilter	yawRateWashout;
-	DummyFilter	yawRateFilter;
-	DummyFilter	yawServoFilter;
-	/**/
-
-	F16BodyState bodyState;
-	F16FlightSurface flightSurface;
-
-	F16Atmosphere *pAtmos;
 
 public:
 	F16FlightControls(F16Atmosphere *atmos)
@@ -235,6 +102,9 @@ public:
 		, leading_edge_flap_rate(0)
 		, leading_edge_flap_integrated_gained(0)
 		, leading_edge_flap_integrated_gained_biased(0)
+		, bodyState()
+		, flightSurface()
+		, pAtmos(atmos)
 		, airbrakeSwitch(false)
 		, airbrakeActuator(1.0, 0, 1.0) //
 		, airbrakeDrag(0)
@@ -245,31 +115,11 @@ public:
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
 		, rudderActuator(1.0, -30.0, 30.0)
-		, pitchControl()
-		, rollControl()
-		, yawControl()
+		, pitchControl(&bodyState, &flightSurface)
+		, rollControl(&bodyState, &flightSurface)
+		, yawControl(&bodyState, &flightSurface)
 		, manualPitchOverride(false)
 		, gearRelatedFlaps(false)
-		, m_alphaFiltered(0)
-		/**/
-		, pitchRateWashout()
-		, pitchIntegrator()
-		, pitchPreActuatorFilter()
-		, pitchActuatorDynamicsFilter()
-		, accelFilter()
-		, latStickForceFilter()
-		, rollCommandFilter()
-		, rollActuatorDynamicsFilter()
-		, rollRateFilter1()
-		, rollRateFilter2()
-		, rudderCommandFilter()
-		, yawRateWashout()
-		, yawRateFilter()
-		, yawServoFilter()
-		/**/
-		, bodyState()
-		, flightSurface()
-		, pAtmos(atmos)
 	{
 		// just do this once when constructing
 		initialize(0);
@@ -448,139 +298,6 @@ public:
 	}
 
 
-	// Controller for yaw
-	double fcs_yaw_controller(double pedInput, double alphaFiltered, double aileron_commanded, double dt)
-	{
-		const double roll_rate = bodyState.getRollRateDegs();
-		const double yaw_rate = bodyState.getYawRateDegs();
-		double ay = bodyState.getAccYPerG();
-
-		double rudderCommand = yawControl.getRudderCommand(pedInput);
-		double rudderCommandFiltered = rudderCommandFilter.Filter(dt,rudderCommand);
-		double rudderCommandFilteredWTrim = trimState.trimYaw - rudderCommandFiltered;
-
-		double alphaGained = alphaFiltered * (1.0 / 57.3);
-		double rollRateWithAlpha = roll_rate * alphaGained;
-		double yawRateWithRoll = yaw_rate - rollRateWithAlpha;
-
-		double yawRateWithRollWashedOut = yawRateWashout.Filter(dt,yawRateWithRoll);
-		double yawRateWithRollFiltered = yawRateFilter.Filter(dt,yawRateWithRollWashedOut);
-
-		double yawRateFilteredWithSideAccel = yawRateWithRollFiltered;// + (ay * 19.3);
-
-		double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * aileron_commanded;
-
-		double finalRudderCommand = aileronGained + yawRateFilteredWithSideAccel + rudderCommandFilteredWTrim;
-
-		return finalRudderCommand;
-
-		//TODO: Figure out why there is a ton of flutter at high speed due to these servo dynamics
-		//double yawServoCommand = yawServoFilter.Filter(!(simInitialized),dt,finalRudderCommand);
-		//return yawServoCommand;
-	}
-
-
-
-
-	// Angle of attack limiter logic
-	double angle_of_attack_limiter(const double alphaFiltered, const double pitchRateCommand) const
-	{
-		// TODO: 
-		//if (manualPitchOverride == true)
-	
-		double topLimit = limit((alphaFiltered - 22.5) * 0.69, 0.0, 99999.0);
-		double bottomLimit = limit((alphaFiltered - 15.0 + pitchRateCommand) * 0.322, 0.0, 99999.0);
-
-		return (topLimit + bottomLimit);
-	}
-
-
-	// Controller for pitch
-	// (differentialCommand is hard-coded to 0 in caller)
-	double fcs_pitch_controller(double longStickInput, double differentialCommand, double dynPressure_LBFT2, double dt)
-	{
-		const double pitch_rate = bodyState.getPitchRateDegs();
-		const double az = bodyState.getAccZPerG();
-
-		double stickCommandPos = pitchControl.fcs_pitch_controller_force_command(longStickInput, trimState.trimPitch, dt);
-
-		double dynamicPressureScheduled = pitchControl.dynamic_pressure_schedule(dynPressure_LBFT2);	
-
-		double azFiltered = accelFilter.Filter(dt, az-1.0);
-
-		double alphaLimited = limit(bodyState.alpha_DEG, -5.0, 30.0);
-		double alphaLimitedRate = 10.0 * (alphaLimited - m_alphaFiltered);
-		m_alphaFiltered += (alphaLimitedRate * dt);
-
-		double pitchRateWashedOut = pitchRateWashout.Filter(dt, pitch_rate);
-		double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;		
-
-		double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
-
-		double gLimiterCommand = -(azFiltered +  (pitchRateWashedOut * 0.2));	
-
-		double finalCombinedCommand = dynamicPressureScheduled * (2.5 * (stickCommandPos + limiterCommand + gLimiterCommand));
-
-		double finalCombinedCommandFilteredLimited = limit(pitchIntegrator.Filter(dt,finalCombinedCommand),-25.0,25.0);
-		finalCombinedCommandFilteredLimited = finalCombinedCommandFilteredLimited + finalCombinedCommand;
-
-		double finalPitchCommandTotal = pitchPreActuatorFilter.Filter(dt,finalCombinedCommandFilteredLimited);
-		finalPitchCommandTotal += (0.5 * m_alphaFiltered);
-
-		return finalPitchCommandTotal;
-
-		// TODO: There are problems with flutter with the servo dynamics...needs to be nailed down!
-		//double actuatorDynamicsResult = pitchActuatorDynamicsFilter.Filter(!(simInitialized),dt,finalPitchCommandTotal);
-		//return actuatorDynamicsResult;	
-	}
-
-	// Controller for roll
-	double fcs_roll_controller(double latStickInput, double dynPressure_LBFT2, double dt)
-	{
-		const double roll_rate = bodyState.getRollRateDegs();
-		double ay = bodyState.getAccYPerG();
-
-
-		double latStickForceCmd = latStickInput * 75.0;
-		double latStickForce = latStickForceFilter.Filter(dt,latStickForceCmd);
-
-		double latStickForceBiased = latStickForce - (ay * 8.9);  // CJS: remove side acceleration bias?
-
-		double rollFeelGain = rollControl.getRollFeelGain(pitchControl.getLongStickForce()); // <- bug? (should be lateral?)
-
-		double rollRateCommand = rollControl.getRollRateCommand(latStickForceBiased * rollFeelGain);
-
-		double rollRateCommandFilterd = rollCommandFilter.Filter(dt,rollRateCommand);
-
-		double rollRateFiltered1 = rollRateFilter1.Filter(dt,roll_rate);
-
-		double rollRateFiltered2 = (rollRateFilter2.Filter(dt,rollRateFiltered1));
-
-		double rollRateCommandCombined = rollRateFiltered2 - rollRateCommandFilterd - trimState.trimRoll;
-
-		double dynamicPressure_NM2 = dynPressure_LBFT2 * 47.880258889;
-
-		double pressureGain = 0.0;
-		if(dynamicPressure_NM2 < 19153.0)
-		{
-			pressureGain = 0.2;
-		}
-		else if((dynamicPressure_NM2 >= 19153.0) && (dynamicPressure_NM2 <= 23941.0))
-		{
-			pressureGain = -0.00002089 * dynamicPressure_NM2 + 0.6;
-		}
-		else
-		{
-			pressureGain = 0.1;
-		}
-
-		double rollCommandGained = limit(rollRateCommandCombined * pressureGain, -21.5, 21.5);
-
-		// Mechanical servo dynamics
-		double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(dt,rollCommandGained);	
-		return rollActuatorCommand;
-	}		
-
 	// Passive flap schedule for the F-16...nominal for now from flight manual comments
 	double fcs_flap_controller(double airspeed_FPS)
 	{
@@ -608,89 +325,6 @@ public:
 		return trailing_edge_flap_deflection;
 	}
 
-	bool initializeYawController()
-	{
-		if (simInitialized == true)
-		{
-			return true;
-		}
-
-		double numerators[2] = { 0.0, 4.0 };
-		double denominators[2] = { 1.0, 4.0 };
-		rudderCommandFilter.InitFilter(numerators, denominators, 1);
-
-		double numerators1[2] = { 1.0, 0.0 };
-		double denominators1[2] = { 1.0, 1.0 };
-		yawRateWashout.InitFilter(numerators1, denominators1, 1);
-
-		double numerators2[2] = { 3.0, 15.0 };
-		double denominators2[2] = { 1.0, 15.0 };
-		yawRateFilter.InitFilter(numerators2, denominators2, 1);
-
-		double numerators3[3] = { 0.0, 0.0, pow(52.0, 2.0) };
-		double denomiantors3[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-		yawServoFilter.InitFilter(numerators3, denomiantors3, 2);
-		return true;
-	}
-
-	bool initializePitchController()
-	{
-		if (simInitialized == true)
-		{
-			return true;
-		}
-
-		double numerators[2] = { 1.0, 0.0 };
-		double denominators[2] = { 1.0, 1.0 };
-		pitchRateWashout.InitFilter(numerators, denominators, 1);
-
-		numerators[0] = 0.0; numerators[1] = 2.5;
-		denominators[0] = 1.0; denominators[1] = 0.0;
-		pitchIntegrator.InitFilter(numerators, denominators, 1);
-
-		numerators[0] = 3.0; numerators[1] = 15;
-		denominators[0] = 1.0; denominators[1] = 15.0;
-		pitchPreActuatorFilter.InitFilter(numerators, denominators, 1);
-
-		double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
-		double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-		pitchActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
-
-		numerators[0] = 0.0; numerators[1] = 15.0;
-		denominators[0] = 1.0; denominators[1] = 15.0;
-		accelFilter.InitFilter(numerators, denominators, 1);
-		return true;
-	}
-
-	bool initializeRollController()
-	{
-		if (simInitialized == true)
-		{
-			return true;
-		}
-
-		double numerators[2] = { 0.0, 60.0 };
-		double denominators[2] = { 1.0, 60.0 };
-		latStickForceFilter.InitFilter(numerators, denominators, 1);
-
-		double numerators1[2] = { 0.0, 10.0 };
-		double denominators1[2] = { 1.0, 10.0 };
-		rollCommandFilter.InitFilter(numerators1, denominators1, 1);
-
-		double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
-		double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-		rollActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
-
-		double numerators3[2] = { 0.0, 50.0 };
-		double denominators3[2] = { 1.0, 50.0 };
-		rollRateFilter1.InitFilter(numerators3, denominators3, 1);
-
-		double numerators4[3] = { 4.0, 64.0, 6400.0 };
-		double denomiantors4[3] = { 1.0, 80.0, 6400.0 };
-		rollRateFilter2.InitFilter(numerators4, denomiantors4, 2);
-		return true;
-	}
-
 public:
 
 	bool initialize(double dt)
@@ -702,31 +336,14 @@ public:
 
 		bool res = true;
 
-		res &= initializePitchController();
-		res &= initializeRollController();
-		res &= initializeYawController();
+		res &= pitchControl.initialize(dt);
+		res &= rollControl.initialize(dt);
+		res &= yawControl.initialize(dt);
 
-		resetFilters(dt);
+		pitchControl.reset(dt);
+		rollControl.reset(dt);
+		yawControl.reset(dt);
 		return res;
-	}
-	void resetFilters(double dt)
-	{
-		// this kind of stuff is only needed on (re-)initialize
-		// -> remove one pointless flag parameter from each Filter() call
-		pitchRateWashout.ResetFilter(dt);
-		pitchIntegrator.ResetFilter(dt);
-		pitchPreActuatorFilter.ResetFilter(dt);
-		pitchActuatorDynamicsFilter.ResetFilter(dt);
-		accelFilter.ResetFilter(dt);
-		latStickForceFilter.ResetFilter(dt);
-		rollCommandFilter.ResetFilter(dt);
-		rollActuatorDynamicsFilter.ResetFilter(dt);
-		rollRateFilter1.ResetFilter(dt);
-		rollRateFilter2.ResetFilter(dt);
-		rudderCommandFilter.ResetFilter(dt);
-		yawRateWashout.ResetFilter(dt);
-		yawRateFilter.ResetFilter(dt);
-		yawServoFilter.ResetFilter(dt);
 	}
 
 	// before simulation starts
@@ -792,16 +409,16 @@ public:
 		// or pitch controller should calculate roll effect too?
 		// -> check control laws, in addition to handling supersonic flutter
 
-		double elevator_DEG_commanded = -(fcs_pitch_controller(longStickInput.getValue(), 0.0, dynamicPressure_LBFT2, frametime));
+		double elevator_DEG_commanded = -(pitchControl.fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_LBFT2, frametime));
 		// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
 		flightSurface.elevator_DEG = elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
 		flightSurface.elevator_DEG = limit(flightSurface.elevator_DEG, -25.0, 25.0);
 
-		double aileron_DEG_commanded = (fcs_roll_controller(latStickInput.getValue(), dynamicPressure_LBFT2, frametime));
+		double aileron_DEG_commanded = (rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), trimState.trimRoll, dynamicPressure_LBFT2, frametime));
 		flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 		flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 
-		double rudder_DEG_commanded = fcs_yaw_controller(pedInput.getValue(), pitchControl.getAlphaFiltered(), aileron_DEG_commanded, frametime);
+		double rudder_DEG_commanded = yawControl.fcs_yaw_controller(pedInput.getValue(), trimState.trimYaw, pitchControl.getAlphaFiltered(), aileron_DEG_commanded, frametime);
 		flightSurface.rudder_DEG = rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 		flightSurface.rudder_DEG = limit(flightSurface.rudder_DEG, -30.0, 30.0);
 

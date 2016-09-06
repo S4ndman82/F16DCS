@@ -5,6 +5,11 @@
 
 #include "../UtilityFunctions.h"
 
+//#include "../include/general_filter.h"
+#include "DummyFilter.h"
+
+#include "F16FcsCommon.h"
+
 
 class F16FcsPitchController
 {
@@ -13,6 +18,15 @@ protected:
 	double		m_alphaFiltered;
 	double		m_longStickForce;
 	double		m_latStickForce;
+
+	F16BodyState *bodyState;
+	F16FlightSurface *flightSurface;
+
+	DummyFilter	pitchRateWashout;
+	DummyFilter	pitchIntegrator;
+	DummyFilter	pitchPreActuatorFilter;
+	DummyFilter	pitchActuatorDynamicsFilter;
+	DummyFilter	accelFilter;
 
 public:
 	// Schedule gain component due to dynamic pressure
@@ -94,14 +108,104 @@ public:
 		return m_stickCommandPosFiltered;
 	}
 
+	// Angle of attack limiter logic
+	double angle_of_attack_limiter(const double alphaFiltered, const double pitchRateCommand) const
+	{
+		// TODO: 
+		//if (manualPitchOverride == true)
+
+		double topLimit = limit((alphaFiltered - 22.5) * 0.69, 0.0, 99999.0);
+		double bottomLimit = limit((alphaFiltered - 15.0 + pitchRateCommand) * 0.322, 0.0, 99999.0);
+
+		return (topLimit + bottomLimit);
+	}
+
+
+	// Controller for pitch
+	// (differentialCommand is hard-coded to 0 in caller)
+	double fcs_pitch_controller(double longStickInput, double trimPitch, double differentialCommand, double dynPressure_LBFT2, double dt)
+	{
+		const double pitch_rate = bodyState->getPitchRateDegs();
+		const double az = bodyState->getAccZPerG();
+
+		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, trimPitch, dt);
+		double dynamicPressureScheduled = dynamic_pressure_schedule(dynPressure_LBFT2);
+
+		double azFiltered = accelFilter.Filter(dt, az - 1.0);
+
+		double alphaLimited = limit(bodyState->alpha_DEG, -5.0, 30.0);
+		double alphaLimitedRate = 10.0 * (alphaLimited - m_alphaFiltered);
+		m_alphaFiltered += (alphaLimitedRate * dt);
+
+		double pitchRateWashedOut = pitchRateWashout.Filter(dt, pitch_rate);
+		double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;
+
+		double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
+
+		double gLimiterCommand = -(azFiltered + (pitchRateWashedOut * 0.2));
+
+		double finalCombinedCommand = dynamicPressureScheduled * (2.5 * (stickCommandPos + limiterCommand + gLimiterCommand));
+
+		double finalCombinedCommandFilteredLimited = limit(pitchIntegrator.Filter(dt, finalCombinedCommand), -25.0, 25.0);
+		finalCombinedCommandFilteredLimited = finalCombinedCommandFilteredLimited + finalCombinedCommand;
+
+		double finalPitchCommandTotal = pitchPreActuatorFilter.Filter(dt, finalCombinedCommandFilteredLimited);
+		finalPitchCommandTotal += (0.5 * m_alphaFiltered);
+
+		return finalPitchCommandTotal;
+
+		// TODO: There are problems with flutter with the servo dynamics...needs to be nailed down!
+		//double actuatorDynamicsResult = pitchActuatorDynamicsFilter.Filter(!(simInitialized),dt,finalPitchCommandTotal);
+		//return actuatorDynamicsResult;	
+	}
+
 public:
-	F16FcsPitchController() :
+	F16FcsPitchController(F16BodyState *bs, F16FlightSurface *fs) :
 		m_stickCommandPosFiltered(0),
 		m_alphaFiltered(0),
 		m_longStickForce(0),
-		m_latStickForce(0)
+		m_latStickForce(0),
+		bodyState(bs),
+		flightSurface(fs),
+		pitchRateWashout(),
+		pitchIntegrator(),
+		pitchPreActuatorFilter(),
+		pitchActuatorDynamicsFilter(),
+		accelFilter()
 	{}
 	~F16FcsPitchController() {}
+
+	bool initialize(double dt)
+	{
+		double numerators[2] = { 1.0, 0.0 };
+		double denominators[2] = { 1.0, 1.0 };
+		pitchRateWashout.InitFilter(numerators, denominators, 1);
+
+		numerators[0] = 0.0; numerators[1] = 2.5;
+		denominators[0] = 1.0; denominators[1] = 0.0;
+		pitchIntegrator.InitFilter(numerators, denominators, 1);
+
+		numerators[0] = 3.0; numerators[1] = 15;
+		denominators[0] = 1.0; denominators[1] = 15.0;
+		pitchPreActuatorFilter.InitFilter(numerators, denominators, 1);
+
+		double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
+		double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
+		pitchActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
+
+		numerators[0] = 0.0; numerators[1] = 15.0;
+		denominators[0] = 1.0; denominators[1] = 15.0;
+		accelFilter.InitFilter(numerators, denominators, 1);
+		return true;
+	}
+	void reset(double dt)
+	{
+		pitchRateWashout.ResetFilter(dt);
+		pitchIntegrator.ResetFilter(dt);
+		pitchPreActuatorFilter.ResetFilter(dt);
+		pitchActuatorDynamicsFilter.ResetFilter(dt);
+		accelFilter.ResetFilter(dt);
+	}
 
 	double getAlphaFiltered() const { return m_alphaFiltered; }
 	double getLongStickForce() const { return m_longStickForce; }
