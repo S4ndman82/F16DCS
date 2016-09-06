@@ -283,13 +283,18 @@ public:
 		add_local_moment(cn_moment);	
 	}
 
-	void updateEngineForces(double thrust_N)
+	// engine thrust,
+	// rolling moment
+	void updateEngineForces(double thrust_N, double rolling_moment)
 	{
 		// Thrust	
 		Vec3 thrust_force(thrust_N , 0.0, 0.0);	// Output force in Newtons
 		Vec3 thrust_force_pos(0,0,0);
 		add_local_force_cg(thrust_force /*, thrust_force_pos*/);	
 		//add_local_force(thrust_force, thrust_force_pos);	
+
+		// TODO: rolling moment of engine
+		// (counter-clockwise?)
 	}
 
 	// TODO: left, right and nose wheel forces
@@ -299,18 +304,16 @@ public:
 		// TODO: nose wheel turn
 
 		// silly hack for now, better approach in progress
-		updateRollingFriction(leftWheelX + rightWheelX + noseWheelX, leftWheelZ + rightWheelZ + noseWheelZ);
-	}
 
-	// free-rolling friction
-	void updateRollingFriction(const double CxWheelFriction, const double CzWheelFriction)
-	{
+		double xTotal = leftWheelX + rightWheelX + noseWheelX;
+		double zTotal = leftWheelZ + rightWheelZ + noseWheelZ;
+
 		// TODO: must have support for static friction: engine power needed to overcome and transfer to rolling
 
 		// note! this is mostly silly hacking now,
 		// better approach in progress
 
-		Vec3 cx_wheel_friction_force(CxWheelFriction, 0.0, 0.0);
+		Vec3 cx_wheel_friction_force(xTotal, 0.0, 0.0);
 		//Vec3 cx_wheel_friction_pos(0.0,0.0,0.0);
 		//add_local_force_cg(cx_wheel_friction_force /*,cx_wheel_friction_pos*/);
 
