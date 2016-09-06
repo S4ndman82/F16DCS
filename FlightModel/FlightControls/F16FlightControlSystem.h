@@ -4,7 +4,6 @@
 #include <cmath>
 
 #include "F16Constants.h"
-
 #include "../UtilityFunctions.h"
 
 //#include "../include/general_filter.h"
@@ -14,6 +13,10 @@
 #include "Atmosphere/F16Atmosphere.h"
 
 #include "FlightControls/F16Actuator.h"
+
+#include "F16FcsPitchController.h"
+#include "F16FcsRollController.h"
+#include "F16FcsYawController.h"
 
 /*
 sources:
@@ -186,6 +189,10 @@ public:
 	F16Actuator		leadingedgeActuatorRight;
 	*/
 
+	F16FcsPitchController pitchControl;
+	F16FcsRollController rollControl;
+	F16FcsYawController yawControl;
+
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 	bool manualPitchOverride;
 
@@ -195,9 +202,7 @@ public:
 	// gear go up -> trailing edge flaps go up
 	bool gearRelatedFlaps;
 
-	double		m_stickCommandPosFiltered;
 	double		m_alphaFiltered;
-	double		m_longStickForce;
 
 	/**/
 	// Control filters (general filters to easily code up when compared to report block diagrams)
@@ -240,11 +245,12 @@ public:
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
 		, rudderActuator(1.0, -30.0, 30.0)
+		, pitchControl()
+		, rollControl()
+		, yawControl()
 		, manualPitchOverride(false)
 		, gearRelatedFlaps(false)
-		, m_stickCommandPosFiltered(0)
 		, m_alphaFiltered(0)
-		, m_longStickForce(0)
 		/**/
 		, pitchRateWashout()
 		, pitchIntegrator()
@@ -441,39 +447,19 @@ public:
 		return leading_edge_flap_integrated_gained_biased; 
 	}
 
-	double getRudderCommand(const double pedInput) const
-	{
-		double rudderForceCommand = pedInput * 450.0;
-
-		double rudderCommand = 0.0;
-		if (abs(rudderForceCommand) < 44.0)
-		{
-			rudderCommand = 0.0;
-		}
-		else if (rudderForceCommand >= 44.0)
-		{
-			rudderCommand = -0.0739 * rudderForceCommand + 3.2512;
-		}
-		else if (rudderForceCommand <= -44.0)
-		{
-			rudderCommand = -0.0739 * rudderForceCommand - 3.2512;
-		}
-
-		return limit(rudderCommand, -30.0, 30.0);
-	}
 
 	// Controller for yaw
-	double fcs_yaw_controller(double pedInput, double aileron_commanded, double dt)
+	double fcs_yaw_controller(double pedInput, double alphaFiltered, double aileron_commanded, double dt)
 	{
 		const double roll_rate = bodyState.getRollRateDegs();
 		const double yaw_rate = bodyState.getYawRateDegs();
 		double ay = bodyState.getAccYPerG();
 
-		double rudderCommand = getRudderCommand(pedInput);
+		double rudderCommand = yawControl.getRudderCommand(pedInput);
 		double rudderCommandFiltered = rudderCommandFilter.Filter(dt,rudderCommand);
 		double rudderCommandFilteredWTrim = trimState.trimYaw - rudderCommandFiltered;
 
-		double alphaGained = m_alphaFiltered * (1.0 / 57.3);
+		double alphaGained = alphaFiltered * (1.0 / 57.3);
 		double rollRateWithAlpha = roll_rate * alphaGained;
 		double yawRateWithRoll = yaw_rate - rollRateWithAlpha;
 
@@ -482,7 +468,7 @@ public:
 
 		double yawRateFilteredWithSideAccel = yawRateWithRollFiltered;// + (ay * 19.3);
 
-		double aileronGained = limit(0.05 * m_alphaFiltered, 0.0, 1.5) * aileron_commanded;
+		double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * aileron_commanded;
 
 		double finalRudderCommand = aileronGained + yawRateFilteredWithSideAccel + rudderCommandFilteredWTrim;
 
@@ -493,83 +479,8 @@ public:
 		//return yawServoCommand;
 	}
 
-	double getPitchRateCommand(const double longStickInputForce) const
-	{
-		double longStickCommand_G = 0.0;
-		if (abs(longStickInputForce) <= 8.0)
-		{
-			longStickCommand_G = 0.0;
-		}
-		else if ((longStickInputForce < -8) && (longStickInputForce > -33.0))
-		{
-			longStickCommand_G = (0.016 * longStickInputForce) + 0.128;
-		}
-		else if (longStickInputForce <= -33.0)
-		{
-			longStickCommand_G = (0.067 * longStickInputForce) + 1.8112;
-		}
-		else if ((longStickInputForce > 8.0) && (longStickInputForce < 33.0))
-		{
-			longStickCommand_G = (0.032 * longStickInputForce) - 0.256;
-		}
-		else if (longStickInputForce >= 33.0)
-		{
-			longStickCommand_G = 0.0681*longStickInputForce - 1.4468;
-		}
-		return longStickCommand_G;
-	}
 
-	// Stick force schedule for pitch control
-	double fcs_pitch_controller_force_command(double longStickInput, double dt)
-	{
-		double longStickInputForce = 0.0;
-		if(longStickInput > 0.0)
-		{
-			longStickInputForce = longStickInput * 80.0;
-		}
-		else
-		{
-			longStickInputForce = longStickInput * 180.0;
-		}
-		longStickInputForce = limit(longStickInputForce,-180.0,80.0);
-		m_longStickForce = longStickInputForce;
 
-		// TODO: if pitch override command is in effect -> override G-limit
-		//if (manualPitchOverride == true)
-
-		double longStickCommand_G = getPitchRateCommand(longStickInputForce);
-
-		double longStickCommandWithTrim_G = trimState.trimPitch - longStickCommand_G;
-
-		double longStickCommandWithTrimLimited_G = limit(longStickCommandWithTrim_G, -4.0, 8.0);
-
-		double longStickCommandWithTrimLimited_G_Rate = 4.0 * (longStickCommandWithTrimLimited_G - m_stickCommandPosFiltered);
-		m_stickCommandPosFiltered += (longStickCommandWithTrimLimited_G_Rate * dt);
-
-		return m_stickCommandPosFiltered;
-	}
-
-	// Schedule gain component due to dynamic pressure
-	double dynamic_pressure_schedule(const double dynPressure_LBFT2) const
-	{
-		double dynamicPressure_kNM2 = dynPressure_LBFT2 * 1.4881639/1000.0; //for kN/m^2
-		double scheduleOutput = 0.0;
-		if(dynamicPressure_kNM2 < 9.576)
-		{
-			scheduleOutput = 1.0;
-		}
-		else if((dynamicPressure_kNM2 >= 9.576) && (dynamicPressure_kNM2 <= 43.0))
-		{
-			scheduleOutput =  (-0.018 * dynamicPressure_kNM2) + 1.1719;
-			//scheduleOutput =  (-0.0239 * dynamicPressure_kNM2) + 1.2292;
-		}
-		else if(dynamicPressure_kNM2 > 43.0)
-		{
-			scheduleOutput = -0.003 * dynamicPressure_kNM2 + 0.5277;
-			//scheduleOutput = -0.001 * dynamicPressure_kNM2 + 0.2422;
-		}
-		return limit(scheduleOutput,0.05,1.0);
-	}
 
 	// Angle of attack limiter logic
 	double angle_of_attack_limiter(const double alphaFiltered, const double pitchRateCommand) const
@@ -591,9 +502,9 @@ public:
 		const double pitch_rate = bodyState.getPitchRateDegs();
 		const double az = bodyState.getAccZPerG();
 
-		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, dt);
+		double stickCommandPos = pitchControl.fcs_pitch_controller_force_command(longStickInput, trimState.trimPitch, dt);
 
-		double dynamicPressureScheduled = dynamic_pressure_schedule(dynPressure_LBFT2);	
+		double dynamicPressureScheduled = pitchControl.dynamic_pressure_schedule(dynPressure_LBFT2);	
 
 		double azFiltered = accelFilter.Filter(dt, az-1.0);
 
@@ -623,59 +534,6 @@ public:
 		//return actuatorDynamicsResult;	
 	}
 
-	double getRollRateCommand(const double latStickForceFinal) const
-	{
-		double rollRateCommand = 0.0;
-		if (abs(latStickForceFinal) < 3.0)
-		{
-			rollRateCommand = 0.0;
-		}
-		else if ((latStickForceFinal >= 3.0) && (latStickForceFinal <= 25.0))
-		{
-			rollRateCommand = 0.9091 * latStickForceFinal - 2.7273;
-		}
-		else if ((latStickForceFinal > 25.0) && (latStickForceFinal <= 46.0))
-		{
-			rollRateCommand = 2.8571 * latStickForceFinal - 51.429;
-		}
-		else if ((latStickForceFinal > 46.0))
-		{
-			rollRateCommand = 7.5862 * latStickForceFinal - 268.97;
-		}
-		else if ((latStickForceFinal <= -3.0) && (latStickForceFinal >= -25.0))
-		{
-			rollRateCommand = 0.9091 * latStickForceFinal + 2.7273;
-		}
-		else if ((latStickForceFinal < -25.0) && (latStickForceFinal >= -46.0))
-		{
-			rollRateCommand = 2.8571 * latStickForceFinal + 51.429;
-		}
-		else if ((latStickForceFinal < -46.0))
-		{
-			rollRateCommand = 7.5862 * latStickForceFinal + 268.97;
-		}
-		return rollRateCommand;
-	}
-
-	double getRollFeelGain(const double longStickForce) const
-	{
-		double longStickForceGained = longStickForce * 0.0667;
-		double rollFeelGain = 0.0;
-		if (abs(longStickForce) > 25.0)
-		{
-			rollFeelGain = 0.7;
-		}
-		else if (longStickForce >= 0.0)
-		{
-			rollFeelGain = -0.012 * longStickForceGained + 1.0;
-		}
-		else if (longStickForce < 0.0)
-		{
-			rollFeelGain = 0.012 * longStickForceGained + 1.0;
-		}
-		return rollFeelGain;
-	}
-
 	// Controller for roll
 	double fcs_roll_controller(double latStickInput, double dynPressure_LBFT2, double dt)
 	{
@@ -688,9 +546,9 @@ public:
 
 		double latStickForceBiased = latStickForce - (ay * 8.9);  // CJS: remove side acceleration bias?
 
-		double rollFeelGain = getRollFeelGain(m_longStickForce);
+		double rollFeelGain = rollControl.getRollFeelGain(pitchControl.getLongStickForce()); // <- bug? (should be lateral?)
 
-		double rollRateCommand = getRollRateCommand(latStickForceBiased * rollFeelGain);
+		double rollRateCommand = rollControl.getRollRateCommand(latStickForceBiased * rollFeelGain);
 
 		double rollRateCommandFilterd = rollCommandFilter.Filter(dt,rollRateCommand);
 
@@ -943,7 +801,7 @@ public:
 		flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
 		flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 
-		double rudder_DEG_commanded = fcs_yaw_controller(pedInput.getValue(), aileron_DEG_commanded, frametime);
+		double rudder_DEG_commanded = fcs_yaw_controller(pedInput.getValue(), pitchControl.getAlphaFiltered(), aileron_DEG_commanded, frametime);
 		flightSurface.rudder_DEG = rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
 		flightSurface.rudder_DEG = limit(flightSurface.rudder_DEG, -30.0, 30.0);
 
