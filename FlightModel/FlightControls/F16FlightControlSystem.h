@@ -3,9 +3,6 @@
 
 #include <cmath>
 
-#include <malloc.h>
-#include <memory.h>
-
 #include "F16Constants.h"
 
 #include "../UtilityFunctions.h"
@@ -35,52 +32,7 @@ sources:
 
 // TODO! combine controllers with real actuator support
 
-class F16FcsController
-{
-public:
-	F16FcsController() {}
-	~F16FcsController() {}
 
-	virtual bool initialize()
-	{
-		return true;
-	}
-
-	virtual void updateFrame(const double frameTime) = 0;
-};
-
-class F16YawController : public F16FcsController
-{
-public:
-	F16YawController()
-		: F16FcsController()
-	{}
-	~F16YawController() {}
-
-	virtual void updateFrame(const double frameTime) {};
-};
-
-class F16PitchController : public F16FcsController
-{
-public:
-	F16PitchController() 
-		: F16FcsController() 
-	{}
-	~F16PitchController() {}
-
-	virtual void updateFrame(const double frameTime) {};
-};
-
-class F16RollController : public F16FcsController
-{
-public:
-	F16RollController()
-		: F16FcsController()
-	{}
-	~F16RollController() {}
-
-	virtual void updateFrame(const double frameTime) {};
-};
 
 // if/when trimming support is needed,
 // keep settings in one place.
