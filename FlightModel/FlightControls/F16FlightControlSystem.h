@@ -91,7 +91,7 @@ protected:
 	// flaps are controlled with landing gear lever as well,
 	// gears go down -> trailing edge flaps go down
 	// gear go up -> trailing edge flaps go up
-	bool gearRelatedFlaps;
+	bool gearLevelStatus;
 
 
 public:
@@ -115,7 +115,7 @@ public:
 		, flapControl(&bodyState, &flightSurface)
 		, airbrakeControl(&bodyState, &flightSurface)
 		, manualPitchOverride(false)
-		, gearRelatedFlaps(false)
+		, gearLevelStatus(false)
 	{}
 	~F16FlightControls() {}
 
@@ -208,7 +208,7 @@ public:
 
 		// landing gear "down&locked" affects some logic
 		isGearDown = landingGear->isGearDownLocked();
-		gearRelatedFlaps = landingGear->getGearLevelStatus();
+		gearLevelStatus = landingGear->getGearLevelStatus();
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step
@@ -253,7 +253,7 @@ public:
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flightSurface.flap_DEG = flapControl.fcs_flap_controller(totalVelocity_FPS);
+		flightSurface.flap_DEG = flapControl.fcs_flap_controller(gearLevelStatus, totalVelocity_FPS);
 		flightSurface.flap_PCT = flightSurface.flap_DEG / 20.0;
 	}
 

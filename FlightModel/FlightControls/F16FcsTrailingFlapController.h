@@ -29,13 +29,18 @@ public:
 	}
 
 	// Passive flap schedule for the F-16...nominal for now from flight manual comments
-	double fcs_flap_controller(double airspeed_FPS)
+	double fcs_flap_controller(bool gearLevelUp, double airspeed_FPS)
 	{
-		// TODO: 
-		//if (gearRelatedFlaps == true)
-
 		double airspeed_KTS = 0.5924838012958964 * airspeed_FPS;
 		double trailing_edge_flap_deflection = 0.0;
+
+		/*
+		// TODO: if gear lever is down -> max flaps?
+		if (gearLevelUp == false)
+		{
+			return 20.0;
+		}
+		*/
 
 		if (airspeed_KTS < 240.0)
 		{
@@ -47,11 +52,11 @@ public:
 		}
 		else
 		{
-			trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
+			//trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
+			trailing_edge_flap_deflection = 0.0;
 		}
 
 		trailing_edge_flap_deflection = limit(trailing_edge_flap_deflection, 0.0, 20.0);
-
 		return trailing_edge_flap_deflection;
 	}
 
