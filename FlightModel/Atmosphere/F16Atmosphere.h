@@ -113,7 +113,7 @@ public:
 
 	double getMachSpeed() const
 	{
-		double tempR = F16::kelvinToRankine(ambientTemperature_DegK); // In Deg Rankine
+		double tempR = ambientTemperature_DegK * F16::kelvin_to_rankine; // In Deg Rankine
 		double totalVelocity_FPS = getTotalVelocityFPS();
 		double mach = (totalVelocity_FPS) / sqrt(1.4 * 1716.3 * tempR);
 		return mach;

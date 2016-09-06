@@ -61,6 +61,9 @@ namespace F16
 
 	const double		standard_gravity		= 9.80665; // "average", m/s^2
 
+	const double		kelvin_to_rankine		= 1.8; // 
+
+	/*
 	////////////////////
 	// some additional stuff that should be used as functions perhaps (see if we need them)
 	// VS2013 does not yet support constexpr though, need upgrade to 2015.. :(
@@ -74,6 +77,7 @@ namespace F16
 	double lbtokg(double lb) { return lb / 2.2046; }
 	double fttom(double ft) { return ft / 3.2808; }
 	double intocm(double in) { return in / 0.39370; }
+	*/
 }
 
 #endif // ifndef _F16CONSTANTS_H_
