@@ -24,9 +24,6 @@
     <ClInclude Include="Atmosphere\F16Atmosphere.h">
       <Filter>Atmosphere</Filter>
     </ClInclude>
-    <ClInclude Include="FlightControls\F16FlightControls.h">
-      <Filter>FlightControls</Filter>
-    </ClInclude>
     <ClInclude Include="Inputs\F16Inputs.h">
       <Filter>Inputs</Filter>
     </ClInclude>
@@ -121,6 +118,9 @@
       <Filter>FlightControls</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="FlightControls\F16FlightControlSystem.h">
+      <Filter>FlightControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

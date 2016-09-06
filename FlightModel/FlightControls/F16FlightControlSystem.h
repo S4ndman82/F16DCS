@@ -1,5 +1,5 @@
-#ifndef _F16FLIGHTCONTROLS_H_
-#define _F16FLIGHTCONTROLS_H_
+#ifndef _F16FLIGHTCONTROLSYSTEM_H_
+#define _F16FLIGHTCONTROLSYSTEM_H_
 
 #include <cmath>
 
@@ -1015,4 +1015,4 @@ public:
 
 };
 
-#endif // ifndef _F16FLIGHTCONTROLS_H_
+#endif // ifndef _F16FLIGHTCONTROLSYSTEM_H_

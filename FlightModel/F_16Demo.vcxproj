@@ -120,7 +120,7 @@
     <ClInclude Include="EquationsOfMotion\F16WeightBalance.h" />
     <ClInclude Include="FlightControls\DummyFilter.h" />
     <ClInclude Include="FlightControls\F16Actuator.h" />
-    <ClInclude Include="FlightControls\F16FlightControls.h" />
+    <ClInclude Include="FlightControls\F16FlightControlSystem.h" />
     <ClInclude Include="F_16Demo.h" />
     <ClInclude Include="Hydraulics\AbstractHydraulicDevice.h" />
     <ClInclude Include="Hydraulics\F16HydraulicPump.h" />

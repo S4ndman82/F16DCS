@@ -90,7 +90,7 @@
 #include "Aerodynamics/F16Aero.h"				//Aerodynamic model functions
 
 #include "Hydraulics/F16HydraulicSystem.h"
-#include "FlightControls/F16FlightControls.h"	//Flight Controls model functions
+#include "FlightControls/F16FlightControlSystem.h"	//Flight Controls model functions
 
 #include "Engine/F16EngineManagementSystem.h"
 #include "Engine/F16Engine.h"					//Engine model functions
