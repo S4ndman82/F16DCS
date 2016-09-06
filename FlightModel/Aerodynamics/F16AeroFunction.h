@@ -3,6 +3,9 @@
 
 #include <cmath>
 
+#include <malloc.h>
+#include <memory.h>
+
 #include "../UtilityFunctions.h"
 
 // mostly just wrapper to assist with interpolation 
