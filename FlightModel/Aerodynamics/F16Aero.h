@@ -207,8 +207,65 @@ protected:
 	AERO_Function fn_eta_el;
 
 public:
-	F16Aero();
-	~F16Aero();
+	F16Aero() :
+		Cx_total(0),
+		Cz_total(0),
+		Cm_total(0),
+		Cy_total(0),
+		Cn_total(0),
+		Cl_total(0),
+		fn_Cx(3, F16::_CxData),
+		fn_CxEle0(3, F16::_CxData),
+		fn_Cz(3, F16::_CzData),
+		fn_CzEle0(3, F16::_CzData),
+		fn_Cm(3, F16::_CmData),
+		fn_CmEle0(3, F16::_CmData),
+		fn_Cy(2, F16::_CyData),
+		fn_Cn(3, F16::_CnData),
+		fn_CnEle0(3, F16::_CnData),
+		fn_Cl(3, F16::_ClData),
+		fn_ClEle0(3, F16::_ClData),
+		fn_Cx_lef(2, F16::_Cx_lefData),
+		fn_Cz_lef(2, F16::_Cz_lefData),
+		fn_Cm_lef(2, F16::_Cm_lefData),
+		fn_Cy_lef(2, F16::_Cy_lefData),
+		fn_Cn_lef(2, F16::_Cn_lefData),
+		fn_Cl_lef(2, F16::_Cl_lefData),
+		fn_CXq(1, F16::_CxqData),
+		fn_CZq(1, F16::_CzqData),
+		fn_CMq(1, F16::_CmqData),
+		fn_CYp(1, F16::_CypData),
+		fn_CYr(1, F16::_CyrData),
+		fn_CNr(1, F16::_CnrData),
+		fn_CNp(1, F16::_CnpData),
+		fn_CLp(1, F16::_ClpData),
+		fn_CLr(1, F16::_ClrData),
+		fn_delta_CXq_lef(1, F16::_delta_CXq_lefData),
+		fn_delta_CYr_lef(1, F16::_delta_CYr_lefData),
+		fn_delta_CYp_lef(1, F16::_delta_CYp_lefData),
+		fn_delta_CZq_lef(1, F16::_delta_CZq_lefData),
+		fn_delta_CLr_lef(1, F16::_delta_CLr_lefData),
+		fn_delta_CLp_lef(1, F16::_delta_CLp_lefData),
+		fn_delta_CMq_lef(1, F16::_delta_CMq_lefData),
+		fn_delta_CNr_lef(1, F16::_delta_CNr_lefData),
+		fn_delta_CNp_lef(1, F16::_delta_CNp_lefData),
+		fn_Cy_r30(2, F16::_Cy_r30Data),
+		fn_Cn_r30(2, F16::_Cn_r30Data),
+		fn_Cl_r30(2, F16::_Cl_r30Data),
+		fn_Cy_a20(2, F16::_Cy_a20Data),
+		fn_Cy_a20_lef(2, F16::_Cy_a20_lefData),
+		fn_Cn_a20(2, F16::_Cn_a20Data),
+		fn_Cn_a20_lef(2, F16::_Cn_a20_lefData),
+		fn_Cl_a20(2, F16::_Cl_a20Data),
+		fn_Cl_a20_lef(2, F16::_Cl_a20_lefData),
+		fn_delta_CNbeta(1, F16::_delta_CNbetaData),
+		fn_delta_CLbeta(1, F16::_delta_CLbetaData),
+		fn_delta_Cm(1, F16::_delta_CmData),
+		fn_eta_el(1, F16::_eta_elData)
+	{
+		initfn();
+	}
+	~F16Aero() {}
 	void initfn();
 
 	void updateFrame(const double alpha_DEG, const double beta_DEG, const double elevator_DEG, const double frameTime)
@@ -383,70 +440,6 @@ public:
 	double getClTotal() const { return Cl_total; }
 
 }; // class F16Aero
-
-// constructor
-F16Aero::F16Aero() :
-	Cx_total(0),
-	Cz_total(0),		
-	Cm_total(0),		
-	Cy_total(0),		
-	Cn_total(0),		
-	Cl_total(0),		
-	fn_Cx(3, F16::_CxData),
-	fn_CxEle0(3, F16::_CxData),
-	fn_Cz(3, F16::_CzData),
-	fn_CzEle0(3, F16::_CzData),
-	fn_Cm(3, F16::_CmData),
-	fn_CmEle0(3, F16::_CmData),
-	fn_Cy(2, F16::_CyData),
-	fn_Cn(3, F16::_CnData),
-	fn_CnEle0(3, F16::_CnData),
-	fn_Cl(3, F16::_ClData),
-	fn_ClEle0(3, F16::_ClData),
-	fn_Cx_lef(2, F16::_Cx_lefData),
-	fn_Cz_lef(2, F16::_Cz_lefData),
-	fn_Cm_lef(2, F16::_Cm_lefData),
-	fn_Cy_lef(2, F16::_Cy_lefData),
-	fn_Cn_lef(2, F16::_Cn_lefData),
-	fn_Cl_lef(2, F16::_Cl_lefData),
-	fn_CXq(1, F16::_CxqData),
-	fn_CZq(1, F16::_CzqData),
-	fn_CMq(1, F16::_CmqData),
-	fn_CYp(1, F16::_CypData),
-	fn_CYr(1, F16::_CyrData),
-	fn_CNr(1, F16::_CnrData),
-	fn_CNp(1, F16::_CnpData),
-	fn_CLp(1, F16::_ClpData),
-	fn_CLr(1, F16::_ClrData),
-	fn_delta_CXq_lef(1, F16::_delta_CXq_lefData),
-	fn_delta_CYr_lef(1, F16::_delta_CYr_lefData),
-	fn_delta_CYp_lef(1, F16::_delta_CYp_lefData),
-	fn_delta_CZq_lef(1, F16::_delta_CZq_lefData),
-	fn_delta_CLr_lef(1, F16::_delta_CLr_lefData),
-	fn_delta_CLp_lef(1, F16::_delta_CLp_lefData),
-	fn_delta_CMq_lef(1, F16::_delta_CMq_lefData),
-	fn_delta_CNr_lef(1, F16::_delta_CNr_lefData),
-	fn_delta_CNp_lef(1, F16::_delta_CNp_lefData),
-	fn_Cy_r30(2, F16::_Cy_r30Data),
-	fn_Cn_r30(2, F16::_Cn_r30Data),
-	fn_Cl_r30(2, F16::_Cl_r30Data),
-	fn_Cy_a20(2, F16::_Cy_a20Data),
-	fn_Cy_a20_lef(2, F16::_Cy_a20_lefData),
-	fn_Cn_a20(2, F16::_Cn_a20Data),
-	fn_Cn_a20_lef(2, F16::_Cn_a20_lefData),
-	fn_Cl_a20(2, F16::_Cl_a20Data),
-	fn_Cl_a20_lef(2, F16::_Cl_a20_lefData),
-	fn_delta_CNbeta(1, F16::_delta_CNbetaData),
-	fn_delta_CLbeta(1, F16::_delta_CLbetaData),
-	fn_delta_Cm(1, F16::_delta_CmData),
-	fn_eta_el(1, F16::_eta_elData)
-{
-	initfn();
-}
-
-// destructor
-F16Aero::~F16Aero()
-{}
 
 void F16Aero::initfn()
 {
