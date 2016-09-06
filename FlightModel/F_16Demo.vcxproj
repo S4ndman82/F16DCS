@@ -120,9 +120,12 @@
     <ClInclude Include="EquationsOfMotion\F16WeightBalance.h" />
     <ClInclude Include="FlightControls\DummyFilter.h" />
     <ClInclude Include="FlightControls\F16Actuator.h" />
+    <ClInclude Include="FlightControls\F16FcsAirbrakeController.h" />
     <ClInclude Include="FlightControls\F16FcsCommon.h" />
+    <ClInclude Include="FlightControls\F16FcsLeadingEdgeController.h" />
     <ClInclude Include="FlightControls\F16FcsPitchController.h" />
     <ClInclude Include="FlightControls\F16FcsRollController.h" />
+    <ClInclude Include="FlightControls\F16FcsTrailingFlapController.h" />
     <ClInclude Include="FlightControls\F16FcsYawController.h" />
     <ClInclude Include="FlightControls\F16FlightControlSystem.h" />
     <ClInclude Include="F_16Demo.h" />

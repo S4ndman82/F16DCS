@@ -133,6 +133,15 @@
     <ClInclude Include="FlightControls\F16FcsCommon.h">
       <Filter>FlightControls</Filter>
     </ClInclude>
+    <ClInclude Include="FlightControls\F16FcsAirbrakeController.h">
+      <Filter>FlightControls</Filter>
+    </ClInclude>
+    <ClInclude Include="FlightControls\F16FcsLeadingEdgeController.h">
+      <Filter>FlightControls</Filter>
+    </ClInclude>
+    <ClInclude Include="FlightControls\F16FcsTrailingFlapController.h">
+      <Filter>FlightControls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

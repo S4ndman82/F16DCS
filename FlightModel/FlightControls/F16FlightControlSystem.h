@@ -19,6 +19,9 @@
 #include "F16FcsPitchController.h"
 #include "F16FcsRollController.h"
 #include "F16FcsYawController.h"
+#include "F16FcsLeadingEdgeController.h"
+#include "F16FcsTrailingFlapController.h"
+#include "F16FcsAirbrakeController.h"
 
 /*
 sources:
@@ -44,11 +47,6 @@ public:
 	bool		simInitialized;
 
 //protected:
-	double		leading_edge_flap_integral;
-	double		leading_edge_flap_integrated;
-	double		leading_edge_flap_rate;
-	double		leading_edge_flap_integrated_gained;
-	double		leading_edge_flap_integrated_gained_biased;
 
 	F16BodyState bodyState;
 	F16FlightSurface flightSurface;
@@ -83,6 +81,9 @@ public:
 	F16FcsPitchController pitchControl;
 	F16FcsRollController rollControl;
 	F16FcsYawController yawControl;
+	F16FcsLeadingEdgeController leadingedgeControl;
+	F16FcsTrailingFlapController flapControl;
+	F16FcsAirbrakeController airbrakeControl;
 
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 	bool manualPitchOverride;
@@ -97,11 +98,6 @@ public:
 public:
 	F16FlightControls(F16Atmosphere *atmos)
 		: simInitialized(false)
-		, leading_edge_flap_integral(0)
-		, leading_edge_flap_integrated(0)
-		, leading_edge_flap_rate(0)
-		, leading_edge_flap_integrated_gained(0)
-		, leading_edge_flap_integrated_gained_biased(0)
 		, bodyState()
 		, flightSurface()
 		, pAtmos(atmos)
@@ -118,6 +114,9 @@ public:
 		, pitchControl(&bodyState, &flightSurface)
 		, rollControl(&bodyState, &flightSurface)
 		, yawControl(&bodyState, &flightSurface)
+		, leadingedgeControl(&bodyState, &flightSurface)
+		, flapControl(&bodyState, &flightSurface)
+		, airbrakeControl(&bodyState, &flightSurface)
 		, manualPitchOverride(false)
 		, gearRelatedFlaps(false)
 	{
@@ -275,55 +274,7 @@ public:
 	}
 	*/
 
-	// Controller for the leading edge flaps
-	double leading_edge_flap_controller(double dynamicPressure_FTLB, double staticPressure_FTLB, double frameTime)
-	{
-		double qbarOverPs = dynamicPressure_FTLB/staticPressure_FTLB;
 
-		if(!(simInitialized))
-		{
-			leading_edge_flap_integral = -bodyState.alpha_DEG;
-			leading_edge_flap_integrated = leading_edge_flap_integral + 2 * bodyState.alpha_DEG;
-			return leading_edge_flap_integral;
-		}
-
-		leading_edge_flap_rate = (bodyState.alpha_DEG - leading_edge_flap_integrated) * 7.25;
-		leading_edge_flap_integral += (leading_edge_flap_rate * frameTime);
-
-		leading_edge_flap_integrated = leading_edge_flap_integral + bodyState.alpha_DEG * 2.0;
-		leading_edge_flap_integrated_gained = leading_edge_flap_integrated * 1.38;
-		leading_edge_flap_integrated_gained_biased = leading_edge_flap_integrated_gained + 1.45 - (9.05 * qbarOverPs);	
-
-		return leading_edge_flap_integrated_gained_biased; 
-	}
-
-
-	// Passive flap schedule for the F-16...nominal for now from flight manual comments
-	double fcs_flap_controller(double airspeed_FPS)
-	{
-		// TODO: 
-		//if (gearRelatedFlaps == true)
-
-		double airspeed_KTS = 0.5924838012958964 * airspeed_FPS;
-		double trailing_edge_flap_deflection = 0.0;
-
-		if(airspeed_KTS < 240.0)
-		{
-			trailing_edge_flap_deflection = 20.0;
-		}
-		else if((airspeed_KTS >= 240.0) && (airspeed_KTS <= 370.0))
-		{
-			trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0)/(370.0-240.0))) * 20.0;
-		}
-		else
-		{
-			trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0)/(370.0-240.0))) * 20.0;
-		}
-
-		trailing_edge_flap_deflection = limit(trailing_edge_flap_deflection,0.0,20.0);
-
-		return trailing_edge_flap_deflection;
-	}
 
 public:
 
@@ -395,7 +346,7 @@ public:
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
 		// Leading edge flap deflection (deg)
-		flightSurface.leadingEdgeFlap_DEG = leading_edge_flap_controller(dynamicPressure_LBFT2, ps_LBFT2, frametime);
+		flightSurface.leadingEdgeFlap_DEG = leadingedgeControl.leading_edge_flap_controller(simInitialized, dynamicPressure_LBFT2, ps_LBFT2, frametime);
 		flightSurface.leadingEdgeFlap_PCT = limit(flightSurface.leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
 
 		// Call the longitudinal (pitch) controller.  Takes the following inputs:
@@ -431,7 +382,7 @@ public:
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flightSurface.flap_DEG = fcs_flap_controller(totalVelocity_FPS);
+		flightSurface.flap_DEG = flapControl.fcs_flap_controller(totalVelocity_FPS);
 		flightSurface.flap_PCT = flightSurface.flap_DEG / 20.0;
 	}
 
