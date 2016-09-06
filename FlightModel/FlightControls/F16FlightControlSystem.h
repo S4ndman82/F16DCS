@@ -44,14 +44,17 @@ sources:
 class F16FlightControls
 {
 public:
-	bool		simInitialized;
-
-//protected:
-
+	F16Atmosphere *pAtmos;
 	F16BodyState bodyState;
 	F16FlightSurface flightSurface;
+	F16TrimState trimState;
 
-	F16Atmosphere *pAtmos;
+protected:
+
+	// TODO: get rid of this
+	bool		simInitialized;
+
+
 
 	// note: airbrake limit different when landing gear down (prevent strike to runway)
 	// cx_brk = 0.08, --coefficient, drag, breaks <- for airbrake?
@@ -60,8 +63,8 @@ public:
 	double airbrakeDrag;
 
 	bool isGearDown; // is landing gear down
-
-	F16TrimState trimState;
+	// replace with:
+	//F16LandingGear *landingGear;
 
 	// Pitch controller variables
 	AnalogInput		longStickInput; // pitch normalized
@@ -97,16 +100,16 @@ public:
 
 public:
 	F16FlightControls(F16Atmosphere *atmos)
-		: simInitialized(false)
+		: pAtmos(atmos)
 		, bodyState()
 		, flightSurface()
-		, pAtmos(atmos)
+		//, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
+		, trimState(0, 0, 0)
+		, simInitialized(false)
 		, airbrakeSwitch(false)
 		, airbrakeActuator(1.0, 0, 1.0) //
 		, airbrakeDrag(0)
 		, isGearDown(true)
-		//, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
-		, trimState(0, 0, 0) 
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
