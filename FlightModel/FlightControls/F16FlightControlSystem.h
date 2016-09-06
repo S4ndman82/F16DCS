@@ -137,15 +137,6 @@ public:
 		manualPitchOverride = aoa_override;
 	}
 
-	// landing gear related flaps:
-	// flaps are controlled with landing gear lever as well,
-	// gears go down -> trailing edge flaps go down
-	// gear go up -> trailing edge flaps go up
-	void setGearRelatedFlaps(bool up)
-	{
-		gearRelatedFlaps = up;
-	}
-
 	void initAirBrakeOff()
 	{
 		airbrakeControl.initAirBrakeOff();
@@ -161,10 +152,6 @@ public:
 	void switchAirbrake()
 	{
 		airbrakeControl.toggleAirbrake();
-	}
-	void setIsGearDown(bool gearDown)
-	{
-		isGearDown = gearDown;
 	}
 
 	// right-side
@@ -221,6 +208,7 @@ public:
 
 		// landing gear "down&locked" affects some logic
 		isGearDown = landingGear->isGearDownLocked();
+		gearRelatedFlaps = landingGear->getGearLevelStatus();
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step

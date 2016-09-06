@@ -228,6 +228,11 @@ public:
 		wheelRight.setStrutAngle(actRight.m_current);
 	}
 
+	bool getGearLevelStatus()
+	{
+		return gearLevelUp;
+	}
+
 	// user "lever" action
 	void switchGearUpDown()
 	{

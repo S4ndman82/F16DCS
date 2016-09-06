@@ -502,18 +502,12 @@ void ed_fm_set_command(int command, float value)
 
 	case F16::Gear:
 		F16::LandingGear.switchGearUpDown();
-		// also switch trailing-edge flaps position
-		//F16::FlightControls.setGearRelatedFlaps()
 		break;
 	case F16::LandingGearUp:
 		F16::LandingGear.setGearUp();
-		// also switch trailing-edge flaps position
-		//F16::FlightControls.setGearRelatedFlaps(true);
 		break;
 	case F16::LandingGearDown:
 		F16::LandingGear.setGearDown();
-		// also switch trailing-edge flaps position
-		//F16::FlightControls.setGearRelatedFlaps(false);
 		break;
 
 	case F16::NoseWheelSteering:
@@ -988,7 +982,6 @@ void ed_fm_cold_start()
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyOpen();
 	F16::FlightControls.initAirBrakeOff();
-	F16::FlightControls.setIsGearDown(true);
 	F16::Electrics.setElectricsOn(); // <- off
 	F16::EMS.initEngineOff(); // <- stop
 }
@@ -1002,7 +995,6 @@ void ed_fm_hot_start()
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyClosed();
 	F16::FlightControls.initAirBrakeOff();
-	F16::FlightControls.setIsGearDown(true);
 	F16::Electrics.setElectricsOn();
 	F16::EMS.initEngineIdle();
 }
@@ -1016,7 +1008,6 @@ void ed_fm_hot_start_in_air()
 	F16::LandingGear.initGearsUp();
 	F16::Airframe.initCanopyClosed();
 	F16::FlightControls.initAirBrakeOff();
-	F16::FlightControls.setIsGearDown(false);
 	F16::Electrics.setElectricsOn();
 	F16::EMS.initEngineCruise();
 }
