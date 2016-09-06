@@ -104,11 +104,6 @@
 // physics integration
 #include "EquationsOfMotion/F16EquationsOfMotion.h"
 
-// integrate with cockpit DLL
-// -> EFM does not need to call cockpit DLL (reverse case instead)
-// -> no need for this
-//#include "../F16ACockpit/F16ACockpit.h"
-
 
 wchar_t dbgmsg[255] = {0};
 //dbgmsg[0] = 0;

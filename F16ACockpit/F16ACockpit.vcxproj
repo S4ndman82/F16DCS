@@ -66,7 +66,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_USE_MATH_DEFINES;NOMINMAX;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;F16ACOCKPIT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;WIN32_LEAN_AND_MEAN;_WINDOWS;_WIN32_WINNT=0x0600;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_USE_MATH_DEFINES;NOMINMAX;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;F16ACOCKPIT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
