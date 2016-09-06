@@ -29,9 +29,8 @@ public:
 	}
 
 	// Passive flap schedule for the F-16...nominal for now from flight manual comments
-	double fcs_flap_controller(bool gearLevelUp, double airspeed_FPS)
+	double fcs_flap_controller(bool gearLevelUp, double airspeed_KTS)
 	{
-		double airspeed_KTS = 0.5924838012958964 * airspeed_FPS;
 		double trailing_edge_flap_deflection = 0.0;
 
 		/*

@@ -45,6 +45,7 @@ namespace F16
 	const double		inertia_Iz_KGM2			= 85552.1;		// Reference moment of inertia (kg/m^2) // 63035 in one source? (scale model?)
 	const double		inertia_Ixz_KGM2		= 179.0;		// Reference moment of inertia (kg/m^2) 
 
+	const double		metersToKnots			= 1.943844;		// m/s to knots
 	const double		meterToFoot				= 3.28084;		// Meter to foot conversion factor
 	const double		feetToMeter				= 0.3048;		// multiplier, ft to m
 	const double		inchesToCentim			= 2.54;			// multiplier, in to cm

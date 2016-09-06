@@ -87,6 +87,10 @@ public:
 	{
 		return altitude * F16::meterToFoot; // meters to feet
 	}
+	double getTotalVelocityKTS() const
+	{
+		return totalVelocity * F16::metersToKnots;
+	}
 	double getTotalVelocityFPS() const
 	{
 		// to feets per second

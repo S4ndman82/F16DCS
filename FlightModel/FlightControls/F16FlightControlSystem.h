@@ -67,7 +67,6 @@ protected:
 	AnalogInput		latStickInput; // bank normalized
 	AnalogInput		pedInput;		// Pedal input command normalized (-1 to 1)
 
-	F16Actuator		rudderActuator;
 	/*
 	F16Actuator		elevatorActuatorLeft;
 	F16Actuator		elevatorActuatorRight;
@@ -107,7 +106,6 @@ public:
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
-		, rudderActuator(1.0, -30.0, 30.0)
 		, pitchControl(&bodyState, &flightSurface)
 		, rollControl(&bodyState, &flightSurface)
 		, yawControl(&bodyState, &flightSurface)
@@ -200,7 +198,7 @@ public:
 	//---------------------------------------------
 	void updateFrame(double frametime)
 	{
-		const double totalVelocity_FPS = pAtmos->getTotalVelocityFPS();
+		//const double totalVelocity_FPS = pAtmos->getTotalVelocityFPS();
 
 		// only place this is needed for now..
 		const double ps_LBFT2 = pAtmos->getAmbientPressureLBFTSQ(); // (N/m^2) to (lb/ft^2)
@@ -212,7 +210,7 @@ public:
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step
-		airbrakeControl.updateAirBrake(isGearDown, totalVelocity_FPS, dynamicPressure_LBFT2, ps_LBFT2, frametime);
+		airbrakeControl.updateAirBrake(isGearDown, dynamicPressure_LBFT2, ps_LBFT2, frametime);
 
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
@@ -231,17 +229,13 @@ public:
 		// or pitch controller should calculate roll effect too?
 		// -> check control laws, in addition to handling supersonic flutter
 
-		double elevator_DEG_commanded = -(pitchControl.fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_LBFT2, frametime));
-		// Call the servo dynamics model (not used as it causes high flutter in high speed situations, related to filtering and dt rate)
-		flightSurface.elevator_DEG = elevator_DEG_commanded; //F16::ACTUATORS::elevator_actuator(F16::elevator_DEG_commanded,dt);
+		flightSurface.elevator_DEG = -(pitchControl.fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_LBFT2, frametime));
 		flightSurface.elevator_DEG = limit(flightSurface.elevator_DEG, -25.0, 25.0);
 
-		double aileron_DEG_commanded = (rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), trimState.trimRoll, dynamicPressure_LBFT2, frametime));
-		flightSurface.aileron_DEG = aileron_DEG_commanded; //F16::ACTUATORS::aileron_actuator(F16::aileron_DEG_commanded,dt);
+		flightSurface.aileron_DEG = (rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), trimState.trimRoll, dynamicPressure_LBFT2, frametime));
 		flightSurface.aileron_DEG = limit(flightSurface.aileron_DEG, -21.5, 21.5);
 
-		double rudder_DEG_commanded = yawControl.fcs_yaw_controller(pedInput.getValue(), trimState.trimYaw, pitchControl.getAlphaFiltered(), aileron_DEG_commanded, frametime);
-		flightSurface.rudder_DEG = rudder_DEG_commanded; //F16::ACTUATORS::rudder_actuator(F16::rudder_DEG_commanded,dt);
+		flightSurface.rudder_DEG = yawControl.fcs_yaw_controller(pedInput.getValue(), trimState.trimYaw, pitchControl.getAlphaFiltered(), flightSurface.aileron_DEG, frametime);
 		flightSurface.rudder_DEG = limit(flightSurface.rudder_DEG, -30.0, 30.0);
 
 		// reuse in drawargs
@@ -253,7 +247,7 @@ public:
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flightSurface.flap_DEG = flapControl.fcs_flap_controller(gearLevelStatus, totalVelocity_FPS);
+		flightSurface.flap_DEG = flapControl.fcs_flap_controller(gearLevelStatus, pAtmos->getTotalVelocityKTS());
 		flightSurface.flap_PCT = flightSurface.flap_DEG / 20.0;
 	}
 
