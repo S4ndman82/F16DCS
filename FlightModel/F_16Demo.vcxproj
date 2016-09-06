@@ -96,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="Aerodynamics\F16Aero.h" />
     <ClInclude Include="Aerodynamics\F16AeroData.h" />
+    <ClInclude Include="Aerodynamics\F16AeroFunction.h" />
     <ClInclude Include="Airframe\F16Airframe.h" />
     <ClInclude Include="Atmosphere\F16Atmosphere.h" />
     <ClInclude Include="Atmosphere\F16GroundSurface.h" />
