@@ -23,6 +23,8 @@
 #include "F16FcsTrailingFlapController.h"
 #include "F16FcsAirbrakeController.h"
 
+#include "LandingGear/F16LandingGear.h"
+
 /*
 sources:
 - NASA TP 1538
@@ -45,6 +47,8 @@ class F16FlightControls
 {
 public:
 	F16Atmosphere *pAtmos;
+	F16LandingGear *landingGear; // affecting some logic
+
 	F16BodyState bodyState;
 	F16FlightSurface flightSurface;
 	F16TrimState trimState;
@@ -55,11 +59,8 @@ protected:
 	bool		simInitialized;
 
 
-
-
 	bool isGearDown; // is landing gear down
-	// replace with:
-	//F16LandingGear *landingGear;
+
 
 	// Pitch controller variables
 	AnalogInput		longStickInput; // pitch normalized
@@ -94,8 +95,9 @@ protected:
 
 
 public:
-	F16FlightControls(F16Atmosphere *atmos)
+	F16FlightControls(F16Atmosphere *atmos, F16LandingGear *lgear)
 		: pAtmos(atmos)
+		, landingGear(lgear)
 		, bodyState()
 		, flightSurface()
 		//, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
@@ -217,6 +219,8 @@ public:
 		const double ps_LBFT2 = pAtmos->getAmbientPressureLBFTSQ(); // (N/m^2) to (lb/ft^2)
 		const double dynamicPressure_LBFT2 = pAtmos->getDynamicPressureLBFTSQ(); // LB/FT^2
 
+		// landing gear "down&locked" affects some logic
+		isGearDown = landingGear->isGearDownLocked();
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step

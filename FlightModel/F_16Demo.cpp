@@ -126,11 +126,11 @@ namespace F16
 	F16Aero Aero;
 	F16FuelSystem Fuel;
 	F16EngineManagementSystem EMS(&Atmos, &Fuel);
-	F16HydraulicSystem Hydraulics; 
-	F16FlightControls FlightControls(&Atmos);
 	F16LandingGear LandingGear(&Atmos, &Ground);
+	F16FlightControls FlightControls(&Atmos, &LandingGear);
 	F16Airframe Airframe;
 	F16Motion Motion(&Atmos);
+	F16HydraulicSystem Hydraulics;
 	F16ElectricSystem Electrics;
 	F16EnvControlSystem EnvCS(&Atmos);
 }
@@ -245,7 +245,6 @@ void ed_fm_simulate(double dt)
 
 	//-----CONTROL DYNAMICS------------------------
 	// landing gear "down&locked" affects some logic
-	F16::FlightControls.setIsGearDown(F16::LandingGear.isGearDownLocked());
 	F16::FlightControls.updateFrame(frametime);
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::FlightControls.flightSurface.elevator_DEG, frametime);
