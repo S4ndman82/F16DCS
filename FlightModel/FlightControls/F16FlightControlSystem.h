@@ -56,11 +56,6 @@ protected:
 
 
 
-	// note: airbrake limit different when landing gear down (prevent strike to runway)
-	// cx_brk = 0.08, --coefficient, drag, breaks <- for airbrake?
-	bool airbrakeSwitch; // switch status
-	F16Actuator airbrakeActuator;
-	double airbrakeDrag;
 
 	bool isGearDown; // is landing gear down
 	// replace with:
@@ -106,9 +101,6 @@ public:
 		//, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
 		, trimState(0, 0, 0)
 		, simInitialized(false)
-		, airbrakeSwitch(false)
-		, airbrakeActuator(1.0, 0, 1.0) //
-		, airbrakeDrag(0)
 		, isGearDown(true)
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
@@ -122,10 +114,7 @@ public:
 		, airbrakeControl(&bodyState, &flightSurface)
 		, manualPitchOverride(false)
 		, gearRelatedFlaps(false)
-	{
-		// just do this once when constructing
-		initialize(0);
-	}
+	{}
 	~F16FlightControls() {}
 
 	void setLatStickInput(double value) 
@@ -157,24 +146,19 @@ public:
 
 	void initAirBrakeOff()
 	{
-		airbrakeDrag = 0;
-		airbrakeSwitch = false;
-		airbrakeActuator.m_current = 0;
-		airbrakeActuator.m_commanded = 0;
+		airbrakeControl.initAirBrakeOff();
 	}
 	void setAirbrakeON()
 	{
-		airbrakeSwitch = true;
-		airbrakeActuator.m_commanded = 1;
+		airbrakeControl.setAirbrake(true);
 	}
 	void setAirbrakeOFF()
 	{
-		airbrakeSwitch = false;
-		airbrakeActuator.m_commanded = 0;
+		airbrakeControl.setAirbrake(false);
 	}
 	void switchAirbrake()
 	{
-		airbrakeSwitch = !airbrakeSwitch;
+		airbrakeControl.toggleAirbrake();
 	}
 	void setIsGearDown(bool gearDown)
 	{
@@ -187,7 +171,7 @@ public:
 		// TODO: value from degrees to percentages here
 
 		// use same for both sides for now
-		return (float)airbrakeActuator.m_current;
+		return (float)airbrakeControl.airbrakeActuator.m_current;
 	}
 	// left-side
 	float getAirbrakeLSAngle() const
@@ -195,109 +179,7 @@ public:
 		// TODO: value from degrees to percentages here
 
 		// use same for both sides for now
-		return (float)airbrakeActuator.m_current;
-	}
-
-	void updateAirBrake(const double totalVelocity_FPS, const double dynamicPressure_LBFT2, const double ps_LBFT2, const double frameTime)
-	{
-		// TODO: change values to degrees here
-
-		// for now, just use frametime for rate of movement
-		// (multiplier 1)
-
-		// note: airbrake limit 60 degrees normally, 
-		// 43 deg when landing gear down (prevent strike to runway)
-		double maxAnglePCT = 1.0; // 60 deg
-		if (isGearDown == true)
-		{
-			maxAnglePCT = 0.71; // ~43 deg
-		}
-
-		// TODO: if weight on wheel -> max opening
-		// if gear down but no weight on wheel -> restricted
-		// controlled by additional switch in cockpit?
-
-		if (airbrakeSwitch == true)
-		{
-			// open to max allowed by limit
-			airbrakeActuator.m_commanded = maxAnglePCT;
-		}
-		else
-		{
-			// close it
-			airbrakeActuator.m_commanded = 0;
-		}
-		airbrakeActuator.updateFrame(frameTime);
-
-
-		// after actuator move, calculate new drag at new position
-
-		// TODO: switch to actual angles instead of percentages
-		//double angle = cos(airbrakeActuator.m_current);
-
-		// TEST!
-		// just use full now for testing
-		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
-
-		/* source: http://www.f-16.net/forum/viewtopic.php?t=11398
-		Because landing is such a low speed, I did not bother to calculate those forces. 
-		But to estimate the force on the speedbrake at landing, you can use the dynamic pressure at landing speed x speedbrake area x cos 60 deg x Cd
-
-		dynamic pressure q ~ 125 lb/sq ft (from q/M^2 = 1480 lb/sq ft)
-		area ~ 4 sq ft x 4
-		cos 60 deg = .866
-		Cd ~ .7
-
-		total drag force ~ 1212 lb
-
-		That is the total force (parallel to the fuselage centerline) on all four panels at landing speed. It is much less than 3 tons.
-		*/
-
-		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
-
-		if (airbrakeActuator.m_current > 0)
-		{
-			double CDAirbrake = airbrakeActuator.m_current * 0.7;
-			airbrakeDrag = -(CDAirbrake * cos(F16::degtorad));
-
-			//double pressureAreaFT2 = airbrakeArea_FT2 * dynamicPressure_LBFT2;
-			//double airbrake_DEG = (airbrakeActuator.m_current * 60); // <- PCT to DEG
-			//airbrakeDrag = -(0.7 * cos(airbrake_DEG));
-		}
-		else
-		{
-			airbrakeDrag = 0;
-		}
-
-	}
-
-	/*
-	bool initializeLeadingEdgeFlapController()
-	{
-	}
-	*/
-
-
-
-public:
-
-	bool initialize(double dt)
-	{
-		if (simInitialized == true)
-		{
-			return true;
-		}
-
-		bool res = true;
-
-		res &= pitchControl.initialize(dt);
-		res &= rollControl.initialize(dt);
-		res &= yawControl.initialize(dt);
-
-		pitchControl.reset(dt);
-		rollControl.reset(dt);
-		yawControl.reset(dt);
-		return res;
+		return (float)airbrakeControl.airbrakeActuator.m_current;
 	}
 
 	// before simulation starts
@@ -324,12 +206,6 @@ public:
 		bodyState.accy = az;
 	}
 
-	// after first frame is done
-	void setInitialized()
-	{
-		simInitialized = true;
-	}
-
 	//---------------------------------------------
 	//-----CONTROL DYNAMICS------------------------
 	//---------------------------------------------
@@ -344,7 +220,7 @@ public:
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step
-		updateAirBrake(totalVelocity_FPS, dynamicPressure_LBFT2, ps_LBFT2, frametime);
+		airbrakeControl.updateAirBrake(isGearDown, totalVelocity_FPS, dynamicPressure_LBFT2, ps_LBFT2, frametime);
 
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
@@ -391,7 +267,14 @@ public:
 
 	double getAirbrakeDrag()
 	{
-		return airbrakeDrag;
+		return airbrakeControl.airbrakeDrag;
+	}
+
+	// after first frame is done
+	// TODO: get rid of this
+	void setInitialized()
+	{
+		simInitialized = true;
 	}
 
 };

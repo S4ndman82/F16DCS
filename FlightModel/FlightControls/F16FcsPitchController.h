@@ -172,7 +172,11 @@ public:
 		pitchPreActuatorFilter(),
 		pitchActuatorDynamicsFilter(),
 		accelFilter()
-	{}
+	{
+		// just do this once when constructing
+		initialize(0);
+		reset(0);
+	}
 	~F16FcsPitchController() {}
 
 	bool initialize(double dt)

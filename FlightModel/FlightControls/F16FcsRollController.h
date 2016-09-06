@@ -137,7 +137,11 @@ public:
 		rollActuatorDynamicsFilter(),
 		rollRateFilter1(),
 		rollRateFilter2()
-	{}
+	{
+		// just do this once when constructing
+		initialize(0);
+		reset(0);
+	}
 	~F16FcsRollController() {}
 
 	bool initialize(double dt)

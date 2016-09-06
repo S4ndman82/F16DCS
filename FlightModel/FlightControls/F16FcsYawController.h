@@ -84,7 +84,11 @@ public:
 		yawRateWashout(),
 		yawRateFilter(),
 		yawServoFilter()
-	{}
+	{
+		// just do this once when constructing
+		initialize(0);
+		reset(0);
+	}
 	~F16FcsYawController() {}
 
 	bool initialize(double dt)
