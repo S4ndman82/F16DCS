@@ -4,6 +4,23 @@
 #include "stdafx.h"
 #include <windows.h>
 
+#include "F16ACockpit.h"
+
+// for debug use
+#include <wchar.h>
+#include <stdio.h>
+
+// integrate with EFM DLL
+// -> cockpit DLL may need to call EFM to get/set information
+#include "../FlightModel/F_16Demo.h"
+
+
+wchar_t dbgmsg[255] = { 0 };
+//dbgmsg[0] = 0;
+
+// prototype for later..
+bool locateEfmDll();
+
 // create handlers for controls (stick, throttle, pedals)
 
 // create handlers for "passive" instruments (clock, ADI, engine RPM)
@@ -52,4 +69,27 @@ you can call that with the argument of the base sensor index and it will return 
 double test(double in)
 {
 	return in*10.0;
+}
+
+bool locateEfmDll()
+{
+	// function prototype for function exported from cockpit dll
+	typedef double test(double in);
+
+	HMODULE	efm_dll = GetModuleHandle(L"F16DemoFM.dll"); //assume that we work inside same process
+	if (efm_dll == NULL)
+	{
+		return false;
+	}
+
+	test *pfnTest = (test*)GetProcAddress(efm_dll, "test");
+	if (pfnTest == NULL)
+	{
+		return false;
+	}
+
+	double res = (double)(*pfnTest)(10.0);
+
+	// all successful
+	return true;
 }
