@@ -346,12 +346,14 @@ public:
 
 	void onEject()
 	{
+		/*
 		// TODO: check for three times in quick succession before doing more here
 		if (ejectCount < 3)
 		{
 			ejectCount++;
 			return;
 		}
+		*/
 		// TODO: check time since first press (must be rapid)
 
 		// pilot and seat gone
