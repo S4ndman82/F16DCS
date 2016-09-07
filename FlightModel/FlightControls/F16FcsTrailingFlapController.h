@@ -13,10 +13,14 @@ protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
 
+	// is alternate flaps mode (extend regardless of landing gear lever)
+	bool isAltFlaps;
+
 public:
 	F16FcsTrailingFlapController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
-		flightSurface(fs)
+		flightSurface(fs),
+		isAltFlaps(false)
 	{}
 	~F16FcsTrailingFlapController() {}
 

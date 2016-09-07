@@ -25,6 +25,9 @@ protected:
 	F16Actuator		leadingedgeActuatorRight;
 	*/
 
+	// is in automatic operation or locked in position
+	bool isAuto;
+
 public:
 	F16FcsLeadingEdgeController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
@@ -33,7 +36,8 @@ public:
 		leading_edge_flap_integrated(0),
 		leading_edge_flap_rate(0),
 		leading_edge_flap_integrated_gained(0),
-		leading_edge_flap_integrated_gained_biased(0)
+		leading_edge_flap_integrated_gained_biased(0),
+		isAuto(true)
 	{}
 	~F16FcsLeadingEdgeController() {}
 
