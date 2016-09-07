@@ -16,6 +16,34 @@ protected:
 	// is alternate flaps mode (extend regardless of landing gear lever)
 	bool isAltFlaps;
 
+	// Passive flap schedule for the F-16...nominal for now from flight manual comments
+	double fcs_flap_controller(bool gearLevelUp, double airspeed_KTS)
+	{
+		const double tef_min = 0.0;
+		const double tef_max = 20.0;
+
+		// if gear lever is down -> max flaps
+		// if alt flap switch -> max flaps
+		if (isAltFlaps == true || gearLevelUp == false)
+		{
+			return tef_max;
+		}
+
+		if (airspeed_KTS < 240.0)
+		{
+			return tef_max;
+		}
+		else if ((airspeed_KTS >= 240.0) && (airspeed_KTS <= 370.0))
+		{
+			double trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
+			return limit(trailing_edge_flap_deflection, tef_min, tef_max);
+		}
+		else
+		{
+			return tef_min;
+		}
+	}
+
 public:
 	F16FcsTrailingFlapController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
@@ -32,42 +60,19 @@ public:
 	{
 	}
 
-	// Passive flap schedule for the F-16...nominal for now from flight manual comments
-	double fcs_flap_controller(bool gearLevelUp, double airspeed_KTS)
+	// Trailing edge flap deflection (deg)
+	// Note that flaps should be controlled by landing gear level:
+	// when gears go down flaps go down as well.
+	//
+	// In normal flight, flaps are used like normal ailerons.
+	//
+	void updateFrame(bool gearLevelUp, double airspeed_KTS, double frametime)
 	{
-		double trailing_edge_flap_deflection = 0.0;
+		double tef_DEG = fcs_flap_controller(gearLevelUp, airspeed_KTS);
 
-		/*
-		// TODO: if gear lever is down -> max flaps?
-		if (gearLevelUp == false)
-		{
-			return 20.0;
-		}
-		*/
-
-		if (airspeed_KTS < 240.0)
-		{
-			trailing_edge_flap_deflection = 20.0;
-		}
-		else if ((airspeed_KTS >= 240.0) && (airspeed_KTS <= 370.0))
-		{
-			trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
-		}
-		else
-		{
-			//trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
-			trailing_edge_flap_deflection = 0.0;
-		}
-
-		trailing_edge_flap_deflection = limit(trailing_edge_flap_deflection, 0.0, 20.0);
-
-		flightSurface->flap_DEG = trailing_edge_flap_deflection;
-		flightSurface->flap_PCT = trailing_edge_flap_deflection / 20.0;
-
-		return trailing_edge_flap_deflection;
+		flightSurface->flap_DEG = tef_DEG;
+		flightSurface->flap_PCT = tef_DEG / 20.0;
 	}
-
-	void updateFrame(double frametime) {}
 };
 
 #endif // ifndef _F16FCSTRAILINGFLAPCONTROLLER_H_

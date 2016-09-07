@@ -96,11 +96,11 @@ public:
 	Vec3 position;
 	Vec3 size; // bounding box
 
-	F16FuelTank(double _volume = 0, double _fuel = 0)
+	F16FuelTank(double max_volume, double pos_x = 0, double pos_y = 0, double pos_z = 0)
 		: station(0)
-		, volume(_volume)
-		, fuel(_fuel)
-		, position()
+		, volume(max_volume)
+		, fuel(0)
+		, position(pos_x, pos_y, pos_z)
 		, size()
 	{}
 	~F16FuelTank() {}

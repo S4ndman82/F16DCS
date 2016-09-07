@@ -223,7 +223,7 @@ public:
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flapControl.fcs_flap_controller(gearLevelStatus, pAtmos->getTotalVelocityKTS());
+		flapControl.updateFrame(gearLevelStatus, pAtmos->getTotalVelocityKTS(), frametime);
 	}
 
 	double getAirbrakeDrag()
