@@ -213,11 +213,36 @@ public:
 
 	}
 
+	// In low speeds, lift is in front of reference CG,
+	// in mach 1 lift is at CG position,
+	// over mach 1 lift aft of CG position (towards tail)
+	// -> aerodynamic CG is different from "weight" (mass CG)
+	// -> this needs to be calculated as function of velocity
+	//
+	double getAeroCgDiff(const double totalVelocity, const double machNumber)
+	{
+		// CG may vary from 0.30 - 0.39, 0.35 at mach 1 (reference point)
+		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
+
+		double diffCgPCT = 0.0;
+
+		// TODO: make actual calculations here
+		if (machNumber < 1)
+		{
+			diffCgPCT = F16::referenceCG_PCT - 0.30;
+		}
+		else if (machNumber > 1)
+		{
+			diffCgPCT = F16::referenceCG_PCT - 0.39;
+		}
+		return diffCgPCT;
+	}
+
 	/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
 	(as on NASA report p37-40)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-	void computeTotals(const double AtmosTotalVelocity_FPS, 
+	void computeTotals(const double AtmosTotalVelocity_FPS, const double diffCgPCT,
 					const double flap_PCT, const double leadingEdgeFlap_PCT, const double aileron_PCT, const double rudder_PCT,
 					const double pitchRate_RPS, const double rollRate_RPS, const double yawRate_RPS, 
 					const double alpha_DEG, const double beta_DEG, const double LgCxGearAero, const double LgCzGearAero,
@@ -237,7 +262,7 @@ public:
 		// -> aerodynamic CG is different from "weight" (mass CG)
 		// -> this needs to be calculated as function of velocity
 		//
-		const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
+		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 		const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
 
 		// calculate values based on interpolation results

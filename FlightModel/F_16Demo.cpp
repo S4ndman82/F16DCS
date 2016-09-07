@@ -248,7 +248,8 @@ void ed_fm_simulate(double dt)
 	F16::FlightControls.updateFrame(frametime);
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState.alpha_DEG, F16::FlightControls.bodyState.beta_DEG, F16::FlightControls.flightSurface.elevator_DEG, frametime);
-	F16::Aero.computeTotals(F16::Atmos.getTotalVelocityFPS(),
+	double diffCgPCT = F16::Aero.getAeroCgDiff(F16::Atmos.totalVelocity, F16::Atmos.machNumber); // this is for testing now
+	F16::Aero.computeTotals(F16::Atmos.getTotalVelocityFPS(), diffCgPCT,
 		F16::FlightControls.flightSurface.flap_PCT, 
 		F16::FlightControls.flightSurface.leadingEdgeFlap_PCT, 
 		F16::FlightControls.flightSurface.aileron_PCT, 
