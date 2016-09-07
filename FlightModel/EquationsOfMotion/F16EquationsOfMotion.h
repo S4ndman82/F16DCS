@@ -246,9 +246,9 @@ public:
 	void updateAeroForces(const double Cy_total, const double Cx_total, const double Cz_total, const double Cl_total, const double Cm_total, const double Cn_total)
 	{
 		// precalculate some terms
-		const double wingPressureFT = F16::wingArea_FT2 * pAtmos->getDynamicPressureLBFTSQ();
-		const double wingPressureN = wingPressureFT * 4.44822162825;
-		const double wingPressureNm = wingPressureFT * 1.35581795;
+		const double wingPressureLB = F16::wingArea_FT2 * pAtmos->getDynamicPressureLBFTSQ();
+		const double wingPressureN = wingPressureLB * 4.44822162825;
+		const double wingPressureNm = wingPressureLB * 1.35581795;
 
 
 		// check
