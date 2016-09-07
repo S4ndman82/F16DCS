@@ -188,8 +188,6 @@ public:
 	//---------------------------------------------
 	void updateFrame(double frametime)
 	{
-		//const double totalVelocity_FPS = pAtmos->getTotalVelocityFPS();
-
 		double dynamicPressure_kNM2 = pAtmos->dynamicPressure / 1000.0; //for kN/m^2
 		// stagnation pressure?
 		double qbarOverPs = pAtmos->dynamicPressure / pAtmos->ambientPressure;
