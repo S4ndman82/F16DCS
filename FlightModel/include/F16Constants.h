@@ -34,8 +34,8 @@ namespace F16
 	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft) // 10.94 in one source?
 	const double		meanChord_m				= 3.450336;		// mean aerodynamic chord (m) // 3.335 in one source?
 
-	const double		airbrakeArea_FT2		= 14.26;
-	//const double		airbrakeArea_m2			= 1.48645;
+	const double		airbrakeArea_FT2		= 14.26;		// 
+	const double		airbrakeArea_m2			= 1.48645;		// based on ~16ft^2 -> m^2
 
 	// TODO: dynamic CG to calculations
 	const double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord

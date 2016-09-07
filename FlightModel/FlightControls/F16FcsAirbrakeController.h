@@ -121,9 +121,11 @@ public:
 		// ~1.48645m^2 area
 
 		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
+		//double force = dynamicPressure_NM2 * F16::airbrakeArea_m2 * cos(60) * 0.7;
 
 		if (airbrakeActuator.m_current > 0)
 		{
+			double force = dynamicPressure_NM2 * F16::airbrakeArea_m2;
 			double CDAirbrake = airbrakeActuator.m_current * 0.7;
 			airbrakeDrag = -(CDAirbrake * cos(F16::degtorad));
 
