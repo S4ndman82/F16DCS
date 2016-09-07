@@ -262,17 +262,17 @@ public:
 		Vec3 cz_force_pos(0,0,0);
 		add_local_force_cg(cz_force /*,cz_force_pos*/);
 
-		// Cl	(Output force in N/m)
+		// Cl	(Output force in Nm)
 		//Vec3 cl_moment(Cl_total * wingPressureNm * F16::wingSpan_FT, 0.0,  0.0);
 		Vec3 cl_moment(Cl_total * wingPressureN * F16::wingSpan_m, 0.0, 0.0);
 		add_local_moment(cl_moment);
 
-		// Cm	(Output force in N/m)
+		// Cm	(Output force in Nm)
 		//Vec3 cm_moment(0.0, 0.0,  Cm_total * wingPressureNm * F16::meanChord_FT);
 		Vec3 cm_moment(0.0, 0.0, Cm_total * wingPressureN * F16::meanChord_m);
 		add_local_moment(cm_moment);
 
-		// Cn	(Output force in N/m)
+		// Cn	(Output force in Nm)
 		//Vec3 cn_moment(0.0, -Cn_total * wingPressureNm * F16::wingSpan_FT, 0.0);
 		Vec3 cn_moment(0.0, -Cn_total * wingPressureN * F16::wingSpan_m, 0.0);
 		add_local_moment(cn_moment);
