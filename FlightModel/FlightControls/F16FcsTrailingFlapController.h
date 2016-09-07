@@ -6,12 +6,19 @@
 #include "../UtilityFunctions.h"
 
 #include "F16FcsCommon.h"
+#include "F16Actuator.h"
 
 class F16FcsTrailingFlapController
 {
 protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
+
+	// TEF actually does not have own actuators 
+	// but use the "flaperon" actuators.
+	// This is only to estimate some "gain" of position movement.
+	// Bit of a hack now really, might need to be in roll controller..
+	F16Actuator actuator;
 
 	// is alternate flaps mode (extend regardless of landing gear lever)
 	bool isAltFlaps;
@@ -48,6 +55,7 @@ public:
 	F16FcsTrailingFlapController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
+		actuator(10.0, 0, 20.0),
 		isAltFlaps(false)
 	{}
 	~F16FcsTrailingFlapController() {}
@@ -69,9 +77,11 @@ public:
 	void updateFrame(bool gearLevelUp, double airspeed_KTS, double frametime)
 	{
 		double tef_DEG = fcs_flap_controller(gearLevelUp, airspeed_KTS);
+		actuator.commandMove(tef_DEG);
+		actuator.updateFrame(frametime);
 
-		flightSurface->flap_DEG = tef_DEG;
-		flightSurface->flap_PCT = tef_DEG / 20.0;
+		flightSurface->flap_DEG = actuator.m_current;
+		flightSurface->flap_PCT = actuator.m_current / 20.0;
 	}
 };
 

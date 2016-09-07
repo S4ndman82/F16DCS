@@ -81,6 +81,17 @@ public:
 	{}
 	~F16Actuator() {}
 
+	void commandMove(const double command)
+	{
+		m_commanded = command;
+		/*
+		if (m_haveLimits == true)
+		{
+			m_commanded = limit(command, m_minLimit, m_maxLimit)
+		}
+		*/
+	}
+
 	// TODO: improve upon this before using
 	// this should be non-linear function to give actual movement when resisting force increases near limit?
 	// or are all actuators expected work exactly to limit and then stop?

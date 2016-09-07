@@ -185,10 +185,10 @@ public:
 		: is_unlimited_fuel(false)
 		, previous_usage(0)
 		, m_fuelWarningLimit(500.0) // in kg
-		, FwdFus(3100 * F16::lb_to_kg) // lb to kg
-		, AftFus(2800 * F16::lb_to_kg)
-		, LeftWing(525 * F16::lb_to_kg)
-		, RightWing(525 * F16::lb_to_kg)
+		, FwdFus(3100 * F16::lb_to_kg, 1.0, 0.0, 0.0) // just use non-zero positions for now
+		, AftFus(2800 * F16::lb_to_kg, -1.0, 0.0, 0.0)
+		, LeftWing(525 * F16::lb_to_kg, 0.0, 0.0, 1.0)
+		, RightWing(525 * F16::lb_to_kg, 0.0, 0.0, -1.0)
 		, ext_Center(1800 * F16::lb_to_kg)
 		, ext_LWing(2300 * F16::lb_to_kg)
 		, ext_RWing(2300 * F16::lb_to_kg)
