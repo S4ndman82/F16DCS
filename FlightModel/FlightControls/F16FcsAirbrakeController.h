@@ -64,7 +64,7 @@ public:
 	{
 	}
 
-	void updateAirBrake(bool isGearDown, const double dynamicPressure_LBFT2, const double ps_LBFT2, const double frameTime)
+	void updateAirBrake(bool isGearDown, const double dynamicPressure_NM2, const double frameTime)
 	{
 		// TODO: change values to degrees here
 

@@ -193,6 +193,8 @@ public:
 		// only place this is needed for now..
 		const double ps_LBFT2 = pAtmos->getAmbientPressureLBFTSQ(); // (N/m^2) to (lb/ft^2)
 		const double dynamicPressure_LBFT2 = pAtmos->getDynamicPressureLBFTSQ(); // LB/FT^2
+		double dynamicPressure_NM2 = dynamicPressure_LBFT2 * 47.880258889;
+		double dynamicPressure_kNM2 = dynamicPressure_LBFT2 * 1.4881639 / 1000.0; //for kN/m^2
 
 		// landing gear "down&locked" affects some logic
 		isGearDown = landingGear->isGearDownLocked();
@@ -200,7 +202,7 @@ public:
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step
-		airbrakeControl.updateAirBrake(isGearDown, dynamicPressure_LBFT2, ps_LBFT2, frametime);
+		airbrakeControl.updateAirBrake(isGearDown, dynamicPressure_NM2, frametime);
 
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
@@ -218,8 +220,8 @@ public:
 		// or pitch controller should calculate roll effect too?
 		// -> check control laws, in addition to handling supersonic flutter
 
-		pitchControl.fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_LBFT2, frametime);
-		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), trimState.trimRoll, dynamicPressure_LBFT2, frametime);
+		pitchControl.fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_kNM2, frametime);
+		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), trimState.trimRoll, dynamicPressure_NM2, frametime);
 		yawControl.fcs_yaw_controller(pedInput.getValue(), trimState.trimYaw, pitchControl.getAlphaFiltered(), flightSurface.aileron_DEG, frametime);
 
 		// Trailing edge flap deflection (deg)

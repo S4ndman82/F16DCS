@@ -102,10 +102,12 @@ public:
 	}
 
 	// Controller for roll
-	double fcs_roll_controller(double latStickInput, double longStickForce, double trimRoll, double dynPressure_LBFT2, double dt)
+	double fcs_roll_controller(double latStickInput, double longStickForce, double trimRoll, double dynamicPressure_NM2, double dt)
 	{
 		const double roll_rate = bodyState->getRollRateDegs();
 		double ay = bodyState->getAccYPerG();
+
+		// TODO: in case of alpha > (limit), lateral input is ignored (yaw limiter)
 
 
 		double latStickForceCmd = latStickInput * 75.0;
@@ -122,8 +124,6 @@ public:
 		double rollRateFiltered2 = (rollRateFilter2.Filter(dt, rollRateFiltered1));
 
 		double rollRateCommandCombined = rollRateFiltered2 - rollRateCommandFilterd - trimRoll;
-
-		double dynamicPressure_NM2 = dynPressure_LBFT2 * 47.880258889;
 
 		double pressureGain = getPressureGain(dynamicPressure_NM2);
 

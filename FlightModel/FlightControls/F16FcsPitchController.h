@@ -35,9 +35,8 @@ protected:
 
 public:
 	// Schedule gain component due to dynamic pressure
-	double dynamic_pressure_schedule(const double dynPressure_LBFT2) const
+	double dynamic_pressure_schedule(const double dynamicPressure_kNM2) const
 	{
-		double dynamicPressure_kNM2 = dynPressure_LBFT2 * 1.4881639 / 1000.0; //for kN/m^2
 		double scheduleOutput = 0.0;
 		if (dynamicPressure_kNM2 < 9.576)
 		{
@@ -128,13 +127,13 @@ public:
 
 	// Controller for pitch
 	// (differentialCommand is hard-coded to 0 in caller)
-	double fcs_pitch_controller(double longStickInput, double trimPitch, double differentialCommand, double dynPressure_LBFT2, double dt)
+	double fcs_pitch_controller(double longStickInput, double trimPitch, double differentialCommand, double dynamicPressure_kNM2, double dt)
 	{
 		const double pitch_rate = bodyState->getPitchRateDegs();
 		const double az = bodyState->getAccZPerG();
 
 		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, trimPitch, dt);
-		double dynamicPressureScheduled = dynamic_pressure_schedule(dynPressure_LBFT2);
+		double dynamicPressureScheduled = dynamic_pressure_schedule(dynamicPressure_kNM2);
 
 		double azFiltered = accelFilter.Filter(dt, az - 1.0);
 
