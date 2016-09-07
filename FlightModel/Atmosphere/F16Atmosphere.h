@@ -112,6 +112,8 @@ public:
 	{
 		return ambientPressure * F16::Nm_sq_to_lbft_sq; // (N/m^2) to (lb/ft^2)
 	}
+
+	/*
 	double getDynamicPressureLBFTSQ() const
 	{
 		// Call the atmosphere model to get mach and dynamic pressure
@@ -121,6 +123,7 @@ public:
 		double dynamicPressure_LBFT2 = .5 * rho * pow(totalVelocity_FPS, 2);
 		return dynamicPressure_LBFT2;
 	}
+	*/
 
 	/*
 	// this is old stuff, pointlessly complicated since we get speed of sound already
