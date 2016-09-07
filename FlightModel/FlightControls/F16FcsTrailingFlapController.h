@@ -56,6 +56,10 @@ public:
 		}
 
 		trailing_edge_flap_deflection = limit(trailing_edge_flap_deflection, 0.0, 20.0);
+
+		flightSurface->flap_DEG = trailing_edge_flap_deflection;
+		flightSurface->flap_PCT = trailing_edge_flap_deflection / 20.0;
+
 		return trailing_edge_flap_deflection;
 	}
 

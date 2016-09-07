@@ -70,6 +70,9 @@ public:
 
 		double finalRudderCommand = aileronGained + yawRateFilteredWithSideAccel + rudderCommandFilteredWTrim;
 
+		flightSurface->rudder_DEG = limit(finalRudderCommand, -30.0, 30.0);
+		flightSurface->rudder_PCT = flightSurface->rudder_DEG / 30.0;
+
 		return finalRudderCommand;
 
 		//TODO: Figure out why there is a ton of flutter at high speed due to these servo dynamics

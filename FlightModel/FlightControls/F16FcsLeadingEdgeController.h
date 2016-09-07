@@ -6,6 +6,7 @@
 #include "../UtilityFunctions.h"
 
 #include "F16FcsCommon.h"
+#include "F16Actuator.h"
 
 class F16FcsLeadingEdgeController
 {
@@ -18,6 +19,11 @@ protected:
 	double		leading_edge_flap_rate;
 	double		leading_edge_flap_integrated_gained;
 	double		leading_edge_flap_integrated_gained_biased;
+
+	/*
+	F16Actuator		leadingedgeActuatorLeft;
+	F16Actuator		leadingedgeActuatorRight;
+	*/
 
 public:
 	F16FcsLeadingEdgeController(F16BodyState *bs, F16FlightSurface *fs) :
@@ -57,6 +63,9 @@ public:
 		leading_edge_flap_integrated = leading_edge_flap_integral + bodyState->alpha_DEG * 2.0;
 		leading_edge_flap_integrated_gained = leading_edge_flap_integrated * 1.38;
 		leading_edge_flap_integrated_gained_biased = leading_edge_flap_integrated_gained + 1.45 - (9.05 * qbarOverPs);
+
+		flightSurface->leadingEdgeFlap_DEG = leading_edge_flap_integrated_gained_biased;
+		flightSurface->leadingEdgeFlap_PCT = limit(leading_edge_flap_integrated_gained_biased / 25.0, 0.0, 1.0);
 
 		return leading_edge_flap_integrated_gained_biased;
 	}

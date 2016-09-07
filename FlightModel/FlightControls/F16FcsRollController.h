@@ -9,6 +9,7 @@
 #include "DummyFilter.h"
 
 #include "F16FcsCommon.h"
+#include "F16Actuator.h"
 
 
 class F16FcsRollController
@@ -22,6 +23,11 @@ protected:
 	DummyFilter	rollActuatorDynamicsFilter;
 	DummyFilter	rollRateFilter1;
 	DummyFilter	rollRateFilter2;
+
+	/*
+	F16Actuator		flaperonActuatorLeft;
+	F16Actuator		flaperonActuatorRight;
+	*/
 
 public:
 	double getRollFeelGain(const double longStickForce) const
@@ -125,6 +131,11 @@ public:
 
 		// Mechanical servo dynamics
 		double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(dt, rollCommandGained);
+
+
+		flightSurface->aileron_DEG = limit(rollActuatorCommand, -21.5, 21.5);
+		flightSurface->aileron_PCT = flightSurface->aileron_DEG / 21.5;
+
 		return rollActuatorCommand;
 	}
 
