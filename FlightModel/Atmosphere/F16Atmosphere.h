@@ -108,34 +108,6 @@ public:
 		}
 		return totalVelocity_FPS;
 	}
-	double getAmbientPressureLBFTSQ() const
-	{
-		return ambientPressure * F16::Nm_sq_to_lbft_sq; // (N/m^2) to (lb/ft^2)
-	}
-
-	/*
-	double getDynamicPressureLBFTSQ() const
-	{
-		// Call the atmosphere model to get mach and dynamic pressure
-		// I'm used to english units so I am using LB/FT^2 for the pressures
-		double totalVelocity_FPS = getTotalVelocityFPS();
-		double rho = ambientDensity * 0.00194032033;
-		double dynamicPressure_LBFT2 = .5 * rho * pow(totalVelocity_FPS, 2);
-		return dynamicPressure_LBFT2;
-	}
-	*/
-
-	/*
-	// this is old stuff, pointlessly complicated since we get speed of sound already
-	double getMachSpeed() const
-	{
-		double tempR = ambientTemperature_DegK * F16::kelvin_to_rankine; // In Deg Rankine
-		double soundspeed = sqrt(1.4 * 1716.3 * tempR);
-		double totalVelocity_FPS = getTotalVelocityFPS();
-		double mach = totalVelocity_FPS / soundspeed;
-		return mach;
-	}
-	*/
 
 	void getAirspeed(Vec3 &airSpeed) const
 	{
