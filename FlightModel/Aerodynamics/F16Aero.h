@@ -230,6 +230,13 @@ public:
 
 		// TODO: dynamic CG to calculations, uses hardcoded "real" position now
 		// (check: does this actually consider the RSS lift at non-CG position?)
+		//
+		// In low speeds, lift is in front of reference CG,
+		// in mach 1 lift is at CG position,
+		// over mach 1 lift aft of CG position (towards tail)
+		// -> aerodynamic CG is different from "weight" (mass CG)
+		// -> this needs to be calculated as function of velocity
+		//
 		const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 		const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
 
