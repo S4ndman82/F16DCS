@@ -31,9 +31,9 @@ protected:
 public:
 	double		ambientTemperature_DegK;	// Ambient temperature (kelvin)
 	double		ambientDensity;		// Ambient density (kg/m^3)
-	double		dynamicPressure;	// Dynamic pressure (Pa)
+	double		dynamicPressure;	// Dynamic pressure (Pa == N/m^2)
 	double		speed_of_sound;		// (meters/sec)
-	double		ambientPressure;	// atmosphere pressure (N/m^2)
+	double		ambientPressure;	// atmosphere pressure (Pa == N/m^2)
 	double		altitude;			// Absolute altitude MSL (meters)
 	double		totalVelocity;		// velocity in m/s
 	double		machNumber;			// M, gas compressibility, velocity per speed of sound

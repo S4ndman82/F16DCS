@@ -14,6 +14,9 @@ protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
 
+	// TODO: get rid of this
+	bool		simInitialized;
+
 	double		leading_edge_flap_integral;
 	double		leading_edge_flap_integrated;
 	double		leading_edge_flap_rate;
@@ -32,6 +35,7 @@ public:
 	F16FcsLeadingEdgeController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
+		simInitialized(false),
 		leading_edge_flap_integral(0),
 		leading_edge_flap_integrated(0),
 		leading_edge_flap_rate(0),
@@ -50,13 +54,16 @@ public:
 	}
 
 	// Controller for the leading edge flaps
-	double leading_edge_flap_controller(bool simInitialized, double qbarOverPs, double frameTime)
+	void updateFrame(double qbarOverPs, double frameTime)
 	{
 		if (!(simInitialized))
 		{
 			leading_edge_flap_integral = -bodyState->alpha_DEG;
 			leading_edge_flap_integrated = leading_edge_flap_integral + 2 * bodyState->alpha_DEG;
-			return leading_edge_flap_integral;
+
+			flightSurface->leadingEdgeFlap_DEG = leading_edge_flap_integral;
+			flightSurface->leadingEdgeFlap_PCT = limit(leading_edge_flap_integral / 25.0, 0.0, 1.0);
+			return;
 		}
 
 		leading_edge_flap_rate = (bodyState->alpha_DEG - leading_edge_flap_integrated) * 7.25;
@@ -68,11 +75,12 @@ public:
 
 		flightSurface->leadingEdgeFlap_DEG = leading_edge_flap_integrated_gained_biased;
 		flightSurface->leadingEdgeFlap_PCT = limit(leading_edge_flap_integrated_gained_biased / 25.0, 0.0, 1.0);
-
-		return leading_edge_flap_integrated_gained_biased;
 	}
 
-	void updateFrame(double frametime) {}
+	void setInitialized()
+	{
+		simInitialized = true;
+	}
 };
 
 #endif // ifndef _F16FCSLEADINGEDGECONTROLLER_H_

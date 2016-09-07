@@ -195,7 +195,9 @@ public:
 		const double dynamicPressure_LBFT2 = pAtmos->getDynamicPressureLBFTSQ(); // LB/FT^2
 		//double dynamicPressure_NM2 = dynamicPressure_LBFT2 * 47.880258889;
 		double dynamicPressure_kNM2 = pAtmos->dynamicPressure / 1000.0; //for kN/m^2
-		double qbarOverPs = dynamicPressure_LBFT2 / ps_LBFT2;
+		double qbarOverPs = dynamicPressure_LBFT2 / ps_LBFT2; // stagnation pressure?
+		// check
+		//double qbarOverPs = pAtmos->dynamicPressure / pAtmos->ambientPressure;
 
 		// landing gear "down&locked" affects some logic
 		isGearDown = landingGear->isGearDownLocked();
@@ -208,7 +210,7 @@ public:
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
 		// Leading edge flap deflection (deg)
-		leadingedgeControl.leading_edge_flap_controller(simInitialized, qbarOverPs, frametime);
+		leadingedgeControl.updateFrame(qbarOverPs, frametime);
 
 		// Call the longitudinal (pitch) controller.  Takes the following inputs:
 		// -Normalize long stick input
@@ -241,6 +243,7 @@ public:
 	void setInitialized()
 	{
 		simInitialized = true;
+		leadingedgeControl.setInitialized();
 	}
 
 };
