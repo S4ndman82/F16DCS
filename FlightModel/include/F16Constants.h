@@ -35,6 +35,7 @@ namespace F16
 	const double		meanChord_m				= 3.450336;		// mean aerodynamic chord (m) // 3.335 in one source?
 
 	const double		airbrakeArea_FT2		= 14.26;
+	//const double		airbrakeArea_m2			= 1.48645;
 
 	// TODO: dynamic CG to calculations
 	const double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord
@@ -56,6 +57,8 @@ namespace F16
 	const double		Nm_sq_to_lbft_sq		= 0.020885434273; // (N/m^2) to (lb/ft^2);
 
 	const double		lb_to_kg				= 0.45359237; // multiplier, lb to kg
+	const double		lbf_to_N				= 4.44822162825; // multiplier, pound force to Newtons
+	const double		lbf_to_Nm				= 1.35581795; // multiplier, "pound-foot" to Newtonmeters
 
 	const double		weight_empty_kg			= 9207.9;
 	const double		internal_fuel_kg		= 2685.2;

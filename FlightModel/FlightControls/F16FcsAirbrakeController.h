@@ -118,6 +118,7 @@ public:
 
 		That is the total force (parallel to the fuselage centerline) on all four panels at landing speed. It is much less than 3 tons.
 		*/
+		// ~1.48645m^2 area
 
 		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
 
