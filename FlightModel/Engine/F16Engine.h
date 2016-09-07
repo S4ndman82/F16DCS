@@ -757,7 +757,7 @@ public:
 		//fuelPerFrame = 10 * frameTime; //10 kg persecond
 
 		// start by setting ambient conditions
-		GasData gas(pAtmos->ambientPressure, pAtmos->ambientDensity, pAtmos->ambientTemperature_DegK);
+		GasData gas(pAtmos->ambientPressure, pAtmos->ambientDensity, pAtmos->ambientTemperature);
 		GasData bypass(gas); // <- according to bypass ratio, injection back to engine
 
 		// temporary, should be given by engine management system

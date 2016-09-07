@@ -29,7 +29,7 @@ protected:
 	Vec3	m_airspeed;
 
 public:
-	double		ambientTemperature_DegK;	// Ambient temperature (kelvin)
+	double		ambientTemperature;	// Ambient temperature (kelvin)
 	double		ambientDensity;		// Ambient density (kg/m^3)
 	double		dynamicPressure;	// Dynamic pressure (Pa == N/m^2)
 	double		speed_of_sound;		// (meters/sec)
@@ -42,7 +42,7 @@ public:
 		: wind()
 		, velocity_world_cs()
 		, m_airspeed()
-		, ambientTemperature_DegK(0)
+		, ambientTemperature(0)
 		, ambientDensity(0)
 		, dynamicPressure(0)
 		, speed_of_sound(0)
@@ -55,7 +55,7 @@ public:
 
 	void setAtmosphere(const double temperature, const double density, const double soundspeed, const double alt, const double pressure)
 	{
-		ambientTemperature_DegK = temperature;
+		ambientTemperature = temperature;
 		ambientDensity = density; 
 		altitude = alt;
 		ambientPressure = pressure;
