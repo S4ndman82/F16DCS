@@ -73,6 +73,13 @@ protected:
 	F16FcsTrailingFlapController flapControl;
 	F16FcsAirbrakeController airbrakeControl;
 
+	/* check: might be better to have these here due to complexity of dependencies..
+	F16Actuator		elevatorActuatorLeft;
+	F16Actuator		elevatorActuatorRight;
+	F16Actuator		flaperonActuatorLeft;
+	F16Actuator		flaperonActuatorRight;
+	*/
+
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 	bool manualPitchOverride;
 
