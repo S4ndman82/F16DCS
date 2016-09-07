@@ -190,14 +190,9 @@ public:
 	{
 		//const double totalVelocity_FPS = pAtmos->getTotalVelocityFPS();
 
-		// only place this is needed for now..
-		const double ps_LBFT2 = pAtmos->getAmbientPressureLBFTSQ(); // (N/m^2) to (lb/ft^2)
-		const double dynamicPressure_LBFT2 = pAtmos->getDynamicPressureLBFTSQ(); // LB/FT^2
-		//double dynamicPressure_NM2 = dynamicPressure_LBFT2 * 47.880258889;
 		double dynamicPressure_kNM2 = pAtmos->dynamicPressure / 1000.0; //for kN/m^2
-		double qbarOverPs = dynamicPressure_LBFT2 / ps_LBFT2; // stagnation pressure?
-		// check
-		//double qbarOverPs = pAtmos->dynamicPressure / pAtmos->ambientPressure;
+		// stagnation pressure?
+		double qbarOverPs = pAtmos->dynamicPressure / pAtmos->ambientPressure;
 
 		// landing gear "down&locked" affects some logic
 		isGearDown = landingGear->isGearDownLocked();
