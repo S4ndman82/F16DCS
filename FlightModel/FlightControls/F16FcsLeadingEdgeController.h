@@ -50,10 +50,8 @@ public:
 	}
 
 	// Controller for the leading edge flaps
-	double leading_edge_flap_controller(bool simInitialized, double dynamicPressure_FTLB, double staticPressure_FTLB, double frameTime)
+	double leading_edge_flap_controller(bool simInitialized, double qbarOverPs, double frameTime)
 	{
-		double qbarOverPs = dynamicPressure_FTLB / staticPressure_FTLB;
-
 		if (!(simInitialized))
 		{
 			leading_edge_flap_integral = -bodyState->alpha_DEG;
