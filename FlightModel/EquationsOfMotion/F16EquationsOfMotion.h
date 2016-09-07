@@ -245,15 +245,7 @@ public:
 	//----------------------------------------------------------------
 	void updateAeroForces(const double Cy_total, const double Cx_total, const double Cz_total, const double Cl_total, const double Cm_total, const double Cn_total)
 	{
-		// precalculate some terms
-		const double wingPressureLB = F16::wingArea_FT2 * pAtmos->getDynamicPressureLBFTSQ();
-		const double wingPressureN = wingPressureLB * F16::lbf_to_N;
-		const double wingPressureNm = wingPressureLB * F16::lbf_to_Nm;
-
-
-		// check
-		//const double wingPressureNm = F16::wingArea_m2 * pAtmos->dynamicPressure;
-		//const double wingPressureN = pAtmos->dynamicPressure / F16::wingArea_m2;
+		const double wingPressureN = pAtmos->dynamicPressure * F16::wingArea_m2;
 
 		// Cy	(force out the right wing)
 		Vec3 cy_force(0.0, 0.0, Cy_total * wingPressureN);		// Output force in Newtons
@@ -271,16 +263,19 @@ public:
 		add_local_force_cg(cz_force /*,cz_force_pos*/);
 
 		// Cl	(Output force in N/m)
-		Vec3 cl_moment(Cl_total * wingPressureNm * F16::wingSpan_FT, 0.0,  0.0);
+		//Vec3 cl_moment(Cl_total * wingPressureNm * F16::wingSpan_FT, 0.0,  0.0);
+		Vec3 cl_moment(Cl_total * wingPressureN * F16::wingSpan_m, 0.0, 0.0);
 		add_local_moment(cl_moment);
 
 		// Cm	(Output force in N/m)
-		Vec3 cm_moment(0.0, 0.0,  Cm_total * wingPressureNm * F16::meanChord_FT);
+		//Vec3 cm_moment(0.0, 0.0,  Cm_total * wingPressureNm * F16::meanChord_FT);
+		Vec3 cm_moment(0.0, 0.0, Cm_total * wingPressureN * F16::meanChord_m);
 		add_local_moment(cm_moment);
 
 		// Cn	(Output force in N/m)
-		Vec3 cn_moment(0.0, -Cn_total * wingPressureNm * F16::wingSpan_FT, 0.0);
-		add_local_moment(cn_moment);	
+		//Vec3 cn_moment(0.0, -Cn_total * wingPressureNm * F16::wingSpan_FT, 0.0);
+		Vec3 cn_moment(0.0, -Cn_total * wingPressureN * F16::wingSpan_m, 0.0);
+		add_local_moment(cn_moment);
 	}
 
 	// engine thrust,
