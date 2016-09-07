@@ -31,11 +31,12 @@ protected:
 public:
 	double		ambientTemperature_DegK;	// Ambient temperature (kelvin)
 	double		ambientDensity;		// Ambient density (kg/m^3)
-	double		dynamicPressure;		// Dynamic pressure (Pa)
-	double		speed_of_sound;				// (meters/sec)
+	double		dynamicPressure;	// Dynamic pressure (Pa)
+	double		speed_of_sound;		// (meters/sec)
 	double		ambientPressure;	// atmosphere pressure (N/m^2)
-	double		altitude;		// Absolute altitude MSL (meters)
-	double		totalVelocity;	// velocity in m/s
+	double		altitude;			// Absolute altitude MSL (meters)
+	double		totalVelocity;		// velocity in m/s
+	double		machNumber;			// M, gas compressibility, velocity per speed of sound
 
 	F16Atmosphere() 
 		: wind()
@@ -48,6 +49,7 @@ public:
 		, ambientPressure(0)
 		, altitude(0)
 		, totalVelocity(0)
+		, machNumber(0)
 	{}
 	~F16Atmosphere() {}
 
@@ -81,6 +83,11 @@ public:
 	{
 		totalVelocity = sqrt(m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z);
 		dynamicPressure = .5 * ambientDensity * pow(totalVelocity, 2);
+
+		if (speed_of_sound > 0) // avoid crash in case we don't have this yet..
+		{
+			machNumber = totalVelocity / speed_of_sound;
+		}
 	}
 
 	double getAltitudeFeet() const
@@ -115,13 +122,17 @@ public:
 		return dynamicPressure_LBFT2;
 	}
 
+	/*
+	// this is old stuff, pointlessly complicated since we get speed of sound already
 	double getMachSpeed() const
 	{
 		double tempR = ambientTemperature_DegK * F16::kelvin_to_rankine; // In Deg Rankine
+		double soundspeed = sqrt(1.4 * 1716.3 * tempR);
 		double totalVelocity_FPS = getTotalVelocityFPS();
-		double mach = (totalVelocity_FPS) / sqrt(1.4 * 1716.3 * tempR);
+		double mach = totalVelocity_FPS / soundspeed;
 		return mach;
 	}
+	*/
 
 	void getAirspeed(Vec3 &airSpeed) const
 	{

@@ -853,7 +853,8 @@ public:
 
 		//From Simulator Study document (use 0 altitude values for now)
 		//TODO: This should really be a look-up table per the document reference but this is sufficient for now...
-		double mach = pAtmos->getMachSpeed();
+		//double mach = pAtmos->getMachSpeed();
+		double mach = pAtmos->machNumber;
 		double altTemp = (altFeet / 55000.0);
 		double altTemp2 = (altFeet/50000.0);
 		double machLimited = limit(mach,0.2,1.0);
