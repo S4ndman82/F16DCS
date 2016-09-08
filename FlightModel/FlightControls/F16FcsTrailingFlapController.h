@@ -76,8 +76,8 @@ public:
 	//
 	void updateFrame(bool gearLevelUp, double airspeed_KTS, double frametime)
 	{
-		double tef_DEG = fcs_flap_controller(gearLevelUp, airspeed_KTS);
-		actuator.commandMove(tef_DEG);
+		flightSurface->flap_Command = fcs_flap_controller(gearLevelUp, airspeed_KTS);
+		actuator.commandMove(flightSurface->flap_Command);
 		actuator.updateFrame(frametime);
 
 		flightSurface->flap_DEG = actuator.m_current;

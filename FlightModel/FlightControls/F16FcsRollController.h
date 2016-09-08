@@ -132,6 +132,9 @@ public:
 		// Mechanical servo dynamics
 		double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(dt, rollCommandGained);
 
+		// if trailing edge flaps are used, only adjust instead of full control?
+		// also, using elevators for roll control?
+		//if (flightSurface->flap_Command > 0)
 
 		flightSurface->aileron_DEG = limit(rollActuatorCommand, -21.5, 21.5);
 		flightSurface->aileron_PCT = flightSurface->aileron_DEG / 21.5;

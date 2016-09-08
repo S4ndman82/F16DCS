@@ -88,25 +88,27 @@ public:
 class F16FlightSurface
 {
 public:
-	double		leadingEdgeFlap_DEG = 0.0;			// Leading edge flap deflection (deg)
-	double		leadingEdgeFlap_PCT = 0.0;			// Leading edge flap as a percent of maximum (0 to 1)
+	double		leadingEdgeFlap_DEG;			// Leading edge flap deflection (deg)
+	double		leadingEdgeFlap_PCT;			// Leading edge flap as a percent of maximum (0 to 1)
 
-	double		flap_DEG = 0.0;			// Trailing edge flap deflection (deg)
-	double		flap_PCT = 0.0;			// Trailing edge flap deflection (0 to 1)
+	double		flap_Command;		// command from tef controller (position), can be adjusted by roll controller?
+	double		flap_DEG;			// Trailing edge flap deflection (deg)
+	double		flap_PCT;			// Trailing edge flap deflection (0 to 1)
 
-	double		elevator_DEG = 0.0;			// Elevator deflection (deg)
-	double		elevator_PCT = 0.0;			// Elevator deflection as a percent of maximum (-1 to 1)
+	double		elevator_DEG;			// Elevator deflection (deg)
+	double		elevator_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 
-	double		aileron_DEG = 0.0;			// Aileron deflection (deg)
-	double		aileron_PCT = 0.0;			// Aileron deflection as a percent of maximum (-1 to 1)
+	double		aileron_DEG;			// Aileron deflection (deg)
+	double		aileron_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
 
-	double		rudder_DEG = 0.0;			// Rudder  deflection (deg)
-	double		rudder_PCT = 0.0;			// Rudder deflection as a percent of maximum (-1 to 1)
+	double		rudder_DEG;			// Rudder  deflection (deg)
+	double		rudder_PCT;			// Rudder deflection as a percent of maximum (-1 to 1)
 
 public:
 	F16FlightSurface()
 		: leadingEdgeFlap_DEG(0)
 		, leadingEdgeFlap_PCT(0)
+		, flap_Command(0)
 		, flap_DEG(0)
 		, flap_PCT(0)
 		, elevator_DEG(0)

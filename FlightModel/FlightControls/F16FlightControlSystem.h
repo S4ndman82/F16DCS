@@ -73,12 +73,12 @@ protected:
 	F16FcsTrailingFlapController flapControl;
 	F16FcsAirbrakeController airbrakeControl;
 
-	/* check: might be better to have these here due to complexity of dependencies..
-	F16Actuator		elevatorActuatorLeft;
-	F16Actuator		elevatorActuatorRight;
+	//check: might be better to have these here due to complexity of dependencies..
 	F16Actuator		flaperonActuatorLeft;
 	F16Actuator		flaperonActuatorRight;
-	*/
+	F16Actuator		elevatorActuatorLeft;
+	F16Actuator		elevatorActuatorRight;
+	F16Actuator		rudderActuator;
 
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 	bool manualPitchOverride;
@@ -109,6 +109,11 @@ public:
 		, leadingedgeControl(&bodyState, &flightSurface)
 		, flapControl(&bodyState, &flightSurface)
 		, airbrakeControl(&bodyState, &flightSurface)
+		, flaperonActuatorLeft(1) // <- placeholder value
+		, flaperonActuatorRight(1) // <- placeholder value
+		, elevatorActuatorLeft(1) // <- placeholder value
+		, elevatorActuatorRight(1) // <- placeholder value
+		, rudderActuator(1.0, -30.0, 30.0)
 		, manualPitchOverride(false)
 		, gearLevelStatus(false)
 	{}
@@ -226,6 +231,8 @@ public:
 		pitchControl.fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_kNM2, frametime);
 		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), trimState.trimRoll, pAtmos->dynamicPressure, frametime);
 		yawControl.fcs_yaw_controller(pedInput.getValue(), trimState.trimYaw, pitchControl.getAlphaFiltered(), flightSurface.aileron_DEG, frametime);
+
+		// TODO: combine flap control with aileron control commands
 
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
