@@ -108,6 +108,9 @@ public:
 	double		rudder_DEG;			// Rudder  deflection (deg)
 	double		rudder_PCT;			// Rudder deflection as a percent of maximum (-1 to 1)
 
+	double		airbrake_Right_PCT;
+	double		airbrake_Left_PCT;
+
 public:
 	F16FlightSurface()
 		: leadingEdgeFlap_DEG(0)
@@ -125,6 +128,8 @@ public:
 		, aileron_Left_PCT(0)
 		, rudder_DEG(0)
 		, rudder_PCT(0)
+		, airbrake_Right_PCT(0)
+		, airbrake_Left_PCT(0)
 	{}
 	~F16FlightSurface() {}
 };

@@ -209,18 +209,12 @@ public:
 	// right-side draw argument
 	float getAirbrakeRSDraw() const
 	{
-		// TODO: value from degrees to percentages here
-
-		// use same for both sides for now
-		return (float)airbrakeControl.airbrakeActuator.m_current;
+		return (float)flightSurface.airbrake_Right_PCT;
 	}
 	// left-side draw argument
 	float getAirbrakeLSDraw() const
 	{
-		// TODO: value from degrees to percentages here
-
-		// use same for both sides for now
-		return (float)airbrakeControl.airbrakeActuator.m_current;
+		return (float)flightSurface.airbrake_Left_PCT;
 	}
 
 	// before simulation starts

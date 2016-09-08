@@ -95,6 +95,10 @@ public:
 		}
 		airbrakeActuator.updateFrame(frameTime);
 
+		// just use same for both sides for now
+		flightSurface->airbrake_Right_PCT = airbrakeActuator.m_current;
+		flightSurface->airbrake_Left_PCT = airbrakeActuator.m_current;
+
 
 		// after actuator move, calculate new drag at new position
 
