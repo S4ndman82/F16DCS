@@ -136,11 +136,11 @@ public:
 	~F16Aero() {}
 	void initfn();
 
-	void updateFrame(const double alpha_DEG, const double beta_DEG, const double elevator_DEG, const double frameTime)
+	void updateFrame(const F16BodyState &bstate, F16FlightSurface &fsurf, const double frameTime)
 	{
-		const double alpha = limit(alpha_DEG, -20.0, 90.0);
-		const double beta = limit(beta_DEG, -30.0, 30.0);
-		const double el = elevator_DEG;
+		const double alpha = limit(bstate.alpha_DEG, -20.0, 90.0);
+		const double beta = limit(bstate.beta_DEG, -30.0, 30.0);
+		const double el = fsurf.elevator_DEG;
 
 		// TODO: speed brake handling..
 		// TODO Speedbrakes aero (from JBSim F16.xml config)
@@ -251,15 +251,11 @@ public:
 		const double meanChordFPS = (F16::meanChord_FT / totalVelocity_FPS);
 		const double wingSpanFPS = (F16::wingSpan_FT / totalVelocity_FPS);
 
+		// TODO: left/right side when they can differ according to flight control system
 		const double flap_PCT = fsurf.flap_Right_PCT;
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double aileron_PCT = fsurf.aileron_Right_PCT;
 		const double rudder_PCT = fsurf.rudder_PCT;
-		const double pitchRate_RPS = bstate.pitchRate_RPS;
-		const double rollRate_RPS = bstate.rollRate_RPS;
-		const double yawRate_RPS = bstate.yawRate_RPS;
-		const double alpha_DEG = bstate.alpha_DEG;
-		const double beta_DEG = bstate.beta_DEG;
 
 
 		// TODO: dynamic CG to calculations, uses hardcoded "real" position now
@@ -296,12 +292,12 @@ public:
 		// FLAPS (From JBSim F16.xml config)
 		double CLFlaps = 0.35 * flap_PCT;
 		double CDFlaps = 0.08 * flap_PCT;
-		double CzFlaps = - (CLFlaps * cos(alpha_DEG * F16::degtorad) + CDFlaps * sin(F16::degtorad));
-		double CxFlaps = - (-CLFlaps * sin(alpha_DEG * F16::degtorad) + CDFlaps * cos(F16::degtorad));
+		double CzFlaps = -(CLFlaps * cos(bstate.alpha_DEG * F16::degtorad) + CDFlaps * sin(F16::degtorad));
+		double CxFlaps = -(-CLFlaps * sin(bstate.alpha_DEG * F16::degtorad) + CDFlaps * cos(F16::degtorad));
 
 		/* XXXXXXXX Cx_tot XXXXXXXX */
 		double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
-		Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*pitchRate_RPS;
+		Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
 		Cx_total += CxFlaps + LgCxGearAero;
 
 		/* airbrake - testing now*/
@@ -309,34 +305,34 @@ public:
 
 		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
 		double dZdQ = meanChordFPS * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
-		Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*pitchRate_RPS;
+		Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
 		Cz_total += CzFlaps + LgCzGearAero;
 
 		/* MMMMMMMM Cm_tot MMMMMMMM */ 
 		/* ignore deep-stall regime, delta_Cm_ds = 0 */
 		double dMdQ = meanChordFPS * (fn_CMq.m_result + fn_delta_CMq_lef.m_result*leadingEdgeFlap_PCT);
 		double CmDelta = fn_delta_Cm.m_result + 0; // Cm_delta + Cm_delta_ds (0)
-		Cm_total = fn_Cm.m_result*fn_eta_el.m_result + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*pitchRate_RPS + CmDelta;
+		Cm_total = fn_Cm.m_result*fn_eta_el.m_result + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
 		double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT;
 		double dYdR = wingSpanFPS * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
 		double dYdP = wingSpanFPS * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
-		Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + dYdail*aileron_PCT + Cy_delta_r30*rudder_PCT + dYdR*yawRate_RPS + dYdP*rollRate_RPS;
+		Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + dYdail*aileron_PCT + Cy_delta_r30*rudder_PCT + dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
 	
 		/* NNNNNNNN Cn_tot NNNNNNNN */ 
 		double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT;
 		double dNdR = wingSpanFPS * (fn_CNr.m_result + fn_delta_CNr_lef.m_result*leadingEdgeFlap_PCT);
 		double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
-		double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*beta_DEG;
-		Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + dNdail*aileron_PCT + Cn_delta_r30*rudder_PCT + dNdR*yawRate_RPS + dNdP*rollRate_RPS + CnDeltaBetaDeg;
+		double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*bstate.beta_DEG;
+		Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + dNdail*aileron_PCT + Cn_delta_r30*rudder_PCT + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS + CnDeltaBetaDeg;
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
 		double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT;
 		double dLdR = wingSpanFPS * (fn_CLr.m_result + fn_delta_CLr_lef.m_result*leadingEdgeFlap_PCT);
 		double dLdP = wingSpanFPS * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
-		double ClDeltaBetaDeg = fn_delta_CLbeta.m_result*beta_DEG;
-		Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + dLdail*aileron_PCT + Cl_delta_r30*rudder_PCT + dLdR*yawRate_RPS + dLdP*rollRate_RPS + ClDeltaBetaDeg;
+		double ClDeltaBetaDeg = fn_delta_CLbeta.m_result*bstate.beta_DEG;
+		Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + dLdail*aileron_PCT + Cl_delta_r30*rudder_PCT + dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS + ClDeltaBetaDeg;
 	}
 
 
