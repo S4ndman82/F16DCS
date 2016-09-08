@@ -717,22 +717,22 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[5].f = (float)F16::LandingGear.wheelLeft.getStrutAngle(); // gear angle {0;1}
 	drawargs[6].f = (float)F16::LandingGear.wheelLeft.getStrutCompression(); // strut compression {0;0.5;1}
 
-	drawargs[9].f = (float)F16::FlightControls.flightSurface.flap_PCT; // right flap (trailing edge surface)
-	drawargs[10].f = (float)F16::FlightControls.flightSurface.flap_PCT; // left flap (trailing edge surface)
+	drawargs[9].f = F16::FlightControls.getFlapRSDraw(); // right flap (trailing edge surface)
+	drawargs[10].f = F16::FlightControls.getFlapLSDraw(); // left flap (trailing edge surface)
 
-	drawargs[11].f = (float)-F16::FlightControls.flightSurface.aileron_PCT; // right aileron (trailing edge surface) (in 3D model anim also on elevator)
-	drawargs[12].f = (float)F16::FlightControls.flightSurface.aileron_PCT; // left aileron (trailing edge surface) (in 3D model anim also on elevator)
+	drawargs[11].f = F16::FlightControls.getAileronRSDraw(); // right aileron (trailing edge surface)
+	drawargs[12].f = F16::FlightControls.getAileronLSDraw(); // left aileron (trailing edge surface)
 
-	drawargs[13].f = (float)F16::FlightControls.flightSurface.leadingEdgeFlap_PCT; // right slat (leading edge)
-	drawargs[14].f = (float)F16::FlightControls.flightSurface.leadingEdgeFlap_PCT; // left slat (leading edge)
+	drawargs[13].f = F16::FlightControls.getLefRSDraw(); // right slat (leading edge)
+	drawargs[14].f = F16::FlightControls.getLefLSDraw(); // left slat (leading edge)
 
-	drawargs[15].f = (float)-F16::FlightControls.flightSurface.elevator_PCT; // right elevator
-	drawargs[16].f = (float)-F16::FlightControls.flightSurface.elevator_PCT; // left elevator
+	drawargs[15].f = F16::FlightControls.getElevatorRSDraw(); // right elevator
+	drawargs[16].f = F16::FlightControls.getElevatorLSDraw(); // left elevator
 
-	drawargs[17].f = (float)F16::FlightControls.flightSurface.rudder_PCT; // right rudder
-	drawargs[18].f = (float)-F16::FlightControls.flightSurface.rudder_PCT; // left rudder
+	drawargs[17].f = F16::FlightControls.getRudderDraw(); // right rudder
+	drawargs[18].f = -F16::FlightControls.getRudderDraw(); // left rudder
 
-	drawargs[22].f = (float)F16::Airframe.getRefuelingDoorAngle(); // refueling door (not implemented)
+	drawargs[22].f = F16::Airframe.getRefuelingDoorAngle(); // refueling door (not implemented)
 
 	drawargs[28].f = (float)F16::EMS.getAfterburnerDraw(); // afterburner right engine
 	//drawargs[290..291].f // nozzle rotation?
@@ -746,8 +746,8 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 
 	//drawargs[182].f // right-side brake flaps 0..1
 	//drawargs[186].f // left-side brake flaps 0..1
-	drawargs[182].f = F16::FlightControls.getAirbrakeRSAngle();
-	drawargs[186].f = F16::FlightControls.getAirbrakeLSAngle();
+	drawargs[182].f = F16::FlightControls.getAirbrakeRSDraw();
+	drawargs[186].f = F16::FlightControls.getAirbrakeLSDraw();
 
 	// navigation lights
 	drawargs[49].f = F16::Airframe.isNavigationLight();

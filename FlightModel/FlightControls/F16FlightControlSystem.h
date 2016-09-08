@@ -154,16 +154,68 @@ public:
 		airbrakeControl.toggleAirbrake();
 	}
 
-	// right-side
-	float getAirbrakeRSAngle() const
+	// right-side leading-edge flap draw argument
+	float getLefRSDraw() const
+	{
+		return (float)flightSurface.leadingEdgeFlap_PCT;
+	}
+	// left-side leading-edge flap draw argument
+	float getLefLSDraw() const
+	{
+		return (float)flightSurface.leadingEdgeFlap_PCT;
+	}
+
+	// right-side trailing-edge flap draw argument
+	float getFlapRSDraw() const
+	{
+		return (float)flightSurface.flap_PCT;
+	}
+	// left-side trailing-edge flap draw argument
+	float getFlapLSDraw() const
+	{
+		return (float)flightSurface.flap_PCT;
+	}
+
+	// right-side aileron draw argument
+	float getAileronRSDraw() const
+	{
+		return (float)-flightSurface.aileron_PCT;
+	}
+
+	// left-side aileron draw argument
+	float getAileronLSDraw() const
+	{
+		return (float)flightSurface.aileron_PCT;
+	}
+
+	// right-side elevator draw argument
+	float getElevatorRSDraw() const
+	{
+		return (float)-flightSurface.elevator_PCT;
+	}
+
+	// left-side elevator draw argument
+	float getElevatorLSDraw() const
+	{
+		return (float)-flightSurface.elevator_PCT;
+	}
+
+	// rudder draw argument
+	float getRudderDraw() const
+	{
+		return (float)flightSurface.rudder_PCT;
+	}
+
+	// right-side draw argument
+	float getAirbrakeRSDraw() const
 	{
 		// TODO: value from degrees to percentages here
 
 		// use same for both sides for now
 		return (float)airbrakeControl.airbrakeActuator.m_current;
 	}
-	// left-side
-	float getAirbrakeLSAngle() const
+	// left-side draw argument
+	float getAirbrakeLSDraw() const
 	{
 		// TODO: value from degrees to percentages here
 
