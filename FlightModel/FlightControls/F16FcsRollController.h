@@ -137,7 +137,8 @@ public:
 		//if (flightSurface->flap_Command > 0)
 
 		flightSurface->aileron_DEG = limit(rollActuatorCommand, -21.5, 21.5);
-		flightSurface->aileron_PCT = flightSurface->aileron_DEG / 21.5;
+		flightSurface->aileron_Right_PCT = flightSurface->aileron_DEG / 21.5;
+		flightSurface->aileron_Left_PCT = flightSurface->aileron_DEG / 21.5;
 
 		return rollActuatorCommand;
 	}

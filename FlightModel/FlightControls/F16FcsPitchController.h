@@ -156,8 +156,10 @@ public:
 		double finalPitchCommandTotal = pitchPreActuatorFilter.Filter(dt, finalCombinedCommandFilteredLimited);
 		finalPitchCommandTotal += (0.5 * m_alphaFiltered);
 
+		// TODO: separate movements on opposing side (with roll authority)
 		flightSurface->elevator_DEG = limit(-finalPitchCommandTotal, -25.0, 25.0);
-		flightSurface->elevator_PCT = flightSurface->elevator_DEG / 25.0;
+		flightSurface->elevator_Right_PCT = flightSurface->elevator_DEG / 25.0;
+		flightSurface->elevator_Left_PCT = flightSurface->elevator_DEG / 25.0;
 
 		return finalPitchCommandTotal;
 

@@ -157,12 +157,12 @@ public:
 	// right-side leading-edge flap draw argument
 	float getLefRSDraw() const
 	{
-		return (float)flightSurface.leadingEdgeFlap_PCT;
+		return (float)flightSurface.leadingEdgeFlap_Right_PCT;
 	}
 	// left-side leading-edge flap draw argument
 	float getLefLSDraw() const
 	{
-		return (float)flightSurface.leadingEdgeFlap_PCT;
+		return (float)flightSurface.leadingEdgeFlap_Left_PCT;
 	}
 
 	// right-side trailing-edge flap draw argument
@@ -179,25 +179,25 @@ public:
 	// right-side aileron draw argument
 	float getAileronRSDraw() const
 	{
-		return (float)-flightSurface.aileron_PCT;
+		return (float)-flightSurface.aileron_Right_PCT;
 	}
 
 	// left-side aileron draw argument
 	float getAileronLSDraw() const
 	{
-		return (float)flightSurface.aileron_PCT;
+		return (float)flightSurface.aileron_Left_PCT;
 	}
 
 	// right-side elevator draw argument
 	float getElevatorRSDraw() const
 	{
-		return (float)-flightSurface.elevator_PCT;
+		return (float)-flightSurface.elevator_Right_PCT;
 	}
 
 	// left-side elevator draw argument
 	float getElevatorLSDraw() const
 	{
-		return (float)-flightSurface.elevator_PCT;
+		return (float)-flightSurface.elevator_Left_PCT;
 	}
 
 	// rudder draw argument
