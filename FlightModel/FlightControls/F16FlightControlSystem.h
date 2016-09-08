@@ -168,12 +168,12 @@ public:
 	// right-side trailing-edge flap draw argument
 	float getFlapRSDraw() const
 	{
-		return (float)flightSurface.flap_PCT;
+		return (float)flightSurface.flap_Right_PCT;
 	}
 	// left-side trailing-edge flap draw argument
 	float getFlapLSDraw() const
 	{
-		return (float)flightSurface.flap_PCT;
+		return (float)flightSurface.flap_Left_PCT;
 	}
 
 	// right-side aileron draw argument

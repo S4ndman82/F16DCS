@@ -81,7 +81,8 @@ public:
 		actuator.updateFrame(frametime);
 
 		flightSurface->flap_DEG = actuator.m_current;
-		flightSurface->flap_PCT = actuator.m_current / 20.0;
+		flightSurface->flap_Right_PCT = actuator.m_current / 20.0;
+		flightSurface->flap_Left_PCT = actuator.m_current / 20.0;
 	}
 };
 

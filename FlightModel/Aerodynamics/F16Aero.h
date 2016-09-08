@@ -13,6 +13,7 @@
 #include "F16AeroData.h"
 #include "F16AeroFunction.h"
 
+#include "FlightControls/F16FcsCommon.h"
 
 class F16Aero
 {
@@ -242,16 +243,24 @@ public:
 	compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
 	(as on NASA report p37-40)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-	void computeTotals(const double AtmosTotalVelocity_FPS, const double diffCgPCT,
-					const double flap_PCT, const double leadingEdgeFlap_PCT, const double aileron_PCT, const double rudder_PCT,
-					const double pitchRate_RPS, const double rollRate_RPS, const double yawRate_RPS, 
-					const double alpha_DEG, const double beta_DEG, const double LgCxGearAero, const double LgCzGearAero,
-					const double CxAirbrake)
+	void computeTotals(const double AtmosTotalVelocity_FPS, const double diffCgPCT, F16FlightSurface &fsurf, F16BodyState &bstate,
+					const double LgCxGearAero, const double LgCzGearAero, const double CxAirbrake)
 	{
 		// precalculate some terms to simplify statements
 		const double totalVelocity_FPS = 2*AtmosTotalVelocity_FPS; // <- is this a bug?
 		const double meanChordFPS = (F16::meanChord_FT / totalVelocity_FPS);
 		const double wingSpanFPS = (F16::wingSpan_FT / totalVelocity_FPS);
+
+		const double flap_PCT = fsurf.flap_Right_PCT;
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double aileron_PCT = fsurf.aileron_Right_PCT;
+		const double rudder_PCT = fsurf.rudder_PCT;
+		const double pitchRate_RPS = bstate.pitchRate_RPS;
+		const double rollRate_RPS = bstate.rollRate_RPS;
+		const double yawRate_RPS = bstate.yawRate_RPS;
+		const double alpha_DEG = bstate.alpha_DEG;
+		const double beta_DEG = bstate.beta_DEG;
+
 
 		// TODO: dynamic CG to calculations, uses hardcoded "real" position now
 		// (check: does this actually consider the RSS lift at non-CG position?)

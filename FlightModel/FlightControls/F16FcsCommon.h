@@ -94,7 +94,8 @@ public:
 
 	double		flap_Command;		// command from tef controller (position), can be adjusted by roll controller?
 	double		flap_DEG;			// Trailing edge flap deflection (deg)
-	double		flap_PCT;			// Trailing edge flap deflection (0 to 1)
+	double		flap_Right_PCT;			// Trailing edge flap deflection (0 to 1)
+	double		flap_Left_PCT;			// Trailing edge flap deflection (0 to 1)
 
 	double		elevator_DEG;			// Elevator deflection (deg)
 	double		elevator_Right_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
@@ -114,7 +115,8 @@ public:
 		, leadingEdgeFlap_Left_PCT(0)
 		, flap_Command(0)
 		, flap_DEG(0)
-		, flap_PCT(0)
+		, flap_Right_PCT(0)
+		, flap_Left_PCT(0)
 		, elevator_DEG(0)
 		, elevator_Right_PCT(0)
 		, elevator_Left_PCT(0)

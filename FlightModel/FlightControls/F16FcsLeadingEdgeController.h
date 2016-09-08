@@ -62,7 +62,11 @@ public:
 			leading_edge_flap_integrated = leading_edge_flap_integral + 2 * bodyState->alpha_DEG;
 
 			flightSurface->leadingEdgeFlap_DEG = leading_edge_flap_integral;
-			flightSurface->leadingEdgeFlap_PCT = limit(leading_edge_flap_integral / 25.0, 0.0, 1.0);
+
+			double lef_PCT = limit(leading_edge_flap_integral / 25.0, 0.0, 1.0);
+
+			flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
+			flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;
 			return;
 		}
 
