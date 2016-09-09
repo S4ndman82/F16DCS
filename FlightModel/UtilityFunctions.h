@@ -332,20 +332,29 @@ double limit(double input, double lower_limit, double upper_limit)
 }
 
 // check if there's need to keep configurable limits somewhere..
-class Limiter
+// changed to template for supporting different types
+template<typename T> class Limiter
 {
 public:
-	double lower_limit;
-	double upper_limit;
+	const T lower_limit;
+	const T upper_limit;
 
-	Limiter(double lower, double upper)
+	Limiter(const T lower, const T upper)
 		: lower_limit(lower), upper_limit(upper) 
 	{}
 	~Limiter() {}
 
-	double limit(double input)
+	T limit(const T input) const
 	{
-		return ::limit(input, lower_limit, upper_limit);
+		if (input > upper_limit)
+		{
+			return upper_limit;
+		}
+		else if (input < lower_limit)
+		{
+			return lower_limit;
+		}
+		return input;
 	}
 };
 
