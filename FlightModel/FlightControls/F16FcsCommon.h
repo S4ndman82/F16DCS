@@ -109,8 +109,15 @@ public:
 	double		rudder_DEG;			// Rudder  deflection (deg)
 	double		rudder_PCT;			// Rudder deflection as a percent of maximum (-1 to 1)
 
+	double		airbrake_Command;
 	double		airbrake_Right_PCT;
 	double		airbrake_Left_PCT;
+
+	// new set of commands: split from old code,
+	// then code in mixer to determine combinations of surfaces
+	double		pitch_Command;
+	double		roll_Command;
+	double		yaw_Command;
 
 public:
 	F16FlightSurface()
@@ -130,8 +137,12 @@ public:
 		, aileron_Left_PCT(0)
 		, rudder_DEG(0)
 		, rudder_PCT(0)
+		, airbrake_Command(0)
 		, airbrake_Right_PCT(0)
 		, airbrake_Left_PCT(0)
+		, pitch_Command(0)
+		, roll_Command(0)
+		, yaw_Command(0)
 	{}
 	~F16FlightSurface() {}
 };

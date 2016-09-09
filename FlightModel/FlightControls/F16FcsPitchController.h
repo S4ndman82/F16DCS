@@ -161,6 +161,8 @@ public:
 		flightSurface->elevator_Right_PCT = flightSurface->elevator_DEG / 25.0;
 		flightSurface->elevator_Left_PCT = flightSurface->elevator_DEG / 25.0;
 
+		flightSurface->pitch_Command = finalPitchCommandTotal;
+
 		return finalPitchCommandTotal;
 
 		// TODO: There are problems with flutter with the servo dynamics...needs to be nailed down!

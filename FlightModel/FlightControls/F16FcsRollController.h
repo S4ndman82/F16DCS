@@ -128,7 +128,7 @@ public:
 		double rollCommandGained = limit(rollRateCommandCombined * pressureGain, -21.5, 21.5);
 
 		// Mechanical servo dynamics
-		double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(dt, rollCommandGained);
+		//double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(dt, rollCommandGained);
 
 		// if trailing edge flaps are used, only adjust instead of full control?
 		if (flightSurface->flap_Command > 0)
@@ -136,14 +136,16 @@ public:
 			// one side stays at maximum, other side can lift
 		}
 
-		flightSurface->aileron_DEG = limit(rollActuatorCommand, -21.5, 21.5);
+		flightSurface->aileron_DEG = limit(rollCommandGained, -21.5, 21.5);
 		flightSurface->aileron_Right_PCT = flightSurface->aileron_DEG / 21.5;
 		flightSurface->aileron_Left_PCT = flightSurface->aileron_DEG / 21.5;
 
 		// also, using elevators for roll control:
 		// hta proportional to fl deflection: 0.294 of fl deflection in some condition
 
-		return rollActuatorCommand;
+		flightSurface->roll_Command = rollCommandGained;
+
+		return rollCommandGained;
 	}
 
 public:

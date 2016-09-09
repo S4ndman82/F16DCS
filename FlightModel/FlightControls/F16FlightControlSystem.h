@@ -303,7 +303,7 @@ public:
 
 		pitchControl.fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_kNM2, frametime);
 		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), trimState.trimRoll, pAtmos->dynamicPressure, frametime);
-		yawControl.fcs_yaw_controller(pedInput.getValue(), trimState.trimYaw, pitchControl.getAlphaFiltered(), flightSurface.aileron_DEG, frametime);
+		yawControl.fcs_yaw_controller(pedInput.getValue(), trimState.trimYaw, pitchControl.getAlphaFiltered(), frametime);
 
 		// TODO: combine flap control with aileron control commands
 
@@ -327,6 +327,11 @@ public:
 
 		// pitch was already calculated? -> just modify
 		//flightSurface.elevator_DEG += flightSurface.elevon_DEG;
+
+		// determine roll command for
+		// ailerons (flaperons) and elevons (differential stabilizers),
+		// actuator/servo dynamics
+		//flightSurface->roll_Command = rollCommandGained;
 
 
 	}

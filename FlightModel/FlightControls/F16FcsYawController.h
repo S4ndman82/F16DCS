@@ -45,7 +45,7 @@ public:
 	}
 
 	// Controller for yaw
-	double fcs_yaw_controller(double pedInput, double trimYaw, double alphaFiltered, double aileron_commanded, double dt)
+	double fcs_yaw_controller(double pedInput, double trimYaw, double alphaFiltered, double dt)
 	{
 		const double roll_rate = bodyState->getRollRateDegs();
 		const double yaw_rate = bodyState->getYawRateDegs();
@@ -64,12 +64,16 @@ public:
 
 		double yawRateFilteredWithSideAccel = yawRateWithRollFiltered;// + (ay * 19.3);
 
-		double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * aileron_commanded;
+	
+		// TODO: use flightSurface->roll_Command instead?
+		double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * flightSurface->aileron_DEG;
 
 		double finalRudderCommand = aileronGained + yawRateFilteredWithSideAccel + rudderCommandFilteredWTrim;
 
 		flightSurface->rudder_DEG = limit(finalRudderCommand, -30.0, 30.0);
 		flightSurface->rudder_PCT = flightSurface->rudder_DEG / 30.0;
+
+		flightSurface->yaw_Command = finalRudderCommand;
 
 		return finalRudderCommand;
 

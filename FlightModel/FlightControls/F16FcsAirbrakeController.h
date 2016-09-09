@@ -83,6 +83,7 @@ public:
 		// if gear down but no weight on wheel -> restricted
 		// controlled by additional switch in cockpit?
 
+		flightSurface->airbrake_Command = maxAnglePCT;
 		if (airbrakeSwitch == true)
 		{
 			// open to max allowed by limit
