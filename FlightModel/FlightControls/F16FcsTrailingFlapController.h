@@ -35,8 +35,14 @@ protected:
 		const double tef_min = 0.0;
 		const double tef_max = 20.0;
 
+		// TODO: electrical bias on adjustment?
+
+		// also bit of flaps in transonic speeds?
+		// 
+
 		/*
 		// lower tef by some degrees?
+		// triggered by refueling trap door?
 		if (isAirRefuelMode == true)
 		{
 			return 5.0; // <- just some value for placeholder
@@ -98,8 +104,12 @@ public:
 	//
 	// In normal flight, flaps are used like normal ailerons.
 	//
-	void updateFrame(bool gearLevelUp, double airspeed_KTS, double frametime)
+	void updateFrame(bool gearLevelUp, double airspeed_KTS, double qbarOverPs, double frametime)
 	{
+		// flaps in transonic speeds? 
+		// -2 deg when qbarOverPs >= 1.008
+		// 0..-2 deg when qbarOverPs >= 0.787 && qbarOverPs <= 1.008
+
 		flightSurface->flap_Command = fcs_flap_controller(gearLevelUp, airspeed_KTS);
 		actuator.commandMove(flightSurface->flap_Command);
 		actuator.updateFrame(frametime);

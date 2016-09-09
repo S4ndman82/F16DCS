@@ -274,7 +274,7 @@ public:
 	void updateFrame(double frametime)
 	{
 		double dynamicPressure_kNM2 = pAtmos->dynamicPressure / 1000.0; //for kN/m^2
-		// stagnation pressure?
+		// stagnation pressure? (used to detect transonic speeds?)
 		double qbarOverPs = pAtmos->dynamicPressure / pAtmos->ambientPressure;
 
 		// landing gear "down&locked" affects some logic
@@ -310,7 +310,7 @@ public:
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flapControl.updateFrame(gearLevelStatus, pAtmos->getTotalVelocityKTS(), frametime);
+		flapControl.updateFrame(gearLevelStatus, pAtmos->getTotalVelocityKTS(), qbarOverPs, frametime);
 
 		//
 		fcsMixer(frametime);
