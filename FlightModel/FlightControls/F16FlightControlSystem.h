@@ -23,6 +23,7 @@
 #include "F16FcsAirbrakeController.h"
 
 #include "LandingGear/F16LandingGear.h"
+#include "Airframe/F16Airframe.h"
 
 /*
 sources:
@@ -50,6 +51,7 @@ class F16FlightControls
 public:
 	F16Atmosphere *pAtmos;
 	F16LandingGear *landingGear; // affecting some logic
+	F16Airframe *airframe;
 
 	F16BodyState bodyState;
 	F16FlightSurface flightSurface;
@@ -115,9 +117,10 @@ protected:
 	*/
 
 public:
-	F16FlightControls(F16Atmosphere *atmos, F16LandingGear *lgear)
+	F16FlightControls(F16Atmosphere *atmos, F16LandingGear *lgear, F16Airframe *aframe)
 		: pAtmos(atmos)
 		, landingGear(lgear)
+		, airframe(aframe)
 		, bodyState()
 		, flightSurface()
 		//, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
@@ -127,9 +130,9 @@ public:
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
-		, pitchControl(&bodyState, &flightSurface)
-		, rollControl(&bodyState, &flightSurface)
-		, yawControl(&bodyState, &flightSurface)
+		, pitchControl(&bodyState, &flightSurface, &trimState)
+		, rollControl(&bodyState, &flightSurface, &trimState)
+		, yawControl(&bodyState, &flightSurface, &trimState)
 		, leadingedgeControl(&bodyState, &flightSurface)
 		, flapControl(&bodyState, &flightSurface)
 		, airbrakeControl(&bodyState, &flightSurface)
@@ -280,6 +283,9 @@ public:
 		// landing gear "down&locked" affects some logic
 		isGearDown = landingGear->isGearDownLocked();
 		gearLevelStatus = landingGear->getGearLevelStatus();
+
+		// TODO: affecting flaps logic when air refuel triggered
+		//bool refuelingDoor = (airframe->getRefuelingDoorAngle() ? true : false);
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step

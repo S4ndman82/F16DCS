@@ -17,6 +17,7 @@ class F16FcsRollController
 protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
+	F16TrimState *trimState;
 
 	DummyFilter	latStickForceFilter;
 	DummyFilter	rollCommandFilter;
@@ -149,9 +150,10 @@ public:
 	}
 
 public:
-	F16FcsRollController(F16BodyState *bs, F16FlightSurface *fs) :
+	F16FcsRollController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
 		bodyState(bs),
 		flightSurface(fs),
+		trimState(ts),
 		latStickForceFilter(),
 		rollCommandFilter(),
 		rollActuatorDynamicsFilter(),

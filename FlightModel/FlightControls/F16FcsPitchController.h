@@ -21,6 +21,7 @@ protected:
 
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
+	F16TrimState *trimState;
 
 	DummyFilter	pitchRateWashout;
 	DummyFilter	pitchIntegrator;
@@ -171,13 +172,14 @@ public:
 	}
 
 public:
-	F16FcsPitchController(F16BodyState *bs, F16FlightSurface *fs) :
+	F16FcsPitchController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
 		m_stickCommandPosFiltered(0),
 		m_alphaFiltered(0),
 		m_longStickForce(0),
 		m_latStickForce(0),
 		bodyState(bs),
 		flightSurface(fs),
+		trimState(ts),
 		pitchRateWashout(),
 		pitchIntegrator(),
 		pitchPreActuatorFilter(),

@@ -125,12 +125,12 @@ namespace F16
 
 	F16Atmosphere Atmos;
 	F16GroundSurface Ground(&Atmos);
-	F16Aero Aero;
+	F16Aero Aero(&Atmos, &Ground);
 	F16FuelSystem Fuel;
+	F16Airframe Airframe;
 	F16EngineManagementSystem EMS(&Atmos, &Fuel);
 	F16LandingGear LandingGear(&Atmos, &Ground);
-	F16FlightControls FlightControls(&Atmos, &LandingGear);
-	F16Airframe Airframe;
+	F16FlightControls FlightControls(&Atmos, &LandingGear, &Airframe);
 	F16Motion Motion(&Atmos);
 	F16HydraulicSystem Hydraulics;
 	F16ElectricSystem Electrics;

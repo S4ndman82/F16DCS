@@ -15,9 +15,15 @@
 
 #include "FlightControls/F16FcsCommon.h"
 
+#include "Atmosphere/F16Atmosphere.h"
+#include "Atmosphere/F16GroundSurface.h"
+
 class F16Aero
 {
 protected:
+	F16Atmosphere *pAtmos;
+	F16GroundSurface *pGrounds;
+
 	double		Cx_total;
 	double		Cz_total;
 	double		Cm_total;
@@ -75,7 +81,9 @@ protected:
 	AERO_Function fn_eta_el;
 
 public:
-	F16Aero() :
+	F16Aero(F16Atmosphere *atmos, F16GroundSurface *grounds) :
+		pAtmos(atmos),
+		pGrounds(grounds),
 		Cx_total(0),
 		Cz_total(0),
 		Cm_total(0),
