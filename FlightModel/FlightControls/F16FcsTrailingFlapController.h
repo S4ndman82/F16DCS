@@ -38,6 +38,8 @@ protected:
 			return tef_max;
 		}
 
+		// also: hydraulic pressure limit on startup/shutdown?
+
 		if (airspeed_KTS < 240.0)
 		{
 			return tef_max;

@@ -131,13 +131,17 @@ public:
 		double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(dt, rollCommandGained);
 
 		// if trailing edge flaps are used, only adjust instead of full control?
-		// also, using elevators for roll control?
-		// hta proportional to fl deflection: 0.294 of fl deflection in some condition
-		//if (flightSurface->flap_Command > 0)
+		if (flightSurface->flap_Command > 0)
+		{
+			// one side stays at maximum, other side can lift
+		}
 
 		flightSurface->aileron_DEG = limit(rollActuatorCommand, -21.5, 21.5);
 		flightSurface->aileron_Right_PCT = flightSurface->aileron_DEG / 21.5;
 		flightSurface->aileron_Left_PCT = flightSurface->aileron_DEG / 21.5;
+
+		// also, using elevators for roll control:
+		// hta proportional to fl deflection: 0.294 of fl deflection in some condition
 
 		return rollActuatorCommand;
 	}
