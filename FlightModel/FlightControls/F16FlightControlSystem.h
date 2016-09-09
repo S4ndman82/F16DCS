@@ -85,6 +85,11 @@ protected:
 	F16Actuator		elevonActuatorRight;
 	F16Actuator		rudderActuator;
 
+	Limiter<double>		flaperonLimiter;
+	Limiter<double>		htailLimiter;
+	Limiter<double>		rudderLimiter;
+
+
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 	bool manualPitchOverride;
 
@@ -133,6 +138,9 @@ public:
 		, elevonActuatorLeft(1) // <- placeholder value
 		, elevonActuatorRight(1) // <- placeholder value
 		, rudderActuator(1.0, -30.0, 30.0)
+		, flaperonLimiter(-20, 20) // deflection limit for both sides
+		, htailLimiter(-25, 25) // stab. deflection limits
+		, rudderLimiter(-30, 30) // deflection limit
 		, manualPitchOverride(false)
 		, gearLevelStatus(false)
 	{}

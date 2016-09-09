@@ -18,8 +18,6 @@ protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
 
-	Limiter<double>		flaperonLimiter;
-
 	DummyFilter	latStickForceFilter;
 	DummyFilter	rollCommandFilter;
 	DummyFilter	rollActuatorDynamicsFilter;
@@ -148,7 +146,6 @@ public:
 	F16FcsRollController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
-		flaperonLimiter(-20, 20), // deflection limit for both sides
 		latStickForceFilter(),
 		rollCommandFilter(),
 		rollActuatorDynamicsFilter(),

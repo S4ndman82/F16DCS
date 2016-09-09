@@ -81,10 +81,9 @@ public:
 		leading_edge_flap_integrated_gained = leading_edge_flap_integrated * 1.38;
 		leading_edge_flap_integrated_gained_biased = leading_edge_flap_integrated_gained + 1.45 - (9.05 * qbarOverPs);
 
-		flightSurface->leadingEdgeFlap_DEG = leading_edge_flap_integrated_gained_biased;
+		flightSurface->leadingEdgeFlap_DEG = lefLimiter.limit(leading_edge_flap_integrated_gained_biased);
 
 		double lef_PCT = limit(leading_edge_flap_integrated_gained_biased / 25.0, 0.0, 1.0);
-
 		flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
 		flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;
 	}
