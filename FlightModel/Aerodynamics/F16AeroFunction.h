@@ -12,22 +12,26 @@
 // and related buffers and configuration for each calculation
 class AERO_Function
 {
+private:
+	// disallow copies
+	AERO_Function(const AERO_Function &other) {}
+	AERO_Function& operator=(const AERO_Function &other) { return *this; }
+
 protected:
 
 	// stuff only for temporary use,
 	// avoid reallocations
 	UtilBuffer<int> indexVector;
+	UtilBuffer<double> m_Tbuf; // reusable buffer to reduce malloc()/free()
+
+	UtilMatrix<double> m_xPointMat; // used in interpolation, reduce reallocation
+	UtilMatrix<int> m_indexMat; // used in interpolation, reduce reallocation
 
 public:
 	ND_INFO ndinfo; // dimensions descriptor
 
 	double **m_Xmat; // pointers to static arrays of data (X matrix)
 	double *m_Ydata; // pointer to static array of related data (Y)
-
-	UtilBuffer<double> m_Tbuf; // reusable buffer to reduce malloc()/free()
-
-	UtilMatrix<double> m_xPointMat; // used in interpolation, reduce reallocation
-	UtilMatrix<int> m_indexMat; // used in interpolation, reduce reallocation
 
 	//double *xPar; // parameters for interpolation (1-3 pars)
 	double m_xPar1Limit; // upper limit for X-parameter 1 in functions (only upper and only for this)
@@ -36,12 +40,12 @@ public:
 
 	AERO_Function(const int nDimension, double *Ydata)
 		: indexVector()
-		, ndinfo()
-		, m_Xmat(nullptr)
-		, m_Ydata(Ydata)
 		, m_Tbuf()
 		, m_xPointMat()
 		, m_indexMat()
+		, ndinfo()
+		, m_Xmat(nullptr)
+		, m_Ydata(Ydata)
 		, m_xPar1Limit(0)
 		, m_result(0)
 	{
@@ -51,8 +55,6 @@ public:
 
 	~AERO_Function()
 	{
-		m_indexMat.release();
-		m_xPointMat.release();
 		if (ndinfo.nPoints != nullptr)
 		{
 			free(ndinfo.nPoints);
@@ -63,6 +65,9 @@ public:
 			free(m_Xmat);
 			m_Xmat = nullptr;
 		}
+		m_indexMat.release();
+		m_xPointMat.release();
+		m_Tbuf.release();
 		indexVector.release();
 	}
 

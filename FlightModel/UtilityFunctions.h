@@ -28,6 +28,11 @@
 // reduce repeating malloc()/free()
 template<typename T> class UtilBuffer
 {
+private:
+	// disallow copies
+	UtilBuffer(const UtilBuffer &other) {}
+	UtilBuffer& operator=(const UtilBuffer &other) { return *this; }
+
 public:
 	T *m_vec; // array
 	size_t capacity; // amount of elements in array
@@ -83,6 +88,11 @@ public:
 /**/
 template<typename T> class UtilMatrix
 {
+private:
+	// disallow copies
+	UtilMatrix(const UtilMatrix &other) {}
+	UtilMatrix& operator=(const UtilMatrix &other) { return *this; }
+
 public:
 	T **m_mat;
 	size_t m_n;
