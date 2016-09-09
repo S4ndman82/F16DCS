@@ -97,10 +97,11 @@ public:
 	double		flap_Right_PCT;			// Trailing edge flap deflection (0 to 1)
 	double		flap_Left_PCT;			// Trailing edge flap deflection (0 to 1)
 
-	double		elevator_DEG;			// Elevator deflection (deg)
+	double		elevator_DEG;			// Elevator deflection (deg) (pitch)
 	double		elevator_Right_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 	double		elevator_Left_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 
+	double		elevon_DEG;			// elevon deflection (deg): elevator assist to aileron
 	double		aileron_DEG;			// Aileron deflection (deg)
 	double		aileron_Right_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
 	double		aileron_Left_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
@@ -123,6 +124,7 @@ public:
 		, elevator_DEG(0)
 		, elevator_Right_PCT(0)
 		, elevator_Left_PCT(0)
+		, elevon_DEG(0)
 		, aileron_DEG(0)
 		, aileron_Right_PCT(0)
 		, aileron_Left_PCT(0)

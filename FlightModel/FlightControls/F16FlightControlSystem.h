@@ -198,7 +198,7 @@ public:
 	// right-side aileron draw argument
 	float getAileronRSDraw() const
 	{
-		return (float)-flightSurface.aileron_Right_PCT;
+		return (float)flightSurface.aileron_Right_PCT;
 	}
 
 	// left-side aileron draw argument
@@ -303,6 +303,24 @@ public:
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
 		flapControl.updateFrame(gearLevelStatus, pAtmos->getTotalVelocityKTS(), frametime);
+
+		//
+		fcsMixer(frametime);
+	}
+
+	// combined commands of flight surfaces:
+	// aileron assist from asymmetric stabilizer movement etc.
+	void fcsMixer(double frametime)
+	{
+		// rough test only now, need to fix later
+		flightSurface.elevon_DEG = flightSurface.aileron_DEG*0.294;
+
+		// opposite direction in hta (compared to fl)
+
+		// pitch was already calculated? -> just modify
+		//flightSurface.elevator_DEG += flightSurface.elevon_DEG;
+
+
 	}
 
 	double getAirbrakeDrag()
