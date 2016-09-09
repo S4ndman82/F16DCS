@@ -206,7 +206,7 @@ public:
 	// right-side aileron draw argument
 	float getAileronRSDraw() const
 	{
-		return (float)flightSurface.aileron_Right_PCT;
+		return (float)-flightSurface.aileron_Right_PCT;
 	}
 
 	// left-side aileron draw argument

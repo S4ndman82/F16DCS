@@ -24,11 +24,7 @@ protected:
 	double		leading_edge_flap_integrated_gained_biased;
 
 	Limiter<double>		lefLimiter;
-
-	/*
-	F16Actuator		leadingedgeActuatorLeft;
-	F16Actuator		leadingedgeActuatorRight;
-	*/
+	F16Actuator			lefActuator; // symmetric
 
 	// is in automatic operation or locked in position
 	bool isAuto;
@@ -44,6 +40,7 @@ public:
 		leading_edge_flap_integrated_gained(0),
 		leading_edge_flap_integrated_gained_biased(0),
 		lefLimiter(-2, 25),
+		lefActuator(7.25, -2, 25),
 		isAuto(true)
 	{}
 	~F16FcsLeadingEdgeController() {}
@@ -58,20 +55,14 @@ public:
 
 	// Controller for the leading edge flaps
 	// symmetrical, as function of alpha and mach number
-	void updateFrame(double qbarOverPs, double frameTime)
+	double getLefCommand(const double qbarOverPs, const double frameTime)
 	{
 		if (!(simInitialized))
 		{
 			leading_edge_flap_integral = -bodyState->alpha_DEG;
 			leading_edge_flap_integrated = leading_edge_flap_integral + 2 * bodyState->alpha_DEG;
 
-			flightSurface->leadingEdgeFlap_DEG = leading_edge_flap_integral;
-
-			double lef_PCT = limit(leading_edge_flap_integral / 25.0, 0.0, 1.0);
-
-			flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
-			flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;
-			return;
+			return lefLimiter.limit(leading_edge_flap_integral);
 		}
 
 		leading_edge_flap_rate = (bodyState->alpha_DEG - leading_edge_flap_integrated) * 7.25;
@@ -81,9 +72,18 @@ public:
 		leading_edge_flap_integrated_gained = leading_edge_flap_integrated * 1.38;
 		leading_edge_flap_integrated_gained_biased = leading_edge_flap_integrated_gained + 1.45 - (9.05 * qbarOverPs);
 
-		flightSurface->leadingEdgeFlap_DEG = lefLimiter.limit(leading_edge_flap_integrated_gained_biased);
+		return lefLimiter.limit(leading_edge_flap_integrated_gained_biased);
+	}
 
-		double lef_PCT = limit(leading_edge_flap_integrated_gained_biased / 25.0, 0.0, 1.0);
+	void updateFrame(double qbarOverPs, double frameTime)
+	{
+		flightSurface->leadingEdgeFlap_DEG = getLefCommand(qbarOverPs, frameTime);
+
+		// actuator movement here..
+		//lefActuator.commandMove(flightSurface->leadingEdgeFlap_DEG);
+		//lefActuator.updateFrame(frameTime);
+
+		double lef_PCT = limit(flightSurface->leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
 		flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
 		flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;
 	}
