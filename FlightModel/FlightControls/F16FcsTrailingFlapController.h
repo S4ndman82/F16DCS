@@ -23,6 +23,10 @@ protected:
 	// is alternate flaps mode (extend regardless of landing gear lever)
 	bool isAltFlaps;
 
+	// lowers flaps a few degrees when enabled?
+	// check this
+	bool isAirRefuelMode;
+
 	// Passive flap schedule for the F-16...nominal for now from flight manual comments
 	// below specific dynamic pressure (q) -> function as flaps,
 	// otherwise only as ailerons
@@ -31,28 +35,41 @@ protected:
 		const double tef_min = 0.0;
 		const double tef_max = 20.0;
 
-		// if gear lever is down -> max flaps
-		// if alt flap switch -> max flaps
-		if (isAltFlaps == true || gearLevelUp == false)
+		/*
+		// lower tef by some degrees?
+		if (isAirRefuelMode == true)
 		{
-			return tef_max;
+			return 5.0; // <- just some value for placeholder
+		}
+		*/
+
+		// no "alt flaps" and lg is up -> no flap deflection
+		if (isAltFlaps == false && gearLevelUp == true)
+		{
+			return tef_min;
 		}
 
 		// also: hydraulic pressure limit on startup/shutdown?
 
+		// else if gear lever is down -> max flaps
+		// else if alt flap switch -> max flaps
+
+		// speed high enough -> no flap deflection
 		if (airspeed_KTS > 370.0)
 		{
 			// no deflection
 			return tef_min;
 		}
+
+		// low speed -> full deflection
 		if (airspeed_KTS < 240.0)
 		{
 			// max deflection
 			return tef_max;
 		}
 
+		// otherwise deflection is some value in between..
 		//if ((airspeed_KTS >= 240.0) && (airspeed_KTS <= 370.0))
-
 		double trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
 		return limit(trailing_edge_flap_deflection, tef_min, tef_max);
 	}
@@ -62,7 +79,8 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		actuator(10.0, 0, 20.0), // <- check adjustment rate
-		isAltFlaps(false)
+		isAltFlaps(false),
+		isAirRefuelMode(false)
 	{}
 	~F16FcsTrailingFlapController() {}
 
