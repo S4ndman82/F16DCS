@@ -23,6 +23,8 @@ protected:
 	double		leading_edge_flap_integrated_gained;
 	double		leading_edge_flap_integrated_gained_biased;
 
+	Limiter<double>		lefLimiter;
+
 	/*
 	F16Actuator		leadingedgeActuatorLeft;
 	F16Actuator		leadingedgeActuatorRight;
@@ -41,6 +43,7 @@ public:
 		leading_edge_flap_rate(0),
 		leading_edge_flap_integrated_gained(0),
 		leading_edge_flap_integrated_gained_biased(0),
+		lefLimiter(-2, 25),
 		isAuto(true)
 	{}
 	~F16FcsLeadingEdgeController() {}
@@ -54,6 +57,7 @@ public:
 	}
 
 	// Controller for the leading edge flaps
+	// symmetrical, as function of alpha and mach number
 	void updateFrame(double qbarOverPs, double frameTime)
 	{
 		if (!(simInitialized))

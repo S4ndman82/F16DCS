@@ -18,6 +18,8 @@ protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
 
+	Limiter<double>		flaperonLimiter;
+
 	DummyFilter	latStickForceFilter;
 	DummyFilter	rollCommandFilter;
 	DummyFilter	rollActuatorDynamicsFilter;
@@ -132,6 +134,7 @@ public:
 
 		// if trailing edge flaps are used, only adjust instead of full control?
 		// also, using elevators for roll control?
+		// hta proportional to fl deflection: 0.294 of fl deflection in some condition
 		//if (flightSurface->flap_Command > 0)
 
 		flightSurface->aileron_DEG = limit(rollActuatorCommand, -21.5, 21.5);
@@ -145,6 +148,7 @@ public:
 	F16FcsRollController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
+		flaperonLimiter(-20, 20), // deflection limit for both sides
 		latStickForceFilter(),
 		rollCommandFilter(),
 		rollActuatorDynamicsFilter(),

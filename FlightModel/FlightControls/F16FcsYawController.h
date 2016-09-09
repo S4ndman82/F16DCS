@@ -17,6 +17,8 @@ protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
 
+	Limiter<double>		rudderLimiter;
+
 	DummyFilter	rudderCommandFilter;
 	DummyFilter	yawRateWashout;
 	DummyFilter	yawRateFilter;
@@ -82,6 +84,7 @@ public:
 	F16FcsYawController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
+		rudderLimiter(-30, 30), // deflection limit
 		rudderCommandFilter(),
 		yawRateWashout(),
 		yawRateFilter(),

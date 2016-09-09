@@ -94,6 +94,7 @@ protected:
 	// gear go up -> trailing edge flaps go up
 	bool gearLevelStatus;
 
+	/*
 	enum EGainConstants
 	{
 		N2 = 0.38,
@@ -106,6 +107,7 @@ protected:
 		N25 = 2.50,
 		N30 = 20.00
 	};
+	*/
 
 public:
 	F16FlightControls(F16Atmosphere *atmos, F16LandingGear *lgear)

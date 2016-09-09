@@ -24,6 +24,8 @@ protected:
 	bool isAltFlaps;
 
 	// Passive flap schedule for the F-16...nominal for now from flight manual comments
+	// below specific dynamic pressure (q) -> function as flaps,
+	// otherwise only as ailerons
 	double fcs_flap_controller(bool gearLevelUp, double airspeed_KTS)
 	{
 		const double tef_min = 0.0;

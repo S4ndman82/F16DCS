@@ -22,6 +22,8 @@ protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
 
+	Limiter<double>		htailLimiter;
+
 	DummyFilter	pitchRateWashout;
 	DummyFilter	pitchIntegrator;
 	DummyFilter	pitchPreActuatorFilter;
@@ -176,6 +178,7 @@ public:
 		m_latStickForce(0),
 		bodyState(bs),
 		flightSurface(fs),
+		htailLimiter(-25, 25), // stab. deflection limits
 		pitchRateWashout(),
 		pitchIntegrator(),
 		pitchPreActuatorFilter(),
