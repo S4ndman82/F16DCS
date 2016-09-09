@@ -41,7 +41,10 @@ sources:
 
 // TODO! combine controllers with real actuator support
 
-
+// TODO:
+// - separate command channels with different processing rates?
+// -> asynchronous logic of the actual control system? "skew" of channels
+//
 class F16FlightControls
 {
 public:
@@ -73,11 +76,13 @@ protected:
 	F16FcsTrailingFlapController flapControl;
 	F16FcsAirbrakeController airbrakeControl;
 
-	//check: might be better to have these here due to complexity of dependencies..
+	// 20 rad/sec min (lowest frequency filter)
+	// flaperon: aileron and flap functionality (trailing edge)
 	F16Actuator		flaperonActuatorLeft;
 	F16Actuator		flaperonActuatorRight;
-	F16Actuator		elevatorActuatorLeft;
-	F16Actuator		elevatorActuatorRight;
+	// elevon: elevator and aileron functionality (stabilizers)
+	F16Actuator		elevonActuatorLeft;
+	F16Actuator		elevonActuatorRight;
 	F16Actuator		rudderActuator;
 
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
@@ -89,6 +94,18 @@ protected:
 	// gear go up -> trailing edge flaps go up
 	bool gearLevelStatus;
 
+	enum EGainConstants
+	{
+		N2 = 0.38,
+		N3 = 0.70,
+		N5 = 10.00,
+		N8 = 14.40,
+		N14 = 7.20,
+		N23 = 0.50,
+		N24 = 0.67,
+		N25 = 2.50,
+		N30 = 20.00
+	};
 
 public:
 	F16FlightControls(F16Atmosphere *atmos, F16LandingGear *lgear)
@@ -111,8 +128,8 @@ public:
 		, airbrakeControl(&bodyState, &flightSurface)
 		, flaperonActuatorLeft(1) // <- placeholder value
 		, flaperonActuatorRight(1) // <- placeholder value
-		, elevatorActuatorLeft(1) // <- placeholder value
-		, elevatorActuatorRight(1) // <- placeholder value
+		, elevonActuatorLeft(1) // <- placeholder value
+		, elevonActuatorRight(1) // <- placeholder value
 		, rudderActuator(1.0, -30.0, 30.0)
 		, manualPitchOverride(false)
 		, gearLevelStatus(false)

@@ -1,5 +1,6 @@
 F-16 High Fidelity Flight Dynamics and Tech/Academic Initial Demonstration
-Build 2015-01-06-k
+Build 2016..-k
+preceding commit hash: 09a491c
 
 Update to: SkateZilla Build (version?)
 Update to: Cpt.Smileys v.3 Build
@@ -36,26 +37,36 @@ Changes since SkateZilla build:
 - cockpit stick should move according to pitch/bank input
  * controlled from the DLL, binding in the lua-script to "gauge"
 - early support for nosewheel steering with rudder input
+ -> broken, disabled
 - early experimental support for differential wheel brakes with toe-brakes
+ -> broken, disabled
+- light blinker code for reuse
+- landing gear in/out functionality
+- early version of weight balance calculation (with fuel mass)
+- placeholder for center of lift change as function of speed
+- added simple aerobrake functionality, calculation needs fixing
+- reworked aerodynamic code for less reallocation of memory:
+possibly slightly higher amount of memory used when running but better and stabler framerate,
+code is much much simpler to follow and modify now
+- removed unnecessary unit conversions: this has fixed elevon flutter at high speeds
 
+In progress/TODO:
+- flight control dynamics for differential/symmetric modes of paired control surfaces
+and "mixing" of different surfaces, also needs updates into lift/drag calculations afterwards..
+- supersonic aerodynamics
+- ground effect
 
 Known Issues:
 -Landing Gear Collision is not retractable (disabled intentionally)
+ -> figure out how to remove now that landing gear in/out control is working
+ 
 -Nose Wheel Steering Animation is Disabled (disabled intentionally)
 -Landing Gear Strut and Piston Data Needs to be re-done (uses template settings)
  (causes Aircraft Ground handling problems and tipping.)
 -Landing Gear Suspension values Need to be tuned
  (Landing still feels a bit off, but is no longer a 100% chance of damaged gear)
 -Some Control Surface/Pylon Clipping issues.
--No Speed Brake Systems.
-- rear elevator flutter in speeds over one mach:
- depends on actual altitude and speed so you should see it in range of 1200km/h - 1700km/h
- * we might need control actuator "dampening" calculations here?
- * appears now due to removal of "GeneralFilter"
 
 
-To Install
-Extract Folder from RAR,
-Remove Any Previous Version,
-Copy /F-16A v2.0/ Folder to /DCS World/Mods/Aircrafts/ folder.
-
+To Install:
+Copy entire project as-is to DCS/mods/aircraft/F16Demo/

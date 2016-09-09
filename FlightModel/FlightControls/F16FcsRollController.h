@@ -24,11 +24,6 @@ protected:
 	DummyFilter	rollRateFilter1;
 	DummyFilter	rollRateFilter2;
 
-	/*
-	F16Actuator		flaperonActuatorLeft;
-	F16Actuator		flaperonActuatorRight;
-	*/
-
 public:
 	double getRollFeelGain(const double longStickForce) const
 	{
@@ -109,6 +104,9 @@ public:
 
 		// TODO: in case of alpha > (limit), lateral input is ignored (yaw limiter)
 
+
+		// TODO: calculate elevon differential operation (aileron functionality)
+		// and symmetrical operation (elevator functionality)
 
 		double latStickForceCmd = latStickInput * 75.0;
 		double latStickForce = latStickForceFilter.Filter(dt, latStickForceCmd);

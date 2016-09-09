@@ -67,6 +67,8 @@
 // -> relaxed static stability (RSS) so as intended?
 // -Actuators cause flutter at high speed due to filtering of sensor signals
 //  Removed servo-dynamics until I can figure this out
+// -> reduced unnecessary unit conversions and thus resulting rounding errors etc.
+// -> fixed
 // -Gear reaction happening but ground handling not modeled due to lack of available
 //  API calls
 // -> partially now
