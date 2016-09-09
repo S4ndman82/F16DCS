@@ -40,26 +40,28 @@ protected:
 
 		// also: hydraulic pressure limit on startup/shutdown?
 
-		if (airspeed_KTS < 240.0)
+		if (airspeed_KTS > 370.0)
 		{
-			return tef_max;
-		}
-		else if ((airspeed_KTS >= 240.0) && (airspeed_KTS <= 370.0))
-		{
-			double trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
-			return limit(trailing_edge_flap_deflection, tef_min, tef_max);
-		}
-		else
-		{
+			// no deflection
 			return tef_min;
 		}
+		if (airspeed_KTS < 240.0)
+		{
+			// max deflection
+			return tef_max;
+		}
+
+		//if ((airspeed_KTS >= 240.0) && (airspeed_KTS <= 370.0))
+
+		double trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
+		return limit(trailing_edge_flap_deflection, tef_min, tef_max);
 	}
 
 public:
 	F16FcsTrailingFlapController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
-		actuator(10.0, 0, 20.0),
+		actuator(10.0, 0, 20.0), // <- check adjustment rate
 		isAltFlaps(false)
 	{}
 	~F16FcsTrailingFlapController() {}
