@@ -496,6 +496,14 @@ void ed_fm_set_command(int command, float value)
 		// when button released (up)
 		break;
 
+	case F16::ManualPitchOverride:
+		F16::FlightControls.setManualPitchOverride(value);
+		/*
+		swprintf(dbgmsg, 255, L" F16::manual pitch override (MPO): %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+		*/
+		break;
+
 	case F16::Gear:
 		F16::LandingGear.switchGearUpDown();
 		break;

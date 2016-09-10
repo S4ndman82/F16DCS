@@ -98,6 +98,10 @@ namespace F16
 		TrimYawLeft = 98, // iCommandPlaneTrimLeftRudder
 		TrimYawRight = 99, // iCommandPlaneTrimRightRudder
 
+		//{down = 3401, up = 3401, value_down = 1,  name = _('Manual Pitch Override'), category = _('Flight Control')},
+		ManualPitchOverride = 3401,
+
+
 		//{down = iCommandPlaneParachute, name = _('Dragging Chute'), category = _('Systems')},
 		//DraggingChute // iCommandPlaneParachute
 

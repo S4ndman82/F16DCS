@@ -98,7 +98,7 @@ public:
 	}
 
 	// Controller for roll
-	double fcs_roll_controller(double latStickInput, double longStickForce, double trimRoll, double dynamicPressure_NM2, double dt)
+	double fcs_roll_controller(double latStickInput, double longStickForce, double dynamicPressure_NM2, double dt)
 	{
 		const double roll_rate = bodyState->getRollRateDegs();
 		double ay = bodyState->getAccYPerG();
@@ -117,12 +117,11 @@ public:
 		double rollFeelGain = getRollFeelGain(longStickForce); // <- bug? (should be lateral?)
 		double rollRateCommand = getRollRateCommand(latStickForceBiased * rollFeelGain);
 
-		double rollRateCommandFilterd = rollCommandFilter.Filter(dt, rollRateCommand);
+		//double rollRateCommandFilterd = rollCommandFilter.Filter(dt, rollRateCommand);
+		//double rollRateFiltered1 = rollRateFilter1.Filter(dt, roll_rate);
+		//double rollRateFiltered2 = (rollRateFilter2.Filter(dt, rollRateFiltered1));
 
-		double rollRateFiltered1 = rollRateFilter1.Filter(dt, roll_rate);
-		double rollRateFiltered2 = (rollRateFilter2.Filter(dt, rollRateFiltered1));
-
-		double rollRateCommandCombined = rollRateFiltered2 - rollRateCommandFilterd - trimRoll;
+		double rollRateCommandCombined = roll_rate - rollRateCommand - trimState->trimRoll;
 
 		double pressureGain = getPressureGain(dynamicPressure_NM2);
 
@@ -130,12 +129,6 @@ public:
 
 		// Mechanical servo dynamics
 		//double rollActuatorCommand = rollActuatorDynamicsFilter.Filter(dt, rollCommandGained);
-
-		// if trailing edge flaps are used, only adjust instead of full control?
-		if (flightSurface->flap_Command > 0)
-		{
-			// one side stays at maximum, other side can lift
-		}
 
 		flightSurface->aileron_DEG = limit(rollCommandGained, -21.5, 21.5);
 		flightSurface->aileron_Right_PCT = flightSurface->aileron_DEG / 21.5;

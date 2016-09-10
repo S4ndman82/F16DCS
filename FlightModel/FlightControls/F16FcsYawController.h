@@ -46,7 +46,7 @@ public:
 	}
 
 	// Controller for yaw
-	double fcs_yaw_controller(double pedInput, double trimYaw, double alphaFiltered, double dt)
+	double fcs_yaw_controller(double pedInput, double alphaFiltered, double dt)
 	{
 		const double roll_rate = bodyState->getRollRateDegs();
 		const double yaw_rate = bodyState->getYawRateDegs();
@@ -54,7 +54,7 @@ public:
 
 		double rudderCommand = getRudderCommand(pedInput);
 		double rudderCommandFiltered = rudderCommandFilter.Filter(dt, rudderCommand);
-		double rudderCommandFilteredWTrim = trimYaw - rudderCommandFiltered;
+		double rudderCommandFilteredWTrim = trimState->trimYaw - rudderCommandFiltered;
 
 		double alphaGained = alphaFiltered * (1.0 / 57.3);
 		double rollRateWithAlpha = roll_rate * alphaGained;

@@ -164,9 +164,16 @@ public:
 		pedInput = -value;
 	}
 
-	void setManualPitchOverride(bool aoa_override)
+	void setManualPitchOverride(float aoa_override)
 	{
-		manualPitchOverride = aoa_override;
+		if (aoa_override > 0)
+		{
+			manualPitchOverride = true;
+		}
+		else
+		{
+			manualPitchOverride = false;
+		}
 	}
 
 	void initAirBrakeOff()
@@ -310,9 +317,9 @@ public:
 		// or pitch controller should calculate roll effect too?
 		// -> check control laws, in addition to handling supersonic flutter
 
-		pitchControl.fcs_pitch_controller(longStickInput.getValue(), trimState.trimPitch, 0.0, dynamicPressure_kNM2, frametime);
-		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), trimState.trimRoll, pAtmos->dynamicPressure, frametime);
-		yawControl.fcs_yaw_controller(pedInput.getValue(), trimState.trimYaw, pitchControl.getAlphaFiltered(), frametime);
+		pitchControl.fcs_pitch_controller(longStickInput.getValue(), dynamicPressure_kNM2, manualPitchOverride, frametime);
+		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), pAtmos->dynamicPressure, frametime);
+		yawControl.fcs_yaw_controller(pedInput.getValue(), pitchControl.getAlphaFiltered(), frametime);
 
 		// TODO: combine flap control with aileron control commands
 
@@ -321,11 +328,11 @@ public:
 		// when gears go down flaps go down as well
 		flapControl.updateFrame(isGearUp, pAtmos->getTotalVelocityKTS(), qbarOverPs, frametime);
 
-		//
+		// combinations and differential commands in mixer (to actuators)
 		fcsMixer(frametime);
 	}
 
-	// combined commands of flight surfaces:
+	// combined and differential commands of flight surfaces:
 	// aileron assist from asymmetric stabilizer movement etc.
 	void fcsMixer(double frametime)
 	{
@@ -341,6 +348,12 @@ public:
 		// ailerons (flaperons) and elevons (differential stabilizers),
 		// actuator/servo dynamics
 		//flightSurface->roll_Command = rollCommandGained;
+
+		// if trailing edge flaps are used, only adjust instead of full control?
+		if (flightSurface.flap_Command > 0)
+		{
+			// one side stays at maximum, other side can lift
+		}
 
 
 	}

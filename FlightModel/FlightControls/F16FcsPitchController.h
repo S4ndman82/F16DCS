@@ -116,9 +116,6 @@ public:
 	// Angle of attack limiter logic
 	double angle_of_attack_limiter(const double alphaFiltered, const double pitchRateCommand) const
 	{
-		// TODO: 
-		//if (manualPitchOverride == true)
-
 		double topLimit = limit((alphaFiltered - 22.5) * 0.69, 0.0, 99999.0);
 		double bottomLimit = limit((alphaFiltered - 15.0 + pitchRateCommand) * 0.322, 0.0, 99999.0);
 
@@ -127,13 +124,13 @@ public:
 
 
 	// Controller for pitch
-	// (differentialCommand is hard-coded to 0 in caller)
-	double fcs_pitch_controller(double longStickInput, double trimPitch, double differentialCommand, double dynamicPressure_kNM2, double dt)
+	// TODO: implement differential actuator handling to mixer and actuator stages
+	double fcs_pitch_controller(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double dt)
 	{
 		const double pitch_rate = bodyState->getPitchRateDegs();
 		const double az = bodyState->getAccZPerG();
 
-		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, trimPitch, dt);
+		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, trimState->trimPitch, dt);
 		double dynamicPressureScheduled = dynamic_pressure_schedule(dynamicPressure_kNM2);
 
 		double azFiltered = accelFilter.Filter(dt, az - 1.0);
@@ -145,7 +142,12 @@ public:
 		double pitchRateWashedOut = pitchRateWashout.Filter(dt, pitch_rate);
 		double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;
 
-		double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
+		// TODO: 
+		if (manualPitchOverride == true)
+		{
+		}
+
+		double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand, manualPitchOverride);
 
 		double gLimiterCommand = -(azFiltered + (pitchRateWashedOut * 0.2));
 
