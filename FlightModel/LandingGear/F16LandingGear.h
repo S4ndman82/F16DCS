@@ -261,6 +261,20 @@ public:
 		return true;
 	}
 
+	// is gear "up and locked" -> trailing edge flaps
+	bool isGearUpLocked() const
+	{
+		if (actNose.m_current > actNose.m_minLimit
+			|| actLeft.m_current > actLeft.m_minLimit
+			|| actRight.m_current > actRight.m_minLimit)
+		{
+			// not completely up
+			return false;
+		}
+		// at max -> up & locked
+		return true;
+	}
+
 	// need current weight of the whole aircraft
 	// and speed relative to ground (static, sliding or rolling friction of each wheel)
 	void updateFrame(const double weightN, double frameTime)

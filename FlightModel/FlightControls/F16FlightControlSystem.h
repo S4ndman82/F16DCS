@@ -63,7 +63,8 @@ protected:
 	bool		simInitialized;
 
 
-	bool isGearDown; // is landing gear down
+	bool isGearDown; // is landing gear down&locked
+	bool isGearUp; // is lg up&locked
 
 
 	// Pitch controller variables
@@ -127,6 +128,7 @@ public:
 		, trimState(0, 0, 0)
 		, simInitialized(false)
 		, isGearDown(true)
+		, isGearUp(false)
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
@@ -282,6 +284,7 @@ public:
 
 		// landing gear "down&locked" affects some logic
 		isGearDown = landingGear->isGearDownLocked();
+		isGearUp = landingGear->isGearUpLocked();
 		gearLevelStatus = landingGear->getGearLevelStatus();
 
 		// TODO: affecting flaps logic when air refuel triggered
@@ -316,7 +319,7 @@ public:
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flapControl.updateFrame(gearLevelStatus, pAtmos->getTotalVelocityKTS(), qbarOverPs, frametime);
+		flapControl.updateFrame(isGearUp, pAtmos->getTotalVelocityKTS(), qbarOverPs, frametime);
 
 		//
 		fcsMixer(frametime);
