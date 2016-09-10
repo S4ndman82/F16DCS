@@ -44,7 +44,7 @@ protected:
 		// triggered by refueling trap door?
 		if (isAirRefuelMode == true)
 		{
-			return 5.0; // <- just some value for placeholder
+			return 5.0; // <- just some value for placeholder, figure out right one
 		}
 		*/
 

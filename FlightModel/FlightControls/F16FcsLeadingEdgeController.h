@@ -52,10 +52,14 @@ public:
 	void reset(double dt)
 	{
 	}
+	void setAutoLocked(bool onoff)
+	{
+		isAuto = onoff;
+	}
 
 	// Controller for the leading edge flaps
 	// symmetrical, as function of alpha and mach number
-	double getLefCommand(const double qbarOverPs, const double frameTime)
+	double getLefCommand(const double qbarOverPs, const bool isWoW, const double frameTime)
 	{
 		if (!(simInitialized))
 		{
@@ -64,6 +68,16 @@ public:
 
 			return lefLimiter.limit(leading_edge_flap_integral);
 		}
+
+		/*
+		// TODO: fix rest of handling for this too
+		// actuator movement needs support too
+		if (isWoW == true)
+		{
+			// weight on wheels -> lock to -2 degrees (up)
+			return -2.0;
+		}
+		*/
 
 		leading_edge_flap_rate = (bodyState->alpha_DEG - leading_edge_flap_integrated) * 7.25;
 		leading_edge_flap_integral += (leading_edge_flap_rate * frameTime);
@@ -75,14 +89,15 @@ public:
 		return lefLimiter.limit(leading_edge_flap_integrated_gained_biased);
 	}
 
-	void updateFrame(double qbarOverPs, double frameTime)
+	void updateFrame(double qbarOverPs, const bool isWoW, double frameTime)
 	{
-		flightSurface->leadingEdgeFlap_DEG = getLefCommand(qbarOverPs, frameTime);
+		flightSurface->leadingEdgeFlap_DEG = getLefCommand(qbarOverPs, isWoW, frameTime);
 
 		// actuator movement here..
 		//lefActuator.commandMove(flightSurface->leadingEdgeFlap_DEG);
 		//lefActuator.updateFrame(frameTime);
 
+		// this is bugged when there's weight on wheels (-2 up)
 		double lef_PCT = limit(flightSurface->leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
 		flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
 		flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;

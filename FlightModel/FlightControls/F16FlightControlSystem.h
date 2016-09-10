@@ -63,10 +63,6 @@ protected:
 	bool		simInitialized;
 
 
-	bool isGearDown; // is landing gear down&locked
-	bool isGearUp; // is lg up&locked
-
-
 	// Pitch controller variables
 	AnalogInput		longStickInput; // pitch normalized
 	AnalogInput		latStickInput; // bank normalized
@@ -96,11 +92,14 @@ protected:
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 	bool manualPitchOverride;
 
+	//bool isGearDown; // is landing gear down&locked
+	//bool isGearUp; // is lg up&locked
+
 	// flap position logic according to when landing gears are down:
 	// flaps are controlled with landing gear lever as well,
 	// gears go down -> trailing edge flaps go down
 	// gear go up -> trailing edge flaps go up
-	bool gearLevelStatus;
+	//bool gearLevelStatus;
 
 	// if alternate flaps switch is used
 	bool isAltFlaps;
@@ -130,8 +129,6 @@ public:
 		//, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
 		, trimState(0, 0, 0)
 		, simInitialized(false)
-		, isGearDown(true)
-		, isGearUp(false)
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
@@ -150,7 +147,9 @@ public:
 		, htailLimiter(-25, 25) // stab. deflection limits
 		, rudderLimiter(-30, 30) // deflection limit
 		, manualPitchOverride(false)
-		, gearLevelStatus(false)
+		//, isGearDown(true)
+		//, isGearUp(false)
+		//, gearLevelStatus(false)
 		, isAltFlaps(false)
 	{}
 	~F16FlightControls() {}
@@ -303,9 +302,10 @@ public:
 		double qbarOverPs = pAtmos->dynamicPressure / pAtmos->ambientPressure;
 
 		// landing gear "down&locked" affects some logic
-		isGearDown = landingGear->isGearDownLocked();
-		isGearUp = landingGear->isGearUpLocked();
-		gearLevelStatus = landingGear->getGearLevelStatus();
+		bool isWoW = landingGear->isWoW();
+		bool isGearDown = landingGear->isGearDownLocked();
+		bool isGearUp = landingGear->isGearUpLocked();
+		bool gearLevelStatus = landingGear->getGearLevelStatus();
 
 		// TODO: affecting flaps logic when air refuel triggered
 		//bool refuelingDoor = (airframe->getRefuelingDoorAngle() ? true : false);
@@ -317,7 +317,7 @@ public:
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
 		// Leading edge flap deflection (deg)
-		leadingedgeControl.updateFrame(qbarOverPs, frametime);
+		leadingedgeControl.updateFrame(qbarOverPs, isWoW, frametime);
 
 		// Call the longitudinal (pitch) controller.  Takes the following inputs:
 		// -Normalize long stick input
