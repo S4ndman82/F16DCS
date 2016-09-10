@@ -20,17 +20,16 @@ protected:
 	// Bit of a hack now really, might need to be in roll controller..
 	F16Actuator actuator;
 
-	// is alternate flaps mode (extend regardless of landing gear lever)
-	bool isAltFlaps;
-
 	// lowers flaps a few degrees when enabled?
 	// check this
 	bool isAirRefuelMode;
 
 	// Passive flap schedule for the F-16...nominal for now from flight manual comments
 	// below specific dynamic pressure (q) -> function as flaps,
-	// otherwise only as ailerons
-	double fcs_flap_controller(bool isGearUp, double airspeed_KTS)
+	// otherwise only as ailerons.
+	// Normally flaps are down when gear lever is down.
+	// With alternate flaps switch, flaps are extended regardless of gear lever.
+	double fcs_flap_controller(bool isGearUp, bool isAltFlaps, double airspeed_KTS)
 	{
 		const double tef_min = 0.0;
 		const double tef_max = 20.0;
@@ -85,7 +84,6 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		actuator(10.0, 0, 20.0), // <- check adjustment rate
-		isAltFlaps(false),
 		isAirRefuelMode(false)
 	{}
 	~F16FcsTrailingFlapController() {}
@@ -104,13 +102,13 @@ public:
 	//
 	// In normal flight, flaps are used like normal ailerons.
 	//
-	void updateFrame(bool isGearUp, double airspeed_KTS, double qbarOverPs, double frametime)
+	void updateFrame(bool isGearUp, bool isAltFlaps, double airspeed_KTS, double qbarOverPs, double frametime)
 	{
 		// flaps in transonic speeds? 
 		// -2 deg when qbarOverPs >= 1.008
 		// 0..-2 deg when qbarOverPs >= 0.787 && qbarOverPs <= 1.008
 
-		flightSurface->flap_Command = fcs_flap_controller(isGearUp, airspeed_KTS);
+		flightSurface->flap_Command = fcs_flap_controller(isGearUp, isAltFlaps, airspeed_KTS);
 		actuator.commandMove(flightSurface->flap_Command);
 		actuator.updateFrame(frametime);
 

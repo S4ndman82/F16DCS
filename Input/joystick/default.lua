@@ -45,7 +45,12 @@ join(res.keyCommands,{
 {down = iCommandPlaneJettisonFuelTanks, name = _('Jettison Fuel Tanks'), category = _('Systems')},
 {down = iCommandPlane_HOTAS_NoseWheelSteeringButton, up = iCommandPlane_HOTAS_NoseWheelSteeringButton, name = _('Nose Gear Maneuvering Range'), category = _('Systems')},
 {down = iCommandPlane_HOTAS_NoseWheelSteeringButtonOff, up = iCommandPlane_HOTAS_NoseWheelSteeringButtonOff, name = _('Nose Gear Steering Disengage'), category = _('Systems')},
+
 {down = 3401, up = 3401, value_down = 1,  name = _('Manual Pitch Override'), category = _('Flight Control')},
+{down = iCommandPlaneFlaps,  name = _("Flaps Toggle"), category = _("Systems")},
+{down = iCommandPlaneFlapsOff,  name = _("Flaps Up"), category = _("Systems")},
+{down = iCommandPlaneFlapsOn,  name = _("Flaps Down"), category = _("Systems")},
+
 
 -- Modes
 {down = iCommandPlaneModeFI0, name = _('(6) Longitudinal Missile Aiming Mode'), category = _('Modes')},

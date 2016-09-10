@@ -514,6 +514,18 @@ void ed_fm_set_command(int command, float value)
 		F16::LandingGear.setGearDown();
 		break;
 
+		// flaps normally controlled by landing gear lever,
+		// in case alternate switch is used
+	case F16::FlapsOnOff:
+		F16::FlightControls.toggleAltFlaps();
+		break;
+	case F16::FlapsOn:
+		F16::FlightControls.setAltFlaps(true);
+		break;
+	case F16::FlapsOff:
+		F16::FlightControls.setAltFlaps(false);
+		break;
+
 	case F16::NoseWheelSteering:
 		// value includes status of it?
 		F16::LandingGear.toggleNosewheelSteering();

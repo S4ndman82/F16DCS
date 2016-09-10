@@ -127,19 +127,15 @@ public:
 	// TODO: implement differential actuator handling to mixer and actuator stages
 	double fcs_pitch_controller(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double dt)
 	{
-		const double pitch_rate = bodyState->getPitchRateDegs();
-		const double az = bodyState->getAccZPerG();
-
 		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, trimState->trimPitch, dt);
 		double dynamicPressureScheduled = dynamic_pressure_schedule(dynamicPressure_kNM2);
 
-		double azFiltered = accelFilter.Filter(dt, az - 1.0);
 
 		double alphaLimited = limit(bodyState->alpha_DEG, -5.0, 30.0);
 		double alphaLimitedRate = 10.0 * (alphaLimited - m_alphaFiltered);
 		m_alphaFiltered += (alphaLimitedRate * dt);
 
-		double pitchRateWashedOut = pitchRateWashout.Filter(dt, pitch_rate);
+		double pitchRateWashedOut = bodyState->getPitchRateDegs();
 		double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;
 
 		// TODO: 
@@ -147,16 +143,14 @@ public:
 		{
 		}
 
-		double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand, manualPitchOverride);
-
+		double azFiltered = bodyState->getAccZPerG() - 1.0;
+		double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
 		double gLimiterCommand = -(azFiltered + (pitchRateWashedOut * 0.2));
-
 		double finalCombinedCommand = dynamicPressureScheduled * (2.5 * (stickCommandPos + limiterCommand + gLimiterCommand));
 
-		double finalCombinedCommandFilteredLimited = limit(pitchIntegrator.Filter(dt, finalCombinedCommand), -25.0, 25.0);
+		double finalCombinedCommandFilteredLimited = limit(finalCombinedCommand, -25.0, 25.0);
 		finalCombinedCommandFilteredLimited = finalCombinedCommandFilteredLimited + finalCombinedCommand;
-
-		double finalPitchCommandTotal = pitchPreActuatorFilter.Filter(dt, finalCombinedCommandFilteredLimited);
+		double finalPitchCommandTotal = finalCombinedCommandFilteredLimited;
 		finalPitchCommandTotal += (0.5 * m_alphaFiltered);
 
 		// TODO: separate movements on opposing side (with roll authority)

@@ -102,6 +102,9 @@ protected:
 	// gear go up -> trailing edge flaps go up
 	bool gearLevelStatus;
 
+	// if alternate flaps switch is used
+	bool isAltFlaps;
+
 	/*
 	enum EGainConstants
 	{
@@ -148,6 +151,7 @@ public:
 		, rudderLimiter(-30, 30) // deflection limit
 		, manualPitchOverride(false)
 		, gearLevelStatus(false)
+		, isAltFlaps(false)
 	{}
 	~F16FlightControls() {}
 
@@ -162,6 +166,15 @@ public:
 	void setPedInput(double value)
 	{
 		pedInput = -value;
+	}
+
+	void toggleAltFlaps()
+	{
+		isAltFlaps = !isAltFlaps;
+	}
+	void setAltFlaps(bool status)
+	{
+		isAltFlaps = status;
 	}
 
 	void setManualPitchOverride(float aoa_override)
@@ -326,7 +339,7 @@ public:
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flapControl.updateFrame(isGearUp, pAtmos->getTotalVelocityKTS(), qbarOverPs, frametime);
+		flapControl.updateFrame(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS(), qbarOverPs, frametime);
 
 		// combinations and differential commands in mixer (to actuators)
 		fcsMixer(frametime);

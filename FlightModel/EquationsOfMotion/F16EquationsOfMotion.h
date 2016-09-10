@@ -287,7 +287,8 @@ public:
 
 		// TODO: rolling moment of engine
 		// (counter-clockwise?)
-		Vec3 roll_moment(rolling_moment, 0.0, 0.0);
+		//Vec3 roll_moment(rolling_moment, 0.0, 0.0);
+		Vec3 roll_moment(0.0, 0.0, rolling_moment);
 		add_local_moment(roll_moment);
 	}
 
