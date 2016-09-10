@@ -15,6 +15,8 @@ Anyone Caught Moving the 3D External/Cockpit EDMs to Private/Hacked/Jury Rigged 
 Even for Personal Use will be dealt with harsely as it violates the license Agreements for the 3D Assets.
 So Once Again, Do NOT use the 3D Model EDMs with any private Mods.
 
+Use of program code:
+Use Only for Non-Commercial Purposes
 
 Changes since SkateZilla build:
 - fix memory leak in FM code

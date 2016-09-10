@@ -8,6 +8,9 @@ to implement own modules for Eagle Dynamics' Digital Combat Simulator (DCS).
 
 As such, this is not a complete module and likely never will be.
 
+Use of program code:
+Use Only for Non-Commercial Purposes
+
 All information based on public sources.
 
 Read more at forum thread: http://forums.eagle.ru/showthread.php?t=95985
