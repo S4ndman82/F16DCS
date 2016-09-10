@@ -3,6 +3,8 @@
 
 A howto-module for DCS: World about high fidelity flight dynamics and advanced systems modeling. 
 Originally created by CptSmiley. 3D work done by SkateZilla.
+EFM development continued by kazereal.
+Names are usernames at: https://forums.eagle.ru
 
 Flight model source code:
 Use Only for Non-Commercial Purposes
