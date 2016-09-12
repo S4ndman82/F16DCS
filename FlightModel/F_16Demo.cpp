@@ -214,11 +214,6 @@ void ed_fm_simulate(double dt)
 	// a new set for this run frame
 	F16::Motion.clear();
 
-	// this part is only needed once and only on start of simulation
-	// -> move to where actual initialization is done
-	// -> no need to repeat
-	//F16::FlightControls.initialize(frametime);
-
 	// Get the total absolute velocity acting on the aircraft with wind included
 	// using english units so airspeed is in feet/second here
 	F16::Atmos.updateFrame(frametime);
@@ -255,12 +250,6 @@ void ed_fm_simulate(double dt)
 		F16::FlightControls.bodyState,
 		F16::LandingGear.CxGearAero, 
 		F16::LandingGear.CzGearAero);
-
-	//----------------------------------------------------------------
-	// All prior forces calculated in lbs, needs to be converted
-	// to units.  All prior forces calculated in lb*ft, needs
-	// to be converted into N*m
-	//----------------------------------------------------------------
 
 	F16::Motion.updateAeroForces(F16::Aero.getCyTotal(), F16::Aero.getCxTotal(), F16::Aero.getCzTotal(), 
 								F16::Aero.getClTotal(), F16::Aero.getCmTotal(), F16::Aero.getCnTotal());
@@ -431,19 +420,9 @@ void ed_fm_set_command(int command, float value)
 		break;
 
 	case F16::ApuStart:
-		/*
-		swprintf(dbgmsg, 255, L" F16::APU start: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
-		*/
-
 		F16::EMS.JfsStart();
 		break;
 	case F16::ApuStop:
-		/*
-		swprintf(dbgmsg, 255, L" F16::APU stop: %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
-		*/
-
 		F16::EMS.JfsStop();
 		break;
 
@@ -496,10 +475,6 @@ void ed_fm_set_command(int command, float value)
 
 	case F16::ManualPitchOverride:
 		F16::FlightControls.setManualPitchOverride(value);
-		/*
-		swprintf(dbgmsg, 255, L" F16::manual pitch override (MPO): %d value: %f \r\n", command, value);
-		::OutputDebugString(dbgmsg);
-		*/
 		break;
 
 	case F16::Gear:
