@@ -61,7 +61,7 @@ public:
 	{
 	}
 
-	void commandAirBrake(bool isGearDown, const double dynamicPressure_NM2)
+	void commandAirBrake(bool isGearDown)
 	{
 		// TODO: change values to degrees here
 

@@ -88,6 +88,7 @@ public:
 class F16FlightSurface
 {
 public:
+	double		leadingEdgeFlap_Command;		// command before actuator movement
 	double		leadingEdgeFlap_DEG;			// Leading edge flap deflection (deg)
 	double		leadingEdgeFlap_Right_PCT;			// Leading edge flap as a percent of maximum (0 to 1)
 	double		leadingEdgeFlap_Left_PCT;			// Leading edge flap as a percent of maximum (0 to 1)
@@ -120,29 +121,30 @@ public:
 	double		yaw_Command;
 
 public:
-	F16FlightSurface()
-		: leadingEdgeFlap_DEG(0)
-		, leadingEdgeFlap_Right_PCT(0)
-		, leadingEdgeFlap_Left_PCT(0)
-		, flap_Command(0)
-		, flap_DEG(0)
-		, flap_Right_PCT(0)
-		, flap_Left_PCT(0)
-		, elevator_DEG(0)
-		, elevator_Right_PCT(0)
-		, elevator_Left_PCT(0)
-		, elevon_DEG(0)
-		, aileron_DEG(0)
-		, aileron_Right_PCT(0)
-		, aileron_Left_PCT(0)
-		, rudder_DEG(0)
-		, rudder_PCT(0)
-		, airbrake_Command(0)
-		, airbrake_Right_PCT(0)
-		, airbrake_Left_PCT(0)
-		, pitch_Command(0)
-		, roll_Command(0)
-		, yaw_Command(0)
+	F16FlightSurface() :
+		leadingEdgeFlap_Command(0),
+		leadingEdgeFlap_DEG(0),
+		leadingEdgeFlap_Right_PCT(0),
+		leadingEdgeFlap_Left_PCT(0),
+		flap_Command(0),
+		flap_DEG(0),
+		flap_Right_PCT(0),
+		flap_Left_PCT(0),
+		elevator_DEG(0),
+		elevator_Right_PCT(0),
+		elevator_Left_PCT(0),
+		elevon_DEG(0),
+		aileron_DEG(0),
+		aileron_Right_PCT(0),
+		aileron_Left_PCT(0),
+		rudder_DEG(0),
+		rudder_PCT(0),
+		airbrake_Command(0),
+		airbrake_Right_PCT(0),
+		airbrake_Left_PCT(0),
+		pitch_Command(0),
+		roll_Command(0),
+		yaw_Command(0)
 	{}
 	~F16FlightSurface() {}
 };

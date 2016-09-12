@@ -59,14 +59,16 @@ public:
 
 	// Controller for the leading edge flaps
 	// symmetrical, as function of alpha and mach number
-	double getLefCommand(const double qbarOverPs, const bool isWoW, const double frameTime)
+	void getLefCommand(const double qbarOverPs, const bool isWoW, const double frameTime)
 	{
-		if (!(simInitialized))
+		// TODO: get rid of this
+		if (simInitialized == false)
 		{
 			leading_edge_flap_integral = -bodyState->alpha_DEG;
 			leading_edge_flap_integrated = leading_edge_flap_integral + 2 * bodyState->alpha_DEG;
 
-			return lefLimiter.limit(leading_edge_flap_integral);
+			flightSurface->leadingEdgeFlap_Command = lefLimiter.limit(leading_edge_flap_integral);
+			return;
 		}
 
 		/*
@@ -78,6 +80,7 @@ public:
 			return -2.0;
 		}
 		*/
+		// also add handling in transonic speeds..
 
 		leading_edge_flap_rate = (bodyState->alpha_DEG - leading_edge_flap_integrated) * 7.25;
 		leading_edge_flap_integral += (leading_edge_flap_rate * frameTime);
@@ -86,16 +89,15 @@ public:
 		leading_edge_flap_integrated_gained = leading_edge_flap_integrated * 1.38;
 		leading_edge_flap_integrated_gained_biased = leading_edge_flap_integrated_gained + 1.45 - (9.05 * qbarOverPs);
 
-		return lefLimiter.limit(leading_edge_flap_integrated_gained_biased);
+		flightSurface->leadingEdgeFlap_Command = lefLimiter.limit(leading_edge_flap_integrated_gained_biased);
 	}
 
-	void updateFrame(double qbarOverPs, const bool isWoW, double frameTime)
+	void updateFrame(double frameTime)
 	{
-		flightSurface->leadingEdgeFlap_DEG = getLefCommand(qbarOverPs, isWoW, frameTime);
-
 		// actuator movement here..
 		//lefActuator.commandMove(flightSurface->leadingEdgeFlap_DEG);
 		//lefActuator.updateFrame(frameTime);
+		flightSurface->leadingEdgeFlap_DEG = flightSurface->leadingEdgeFlap_Command;
 
 		// this is bugged when there's weight on wheels (-2 up)
 		double lef_PCT = limit(flightSurface->leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);

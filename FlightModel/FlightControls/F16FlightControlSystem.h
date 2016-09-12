@@ -313,13 +313,14 @@ public:
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step
-		airbrakeControl.commandAirBrake(isGearDown, pAtmos->dynamicPressure);
+		airbrakeControl.commandAirBrake(isGearDown);
 		airbrakeControl.updateFrame(frametime);
 
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
 		// Leading edge flap deflection (deg)
-		leadingedgeControl.updateFrame(qbarOverPs, isWoW, frametime);
+		leadingedgeControl.getLefCommand(qbarOverPs, isWoW, frametime);
+		leadingedgeControl.updateFrame(frametime);
 
 		// Call the longitudinal (pitch) controller.  Takes the following inputs:
 		// -Normalize long stick input
