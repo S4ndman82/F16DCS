@@ -385,14 +385,17 @@ public:
 	{}
 	~DeltaLimiter() {}
 
+	/*
 	T deltaLimit(const T input) const
 	{
 		// not over delta limit
-		if (abs(input - previous) <= delta_max)
+		T diff = input - previous;
+		if (abs(diff) <= delta_max)
 		{
 			return limit(input);
 		}
 	}
+	*/
 
 	T limit(const T input) const
 	{

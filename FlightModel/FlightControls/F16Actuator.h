@@ -31,8 +31,8 @@ public:
 	double m_moveRate;		// "slowness"
 	double m_commanded;		// target movement
 	double m_current;		// current position
-	double m_minLimit;		// lower limit
-	double m_maxLimit;		// upper limit
+
+	Limiter<double> m_limiter;
 	bool m_haveLimits;		// if limits are defined
 
 	// Force threshold needed to move either way:
@@ -69,13 +69,13 @@ public:
 
 	F16Actuator(const double moverate)
 		: m_moveRate(moverate), m_commanded(0), m_current(0),
-		m_minLimit(0), m_maxLimit(0), m_haveLimits(false), 
+		m_limiter(0, 0), m_haveLimits(false),
 		m_forceResistsInc(0), m_forceResistsDec(0), m_forceProvided(0),
 		m_dampeningRate(0), m_externalForce(0), m_isWorking(true)
 	{}
 	F16Actuator(const double moverate, const double minLimit, const double maxLimit)
 		: m_moveRate(moverate), m_commanded(0), m_current(0),
-		m_minLimit(minLimit), m_maxLimit(maxLimit), m_haveLimits(true), 
+		m_limiter(minLimit, maxLimit), m_haveLimits(true),
 		m_forceResistsInc(0), m_forceResistsDec(0), m_forceProvided(0),
 		m_dampeningRate(0), m_externalForce(0), m_isWorking(true)
 	{}
@@ -168,9 +168,9 @@ public:
 		}
 
 		// check that boundaries are not exceeded
-		if (m_haveLimits == true && m_minLimit != m_maxLimit)
+		if (m_haveLimits == true && m_limiter.lower_limit != m_limiter.upper_limit)
 		{
-			m_current = limit(m_current, m_minLimit, m_maxLimit);
+			m_current = m_limiter.limit(m_current);
 		}
 	}
 };

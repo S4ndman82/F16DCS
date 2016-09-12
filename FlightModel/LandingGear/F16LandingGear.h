@@ -250,9 +250,9 @@ public:
 	// is gear "down and locked" -> affects airbrake logic
 	bool isGearDownLocked() const
 	{
-		if (actNose.m_current < actNose.m_maxLimit
-			|| actLeft.m_current < actLeft.m_maxLimit
-			|| actRight.m_current < actRight.m_maxLimit)
+		if (actNose.m_current < actNose.m_limiter.upper_limit
+			|| actLeft.m_current < actLeft.m_limiter.upper_limit
+			|| actRight.m_current < actRight.m_limiter.upper_limit)
 		{
 			// not completely down
 			return false;
@@ -264,9 +264,9 @@ public:
 	// is gear "up and locked" -> trailing edge flaps
 	bool isGearUpLocked() const
 	{
-		if (actNose.m_current > actNose.m_minLimit
-			|| actLeft.m_current > actLeft.m_minLimit
-			|| actRight.m_current > actRight.m_minLimit)
+		if (actNose.m_current > actNose.m_limiter.lower_limit
+			|| actLeft.m_current > actLeft.m_limiter.lower_limit
+			|| actRight.m_current > actRight.m_limiter.lower_limit)
 		{
 			// not completely up
 			return false;

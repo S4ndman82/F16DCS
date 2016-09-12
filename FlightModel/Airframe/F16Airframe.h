@@ -163,7 +163,7 @@ public:
 	{
 		canopySwitchDown = false;
 		//canopyAngle = 0.9; // up
-		actCanopy.m_commanded = actCanopy.m_maxLimit;
+		actCanopy.m_commanded = actCanopy.m_limiter.upper_limit;
 		actCanopy.m_current = actCanopy.m_commanded;
 		canopyGone = false;
 		ejectCount = 0;
@@ -172,7 +172,7 @@ public:
 	{
 		canopySwitchDown = true;
 		//canopyAngle = 0; // down
-		actCanopy.m_commanded = actCanopy.m_minLimit;
+		actCanopy.m_commanded = actCanopy.m_limiter.lower_limit;
 		actCanopy.m_current = actCanopy.m_commanded;
 		canopyGone = false;
 		ejectCount = 0;
@@ -378,7 +378,7 @@ public:
 		// is zero "no fault" or "fully broken"? 
 		::memset(elementIntegrity, 0, 336*sizeof(double));
 		canopyGone = false;
-		actCanopy.m_commanded = actCanopy.m_minLimit;
+		actCanopy.m_commanded = actCanopy.m_limiter.lower_limit;
 		actCanopy.m_isWorking = true;
 	}
 
@@ -409,11 +409,11 @@ public:
 		{
 			if (canopySwitchDown == false)
 			{
-				actCanopy.m_commanded = actCanopy.m_maxLimit;
+				actCanopy.m_commanded = actCanopy.m_limiter.upper_limit;
 			}
 			else
 			{
-				actCanopy.m_commanded = actCanopy.m_minLimit;
+				actCanopy.m_commanded = actCanopy.m_limiter.lower_limit;
 			}
 			actCanopy.updateFrame(frameTime);
 		}
