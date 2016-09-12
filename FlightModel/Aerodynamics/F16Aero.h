@@ -293,11 +293,16 @@ public:
 		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
 		//double force = dynamicPressure_NM2 * F16::airbrakeArea_m2 * cos(60) * 0.7;
 
+		// symmetric operation, should not make difference which one is used..?
 		if (fsurf.airbrake_Left_PCT > 0 || fsurf.airbrake_Right_PCT > 0)
 		{
-			//double force = dynamicPressure_NM2 * F16::airbrakeArea_m2;
-			double CDAirbrake = fsurf.airbrake_Left_PCT * 0.7;
-			airbrakeDrag = -(CDAirbrake * cos(F16::degtorad));
+			// for both sides separately?
+			//double force = dynamicPressure_NM2 * (F16::airbrakeArea_m2 / 2);
+			double force = dynamicPressure_NM2 * F16::airbrakeArea_m2;
+			double CDAirbrake = cos(fsurf.airbrake_Left_PCT) * 0.7;
+			//airbrakeDrag = -(CDAirbrake * cos(F16::degtorad));
+
+			airbrakeDrag = -(CDAirbrake);
 
 			//double pressureAreaFT2 = airbrakeArea_FT2 * dynamicPressure_LBFT2;
 			//double airbrake_DEG = (airbrakeActuator.m_current * 60); // <- PCT to DEG
@@ -390,6 +395,7 @@ public:
 		const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
 
 		// calculate values based on interpolation results
+		// TODO: duplicate this for left and right airflow (with differential stabilizer)?
 		const double Cx_delta_lef = fn_Cx_lef.m_result - fn_CxEle0.m_result;
 		const double Cz_delta_lef = fn_Cz_lef.m_result - fn_CzEle0.m_result;
 		const double Cm_delta_lef = fn_Cm_lef.m_result - fn_CmEle0.m_result;
