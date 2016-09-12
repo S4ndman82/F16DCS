@@ -19,7 +19,7 @@ protected:
 	F16Actuator		rudderActuator;
 	Limiter<double>		rudderLimiter;
 
-public:
+protected:
 	double getRudderCommand(const double pedInput) const
 	{
 		double rudderForceCommand = pedInput * 450.0;
@@ -39,6 +39,25 @@ public:
 		}
 
 		return rudderLimiter.limit(rudderCommand);
+	}
+
+public:
+	F16FcsYawController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
+		bodyState(bs),
+		flightSurface(fs),
+		trimState(ts),
+		rudderActuator(60.0, -30.0, 30.0), // <- check rate
+		rudderLimiter(-30, 30) // deflection limit
+	{
+	}
+	~F16FcsYawController() {}
+
+	bool initialize(double dt)
+	{
+		return true;
+	}
+	void reset(double dt)
+	{
 	}
 
 	// Controller for yaw
@@ -64,25 +83,6 @@ public:
 		// without blending, rudder command == yaw command
 		// -> change in mixer (after this call) if/when necessary
 		flightSurface->rudder_Command = flightSurface->yaw_Command;
-	}
-
-public:
-	F16FcsYawController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
-		bodyState(bs),
-		flightSurface(fs),
-		trimState(ts),
-		rudderActuator(1.0, -30.0, 30.0),
-		rudderLimiter(-30, 30) // deflection limit
-	{
-	}
-	~F16FcsYawController() {}
-
-	bool initialize(double dt)
-	{
-		return true;
-	}
-	void reset(double dt)
-	{
 	}
 
 	void updateFrame(double frametime) 
