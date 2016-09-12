@@ -26,7 +26,7 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		airbrakeSwitch(false),
-		airbrakeActuator(1.0, 0, 1.0) // for now, just use frametime for rate of movement (multiplier 1)
+		airbrakeActuator(30.0, 0, 60.0) // <- check actuator rate
 	{}
 	~F16FcsAirbrakeController() {}
 
@@ -62,10 +62,10 @@ public:
 
 		// note: airbrake limit 60 degrees normally, 
 		// 43 deg when landing gear down (prevent strike to runway)
-		double maxAnglePCT = 1.0; // 60 deg
+		double maxAnglePCT = 60.0; // 60 deg
 		if (isGearDown == true)
 		{
-			maxAnglePCT = 0.71; // ~43 deg
+			maxAnglePCT = 43.0; // ~43 deg
 		}
 
 		// TODO: if weight on wheel -> max opening
@@ -91,9 +91,10 @@ public:
 		airbrakeActuator.updateFrame(frametime);
 
 		// just use same for both sides for now
-		flightSurface->airbrake_Left_DEG = flightSurface->airbrake_Right_DEG;
-		flightSurface->airbrake_Right_PCT = airbrakeActuator.m_current;
-		flightSurface->airbrake_Left_PCT = airbrakeActuator.m_current;
+		flightSurface->airbrake_Left_DEG = flightSurface->airbrake_Right_DEG = airbrakeActuator.m_current;
+
+		flightSurface->airbrake_Right_PCT = flightSurface->airbrake_Right_DEG / 60.0;
+		flightSurface->airbrake_Left_PCT = flightSurface->airbrake_Left_DEG / 60.0;
 	}
 };
 

@@ -293,7 +293,7 @@ public:
 		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
 		//double force = dynamicPressure_NM2 * F16::airbrakeArea_m2 * cos(60) * 0.7;
 
-		if (fsurf.airbrake_Left_PCT > 0)
+		if (fsurf.airbrake_Left_PCT > 0 || fsurf.airbrake_Right_PCT > 0)
 		{
 			//double force = dynamicPressure_NM2 * F16::airbrakeArea_m2;
 			double CDAirbrake = fsurf.airbrake_Left_PCT * 0.7;
