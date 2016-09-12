@@ -16,6 +16,8 @@ protected:
 	F16FlightSurface *flightSurface;
 	F16TrimState *trimState;
 
+	Limiter<double>		rollCommandLimiter;
+
 protected:
 	double getRollFeelGain(const double longStickForce) const
 	{
@@ -92,7 +94,8 @@ public:
 	F16FcsRollController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
 		bodyState(bs),
 		flightSurface(fs),
-		trimState(ts)
+		trimState(ts),
+		rollCommandLimiter(-21.5, 21.5)
 	{
 	}
 	~F16FcsRollController() {}
@@ -127,6 +130,7 @@ public:
 
 		double pressureGain = getPressureGain(dynamicPressure_NM2);
 
+		// actuator actually limited to 20 deg?
 		double rollCommandGained = limit(rollRateCommandCombined * pressureGain, -21.5, 21.5);
 
 		flightSurface->roll_Command = rollCommandGained;
@@ -137,9 +141,11 @@ public:
 
 	void updateFrame(double frametime) 
 	{
-		flightSurface->aileron_DEG = limit(flightSurface->roll_Command, -21.5, 21.5);
-		flightSurface->aileron_Right_PCT = flightSurface->aileron_DEG / 21.5;
-		flightSurface->aileron_Left_PCT = flightSurface->aileron_DEG / 21.5;
+		// for now, just duplicate, consider flaps as well
+		flightSurface->aileron_Right_DEG = flightSurface->roll_Command;
+		flightSurface->aileron_Left_DEG = flightSurface->roll_Command;
+		flightSurface->aileron_Right_PCT = flightSurface->aileron_Right_DEG / 21.5;
+		flightSurface->aileron_Left_PCT = flightSurface->aileron_Left_DEG / 21.5;
 	}
 };
 

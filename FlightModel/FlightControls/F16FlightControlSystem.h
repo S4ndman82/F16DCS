@@ -341,9 +341,6 @@ public:
 	// aileron assist from asymmetric stabilizer movement etc.
 	void fcsMixer(double frametime)
 	{
-		// rough test only now, need to fix later
-		flightSurface.elevon_DEG = flightSurface.aileron_DEG*0.294;
-
 		// opposite direction in hta (compared to fl)
 
 		// pitch was already calculated? -> just modify
@@ -359,6 +356,20 @@ public:
 		{
 			// one side stays at maximum, other side can lift
 		}
+
+		/*
+		// just some rough testing for now
+		if (flightSurface.roll_Command > 0) // clockwise roll?
+		{
+			flightSurface.elevon_Right_DEG += flightSurface.aileron_Right_DEG*0.294;
+			flightSurface.elevon_Left_DEG -= flightSurface.aileron_Left_DEG*0.294;
+		}
+		else if (flightSurface.roll_Command < 0) // anti-clockwise roll?
+		{
+			flightSurface.elevon_Right_DEG -= flightSurface.aileron_Right_DEG*0.294;
+			flightSurface.elevon_Left_DEG += flightSurface.aileron_Left_DEG*0.294;
+		}
+		*/
 	}
 
 	void updateFrame(double frametime)

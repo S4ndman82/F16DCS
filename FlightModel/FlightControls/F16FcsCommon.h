@@ -102,8 +102,11 @@ public:
 	double		elevator_Right_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 	double		elevator_Left_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 
-	double		elevon_DEG;			// elevon deflection (deg): elevator assist to aileron
-	double		aileron_DEG;			// Aileron deflection (deg)
+	double		elevon_Right_DEG;			// elevon deflection (deg): elevator assist to aileron
+	double		elevon_Left_DEG;			// elevon deflection (deg): elevator assist to aileron
+
+	double		aileron_Right_DEG;			// Aileron deflection (deg)
+	double		aileron_Left_DEG;			// Aileron deflection (deg)
 	double		aileron_Right_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
 	double		aileron_Left_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
 
@@ -136,8 +139,10 @@ public:
 		elevator_DEG(0),
 		elevator_Right_PCT(0),
 		elevator_Left_PCT(0),
-		elevon_DEG(0),
-		aileron_DEG(0),
+		elevon_Right_DEG(0),
+		elevon_Left_DEG(0),
+		aileron_Right_DEG(0),
+		aileron_Left_DEG(0),
 		aileron_Right_PCT(0),
 		aileron_Left_PCT(0),
 		rudder_Command(0),

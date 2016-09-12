@@ -74,7 +74,8 @@ public:
 		double yawRateWithRoll = yaw_rate - rollRateWithAlpha;
 
 		// TODO: use flightSurface->roll_Command instead?
-		double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * flightSurface->aileron_DEG;
+		// should get roll side and yaw direction into consideration?
+		double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * flightSurface->roll_Command;
 
 		//double ay = bodyState->getAccYPerG();
 		// TODO: side acceleration (+ (ay * 19.3)) ?
