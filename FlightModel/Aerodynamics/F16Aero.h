@@ -154,7 +154,7 @@ public:
 	{
 		const double alpha = limit(bstate.alpha_DEG, -20.0, 90.0);
 		const double beta = limit(bstate.beta_DEG, -30.0, 30.0);
-		const double el = fsurf.elevator_DEG;
+		const double el = -fsurf.pitch_Command;
 
 		// TODO: speed brake handling..
 		// TODO Speedbrakes aero (from JBSim F16.xml config)

@@ -97,6 +97,8 @@ public:
 		//if ((airspeed_KTS >= 240.0) && (airspeed_KTS <= 370.0))
 		double trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
 		flightSurface->flap_Command = limit(trailing_edge_flap_deflection, tef_min, tef_max);
+
+		// TODO: roll combination in mixer
 	}
 
 	// Trailing edge flap deflection (deg)
@@ -114,9 +116,11 @@ public:
 		actuator.commandMove(flightSurface->flap_Command);
 		actuator.updateFrame(frametime);
 
-		flightSurface->flap_DEG = actuator.m_current;
-		flightSurface->flap_Right_PCT = actuator.m_current / 20.0;
-		flightSurface->flap_Left_PCT = actuator.m_current / 20.0;
+		// TODO: roll combination in mixer
+		flightSurface->flap_Right_DEG = actuator.m_current;
+		flightSurface->flap_Left_DEG = actuator.m_current;
+		flightSurface->flap_Right_PCT = flightSurface->flap_Right_DEG / 20.0;
+		flightSurface->flap_Left_PCT = flightSurface->flap_Left_DEG / 20.0;
 	}
 };
 

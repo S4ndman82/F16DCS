@@ -174,11 +174,14 @@ public:
 	void updateFrame(double frametime) 
 	{
 		// TODO: elevator result after mixing with roll controller
+		// tODO: actuator movement here
 
 		// TODO: separate movements on opposing side (with roll authority)
-		flightSurface->elevator_DEG = limit(-flightSurface->pitch_Command, -25.0, 25.0);
-		flightSurface->elevator_Right_PCT = flightSurface->elevator_DEG / 25.0;
-		flightSurface->elevator_Left_PCT = flightSurface->elevator_DEG / 25.0;
+		double deg = limit(-flightSurface->pitch_Command, -25.0, 25.0);
+		flightSurface->elevator_Right_DEG = deg;
+		flightSurface->elevator_Left_DEG = deg;
+		flightSurface->elevator_Right_PCT = flightSurface->elevator_Right_DEG / 25.0;
+		flightSurface->elevator_Left_PCT = flightSurface->elevator_Left_DEG / 25.0;
 	}
 };
 

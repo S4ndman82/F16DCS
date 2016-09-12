@@ -94,11 +94,13 @@ public:
 	double		leadingEdgeFlap_Left_PCT;			// Leading edge flap as a percent of maximum (0 to 1)
 
 	double		flap_Command;		// command from tef controller (position), can be adjusted by roll controller?
-	double		flap_DEG;			// Trailing edge flap deflection (deg)
+	double		flap_Right_DEG;			// Trailing edge flap deflection (deg)
+	double		flap_Left_DEG;			// Trailing edge flap deflection (deg)
 	double		flap_Right_PCT;			// Trailing edge flap deflection (0 to 1)
 	double		flap_Left_PCT;			// Trailing edge flap deflection (0 to 1)
 
-	double		elevator_DEG;			// Elevator deflection (deg) (pitch)
+	double		elevator_Right_DEG;			// Elevator deflection (deg) (pitch)
+	double		elevator_Left_DEG;			// Elevator deflection (deg) (pitch)
 	double		elevator_Right_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 	double		elevator_Left_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 
@@ -121,7 +123,8 @@ public:
 	double		airbrake_Left_PCT;
 
 	// new set of commands: split from old code,
-	// then code in mixer to determine combinations of surfaces
+	// then code in mixer to determine combinations of surfaces.
+	// These are what each controller wants, actual deflection (according to actuator) comes after.
 	double		pitch_Command;
 	double		roll_Command;
 	double		yaw_Command;
@@ -133,10 +136,12 @@ public:
 		leadingEdgeFlap_Right_PCT(0),
 		leadingEdgeFlap_Left_PCT(0),
 		flap_Command(0),
-		flap_DEG(0),
+		flap_Right_DEG(0),
+		flap_Left_DEG(0),
 		flap_Right_PCT(0),
 		flap_Left_PCT(0),
-		elevator_DEG(0),
+		elevator_Right_DEG(0),
+		elevator_Left_DEG(0),
 		elevator_Right_PCT(0),
 		elevator_Left_PCT(0),
 		elevon_Right_DEG(0),
