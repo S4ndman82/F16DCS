@@ -5,9 +5,6 @@
 
 #include "../UtilityFunctions.h"
 
-//#include "../include/general_filter.h"
-#include "DummyFilter.h"
-
 #include "F16FcsCommon.h"
 #include "F16Actuator.h"
 
@@ -23,18 +20,12 @@ protected:
 	F16FlightSurface *flightSurface;
 	F16TrimState *trimState;
 
-	DummyFilter	pitchRateWashout;
-	DummyFilter	pitchIntegrator;
-	DummyFilter	pitchPreActuatorFilter;
-	DummyFilter	pitchActuatorDynamicsFilter;
-	DummyFilter	accelFilter;
-
 	/*
 	F16Actuator		elevatorActuatorLeft;
 	F16Actuator		elevatorActuatorRight;
 	*/
 
-public:
+protected:
 	// Schedule gain component due to dynamic pressure
 	double dynamic_pressure_schedule(const double dynamicPressure_kNM2) const
 	{
@@ -122,10 +113,34 @@ public:
 		return (topLimit + bottomLimit);
 	}
 
+public:
+	F16FcsPitchController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
+		m_stickCommandPosFiltered(0),
+		m_alphaFiltered(0),
+		m_longStickForce(0),
+		m_latStickForce(0),
+		bodyState(bs),
+		flightSurface(fs),
+		trimState(ts)
+	{
+	}
+	~F16FcsPitchController() {}
+
+	bool initialize(double dt)
+	{
+		return true;
+	}
+	void reset(double dt)
+	{
+	}
+
+	double getAlphaFiltered() const { return m_alphaFiltered; }
+	double getLongStickForce() const { return m_longStickForce; }
+	double getLatStickForce() const { return m_latStickForce; }
 
 	// Controller for pitch
 	// TODO: implement differential actuator handling to mixer and actuator stages
-	double fcs_pitch_controller(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double dt)
+	void fcs_pitch_controller(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double dt)
 	{
 		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, trimState->trimPitch, dt);
 		double dynamicPressureScheduled = dynamic_pressure_schedule(dynamicPressure_kNM2);
@@ -153,78 +168,16 @@ public:
 		double finalPitchCommandTotal = finalCombinedCommandFilteredLimited;
 		finalPitchCommandTotal += (0.5 * m_alphaFiltered);
 
+		flightSurface->pitch_Command = finalPitchCommandTotal;
+	}
+
+	void updateFrame(double frametime) 
+	{
 		// TODO: separate movements on opposing side (with roll authority)
-		flightSurface->elevator_DEG = limit(-finalPitchCommandTotal, -25.0, 25.0);
+		flightSurface->elevator_DEG = limit(-flightSurface->pitch_Command, -25.0, 25.0);
 		flightSurface->elevator_Right_PCT = flightSurface->elevator_DEG / 25.0;
 		flightSurface->elevator_Left_PCT = flightSurface->elevator_DEG / 25.0;
-
-		flightSurface->pitch_Command = finalPitchCommandTotal;
-
-		return finalPitchCommandTotal;
-
-		// TODO: There are problems with flutter with the servo dynamics...needs to be nailed down!
-		//double actuatorDynamicsResult = pitchActuatorDynamicsFilter.Filter(!(simInitialized),dt,finalPitchCommandTotal);
-		//return actuatorDynamicsResult;	
 	}
-
-public:
-	F16FcsPitchController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
-		m_stickCommandPosFiltered(0),
-		m_alphaFiltered(0),
-		m_longStickForce(0),
-		m_latStickForce(0),
-		bodyState(bs),
-		flightSurface(fs),
-		trimState(ts),
-		pitchRateWashout(),
-		pitchIntegrator(),
-		pitchPreActuatorFilter(),
-		pitchActuatorDynamicsFilter(),
-		accelFilter()
-	{
-		// just do this once when constructing
-		initialize(0);
-		reset(0);
-	}
-	~F16FcsPitchController() {}
-
-	bool initialize(double dt)
-	{
-		double numerators[2] = { 1.0, 0.0 };
-		double denominators[2] = { 1.0, 1.0 };
-		pitchRateWashout.InitFilter(numerators, denominators, 1);
-
-		numerators[0] = 0.0; numerators[1] = 2.5;
-		denominators[0] = 1.0; denominators[1] = 0.0;
-		pitchIntegrator.InitFilter(numerators, denominators, 1);
-
-		numerators[0] = 3.0; numerators[1] = 15;
-		denominators[0] = 1.0; denominators[1] = 15.0;
-		pitchPreActuatorFilter.InitFilter(numerators, denominators, 1);
-
-		double numerators2[3] = { 0.0, 0.0, pow(52.0, 2.0) };
-		double denomiantors2[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-		pitchActuatorDynamicsFilter.InitFilter(numerators2, denomiantors2, 2);
-
-		numerators[0] = 0.0; numerators[1] = 15.0;
-		denominators[0] = 1.0; denominators[1] = 15.0;
-		accelFilter.InitFilter(numerators, denominators, 1);
-		return true;
-	}
-	void reset(double dt)
-	{
-		pitchRateWashout.ResetFilter(dt);
-		pitchIntegrator.ResetFilter(dt);
-		pitchPreActuatorFilter.ResetFilter(dt);
-		pitchActuatorDynamicsFilter.ResetFilter(dt);
-		accelFilter.ResetFilter(dt);
-	}
-
-	double getAlphaFiltered() const { return m_alphaFiltered; }
-	double getLongStickForce() const { return m_longStickForce; }
-	double getLatStickForce() const { return m_latStickForce; }
-
-	void updateFrame(double frametime) {}
 };
 
 #endif // ifndef _F16FCSPITCHCONTROLLER_H_

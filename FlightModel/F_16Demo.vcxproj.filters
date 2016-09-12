@@ -42,9 +42,6 @@
     <ClInclude Include="include\F16Constants.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="FlightControls\DummyFilter.h">
-      <Filter>FlightControls</Filter>
-    </ClInclude>
     <ClInclude Include="Electrics\F16ElectricBus.h">
       <Filter>Electrics</Filter>
     </ClInclude>

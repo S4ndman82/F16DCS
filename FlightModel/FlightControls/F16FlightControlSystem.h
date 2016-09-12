@@ -6,9 +6,6 @@
 #include "F16Constants.h"
 #include "../UtilityFunctions.h"
 
-//#include "../include/general_filter.h"
-#include "DummyFilter.h"
-
 #include "Inputs/F16AnalogInput.h"
 #include "Atmosphere/F16Atmosphere.h"
 
@@ -291,7 +288,7 @@ public:
 	//---------------------------------------------
 	//-----CONTROL DYNAMICS------------------------
 	//---------------------------------------------
-	void updateFrame(double frametime)
+	void controlCommands(double frametime)
 	{
 		double dynamicPressure_kNM2 = pAtmos->dynamicPressure / 1000.0; //for kN/m^2
 		// stagnation pressure? (used to detect transonic speeds?)
@@ -310,13 +307,11 @@ public:
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step
 		airbrakeControl.commandAirBrake(isGearDown);
-		airbrakeControl.updateFrame(frametime);
 
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
 		// Leading edge flap deflection (deg)
 		leadingedgeControl.getLefCommand(qbarOverPs, isWoW, frametime);
-		leadingedgeControl.updateFrame(frametime);
 
 		// Call the longitudinal (pitch) controller.  Takes the following inputs:
 		// -Normalize long stick input
@@ -333,7 +328,6 @@ public:
 		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), pAtmos->dynamicPressure, frametime);
 
 		yawControl.fcs_yaw_controller(pedInput.getValue(), pitchControl.getAlphaFiltered());
-		yawControl.updateFrame(frametime);
 
 		// TODO: combine flap control with aileron control commands
 
@@ -341,10 +335,6 @@ public:
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
 		flapControl.fcs_flap_controller(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS());
-		flapControl.updateFrame(frametime);
-
-		// combinations and differential commands in mixer (to actuators)
-		fcsMixer(frametime);
 	}
 
 	// combined and differential commands of flight surfaces:
@@ -369,6 +359,22 @@ public:
 		{
 			// one side stays at maximum, other side can lift
 		}
+	}
+
+	void updateFrame(double frametime)
+	{
+		// determine controller commands
+		controlCommands(frametime);
+
+		// combinations and differential commands in mixer (to actuators)
+		fcsMixer(frametime);
+
+		airbrakeControl.updateFrame(frametime);
+		leadingedgeControl.updateFrame(frametime);
+		pitchControl.updateFrame(frametime);
+		rollControl.updateFrame(frametime);
+		yawControl.updateFrame(frametime);
+		flapControl.updateFrame(frametime);
 	}
 
 	// after first frame is done

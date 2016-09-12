@@ -120,7 +120,6 @@
     <ClInclude Include="EnvironmentalSystem\F16OxygenSystem.h" />
     <ClInclude Include="EquationsOfMotion\F16EquationsOfMotion.h" />
     <ClInclude Include="EquationsOfMotion\F16WeightBalance.h" />
-    <ClInclude Include="FlightControls\DummyFilter.h" />
     <ClInclude Include="FlightControls\F16Actuator.h" />
     <ClInclude Include="FlightControls\F16FcsAirbrakeController.h" />
     <ClInclude Include="FlightControls\F16FcsCommon.h" />
