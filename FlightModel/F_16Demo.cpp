@@ -738,14 +738,13 @@ void ed_fm_set_draw_args(EdDrawArgument * drawargs, size_t size)
 	drawargs[11].f = F16::FlightControls.getAileronRSDraw(); // right aileron (trailing edge surface)
 	drawargs[12].f = F16::FlightControls.getAileronLSDraw(); // left aileron (trailing edge surface)
 
-	drawargs[13].f = F16::FlightControls.getLefRSDraw(); // right slat (leading edge)
-	drawargs[14].f = F16::FlightControls.getLefLSDraw(); // left slat (leading edge)
+	drawargs[13].f = F16::FlightControls.getLefRSDraw(); // right slat (leading edge) <- limited
+	drawargs[14].f = F16::FlightControls.getLefLSDraw(); // left slat (leading edge) <- negative angle works
 
 	drawargs[15].f = F16::FlightControls.getElevatorRSDraw(); // right elevator
 	drawargs[16].f = F16::FlightControls.getElevatorLSDraw(); // left elevator
 
 	drawargs[17].f = F16::FlightControls.getRudderDraw(); // right rudder
-	drawargs[18].f = -F16::FlightControls.getRudderDraw(); // left rudder
 
 	drawargs[22].f = F16::Airframe.getRefuelingDoorAngle(); // refueling door (not implemented)
 
