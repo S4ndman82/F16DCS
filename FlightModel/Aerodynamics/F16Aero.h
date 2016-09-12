@@ -329,6 +329,31 @@ public:
 		m_CxFlaps = CxLeft + CxRight;
 	}
 
+	double getCyAilerons(const double dYdail, F16FlightSurface &fsurf)
+	{
+		double CyAil = 0.0;
+		// check
+		//CyAil = dYdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
+		CyAil = dYdail*fsurf.aileron_Right_PCT + dYdail*fsurf.aileron_Left_PCT;
+		return CyAil;
+	}
+	double getCnAilerons(const double dNdail, F16FlightSurface &fsurf)
+	{
+		double CnAil = 0.0;
+		// check
+		//CnAil = dNdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
+		CnAil = dNdail*fsurf.aileron_Right_PCT + dNdail*fsurf.aileron_Left_PCT;
+		return CnAil;
+	}
+	double getClAilerons(const double dLdail, F16FlightSurface &fsurf)
+	{
+		double ClAil = 0.0;
+		// check
+		//ClAil = dLdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
+		ClAil = dLdail*fsurf.aileron_Right_PCT + dLdail*fsurf.aileron_Left_PCT;
+		return ClAil;
+	}
+
 
 	/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
@@ -347,8 +372,6 @@ public:
 
 		// TODO: left/right side when they can differ according to flight control system
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
-		const double aileron_PCT = fsurf.aileron_Right_PCT;
-		const double rudder_PCT = fsurf.rudder_PCT;
 
 		getFlapsCoeff(pAtmos->dynamicPressure, fsurf, bstate);
 		getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
@@ -405,26 +428,26 @@ public:
 		Cm_total = fn_Cm.m_result*fn_eta_el.m_result + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
-		double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT;
+		double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 		double dYdR = wingSpanFPS * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
 		double dYdP = wingSpanFPS * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
-		Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + dYdail*aileron_PCT + Cy_delta_r30*rudder_PCT 
+		Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + getCyAilerons(dYdail,fsurf) + Cy_delta_r30*fsurf.rudder_PCT
 			+ dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
 	
 		/* NNNNNNNN Cn_tot NNNNNNNN */ 
-		double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT;
+		double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 		double dNdR = wingSpanFPS * (fn_CNr.m_result + fn_delta_CNr_lef.m_result*leadingEdgeFlap_PCT);
 		double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
 		double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*bstate.beta_DEG;
-		Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + dNdail*aileron_PCT 
-			+ Cn_delta_r30*rudder_PCT + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS + CnDeltaBetaDeg;
+		Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + getCnAilerons(dNdail, fsurf)
+			+ Cn_delta_r30*fsurf.rudder_PCT + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS + CnDeltaBetaDeg;
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
-		double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT;
+		double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 		double dLdR = wingSpanFPS * (fn_CLr.m_result + fn_delta_CLr_lef.m_result*leadingEdgeFlap_PCT);
 		double dLdP = wingSpanFPS * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
 		double ClDeltaBetaDeg = fn_delta_CLbeta.m_result*bstate.beta_DEG;
-		Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + dLdail*aileron_PCT + Cl_delta_r30*rudder_PCT 
+		Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + getClAilerons(dLdail, fsurf) + Cl_delta_r30*fsurf.rudder_PCT
 			+ dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS + ClDeltaBetaDeg;
 	}
 
