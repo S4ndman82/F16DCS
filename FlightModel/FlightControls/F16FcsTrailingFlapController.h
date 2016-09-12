@@ -60,14 +60,14 @@ protected:
 		// else if alt flap switch -> max flaps
 
 		// speed high enough -> no flap deflection
-		if (airspeed_KTS > 370.0)
+		if (airspeed_KTS > 370.0) // ~190m/s
 		{
 			// no deflection
 			return tef_min;
 		}
 
 		// low speed -> full deflection
-		if (airspeed_KTS < 240.0)
+		if (airspeed_KTS < 240.0) // ~123m/s
 		{
 			// max deflection
 			return tef_max;

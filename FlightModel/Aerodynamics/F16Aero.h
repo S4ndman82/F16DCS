@@ -228,7 +228,7 @@ public:
 	// -> aerodynamic CG is different from "weight" (mass CG)
 	// -> this needs to be calculated as function of velocity
 	//
-	double getAeroCgDiff(const double totalVelocity, const double machNumber)
+	double getAeroCgDiff(const double dynamicPressure_NM2, const double machNumber)
 	{
 		// CG may vary from 0.30 - 0.39, 0.35 at mach 1 (reference point)
 		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
@@ -250,10 +250,58 @@ public:
 	// drag caused by aircraft skin in contact with air (friction)
 	// see: http://adg.stanford.edu/aa241/drag/wettedarea.html
 	//
-	double getWettedAreaDrag(const double totalVelocity, const double machNumber)
+	double getWettedAreaDrag(const double dynamicPressure_NM2, const double machNumber)
 	{
 		//Sw = 2.0 * (1 + 0.2 t/c) * Se;
 		return 0;
+	}
+
+	double getAirbrakeDrag(const double dynamicPressure_NM2, F16FlightSurface &fsurf)
+	{
+		double airbrakeDrag = 0;
+
+		// after actuator move, calculate new drag at new position
+
+		// TODO: switch to actual angles instead of percentages
+		//double angle = cos(airbrakeActuator.m_current);
+
+		// TEST!
+		// just use full now for testing
+		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
+
+		/* source: http://www.f-16.net/forum/viewtopic.php?t=11398
+		Because landing is such a low speed, I did not bother to calculate those forces.
+		But to estimate the force on the speedbrake at landing, you can use the dynamic pressure at landing speed x speedbrake area x cos 60 deg x Cd
+
+		dynamic pressure q ~ 125 lb/sq ft (from q/M^2 = 1480 lb/sq ft)
+		area ~ 4 sq ft x 4
+		cos 60 deg = .866
+		Cd ~ .7
+
+		total drag force ~ 1212 lb
+
+		That is the total force (parallel to the fuselage centerline) on all four panels at landing speed. It is much less than 3 tons.
+		*/
+		// ~1.48645m^2 area
+
+		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
+		//double force = dynamicPressure_NM2 * F16::airbrakeArea_m2 * cos(60) * 0.7;
+
+		if (fsurf.airbrake_Left_PCT > 0)
+		{
+			//double force = dynamicPressure_NM2 * F16::airbrakeArea_m2;
+			double CDAirbrake = fsurf.airbrake_Left_PCT * 0.7;
+			airbrakeDrag = -(CDAirbrake * cos(F16::degtorad));
+
+			//double pressureAreaFT2 = airbrakeArea_FT2 * dynamicPressure_LBFT2;
+			//double airbrake_DEG = (airbrakeActuator.m_current * 60); // <- PCT to DEG
+			//airbrakeDrag = -(0.7 * cos(airbrake_DEG));
+		}
+		else
+		{
+			airbrakeDrag = 0;
+		}
+		return airbrakeDrag;
 	}
 
 
@@ -261,9 +309,12 @@ public:
 	compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
 	(as on NASA report p37-40)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-	void computeTotals(const double AtmosTotalVelocity_FPS, const double diffCgPCT, F16FlightSurface &fsurf, F16BodyState &bstate,
-					const double LgCxGearAero, const double LgCzGearAero, const double CxAirbrake)
+	void computeTotals(const double AtmosTotalVelocity_FPS, F16FlightSurface &fsurf, F16BodyState &bstate,
+					const double LgCxGearAero, const double LgCzGearAero)
 	{
+		// 
+		double diffCgPCT = getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber); 
+
 		// precalculate some terms to simplify statements
 		const double totalVelocity_FPS = 2*AtmosTotalVelocity_FPS; // <- is this a bug?
 		const double meanChordFPS = (F16::meanChord_FT / totalVelocity_FPS);
@@ -274,6 +325,8 @@ public:
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double aileron_PCT = fsurf.aileron_Right_PCT;
 		const double rudder_PCT = fsurf.rudder_PCT;
+
+		const double CxAirbrake = getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
 
 
 		// TODO: dynamic CG to calculations, uses hardcoded "real" position now

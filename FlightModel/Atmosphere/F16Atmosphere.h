@@ -31,12 +31,13 @@ protected:
 public:
 	double		ambientTemperature;	// Ambient temperature (kelvin)
 	double		ambientDensity;		// Ambient density (kg/m^3)
-	double		dynamicPressure;	// Dynamic pressure (Pa == N/m^2)
+	double		dynamicPressure;	// Dynamic pressure (Pa == N/m^2) (velocity pressure)
 	double		speed_of_sound;		// (meters/sec)
 	double		ambientPressure;	// atmosphere pressure (Pa == N/m^2)
 	double		altitude;			// Absolute altitude MSL (meters)
 	double		totalVelocity;		// velocity in m/s
 	double		machNumber;			// M, gas compressibility, velocity per speed of sound
+	double		QcOverPs;			//
 
 	F16Atmosphere() 
 		: wind()
@@ -50,6 +51,7 @@ public:
 		, altitude(0)
 		, totalVelocity(0)
 		, machNumber(0)
+		, QcOverPs(0)
 	{}
 	~F16Atmosphere() {}
 
@@ -83,11 +85,25 @@ public:
 	{
 		totalVelocity = sqrt(m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z);
 		dynamicPressure = .5 * ambientDensity * pow(totalVelocity, 2);
-
+		QcOverPs = dynamicPressure / ambientPressure;
 		if (speed_of_sound > 0) // avoid crash in case we don't have this yet..
 		{
+			// "flow speed" over speed of sound
 			machNumber = totalVelocity / speed_of_sound;
 		}
+	}
+
+	// q = impact pressure aka. stagnation pressure aka. pitot pressure: 
+	// calibrated airspeed
+	//
+	// stagnation pressure? (used to detect transonic speeds?)
+	// dynamic pressure to static pressure ratio
+	//
+	// get Qc/Ps ratio
+	// 
+	double getQcOverPs() const
+	{
+		return QcOverPs;
 	}
 
 	double getAltitudeFeet() const

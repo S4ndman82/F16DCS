@@ -299,7 +299,8 @@ public:
 	{
 		double dynamicPressure_kNM2 = pAtmos->dynamicPressure / 1000.0; //for kN/m^2
 		// stagnation pressure? (used to detect transonic speeds?)
-		double qbarOverPs = pAtmos->dynamicPressure / pAtmos->ambientPressure;
+		// dynamic pressure to static pressure ratio
+		double qbarOverPs = pAtmos->getQcOverPs();
 
 		// landing gear "down&locked" affects some logic
 		bool isWoW = landingGear->isWoW();
@@ -312,7 +313,8 @@ public:
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step
-		airbrakeControl.updateAirBrake(isGearDown, pAtmos->dynamicPressure, frametime);
+		airbrakeControl.commandAirBrake(isGearDown, pAtmos->dynamicPressure);
+		airbrakeControl.updateFrame(frametime);
 
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
@@ -367,13 +369,6 @@ public:
 		{
 			// one side stays at maximum, other side can lift
 		}
-
-
-	}
-
-	double getAirbrakeDrag()
-	{
-		return airbrakeControl.airbrakeDrag;
 	}
 
 	// after first frame is done
