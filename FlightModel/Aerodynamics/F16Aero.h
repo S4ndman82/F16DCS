@@ -80,6 +80,10 @@ protected:
 	AERO_Function fn_delta_Cm;
 	AERO_Function fn_eta_el;
 
+	double m_CxFlaps;
+	double m_CzFlaps;
+	double m_CxAirbrake;
+
 public:
 	F16Aero(F16Atmosphere *atmos, F16GroundSurface *grounds) :
 		pAtmos(atmos),
@@ -137,7 +141,9 @@ public:
 		fn_delta_CNbeta(1, F16::_delta_CNbetaData),
 		fn_delta_CLbeta(1, F16::_delta_CLbetaData),
 		fn_delta_Cm(1, F16::_delta_CmData),
-		fn_eta_el(1, F16::_eta_elData)
+		fn_eta_el(1, F16::_eta_elData),
+		m_CxFlaps(0), m_CzFlaps(0),
+		m_CxAirbrake(0)
 	{
 		initfn();
 	}
@@ -256,7 +262,7 @@ public:
 		return 0;
 	}
 
-	double getAirbrakeDrag(const double dynamicPressure_NM2, F16FlightSurface &fsurf)
+	void getAirbrakeDrag(const double dynamicPressure_NM2, F16FlightSurface &fsurf)
 	{
 		double airbrakeDrag = 0;
 
@@ -301,7 +307,28 @@ public:
 		{
 			airbrakeDrag = 0;
 		}
-		return airbrakeDrag;
+		m_CxAirbrake = airbrakeDrag;
+	}
+
+	void getFlapCoeff(const double flap_PCT, const double body_alpha_DEG, double &CzFlap, double &CxFlap) const
+	{
+		// FLAPS (From JBSim F16.xml config)
+		double CLFlaps = 0.35 * flap_PCT;
+		double CDFlaps = 0.08 * flap_PCT;
+		CzFlap = -(CLFlaps * cos(body_alpha_DEG * F16::degtorad) + CDFlaps * sin(F16::degtorad));
+		CxFlap = -(-CLFlaps * sin(body_alpha_DEG * F16::degtorad) + CDFlaps * cos(F16::degtorad));
+	}
+	void getFlapsCoeff(const double dynamicPressure_NM2, F16FlightSurface &fsurf, F16BodyState &bstate)
+	{
+		double CzLeft = 0.0, CzRight = 0.0, CxLeft = 0.0, CxRight = 0.0;
+		getFlapCoeff(fsurf.flap_Left_PCT, bstate.alpha_DEG, CzLeft, CxLeft);
+		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, CzRight, CxRight);
+
+		m_CzFlaps = CzLeft + CzRight;
+		m_CxFlaps = CxLeft + CxRight;
+
+		//m_CzFlaps = CzRight;
+		//m_CxFlaps = CxRight;
 	}
 
 
@@ -321,12 +348,12 @@ public:
 		const double wingSpanFPS = (F16::wingSpan_FT / totalVelocity_FPS);
 
 		// TODO: left/right side when they can differ according to flight control system
-		const double flap_PCT = fsurf.flap_Right_PCT;
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double aileron_PCT = fsurf.aileron_Right_PCT;
 		const double rudder_PCT = fsurf.rudder_PCT;
 
-		const double CxAirbrake = getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
+		getFlapsCoeff(pAtmos->dynamicPressure, fsurf, bstate);
+		getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
 
 
 		// TODO: dynamic CG to calculations, uses hardcoded "real" position now
@@ -360,24 +387,18 @@ public:
 		const double Cl_delta_a20 = fn_Cl_a20.m_result - fn_ClEle0.m_result;
 		const double Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - fn_Cl_lef.m_result - Cl_delta_a20;
 
-		// FLAPS (From JBSim F16.xml config)
-		double CLFlaps = 0.35 * flap_PCT;
-		double CDFlaps = 0.08 * flap_PCT;
-		double CzFlaps = -(CLFlaps * cos(bstate.alpha_DEG * F16::degtorad) + CDFlaps * sin(F16::degtorad));
-		double CxFlaps = -(-CLFlaps * sin(bstate.alpha_DEG * F16::degtorad) + CDFlaps * cos(F16::degtorad));
-
 		/* XXXXXXXX Cx_tot XXXXXXXX */
 		double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
 		Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
-		Cx_total += CxFlaps + LgCxGearAero;
+		Cx_total += m_CxFlaps + LgCxGearAero;
 
 		/* airbrake - testing now*/
-		Cx_total += CxAirbrake;
+		Cx_total += m_CxAirbrake;
 
 		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
 		double dZdQ = meanChordFPS * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
 		Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
-		Cz_total += CzFlaps + LgCzGearAero;
+		Cz_total += m_CzFlaps + LgCzGearAero;
 
 		/* MMMMMMMM Cm_tot MMMMMMMM */ 
 		/* ignore deep-stall regime, delta_Cm_ds = 0 */
