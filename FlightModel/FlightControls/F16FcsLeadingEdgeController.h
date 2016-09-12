@@ -59,7 +59,7 @@ public:
 
 	// Controller for the leading edge flaps
 	// symmetrical, as function of alpha and mach number
-	void getLefCommand(const double qbarOverPs, const bool isWoW, const double frameTime)
+	void fcsCommand(const double qbarOverPs, const bool isWoW, const double frameTime)
 	{
 		// TODO: get rid of this
 		if (simInitialized == false)

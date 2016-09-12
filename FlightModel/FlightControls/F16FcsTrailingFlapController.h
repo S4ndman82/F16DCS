@@ -46,7 +46,7 @@ public:
 	// otherwise only as ailerons.
 	// Normally flaps are down when gear lever is down.
 	// With alternate flaps switch, flaps are extended regardless of gear lever.
-	void fcs_flap_controller(bool isGearUp, bool isAltFlaps, double airspeed_KTS)
+	void fcsCommand(bool isGearUp, bool isAltFlaps, double airspeed_KTS)
 	{
 		const double tef_min = 0.0;
 		const double tef_max = 20.0;

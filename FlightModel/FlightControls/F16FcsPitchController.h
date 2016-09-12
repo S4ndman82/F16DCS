@@ -140,7 +140,7 @@ public:
 
 	// Controller for pitch
 	// TODO: implement differential actuator handling to mixer and actuator stages
-	void fcs_pitch_controller(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double dt)
+	void fcsCommand(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double dt)
 	{
 		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, trimState->trimPitch, dt);
 		double dynamicPressureScheduled = dynamic_pressure_schedule(dynamicPressure_kNM2);

@@ -61,7 +61,7 @@ public:
 	}
 
 	// Controller for yaw
-	void fcs_yaw_controller(double pedInput, double alphaFiltered)
+	void fcsCommand(double pedInput, double alphaFiltered)
 	{
 		const double roll_rate = bodyState->getRollRateDegs();
 		const double yaw_rate = bodyState->getYawRateDegs();

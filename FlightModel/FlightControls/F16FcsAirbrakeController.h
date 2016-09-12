@@ -53,7 +53,7 @@ public:
 	{
 	}
 
-	void commandAirBrake(bool isGearDown)
+	void fcsCommand(bool isGearDown)
 	{
 		// TODO: change values to degrees here
 

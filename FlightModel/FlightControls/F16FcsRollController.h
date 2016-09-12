@@ -109,7 +109,7 @@ public:
 	}
 
 	// Controller for roll
-	void fcs_roll_controller(double latStickInput, double longStickForce, double dynamicPressure_NM2, double dt)
+	void fcsCommand(double latStickInput, double longStickForce, double dynamicPressure_NM2, double dt)
 	{
 		const double roll_rate = bodyState->getRollRateDegs();
 

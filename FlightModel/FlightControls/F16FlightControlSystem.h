@@ -306,12 +306,12 @@ public:
 
 		//if (airbrakeExtended != airbrakeSwitch)
 		// -> actuator movement by frame step
-		airbrakeControl.commandAirBrake(isGearDown);
+		airbrakeControl.fcsCommand(isGearDown);
 
 		// Call the leading edge flap dynamics controller, this controller is based on dynamic pressure and angle of attack
 		// and is completely automatic
 		// Leading edge flap deflection (deg)
-		leadingedgeControl.getLefCommand(qbarOverPs, isWoW, frametime);
+		leadingedgeControl.fcsCommand(qbarOverPs, isWoW, frametime);
 
 		// Call the longitudinal (pitch) controller.  Takes the following inputs:
 		// -Normalize long stick input
@@ -324,17 +324,17 @@ public:
 		// or pitch controller should calculate roll effect too?
 		// -> check control laws, in addition to handling supersonic flutter
 
-		pitchControl.fcs_pitch_controller(longStickInput.getValue(), dynamicPressure_kNM2, manualPitchOverride, frametime);
-		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), pAtmos->dynamicPressure, frametime);
+		pitchControl.fcsCommand(longStickInput.getValue(), dynamicPressure_kNM2, manualPitchOverride, frametime);
+		rollControl.fcsCommand(latStickInput.getValue(), pitchControl.getLongStickForce(), pAtmos->dynamicPressure, frametime);
 
-		yawControl.fcs_yaw_controller(pedInput.getValue(), pitchControl.getAlphaFiltered());
+		yawControl.fcsCommand(pedInput.getValue(), pitchControl.getAlphaFiltered());
 
 		// TODO: combine flap control with aileron control commands
 
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flapControl.fcs_flap_controller(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS());
+		flapControl.fcsCommand(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS());
 	}
 
 	// combined and differential commands of flight surfaces:
