@@ -368,5 +368,45 @@ public:
 	}
 };
 
+// simple configurable rate- and range-limiting class,
+// keep value within hysteresis-scale
+template<typename T> class DeltaLimiter
+{
+public:
+	const T lower_limit;
+	const T upper_limit;
+	const T delta_max;
+
+	T previous;
+
+	DeltaLimiter(const T lower, const T upper, const T delta)
+		: lower_limit(lower), upper_limit(upper), delta_max(delta),
+		previous(0)
+	{}
+	~DeltaLimiter() {}
+
+	T deltaLimit(const T input) const
+	{
+		// not over delta limit
+		if (abs(input - previous) <= delta_max)
+		{
+			return limit(input);
+		}
+	}
+
+	T limit(const T input) const
+	{
+		if (input > upper_limit)
+		{
+			return upper_limit;
+		}
+		else if (input < lower_limit)
+		{
+			return lower_limit;
+		}
+		return input;
+	}
+};
+
 
 #endif // ifndef __UtilFunctions__
