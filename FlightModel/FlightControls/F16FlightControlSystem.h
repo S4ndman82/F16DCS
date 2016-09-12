@@ -82,11 +82,9 @@ protected:
 	// elevon: elevator and aileron functionality (stabilizers)
 	F16Actuator		elevonActuatorLeft;
 	F16Actuator		elevonActuatorRight;
-	F16Actuator		rudderActuator;
 
 	Limiter<double>		flaperonLimiter;
 	Limiter<double>		htailLimiter;
-	Limiter<double>		rudderLimiter;
 
 
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
@@ -142,10 +140,8 @@ public:
 		, flaperonActuatorRight(1) // <- placeholder value
 		, elevonActuatorLeft(1) // <- placeholder value
 		, elevonActuatorRight(1) // <- placeholder value
-		, rudderActuator(1.0, -30.0, 30.0)
 		, flaperonLimiter(-20, 20) // deflection limit for both sides
 		, htailLimiter(-25, 25) // stab. deflection limits
-		, rudderLimiter(-30, 30) // deflection limit
 		, manualPitchOverride(false)
 		//, isGearDown(true)
 		//, isGearUp(false)
@@ -335,14 +331,17 @@ public:
 
 		pitchControl.fcs_pitch_controller(longStickInput.getValue(), dynamicPressure_kNM2, manualPitchOverride, frametime);
 		rollControl.fcs_roll_controller(latStickInput.getValue(), pitchControl.getLongStickForce(), pAtmos->dynamicPressure, frametime);
-		yawControl.fcs_yaw_controller(pedInput.getValue(), pitchControl.getAlphaFiltered(), frametime);
+
+		yawControl.fcs_yaw_controller(pedInput.getValue(), pitchControl.getAlphaFiltered());
+		yawControl.updateFrame(frametime);
 
 		// TODO: combine flap control with aileron control commands
 
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flapControl.updateFrame(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS(), qbarOverPs, frametime);
+		flapControl.fcs_flap_controller(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS());
+		flapControl.updateFrame(frametime);
 
 		// combinations and differential commands in mixer (to actuators)
 		fcsMixer(frametime);

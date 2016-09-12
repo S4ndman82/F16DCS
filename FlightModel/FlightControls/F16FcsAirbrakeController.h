@@ -39,14 +39,6 @@ public:
 	void setAirbrake(bool status)
 	{
 		airbrakeSwitch = status;
-		if (airbrakeSwitch == true)
-		{
-			airbrakeActuator.m_commanded = 1;
-		}
-		else
-		{
-			airbrakeActuator.m_commanded = 0;
-		}
 	}
 	void toggleAirbrake()
 	{
@@ -99,6 +91,7 @@ public:
 		airbrakeActuator.updateFrame(frametime);
 
 		// just use same for both sides for now
+		flightSurface->airbrake_Left_DEG = flightSurface->airbrake_Right_DEG;
 		flightSurface->airbrake_Right_PCT = airbrakeActuator.m_current;
 		flightSurface->airbrake_Left_PCT = airbrakeActuator.m_current;
 	}

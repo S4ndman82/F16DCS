@@ -324,11 +324,9 @@ public:
 		getFlapCoeff(fsurf.flap_Left_PCT, bstate.alpha_DEG, CzLeft, CxLeft);
 		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, CzRight, CxRight);
 
+		// check this
 		m_CzFlaps = CzLeft + CzRight;
 		m_CxFlaps = CxLeft + CxRight;
-
-		//m_CzFlaps = CzRight;
-		//m_CxFlaps = CxRight;
 	}
 
 

@@ -107,10 +107,13 @@ public:
 	double		aileron_Right_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
 	double		aileron_Left_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
 
+	double		rudder_Command;
 	double		rudder_DEG;			// Rudder  deflection (deg)
 	double		rudder_PCT;			// Rudder deflection as a percent of maximum (-1 to 1)
 
 	double		airbrake_Command;
+	double		airbrake_Right_DEG;
+	double		airbrake_Left_DEG;
 	double		airbrake_Right_PCT;
 	double		airbrake_Left_PCT;
 
@@ -137,9 +140,12 @@ public:
 		aileron_DEG(0),
 		aileron_Right_PCT(0),
 		aileron_Left_PCT(0),
+		rudder_Command(0),
 		rudder_DEG(0),
 		rudder_PCT(0),
 		airbrake_Command(0),
+		airbrake_Right_DEG(0),
+		airbrake_Left_DEG(0),
 		airbrake_Right_PCT(0),
 		airbrake_Left_PCT(0),
 		pitch_Command(0),

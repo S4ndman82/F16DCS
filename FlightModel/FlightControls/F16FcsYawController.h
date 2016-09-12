@@ -5,10 +5,8 @@
 
 #include "../UtilityFunctions.h"
 
-//#include "../include/general_filter.h"
-#include "DummyFilter.h"
-
 #include "F16FcsCommon.h"
+#include "F16Actuator.h"
 
 
 class F16FcsYawController
@@ -18,10 +16,8 @@ protected:
 	F16FlightSurface *flightSurface;
 	F16TrimState *trimState;
 
-	DummyFilter	rudderCommandFilter;
-	DummyFilter	yawRateWashout;
-	DummyFilter	yawRateFilter;
-	DummyFilter	yawServoFilter;
+	F16Actuator		rudderActuator;
+	Limiter<double>		rudderLimiter;
 
 public:
 	double getRudderCommand(const double pedInput) const
@@ -42,45 +38,32 @@ public:
 			rudderCommand = -0.0739 * rudderForceCommand - 3.2512;
 		}
 
-		return limit(rudderCommand, -30.0, 30.0);
+		return rudderLimiter.limit(rudderCommand);
 	}
 
 	// Controller for yaw
-	double fcs_yaw_controller(double pedInput, double alphaFiltered, double dt)
+	void fcs_yaw_controller(double pedInput, double alphaFiltered)
 	{
 		const double roll_rate = bodyState->getRollRateDegs();
 		const double yaw_rate = bodyState->getYawRateDegs();
-		double ay = bodyState->getAccYPerG();
 
 		double rudderCommand = getRudderCommand(pedInput);
-		double rudderCommandFiltered = rudderCommandFilter.Filter(dt, rudderCommand);
-		double rudderCommandFilteredWTrim = trimState->trimYaw - rudderCommandFiltered;
+		double rudderCommandFilteredWTrim = trimState->trimYaw - rudderCommand;
 
 		double alphaGained = alphaFiltered * (1.0 / 57.3);
 		double rollRateWithAlpha = roll_rate * alphaGained;
 		double yawRateWithRoll = yaw_rate - rollRateWithAlpha;
 
-		double yawRateWithRollWashedOut = yawRateWashout.Filter(dt, yawRateWithRoll);
-		double yawRateWithRollFiltered = yawRateFilter.Filter(dt, yawRateWithRollWashedOut);
-
-		double yawRateFilteredWithSideAccel = yawRateWithRollFiltered;// + (ay * 19.3);
-
-	
 		// TODO: use flightSurface->roll_Command instead?
 		double aileronGained = limit(0.05 * alphaFiltered, 0.0, 1.5) * flightSurface->aileron_DEG;
 
-		double finalRudderCommand = aileronGained + yawRateFilteredWithSideAccel + rudderCommandFilteredWTrim;
+		//double ay = bodyState->getAccYPerG();
+		// TODO: side acceleration (+ (ay * 19.3)) ?
+		flightSurface->yaw_Command = aileronGained + yawRateWithRoll + rudderCommandFilteredWTrim;
 
-		flightSurface->rudder_DEG = limit(finalRudderCommand, -30.0, 30.0);
-		flightSurface->rudder_PCT = flightSurface->rudder_DEG / 30.0;
-
-		flightSurface->yaw_Command = finalRudderCommand;
-
-		return finalRudderCommand;
-
-		//TODO: Figure out why there is a ton of flutter at high speed due to these servo dynamics
-		//double yawServoCommand = yawServoFilter.Filter(!(simInitialized),dt,finalRudderCommand);
-		//return yawServoCommand;
+		// without blending, rudder command == yaw command
+		// -> change in mixer (after this call) if/when necessary
+		flightSurface->rudder_Command = flightSurface->yaw_Command;
 	}
 
 public:
@@ -88,45 +71,28 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		trimState(ts),
-		rudderCommandFilter(),
-		yawRateWashout(),
-		yawRateFilter(),
-		yawServoFilter()
+		rudderActuator(1.0, -30.0, 30.0),
+		rudderLimiter(-30, 30) // deflection limit
 	{
-		// just do this once when constructing
-		initialize(0);
-		reset(0);
 	}
 	~F16FcsYawController() {}
 
 	bool initialize(double dt)
 	{
-		double numerators[2] = { 0.0, 4.0 };
-		double denominators[2] = { 1.0, 4.0 };
-		rudderCommandFilter.InitFilter(numerators, denominators, 1);
-
-		double numerators1[2] = { 1.0, 0.0 };
-		double denominators1[2] = { 1.0, 1.0 };
-		yawRateWashout.InitFilter(numerators1, denominators1, 1);
-
-		double numerators2[2] = { 3.0, 15.0 };
-		double denominators2[2] = { 1.0, 15.0 };
-		yawRateFilter.InitFilter(numerators2, denominators2, 1);
-
-		double numerators3[3] = { 0.0, 0.0, pow(52.0, 2.0) };
-		double denomiantors3[3] = { 1.0, 2.0*0.7*52.0, pow(52.0, 2.0) };
-		yawServoFilter.InitFilter(numerators3, denomiantors3, 2);
 		return true;
 	}
 	void reset(double dt)
 	{
-		rudderCommandFilter.ResetFilter(dt);
-		yawRateWashout.ResetFilter(dt);
-		yawRateFilter.ResetFilter(dt);
-		yawServoFilter.ResetFilter(dt);
 	}
 
-	void updateFrame(double frametime) {}
+	void updateFrame(double frametime) 
+	{
+		rudderActuator.commandMove(flightSurface->rudder_Command);
+		rudderActuator.updateFrame(frametime);
+
+		flightSurface->rudder_DEG = rudderActuator.m_current;
+		flightSurface->rudder_PCT = flightSurface->rudder_DEG / 30.0;
+	}
 };
 
 #endif // ifndef _F16FCSYAWCONTROLLER_H_
