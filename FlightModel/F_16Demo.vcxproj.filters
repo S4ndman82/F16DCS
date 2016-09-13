@@ -8,7 +8,6 @@
   <ItemGroup>
     <ClInclude Include="F_16Demo.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="UtilityFunctions.h" />
     <ClInclude Include="Aerodynamics\F16Aero.h">
       <Filter>Aerodynamics</Filter>
     </ClInclude>
@@ -142,6 +141,8 @@
     <ClInclude Include="Aerodynamics\F16AeroFunction.h">
       <Filter>Aerodynamics</Filter>
     </ClInclude>
+    <ClInclude Include="UtilityFunctions.h" />
+    <ClInclude Include="ndinterp.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
