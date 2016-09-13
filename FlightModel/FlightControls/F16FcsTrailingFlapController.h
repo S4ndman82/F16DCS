@@ -33,7 +33,7 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		actuator(10.0, 0, 20.0), // <- check adjustment rate
-		transonicFlap(0.1105, 0.787, 1.008, 0, 2),
+		transonicFlap(0.1105, 0.787, 1.008, 0, 2), // <- use positive values for flaps
 		isAirRefuelMode(false)
 	{}
 	~F16FcsTrailingFlapController() {}
@@ -53,13 +53,11 @@ public:
 	// With alternate flaps switch, flaps are extended regardless of gear lever.
 	void fcsCommand(bool isGearUp, bool isAltFlaps, const double airspeed_KTS, const double qbarOverPs)
 	{
+		// use positive values
 		const double tef_min = 0.0;
 		const double tef_max = 20.0;
 
 		// TODO: electrical bias on adjustment?
-
-		// also bit of flaps in transonic speeds?
-		// 
 
 		/*
 		// lower tef by some degrees?
@@ -76,7 +74,7 @@ public:
 			//flightSurface->flap_Command = tef_min;
 
 			// linear multiplier of the input
-			flightSurface->flap_Command = -transonicFlap.result(qbarOverPs);
+			flightSurface->flap_Command = transonicFlap.result(qbarOverPs);
 			return;
 		}
 
