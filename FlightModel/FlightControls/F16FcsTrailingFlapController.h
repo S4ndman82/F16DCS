@@ -33,7 +33,7 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		actuator(10.0, 0, 20.0), // <- check adjustment rate
-		transonicFlap(0.1105, 0.787, 1.008, 0, 2), // <- use positive values for flaps
+		transonicFlap(0.1105, 0.787, 0.787, 1.008, 0, 2), // <- use positive values for flaps
 		isAirRefuelMode(false)
 	{}
 	~F16FcsTrailingFlapController() {}

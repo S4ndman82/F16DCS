@@ -56,10 +56,6 @@ public:
 
 protected:
 
-	// TODO: get rid of this
-	bool		simInitialized;
-
-
 	// Pitch controller variables
 	AnalogInput		longStickInput; // pitch normalized
 	AnalogInput		latStickInput; // bank normalized
@@ -123,7 +119,6 @@ public:
 		, flightSurface()
 		//, trimState(-0.3, 0, 0) // <- -0.3 pitch trim, RSS compensation?
 		, trimState(0, 0, 0)
-		, simInitialized(false)
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
@@ -386,14 +381,6 @@ public:
 		rollControl.updateFrame(frametime);
 		yawControl.updateFrame(frametime);
 		flapControl.updateFrame(frametime);
-	}
-
-	// after first frame is done
-	// TODO: get rid of this
-	void setInitialized()
-	{
-		simInitialized = true;
-		leadingedgeControl.setInitialized();
 	}
 
 };

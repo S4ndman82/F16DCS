@@ -282,10 +282,6 @@ void ed_fm_simulate(double dt)
 		// TODO: nose-wheel steering, braking forces etc.
 		F16::Motion.updateNoseWheelTurn(F16::LandingGear.getNoseTurnDirection(), F16::LandingGear.getNosegearAngle());
 	}
-
-	// TODO: remove
-	// Tell the simulation that it has gone through the first frame
-	F16::FlightControls.setInitialized();
 }
 
 /*

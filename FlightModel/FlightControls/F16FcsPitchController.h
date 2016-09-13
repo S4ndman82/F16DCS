@@ -26,7 +26,7 @@ protected:
 	*/
 
 	// F2
-	LinearFunction<double> stability;
+	//LinearFunction<double> stability;
 
 protected:
 	// Schedule gain component due to dynamic pressure
@@ -124,8 +124,8 @@ public:
 		m_latStickForce(0),
 		bodyState(bs),
 		flightSurface(fs),
-		trimState(ts),
-		stability(0.5, 0.53, 1.79, 0.5, -1)
+		trimState(ts)
+		//stability(0.5, 0.53, 1.79, 0.5, -1)
 	{
 	}
 	~F16FcsPitchController() {}

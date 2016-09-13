@@ -19,7 +19,7 @@ protected:
 	Limiter<double>		rollCommandLimiter;
 
 	// amount of hta for roll
-	LinearFunction<double> tailRoll;
+	//LinearFunction<double> tailRoll;
 
 protected:
 	double getRollFeelGain(const double longStickForce) const
@@ -98,8 +98,8 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		trimState(ts),
-		rollCommandLimiter(-21.5, 21.5),
-		tailRoll(1, 0.694, 1.132, 0.25, 0.50)
+		rollCommandLimiter(-21.5, 21.5)
+		//tailRoll(1, 0.694, 1.132, 0.25, 0.50)
 	{
 	}
 	~F16FcsRollController() {}

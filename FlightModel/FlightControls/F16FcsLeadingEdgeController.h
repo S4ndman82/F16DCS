@@ -14,9 +14,6 @@ protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
 
-	// TODO: get rid of this
-	bool		simInitialized;
-
 	double		leading_edge_flap_integral;
 	double		leading_edge_flap_integrated;
 	double		leading_edge_flap_rate;
@@ -34,7 +31,6 @@ public:
 	F16FcsLeadingEdgeController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
-		simInitialized(false),
 		leading_edge_flap_integral(0),
 		leading_edge_flap_integrated(0),
 		leading_edge_flap_rate(0),
@@ -61,16 +57,6 @@ public:
 	// symmetrical, as function of alpha and mach number
 	void fcsCommand(const double qbarOverPs, const bool isWoW, const double frameTime)
 	{
-		// TODO: get rid of this
-		if (simInitialized == false)
-		{
-			leading_edge_flap_integral = -bodyState->alpha_DEG;
-			leading_edge_flap_integrated = leading_edge_flap_integral + 2 * bodyState->alpha_DEG;
-
-			flightSurface->leadingEdgeFlap_Command = lefLimiter.limit(leading_edge_flap_integral);
-			return;
-		}
-
 		/*
 		// TODO: fix rest of handling for this too
 		// actuator movement needs support too
@@ -105,11 +91,6 @@ public:
 		double lef_PCT = limit(flightSurface->leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
 		flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
 		flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;
-	}
-
-	void setInitialized()
-	{
-		simInitialized = true;
 	}
 };
 
