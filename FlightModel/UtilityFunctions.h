@@ -399,11 +399,11 @@ public:
 			// this is crude way but should work for now..
 			if (diff > 0)
 			{
-				current = limit(current + diff);
+				current = limit(current + delta_max);
 			}
 			else
 			{
-				current = limit(current - diff);
+				current = limit(current - delta_max);
 			}
 		}
 		return current;
