@@ -141,8 +141,12 @@
     <ClInclude Include="Aerodynamics\F16AeroFunction.h">
       <Filter>Aerodynamics</Filter>
     </ClInclude>
-    <ClInclude Include="UtilityFunctions.h" />
-    <ClInclude Include="ndinterp.h" />
+    <ClInclude Include="include\UtilityFunctions.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Aerodynamics\ndinterp.h">
+      <Filter>Aerodynamics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

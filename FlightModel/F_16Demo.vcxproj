@@ -98,6 +98,7 @@
     <ClInclude Include="Aerodynamics\F16Aero.h" />
     <ClInclude Include="Aerodynamics\F16AeroData.h" />
     <ClInclude Include="Aerodynamics\F16AeroFunction.h" />
+    <ClInclude Include="Aerodynamics\ndinterp.h" />
     <ClInclude Include="Airframe\F16Airframe.h" />
     <ClInclude Include="Atmosphere\F16Atmosphere.h" />
     <ClInclude Include="Atmosphere\F16GroundSurface.h" />
@@ -136,14 +137,13 @@
     <ClInclude Include="include\ED_FM_Utility.h" />
     <ClInclude Include="include\F16Constants.h" />
     <ClInclude Include="include\FM\wHumanCustomPhysicsAPI.h" />
+    <ClInclude Include="include\UtilityFunctions.h" />
     <ClInclude Include="Inputs\F16AnalogInput.h" />
     <ClInclude Include="Inputs\F16Inputs.h" />
     <ClInclude Include="LandingGear\F16LandingGear.h" />
     <ClInclude Include="LandingGear\F16LandingWheel.h" />
-    <ClInclude Include="ndinterp.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="UtilityFunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

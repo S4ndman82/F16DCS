@@ -7,7 +7,7 @@
 // for actuator code
 #include "FlightControls/F16Actuator.h"
 
-#include "../UtilityFunctions.h"
+#include "UtilityFunctions.h"
 
 // - canopy status
 // - refueling slot status

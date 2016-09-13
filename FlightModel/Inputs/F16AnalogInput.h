@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include "../UtilityFunctions.h"
+#include "UtilityFunctions.h"
 
 // handle normalized values with less repeating
 class AnalogInput

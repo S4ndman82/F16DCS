@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include "../UtilityFunctions.h"
+#include "UtilityFunctions.h"
 
 #include "F16FcsCommon.h"
 #include "F16Actuator.h"

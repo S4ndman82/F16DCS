@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include "../UtilityFunctions.h"
+#include "UtilityFunctions.h"
 
 // if/when trimming support is needed,
 // keep settings in one place.

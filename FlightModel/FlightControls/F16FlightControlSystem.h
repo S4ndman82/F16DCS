@@ -4,7 +4,7 @@
 #include <cmath>
 
 #include "F16Constants.h"
-#include "../UtilityFunctions.h"
+#include "UtilityFunctions.h"
 
 #include "Inputs/F16AnalogInput.h"
 #include "Atmosphere/F16Atmosphere.h"
