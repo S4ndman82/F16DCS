@@ -49,7 +49,7 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		trimState(ts),
-		rudderActuator(60.0, -30.0, 30.0), // <- check rate
+		rudderActuator(120.0, -30.0, 30.0), // <- FLCS diag
 		rudderLimiter(-30, 30) // deflection limit
 		//yawAxis(1, 2.04, 3.23, 0.5, 1)
 	{
