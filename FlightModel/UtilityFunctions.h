@@ -366,6 +366,18 @@ public:
 		}
 		return input;
 	}
+	bool isOutsideRange(const T input) const
+	{
+		if (input > upper_limit)
+		{
+			return true;
+		}
+		else if (input < lower_limit)
+		{
+			return true;
+		}
+		return false;
+	}
 };
 
 // simple configurable rate- and range-limiting class,
@@ -373,19 +385,17 @@ public:
 template<typename T> class DeltaLimiter
 {
 public:
-	const T lower_limit;
-	const T upper_limit;
+	Limiter<T> limiter;
 	const T delta_max;
 
 	T current;
 
 	DeltaLimiter(const T lower, const T upper, const T delta)
-		: lower_limit(lower), upper_limit(upper), delta_max(delta),
+		: limiter(lower, upper), delta_max(delta),
 		current(0)
 	{}
 	~DeltaLimiter() {}
 
-	/**/
 	T deltaLimit(const T input) const
 	{
 		T diff = input - current;
@@ -393,7 +403,7 @@ public:
 		{
 			// not over delta limit (rate-change)
 			// -> check range
-			current = limit(input);
+			current = limiter.limit(input);
 		}
 		else
 		{
@@ -402,29 +412,32 @@ public:
 			// then check limit to range
 			if (diff > 0)
 			{
-				current = limit(current + delta_max);
+				current = limiter.limit(current + delta_max);
 			}
 			else
 			{
-				current = limit(current - delta_max);
+				current = limiter.limit(current - delta_max);
 			}
 		}
 		return current;
 	}
-	/**/
+};
 
-	T limit(const T input) const
-	{
-		if (input > upper_limit)
-		{
-			return upper_limit;
-		}
-		else if (input < lower_limit)
-		{
-			return lower_limit;
-		}
-		return input;
-	}
+// generic linear function:
+// enter values according to graphs in FLCS documents (for example)
+template<typename T> class LinearFunction
+{
+public:
+	const T angleFactor; // factor to multiply with (ratio of X/Y)
+
+	// range for upper and lower values, delta for angle
+	//DeltaLimiter<T> lim;
+
+	LinearFunction(const T angle)
+		: angleFactor(angle)
+	{}
+	~LinearFunction() {}
+
 };
 
 

@@ -93,6 +93,25 @@ public:
 		}
 	}
 
+	/*
+	// note: for testing, not checked
+	double getStaticAirTemperature() const
+	{
+		double correctionFactor = 1/(1+r0.2M^2)
+
+		return ambientTemperature * correctionFactor;
+	}
+	*/
+	// note: for testing, not checked
+	double getTrueAirspeed() const
+	{
+		// should use computed static air temperature in this case?
+		double temp = sqrt(ambientTemperature);
+		temp *= machNumber;
+		temp *= 20.0468;
+		return temp;
+	}
+
 	// q = impact pressure aka. stagnation pressure aka. pitot pressure: 
 	// calibrated airspeed
 	//
