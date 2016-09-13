@@ -33,7 +33,7 @@ public:
 	double **m_Xmat; // pointers to static arrays of data (X matrix)
 	double *m_Ydata; // pointer to static array of related data (Y)
 
-	//double *xPar; // parameters for interpolation (1-3 pars)
+	//double *m_xPar; // parameters for interpolation (1-3 pars)
 	double m_xPar1Limit; // upper limit for X-parameter 1 in functions (only upper and only for this)
 
 	double m_result; // result value
@@ -45,6 +45,7 @@ public:
 		, m_indexMat()
 		, ndinfo()
 		, m_Xmat(nullptr)
+		//, m_xPar(nullptr)
 		, m_Ydata(Ydata)
 		, m_xPar1Limit(0)
 		, m_result(0)
@@ -60,6 +61,13 @@ public:
 			free(ndinfo.nPoints);
 			ndinfo.nPoints = nullptr;
 		}
+		/*
+		if (m_xPar != nullptr)
+		{
+			free(m_xPar);
+			m_xPar = nullptr;
+		}
+		*/
 		if (m_Xmat != nullptr)
 		{
 			free(m_Xmat);
@@ -77,6 +85,9 @@ public:
 
 		// just array of pointers to static data
 		m_Xmat = (double **)malloc(ndinfo.nDimension*sizeof(double*));
+
+		// 1-3 parameters
+		//m_xPar = (double*)malloc(ndinfo.nDimension*sizeof(double*));
 
 		int nVertices = (1 << ndinfo.nDimension);
 		m_Tbuf.getVec(nVertices); // preallocate
