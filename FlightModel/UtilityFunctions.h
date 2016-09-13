@@ -388,15 +388,18 @@ public:
 	/**/
 	T deltaLimit(const T input) const
 	{
-		// not over delta limit
 		T diff = input - current;
 		if (abs(diff) <= delta_max)
 		{
+			// not over delta limit (rate-change)
+			// -> check range
 			current = limit(input);
 		}
 		else
 		{
 			// this is crude way but should work for now..
+			// limit to max rate-change,
+			// then check limit to range
 			if (diff > 0)
 			{
 				current = limit(current + delta_max);
