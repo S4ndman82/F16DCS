@@ -430,13 +430,25 @@ template<typename T> class LinearFunction
 public:
 	const T angleFactor; // factor to multiply with (ratio of X/Y)
 
-	// range for upper and lower values, delta for angle
-	//DeltaLimiter<T> lim;
+	// range where functional (result varies according to input)
+	const T minRange;
+	const T maxRange;
 
-	LinearFunction(const T angle)
-		: angleFactor(angle)
+	LinearFunction(const T angle, const T min, const T max)
+		: angleFactor(angle), minRange(min), maxRange(max)
 	{}
 	~LinearFunction() {}
+
+	T result(const T input) const
+	{
+		// no change outside range
+		if (input < minRange || input > maxRange)
+		{
+			return input;
+		}
+
+		return angleFactor * input;
+	}
 
 };
 
