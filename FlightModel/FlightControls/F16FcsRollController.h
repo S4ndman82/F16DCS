@@ -135,9 +135,7 @@ public:
 		double pressureGain = getPressureGain(dynamicPressure_NM2);
 
 		// actuator actually limited to 20 deg?
-		double rollCommandGained = limit(rollRateCommandCombined * pressureGain, -21.5, 21.5);
-
-		flightSurface->roll_Command = rollCommandGained;
+		flightSurface->roll_Command = rollCommandLimiter.limit(rollRateCommandCombined * pressureGain);
 
 		// also, using elevators for roll control:
 		// hta proportional to fl deflection: 0.294 of fl deflection in some condition
