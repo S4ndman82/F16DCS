@@ -7,6 +7,17 @@
 //
 // File split, helper classes added.
 //
+// template class Limiter:
+// Code to help avoid redefining constants and instead make them parameters (like upper/lower limits).
+//
+// template class DeltaLimiter:
+// Code to manage rate- and range-limited code: can filter out spikes to fit in hysteresis-scale,
+// very simplistic and easy to use where necessary.
+//
+// template class LinearFunction:
+// Code to simplify solving linear equations in run-time with configurable parameters.
+// Instead of hard-coding similar code in various places, reduce duplications with generic code.
+//
 // Ilkka Prusi 2016 <ilkka.prusi@gmail.com>
 //
 
@@ -22,7 +33,7 @@
 
 
 // Simple upper and lower limiter
-double limit(double input, double lower_limit, double upper_limit)
+double limit(double input, double lower_limit, double upper_limit) // <- CJS
 {
 	if(input > upper_limit)
 	{
