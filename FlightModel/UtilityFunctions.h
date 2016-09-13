@@ -377,25 +377,38 @@ public:
 	const T upper_limit;
 	const T delta_max;
 
-	T previous;
+	T current;
 
 	DeltaLimiter(const T lower, const T upper, const T delta)
 		: lower_limit(lower), upper_limit(upper), delta_max(delta),
-		previous(0)
+		current(0)
 	{}
 	~DeltaLimiter() {}
 
-	/*
+	/**/
 	T deltaLimit(const T input) const
 	{
 		// not over delta limit
-		T diff = input - previous;
+		T diff = input - current;
 		if (abs(diff) <= delta_max)
 		{
-			return limit(input);
+			current = limit(input);
 		}
+		else
+		{
+			// this is crude way but should work for now..
+			if (diff > 0)
+			{
+				current = limit(current + diff);
+			}
+			else
+			{
+				current = limit(current - diff);
+			}
+		}
+		return current;
 	}
-	*/
+	/**/
 
 	T limit(const T input) const
 	{
