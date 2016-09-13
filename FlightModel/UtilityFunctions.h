@@ -439,6 +439,12 @@ public:
 	// for now, just use older one
 	Limiter<T> limiter;
 
+	LinearFunction(const T min, const T max, const T lower, const T upper)
+		: angleFactor(0), minRange(min), maxRange(max), limiter(lower, upper)
+	{
+		// TODO: calculation for angle here according to values
+		//angleFactor =
+	}
 	LinearFunction(const T angle, const T min, const T max, const T lower, const T upper)
 		: angleFactor(angle), minRange(min), maxRange(max), limiter(lower, upper)
 	{}
