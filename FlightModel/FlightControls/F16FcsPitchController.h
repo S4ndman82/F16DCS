@@ -25,6 +25,9 @@ protected:
 	F16Actuator		elevatorActuatorRight;
 	*/
 
+	// F2
+	LinearFunction<double> stability;
+
 protected:
 	// Schedule gain component due to dynamic pressure
 	double dynamic_pressure_schedule(const double dynamicPressure_kNM2) const
@@ -121,7 +124,8 @@ public:
 		m_latStickForce(0),
 		bodyState(bs),
 		flightSurface(fs),
-		trimState(ts)
+		trimState(ts),
+		stability(0.5, 0.53, 1.79, 0.5, -1)
 	{
 	}
 	~F16FcsPitchController() {}
@@ -167,6 +171,10 @@ public:
 		finalCombinedCommandFilteredLimited = finalCombinedCommandFilteredLimited + finalCombinedCommand;
 		double finalPitchCommandTotal = finalCombinedCommandFilteredLimited;
 		finalPitchCommandTotal += (0.5 * m_alphaFiltered);
+
+		// TODO:
+		// replace constant 0.5 with linear function:
+		//finalPitchCommandTotal += stability.result(m_alphaFiltered);
 
 		flightSurface->pitch_Command = finalPitchCommandTotal;
 	}
