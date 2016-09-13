@@ -21,7 +21,7 @@ protected:
 	F16Actuator actuator;
 
 	// flap control at transonic speeds:
-	// 0..-2 at Qc/Ps 0.787...1.008
+	// 0..-2 at Qc/Ps 0.787...1.008, 0.8975 is one deg pos?
 	LinearFunction<double> transonicFlap;
 
 	// lowers flaps a few degrees when enabled?

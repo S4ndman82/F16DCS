@@ -19,6 +19,9 @@ protected:
 	F16Actuator		rudderActuator;
 	Limiter<double>		rudderLimiter;
 
+	// F8
+	LinearFunction<double> yawAxis;
+
 protected:
 	double getRudderCommand(const double pedInput) const
 	{
@@ -47,7 +50,8 @@ public:
 		flightSurface(fs),
 		trimState(ts),
 		rudderActuator(60.0, -30.0, 30.0), // <- check rate
-		rudderLimiter(-30, 30) // deflection limit
+		rudderLimiter(-30, 30), // deflection limit
+		yawAxis(1, 2.04, 3.23, 0.5, 1)
 	{
 	}
 	~F16FcsYawController() {}
