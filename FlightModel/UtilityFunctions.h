@@ -5,6 +5,10 @@
 // You could use this header to code up common math utilities your code may use multiple times
 //-----------------------------------------------------------------------------------------------
 //
+// Original code: mexndinterp.c
+// From non-linear F-16 simulation at: http://www.aem.umn.edu/people/faculty/balas/darpa_sec/SEC.Software.html
+//
+//-----------------------------------------------------------------------------------------------
 // Modified to reduce re-allocations of buffers, added helpers to keep track of buffer data
 // and moved most of allocations outside of primary loops (caller must allocate with helpers).
 // This should improve performance (by reducing allocations) 
