@@ -20,10 +20,11 @@ protected:
 	double		leading_edge_flap_integral;
 	double		leading_edge_flap_integrated;
 	double		leading_edge_flap_rate;
-	double		leading_edge_flap_integrated_gained;
-	double		leading_edge_flap_integrated_gained_biased;
+	double		leading_edge_flap_final;
 
 	Limiter<double>		lefLimiter;
+
+	// 25(deg)/sec
 	F16Actuator			lefActuator; // symmetric
 
 	// is in automatic operation or locked in position
@@ -37,8 +38,7 @@ public:
 		leading_edge_flap_integral(0),
 		leading_edge_flap_integrated(0),
 		leading_edge_flap_rate(0),
-		leading_edge_flap_integrated_gained(0),
-		leading_edge_flap_integrated_gained_biased(0),
+		leading_edge_flap_final(0),
 		lefLimiter(-2, 25),
 		lefActuator(7.25, -2, 25),
 		isAuto(true)
@@ -86,10 +86,12 @@ public:
 		leading_edge_flap_integral += (leading_edge_flap_rate * frameTime);
 
 		leading_edge_flap_integrated = leading_edge_flap_integral + bodyState->alpha_DEG * 2.0;
-		leading_edge_flap_integrated_gained = leading_edge_flap_integrated * 1.38;
-		leading_edge_flap_integrated_gained_biased = leading_edge_flap_integrated_gained + 1.45 - (9.05 * qbarOverPs);
 
-		flightSurface->leadingEdgeFlap_Command = lefLimiter.limit(leading_edge_flap_integrated_gained_biased);
+		double lef_gained = leading_edge_flap_integrated * 1.38;
+		double press = (9.05 * qbarOverPs) + 1.45;
+		leading_edge_flap_final = lef_gained - press;
+
+		flightSurface->leadingEdgeFlap_Command = lefLimiter.limit(leading_edge_flap_final);
 	}
 
 	void updateFrame(double frameTime)
