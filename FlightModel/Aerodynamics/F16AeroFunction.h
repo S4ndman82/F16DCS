@@ -6,6 +6,7 @@
 #include <malloc.h>
 #include <memory.h>
 
+#include "../ndinterp.h"
 #include "../UtilityFunctions.h"
 
 // mostly just wrapper to assist with interpolation 
