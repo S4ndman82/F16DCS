@@ -434,20 +434,34 @@ public:
 	const T minRange;
 	const T maxRange;
 
-	LinearFunction(const T angle, const T min, const T max)
-		: angleFactor(angle), minRange(min), maxRange(max)
+	// TODO: use limiter here as well
+	//DeltaLimiter<double> limit;
+	// for now, just use older one
+	Limiter<T> limiter;
+
+	LinearFunction(const T angle, const T min, const T max, const T lower, const T upper)
+		: angleFactor(angle), minRange(min), maxRange(max), limiter(lower, upper)
 	{}
 	~LinearFunction() {}
 
+	bool isInRange(const T input) const
+	{
+		if (input >= minRange && input <= maxRange)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	// TODO: use delta-limiter
 	T result(const T input) const
 	{
 		// no change outside range
-		if (input < minRange || input > maxRange)
+		if (input < minRange)
 		{
 			return input;
 		}
-
-		return angleFactor * input;
+		return limiter.limit(angleFactor * input);
 	}
 
 };

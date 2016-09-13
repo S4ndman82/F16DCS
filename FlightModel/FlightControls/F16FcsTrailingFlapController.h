@@ -20,6 +20,10 @@ protected:
 	// Bit of a hack now really, might need to be in roll controller..
 	F16Actuator actuator;
 
+	// flap control at transonic speeds:
+	// 0..-2 at Qc/Ps 0.787...1.008
+	LinearFunction<double> transonicFlap;
+
 	// lowers flaps a few degrees when enabled?
 	// check this
 	bool isAirRefuelMode;
@@ -29,6 +33,7 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		actuator(10.0, 0, 20.0), // <- check adjustment rate
+		transonicFlap(0.1105, 0.787, 1.008, 0, 2),
 		isAirRefuelMode(false)
 	{}
 	~F16FcsTrailingFlapController() {}
@@ -46,7 +51,7 @@ public:
 	// otherwise only as ailerons.
 	// Normally flaps are down when gear lever is down.
 	// With alternate flaps switch, flaps are extended regardless of gear lever.
-	void fcsCommand(bool isGearUp, bool isAltFlaps, double airspeed_KTS)
+	void fcsCommand(bool isGearUp, bool isAltFlaps, const double airspeed_KTS, const double qbarOverPs)
 	{
 		const double tef_min = 0.0;
 		const double tef_max = 20.0;
@@ -68,7 +73,10 @@ public:
 		// no "alt flaps" and lg is up -> no flap deflection
 		if (isAltFlaps == false && isGearUp == true)
 		{
-			flightSurface->flap_Command = tef_min;
+			//flightSurface->flap_Command = tef_min;
+
+			// linear multiplier of the input
+			flightSurface->flap_Command = -transonicFlap.result(qbarOverPs);
 			return;
 		}
 
