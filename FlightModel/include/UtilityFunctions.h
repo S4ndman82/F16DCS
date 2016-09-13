@@ -3,6 +3,7 @@
 // They are mostly there to help look up tables.  I added in some limiter functions
 //
 // You could use this header to code up common math utilities your code may use multiple times
+// -- CJS
 //-----------------------------------------------------------------------------------------------
 //
 // File split, helper classes added.
@@ -33,6 +34,7 @@
 
 
 // Simple upper and lower limiter
+// <CJS>
 double limit(double input, double lower_limit, double upper_limit) // <- CJS
 {
 	if(input > upper_limit)
@@ -48,6 +50,7 @@ double limit(double input, double lower_limit, double upper_limit) // <- CJS
 		return input;
 	}
 }
+// </CJS>
 
 // check if there's need to keep configurable limits somewhere..
 // changed to template for supporting different types

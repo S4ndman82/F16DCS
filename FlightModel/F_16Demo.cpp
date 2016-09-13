@@ -430,11 +430,12 @@ void ed_fm_set_command(int command, float value)
 		break;
 
 	case F16::PowerOnOff:
-		// electric system
+		// electric system (FC3 style "all in one")
 		F16::Electrics.toggleElectrics();
 		break;
 
 	case F16::BatteryPower:
+		F16::Electrics.toggleBatteryOnOff();
 		break;
 
 	case F16::AirBrake:
@@ -966,7 +967,7 @@ void ed_fm_cold_start()
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyOpen();
 	F16::FlightControls.initAirBrakeOff();
-	F16::Electrics.setElectricsOn(); // <- off
+	F16::Electrics.setElectricsOnOff(false); // <- off
 	F16::EMS.initEngineOff(); // <- stop
 }
 
@@ -979,7 +980,7 @@ void ed_fm_hot_start()
 	F16::LandingGear.initGearsDown();
 	F16::Airframe.initCanopyClosed();
 	F16::FlightControls.initAirBrakeOff();
-	F16::Electrics.setElectricsOn();
+	F16::Electrics.setElectricsOnOff(true);
 	F16::EMS.initEngineIdle();
 }
 
@@ -992,7 +993,7 @@ void ed_fm_hot_start_in_air()
 	F16::LandingGear.initGearsUp();
 	F16::Airframe.initCanopyClosed();
 	F16::FlightControls.initAirBrakeOff();
-	F16::Electrics.setElectricsOn();
+	F16::Electrics.setElectricsOnOff(true);
 	F16::EMS.initEngineCruise();
 }
 

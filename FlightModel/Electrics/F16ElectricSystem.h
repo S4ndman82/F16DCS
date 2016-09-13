@@ -35,20 +35,19 @@ public:
 	{}
 	~F16ElectricSystem() {}
 
-	// FC3 style electric power on/off
+	// FC3 style electric power on/off ("all in one")
 	void toggleElectrics()
 	{
 		electricsOnOff = !electricsOnOff;
 	}
-	void setElectricsOn()
+	void setElectricsOnOff(bool status)
 	{
-		electricsOnOff = true;
+		electricsOnOff = status;
 	}
-	void setElectricsOff()
+	void toggleBatteryOnOff()
 	{
-		electricsOnOff = false;
 	}
-		
+
 	// update with engine/APU rpm/torque
 	// and power consumption
 	void updateFrame(const double frameTime)
