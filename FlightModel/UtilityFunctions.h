@@ -459,8 +459,15 @@ public:
 		// no change outside range
 		if (input < minRange)
 		{
-			return minRange;
+			return limiter.lower_limit;
 		}
+		if (input > maxRange)
+		{
+			return limiter.upper_limit;
+		}
+
+		// angle * input -> value in line of the graph
+		// TODO: use delta limiter for rate-change hysteresis "scale" instead of single line
 		return limiter.limit(angleFactor * input);
 	}
 
