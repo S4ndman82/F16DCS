@@ -24,12 +24,12 @@ protected:
 	F16Atmosphere *pAtmos;
 	F16GroundSurface *pGrounds;
 
-	double		Cx_total;
-	double		Cz_total;
-	double		Cm_total;
-	double		Cy_total;
-	double		Cn_total;
-	double		Cl_total;
+	double		m_Cx_total;
+	double		m_Cz_total;
+	double		m_Cm_total;
+	double		m_Cy_total;
+	double		m_Cn_total;
+	double		m_Cl_total;
 
 	AERO_Function fn_Cx;
 	AERO_Function fn_CxEle0;
@@ -88,12 +88,12 @@ public:
 	F16Aero(F16Atmosphere *atmos, F16GroundSurface *grounds) :
 		pAtmos(atmos),
 		pGrounds(grounds),
-		Cx_total(0),
-		Cz_total(0),
-		Cm_total(0),
-		Cy_total(0),
-		Cn_total(0),
-		Cl_total(0),
+		m_Cx_total(0),
+		m_Cz_total(0),
+		m_Cm_total(0),
+		m_Cy_total(0),
+		m_Cn_total(0),
+		m_Cl_total(0),
 		fn_Cx(3, F16::_CxData),
 		fn_CxEle0(3, F16::_CxData),
 		fn_Cz(3, F16::_CzData),
@@ -154,6 +154,8 @@ public:
 	{
 		const double alpha = limit(bstate.alpha_DEG, -20.0, 90.0);
 		const double beta = limit(bstate.beta_DEG, -30.0, 30.0);
+
+		// TODO: use left and right rudder angles
 		const double el = -fsurf.pitch_Command;
 
 		// TODO: speed brake handling..
@@ -416,29 +418,30 @@ public:
 
 		/* XXXXXXXX Cx_tot XXXXXXXX */
 		double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
-		Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
-		Cx_total += m_CxFlaps + LgCxGearAero;
+		m_Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
+		m_Cx_total += m_CxFlaps + LgCxGearAero;
 
 		/* airbrake - testing now*/
-		Cx_total += m_CxAirbrake;
+		m_Cx_total += m_CxAirbrake;
 
 		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
 		double dZdQ = meanChordFPS * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
-		Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
-		Cz_total += m_CzFlaps + LgCzGearAero;
+		m_Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
+		m_Cz_total += m_CzFlaps + LgCzGearAero;
 
 		/* MMMMMMMM Cm_tot MMMMMMMM */ 
 		/* ignore deep-stall regime, delta_Cm_ds = 0 */
 		double dMdQ = meanChordFPS * (fn_CMq.m_result + fn_delta_CMq_lef.m_result*leadingEdgeFlap_PCT);
 		double CmDelta = fn_delta_Cm.m_result + 0; // Cm_delta + Cm_delta_ds (0)
-		Cm_total = fn_Cm.m_result*fn_eta_el.m_result + Cz_total*diffCgPCT + Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
+		m_Cm_total = fn_Cm.m_result*fn_eta_el.m_result + m_Cz_total*diffCgPCT 
+			+ Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
 		double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 		double dYdR = wingSpanFPS * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
 		double dYdP = wingSpanFPS * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
 		double CyAilerons = getCyAilerons(dYdail, fsurf);
-		Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + CyAilerons + Cy_delta_r30*fsurf.rudder_PCT
+		m_Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + CyAilerons + Cy_delta_r30*fsurf.rudder_PCT
 			+ dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
 	
 		/* NNNNNNNN Cn_tot NNNNNNNN */ 
@@ -447,7 +450,7 @@ public:
 		double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
 		double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*bstate.beta_DEG;
 		double CnAilerons = getCnAilerons(dNdail, fsurf);
-		Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - Cy_total*diffCgPCT*meanChordPerWingSpan + CnAilerons
+		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*diffCgPCT*meanChordPerWingSpan + CnAilerons
 			+ Cn_delta_r30*fsurf.rudder_PCT + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS + CnDeltaBetaDeg;
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
@@ -456,17 +459,17 @@ public:
 		double dLdP = wingSpanFPS * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
 		double ClDeltaBetaDeg = fn_delta_CLbeta.m_result*bstate.beta_DEG;
 		double ClAilerons = getClAilerons(dLdail, fsurf);
-		Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + ClAilerons + Cl_delta_r30*fsurf.rudder_PCT
+		m_Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + ClAilerons + Cl_delta_r30*fsurf.rudder_PCT
 			+ dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS + ClDeltaBetaDeg;
 	}
 
 
-	double getCxTotal() const { return Cx_total; }
-	double getCzTotal() const { return Cz_total; }
-	double getCmTotal() const { return Cm_total; }
-	double getCyTotal() const { return Cy_total; }
-	double getCnTotal() const { return Cn_total; }
-	double getClTotal() const { return Cl_total; }
+	double getCxTotal() const { return m_Cx_total; }
+	double getCzTotal() const { return m_Cz_total; }
+	double getCmTotal() const { return m_Cm_total; }
+	double getCyTotal() const { return m_Cy_total; }
+	double getCnTotal() const { return m_Cn_total; }
+	double getClTotal() const { return m_Cl_total; }
 
 }; // class F16Aero
 
