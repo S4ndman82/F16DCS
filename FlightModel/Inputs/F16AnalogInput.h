@@ -9,16 +9,14 @@
 class AnalogInput
 {
 protected:
-	const double lower_limit;
-	const double upper_limit;
+	Limiter<double> limiter;
 
 	double prev_value;
 	double current_value;
 
 public:
 	AnalogInput(const double lower, const double upper) 
-		: lower_limit(lower)
-		, upper_limit(upper)
+		: limiter(lower, upper)
 		, prev_value(0)
 		, current_value(0)
 	{}
@@ -27,14 +25,14 @@ public:
 	AnalogInput& operator=(const double value)
 	{
 		prev_value = current_value;
-		current_value = limit(value, lower_limit, upper_limit);
+		current_value = limiter.limit(value);
 		return *this;
 	}
 
 	void setValue(const double value)
 	{
 		prev_value = current_value;
-		current_value = limit(value, lower_limit, upper_limit);
+		current_value = limiter.limit(value);
 	}
 	double getValue() const
 	{
@@ -47,11 +45,11 @@ public:
 
 	double getLower() const
 	{
-		return lower_limit;
+		return limiter.lower_limit;
 	}
 	double getUpper() const
 	{
-		return upper_limit;
+		return limiter.upper_limit;
 	}
 };
 
