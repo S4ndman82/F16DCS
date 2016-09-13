@@ -459,7 +459,7 @@ public:
 		// no change outside range
 		if (input < minRange)
 		{
-			return input;
+			return minRange;
 		}
 		return limiter.limit(angleFactor * input);
 	}
