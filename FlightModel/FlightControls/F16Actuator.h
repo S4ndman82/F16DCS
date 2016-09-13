@@ -59,13 +59,6 @@ public:
 	bool m_isWorking;
 
 public:
-	/*
-	F16Actuator() 
-		: m_moveRate(1.0), m_commanded(0), m_current(0),
-		m_minLimit(0), m_maxLimit(0), m_haveLimits(false), 
-		m_isWorking(true)
-	{}
-	*/
 
 	F16Actuator(const double moverate)
 		: m_moveRate(moverate), m_commanded(0), m_current(0),

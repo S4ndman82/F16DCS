@@ -45,6 +45,8 @@ public:
 	bool nosewheelSteering; // is active/not
 	double noseGearTurnAngle; // steering angle {-1=CW max;1=CCW max}
 
+	Limiter<double> nwsLimiter;
+
 	// aerodynamic drag when gears are not fully up
 	//double CDGearAero;
 	double CzGearAero;
@@ -70,6 +72,7 @@ public:
 		: gearLevelUp(false)
 		, nosewheelSteering(true) // <- enable by default until button mapping works
 		, noseGearTurnAngle(0)
+		, nwsLimiter(-32, 32)
 		, CzGearAero(0)
 		, CxGearAero(0)
 		, actNose(0.25, 0, 1.0)
@@ -163,7 +166,7 @@ public:
 		//noseGearTurnAngle = value;
 
 		// for now, just cut input to allowed range in degrees
-		noseGearTurnAngle = limit(value, -32, 32);
+		noseGearTurnAngle = nwsLimiter.limit(value);
 	}
 
 	// in case of nose wheel: 
