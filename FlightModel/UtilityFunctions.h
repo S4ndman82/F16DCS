@@ -428,7 +428,8 @@ public:
 template<typename T> class LinearFunction
 {
 public:
-	const T angleFactor; // factor to multiply with (ratio of X/Y)
+	const T angleFactor; // factor to multiply with (coefficient, ratio of X/Y)
+	const T zeroBias; // zero-point offset
 
 	// range where functional (result varies according to input)
 	const T minRange;
@@ -439,14 +440,16 @@ public:
 	// for now, just use older one
 	Limiter<T> limiter;
 
+	/*
 	LinearFunction(const T min, const T max, const T lower, const T upper)
-		: angleFactor(0), minRange(min), maxRange(max), limiter(lower, upper)
+		: angleFactor(0), zeroBias(0), minRange(min), maxRange(max), limiter(lower, upper)
 	{
 		// TODO: calculation for angle here according to values
 		//angleFactor =
 	}
-	LinearFunction(const T angle, const T min, const T max, const T lower, const T upper)
-		: angleFactor(angle), minRange(min), maxRange(max), limiter(lower, upper)
+	*/
+	LinearFunction(const T angle, const T offset, const T min, const T max, const T lower, const T upper)
+		: angleFactor(angle), zeroBias(offset), minRange(min), maxRange(max), limiter(lower, upper)
 	{}
 	~LinearFunction() {}
 
@@ -474,7 +477,7 @@ public:
 
 		// angle * input -> value in line of the graph
 		// TODO: use delta limiter for rate-change hysteresis "scale" instead of single line
-		return limiter.limit(angleFactor * input);
+		return limiter.limit((angleFactor * input) + zeroBias);
 	}
 
 };
