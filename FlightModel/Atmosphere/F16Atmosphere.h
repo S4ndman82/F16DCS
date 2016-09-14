@@ -30,14 +30,14 @@ protected:
 
 public:
 	double		ambientTemperature;	// Ambient temperature (kelvin)
-	double		ambientDensity;		// Ambient density (kg/m^3)
+	double		ambientDensity;		// Ambient density (kg/m^3) (rho in some equations)
 	double		dynamicPressure;	// Dynamic pressure (Pa == N/m^2) (velocity pressure)
 	double		speed_of_sound;		// (meters/sec)
 	double		ambientPressure;	// atmosphere pressure (Pa == N/m^2)
 	double		altitude;			// Absolute altitude MSL (meters)
 	double		totalVelocity;		// velocity in m/s
 	double		machNumber;			// M, gas compressibility, velocity per speed of sound
-	double		QcOverPs;			//
+	double		QcOverPs;			// qbar/ps in some spec
 
 	F16Atmosphere() 
 		: wind()
@@ -83,8 +83,10 @@ public:
 
 	void updateFrame(const double frameTime)
 	{
-		totalVelocity = sqrt(m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z);
-		dynamicPressure = .5 * ambientDensity * pow(totalVelocity, 2);
+		double speedsqr = m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z;
+		totalVelocity = sqrt(speedsqr);
+		//dynamicPressure = .5 * ambientDensity * pow(totalVelocity, 2);
+		dynamicPressure = .5 * ambientDensity * speedsqr;
 		QcOverPs = dynamicPressure / ambientPressure;
 		if (speed_of_sound > 0) // avoid crash in case we don't have this yet..
 		{
