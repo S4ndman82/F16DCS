@@ -367,6 +367,12 @@ public:
 		*/
 	}
 
+	// when preparing to land (wheels out),
+	// counteract increased drag
+	void landingGains(double frametime)
+	{
+	}
+
 	void updateFrame(double frametime)
 	{
 		// determine controller commands
