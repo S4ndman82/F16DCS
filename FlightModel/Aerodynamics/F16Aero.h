@@ -83,6 +83,7 @@ protected:
 	double m_CxFlaps;
 	double m_CzFlaps;
 	double m_CxAirbrake;
+	double m_diffCgPCT;
 
 public:
 	F16Aero(F16Atmosphere *atmos, F16GroundSurface *grounds) :
@@ -143,7 +144,8 @@ public:
 		fn_delta_Cm(1, F16::_delta_CmData),
 		fn_eta_el(1, F16::_eta_elData),
 		m_CxFlaps(0), m_CzFlaps(0),
-		m_CxAirbrake(0)
+		m_CxAirbrake(0),
+		m_diffCgPCT(0)
 	{
 		initfn();
 	}
@@ -236,14 +238,14 @@ public:
 	// -> aerodynamic CG is different from "weight" (mass CG)
 	// -> this needs to be calculated as function of velocity
 	//
-	double getAeroCgDiff(const double dynamicPressure_NM2, const double machNumber)
+	void getAeroCgDiff(const double dynamicPressure_NM2, const double machNumber)
 	{
 		// CG may vary from 0.30 - 0.39, 0.35 at mach 1 (reference point)
 		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 
 		double diffCgPCT = 0.0;
 
-		// TODO: make actual calculations here
+		// TODO: make actual calculations here (linear function)
 		if (machNumber < 1)
 		{
 			diffCgPCT = F16::referenceCG_PCT - 0.30;
@@ -252,7 +254,7 @@ public:
 		{
 			diffCgPCT = F16::referenceCG_PCT - 0.39;
 		}
-		return diffCgPCT;
+		m_diffCgPCT = diffCgPCT;
 	}
 
 	// drag caused by aircraft skin in contact with air (friction)
@@ -369,9 +371,6 @@ public:
 	void computeTotals(F16FlightSurface &fsurf, F16BodyState &bstate,
 					const double LgCxGearAero, const double LgCzGearAero)
 	{
-		// 
-		double diffCgPCT = getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber); 
-
 		// in original nlplant there is 2*vt, but is that because lift and drag 
 		// are not calculated for both sides separately? (no support for differential deflections)
 		const double AerototalVelocity_FPS = pAtmos->getAeroTotalVelocityFPS(); 
@@ -386,10 +385,6 @@ public:
 		// TODO: left/right side when they can differ according to flight control system
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 
-		getFlapsCoeff(pAtmos->dynamicPressure, fsurf, bstate);
-		getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
-
-
 		// TODO: dynamic CG to calculations, uses hardcoded "real" position now
 		// (check: does this actually consider the RSS lift at non-CG position?)
 		//
@@ -401,6 +396,11 @@ public:
 		//
 		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 		const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
+
+		// get aerodynamic lift position as function of speed (difference from reference CG)
+		getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber);
+		getFlapsCoeff(pAtmos->dynamicPressure, fsurf, bstate);
+		getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
 
 		// calculate values based on interpolation results
 		// TODO: duplicate this for left and right airflow (with differential stabilizer)?
@@ -439,7 +439,7 @@ public:
 		/* ignore deep-stall regime, delta_Cm_ds = 0 */
 		double dMdQ = meanChordFPS * (fn_CMq.m_result + fn_delta_CMq_lef.m_result*leadingEdgeFlap_PCT);
 		double CmDelta = fn_delta_Cm.m_result + 0; // Cm_delta + Cm_delta_ds (0)
-		m_Cm_total = fn_Cm.m_result*fn_eta_el.m_result + m_Cz_total*diffCgPCT 
+		m_Cm_total = fn_Cm.m_result*fn_eta_el.m_result + m_Cz_total*m_diffCgPCT
 			+ Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
@@ -456,7 +456,7 @@ public:
 		double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
 		double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*bstate.beta_DEG;
 		double CnAilerons = getCnAilerons(dNdail, fsurf);
-		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*diffCgPCT*meanChordPerWingSpan + CnAilerons
+		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan + CnAilerons
 			+ Cn_delta_r30*fsurf.rudder_PCT + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS + CnDeltaBetaDeg;
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
