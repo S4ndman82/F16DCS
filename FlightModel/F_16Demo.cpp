@@ -245,9 +245,7 @@ void ed_fm_simulate(double dt)
 	F16::FlightControls.updateFrame(frametime);
 
 	F16::Aero.updateFrame(F16::FlightControls.bodyState, F16::FlightControls.flightSurface, frametime);
-	F16::Aero.computeTotals(F16::Atmos.getTotalVelocityFPS(), 
-		F16::FlightControls.flightSurface, 
-		F16::FlightControls.bodyState,
+	F16::Aero.computeTotals(F16::FlightControls.flightSurface, F16::FlightControls.bodyState,
 		F16::LandingGear.CxGearAero, 
 		F16::LandingGear.CzGearAero);
 

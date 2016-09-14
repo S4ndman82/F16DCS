@@ -37,9 +37,9 @@ namespace F16
 	const double		airbrakeArea_FT2		= 14.26;		// 
 	const double		airbrakeArea_m2			= 1.48645;		// based on ~16ft^2 -> m^2
 
-	// TODO: dynamic CG to calculations
+	//note: need dynamic CG to calculations: lift position as function of speed, mass balance by fuel/payload mass
 	const double		referenceCG_PCT			= 0.35;			// Reference CG as a % of wing chord
-	const double		actualCG_PCT			= 0.30;			// Actual CG as a % of wing chord
+	//const double		actualCG_PCT			= 0.30;			// Actual CG as a % of wing chord
 
 	const double		inertia_Ix_KGM2			= 12874.0;		// Reference moment of inertia (kg/m^2) // 12662 in one source? (scale model?)
 	const double		inertia_Iy_KGM2			= 75673.6;		// Reference moment of inertia (kg/m^2) // 53147 in one source? (scale model?)

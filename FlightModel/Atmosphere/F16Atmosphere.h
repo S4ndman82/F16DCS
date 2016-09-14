@@ -135,15 +135,14 @@ public:
 	{
 		return totalVelocity * F16::metersToKnots;
 	}
-	double getTotalVelocityFPS() const
+	double getAeroTotalVelocityFPS() const
 	{
 		// to feets per second
 		double totalVelocity_FPS = totalVelocity * F16::meterToFoot;
-		if (totalVelocity_FPS < 0.01)
-		{
-			totalVelocity_FPS = 0.01;
-		}
-		return totalVelocity_FPS;
+
+		// in original nlplant there is 2*vt, but is that because lift and drag 
+		// are not calculated for both sides separately? (no support for differential deflections)
+		return 2 * totalVelocity_FPS; // <- is this a bug?
 	}
 
 	void getAirspeed(Vec3 &airSpeed) const

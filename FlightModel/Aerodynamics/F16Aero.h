@@ -366,16 +366,22 @@ public:
 	compute Cx_tot, Cz_tot, Cm_tot, Cy_tot, Cn_tot, and Cl_total
 	(as on NASA report p37-40)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-	void computeTotals(const double AtmosTotalVelocity_FPS, F16FlightSurface &fsurf, F16BodyState &bstate,
+	void computeTotals(F16FlightSurface &fsurf, F16BodyState &bstate,
 					const double LgCxGearAero, const double LgCzGearAero)
 	{
 		// 
 		double diffCgPCT = getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber); 
 
-		// precalculate some terms to simplify statements
-		const double totalVelocity_FPS = 2*AtmosTotalVelocity_FPS; // <- is this a bug?
-		const double meanChordFPS = (F16::meanChord_FT / totalVelocity_FPS);
-		const double wingSpanFPS = (F16::wingSpan_FT / totalVelocity_FPS);
+		// in original nlplant there is 2*vt, but is that because lift and drag 
+		// are not calculated for both sides separately? (no support for differential deflections)
+		const double AerototalVelocity_FPS = pAtmos->getAeroTotalVelocityFPS(); 
+		double meanChordFPS = 0.0;
+		double wingSpanFPS = 0.0;
+		if (AerototalVelocity_FPS != 0.0)
+		{
+			meanChordFPS = (F16::meanChord_FT / AerototalVelocity_FPS);
+			wingSpanFPS = (F16::wingSpan_FT / AerototalVelocity_FPS);
+		}
 
 		// TODO: left/right side when they can differ according to flight control system
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
