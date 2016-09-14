@@ -429,9 +429,13 @@ void ed_fm_set_command(int command, float value)
 		F16::EMS.stopEngine();
 		break;
 
-	case F16::PowerOnOff:
+	case F16::PowerOnOff: // <- not working now
 		// electric system (FC3 style "all in one")
-		F16::Electrics.toggleElectrics();
+		F16::Electrics.toggleElectrics(); 
+		/*
+		swprintf(dbgmsg, 255, L" F16::power on/off (FC3): %d value: %f \r\n", command, value);
+		::OutputDebugString(dbgmsg);
+		*/
 		break;
 
 	case F16::BatteryPower:
@@ -532,6 +536,10 @@ void ed_fm_set_command(int command, float value)
 
 	case F16::NavigationLights:
 		F16::Airframe.toggleNavigationLights();
+		break;
+
+	case F16::OxygenNormal:
+		F16::EnvCS.setOxygenSystem(value);
 		break;
 
 	case F16::Canopy:

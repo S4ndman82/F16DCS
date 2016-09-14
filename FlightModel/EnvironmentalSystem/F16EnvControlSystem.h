@@ -43,6 +43,12 @@ public:
 	{}
 	~F16EnvControlSystem() {}
 
+	void setOxygenSystem(float value)
+	{
+		// value currently ignored, just use as event trigger
+		Oxy.setDiluterNormal();
+	}
+
 	// TODO:
 	// get cockpit pressure in pascals over external (get update from oxygen system also)
 	// -> set to ambient pressure when canopy gone or failure in ECS

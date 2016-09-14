@@ -18,7 +18,7 @@ protected:
 	double tank_usage; // amount used
 	double diluter_setting; // normal/100% ?
 
-	double pressure; // pressure provided (pascals), used over ambient pressure
+	double pressureGen; // pressure provided (pascals), used over ambient pressure
 
 	// sensors? (for cockpit?)
 	// valves?
@@ -28,25 +28,35 @@ public:
 		: tank_volume(5.0)
 		, tank_usage(5.0)
 		, diluter_setting(0) // <- off
-		, pressure(0)
+		, pressureGen(0)
 	{}
 	~F16OxygenSystem() {}
 
-	double getPressure() const
+	void setDiluterNormal()
 	{
-		return pressure;
+		diluter_setting = 100;
 	}
 
+	double getPressure() const
+	{
+		return pressureGen;
+	}
+
+	// very rough value for cockpit pressure over ambient pressure
 	void updateFrame(const double ambientPressure, const double altitude, const double frameTime)
 	{
 		// very rough usage
 		double use = frameTime * diluter_setting;
-		tank_usage -= use;
+		if (tank_usage > use)
+		{
+			tank_usage -= use;
+		}
 		//tanks += o2_gen;
 
 		// pressure provided depends on diluter setting
 		// and ambient pressure ?
-		//pressure
+		pressureGen = 101325; // standard sea-level atmosphere
+		pressureGen -= ambientPressure; // reduce ambient pressure (result pressure over ambient)
 	}
 };
 

@@ -78,6 +78,9 @@ join(res.keyCommands,{
 {combos = {{key = 'H', reformers = {'RShift','RAlt'}}}, pressed = iCommandHUDBrightnessDown, name = _('HUD Brightness down'), category = _('Systems')},
 {combos = {{key = 'R'}}, down = iCommandPlaneFuelOn, up = iCommandPlaneFuelOff, name = _('Fuel Dump'), category = _('Systems')},
 
+--{down = iCommandPlane_Oxygen_Normal, name = _('Oxygen Emergency Lever Normal'), category = _('Environment System Panel')},
+{down = 3001, name = _('Oxygen supply'), category = _('Environment System')},
+
 -- trimming
 {combos = {{key = 'A', reformers = {'LShift'}}}, pressed = iCommandPlaneTrimUp, up = iCommandPlaneTrimStop, name = _('trim: Nose Up'), category = _('Flight Control')},
 {combos = {{key = 'Z', reformers = {'LShift'}}}, pressed = iCommandPlaneTrimDown, up = iCommandPlaneTrimStop, name = _('trim: Nose Down'), category = _('Flight Control')},

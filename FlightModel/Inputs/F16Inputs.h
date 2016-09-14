@@ -58,10 +58,11 @@ namespace F16
 		ApuStart		= 1055, // (works in 1.5.4)
 		ApuStop			= 1056, // (works in 1.5.4)
 
+		// {down = iCommandBatteryPower, name = _('Battery power'), category = _('Electrical power control panel')},
 		BatteryPower = 1073, // iCommandBatteryPower
 
 		//{combos = {{key = 'L', reformers = {'RShift'}}}, down = iCommandPowerOnOff, name = _('Electric Power Switch'), category = _('Systems')},
-		PowerOnOff			= 315, // Electric power switch (FC3 style)
+		PowerOnOff			= 315, // Electric power switch (FC3 style) <- not working
 
 		// {combos = {{key = 'L', reformers = {'RCtrl'}}}, down = iCommandPlaneLightsOnOff, name = _('Navigation lights'), category = _('Systems')},
 		NavigationLights	= 175,
@@ -96,7 +97,6 @@ namespace F16
 		//{down = 3401, up = 3401, value_down = 1,  name = _('Manual Pitch Override'), category = _('Flight Control')},
 		ManualPitchOverride = 3401,
 
-
 		//{down = iCommandPlaneParachute, name = _('Dragging Chute'), category = _('Systems')},
 		//DraggingChute // iCommandPlaneParachute
 
@@ -106,6 +106,10 @@ namespace F16
 		JoystickThrottle	= 2004,
 		JoystickLeftEngineThrottle = 2005,
 		JoystickRightEngineThrottle = 2006,
+
+		// {down = 3001, name = _('Oxygen supply'), category = _('Environment System')},
+		OxygenNormal = 3001,
+
 
 		Reserved // placeholder
 	};
