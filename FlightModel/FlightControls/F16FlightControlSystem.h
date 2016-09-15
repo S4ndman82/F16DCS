@@ -397,7 +397,10 @@ public:
 		flightSurface.elevon_Left_Command = -flightSurface.pitch_Command;
 		flightSurface.elevon_Right_Command = -flightSurface.pitch_Command;
 
-		// combine with aileron effect
+		// TODO: combine with aileron effect, try with equal constant now (modify pitch)
+		//flightSurface.elevon_Left_Command += flightSurface.flaperon_Left_Command*0.294;
+		//flightSurface.elevon_Right_Command += flightSurface.flaperon_Right_Command*0.294;
+
 	}
 
 	// when preparing to land (wheels out),
