@@ -373,7 +373,7 @@ public:
 	{
 		// in original nlplant there is 2*vt, but is that because lift and drag 
 		// are not calculated for both sides separately? (no support for differential deflections)
-		const double AerototalVelocity_FPS = pAtmos->getAeroTotalVelocityFPS(); 
+		const double AerototalVelocity_FPS = pAtmos->getAeroTotalVelocityFPS() * 2; // <- why 2*vt ?
 		double meanChordFPS = 0.0;
 		double wingSpanFPS = 0.0;
 		if (AerototalVelocity_FPS != 0.0)
