@@ -272,7 +272,24 @@ public:
 	//
 	double getWettedAreaDrag(const double dynamicPressure_NM2, const double machNumber)
 	{
-		//Sw = 2.0 * (1 + 0.2 t/c) * Se;
+		//Swetted = 2.0 * (1 + 0.2 t/c) * Sexposed;
+
+		//SwettedNose = .75 * pi * D * Lnose;
+		//SwettedTail = .72 * pi * D * Ltail;
+		// ..where:
+		// D = diameter of constant section
+		// L = length of nose or tail cone
+
+		// Deff = (W/2+H/2)*(64-3*pow(R,4)/(64-16*pow(R,2))
+		// ..where:
+		// R = (H-W)/(H+W)
+
+		//wing_wetted_area_FT2
+		//ventral_fin_each_wetted_area_FT2
+		//horiz_tail_wetted_area_FT2
+		//vertical_tail_wetted_area_FT2
+		//fuselage_wetted_area_FT2
+
 		return 0;
 	}
 
