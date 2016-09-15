@@ -31,8 +31,8 @@ namespace F16
 	const double		length_m				= 15.03;
 	const double		height_m				= 5.09;
 
-	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft) // 10.94 in one source?
-	const double		meanChord_m				= 3.450336;		// mean aerodynamic chord (m) // 3.335 in one source?
+	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft) 
+	const double		meanChord_m				= 3.450336;		// mean aerodynamic chord (m) 
 
 	const double		airbrakeArea_FT2		= 14.26;		// 
 	const double		airbrakeArea_m2			= 1.48645;		// based on ~16ft^2 -> m^2
