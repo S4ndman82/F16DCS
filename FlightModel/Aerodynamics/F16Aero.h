@@ -80,6 +80,9 @@ protected:
 	AERO_Function fn_delta_Cm;
 	AERO_Function fn_eta_el;
 
+	double m_CyAilerons;
+	double m_CnAilerons;
+	double m_ClAilerons;
 	double m_CxFlaps;
 	double m_CzFlaps;
 	double m_CxAirbrake;
@@ -143,6 +146,7 @@ public:
 		fn_delta_CLbeta(1, F16::_delta_CLbetaData),
 		fn_delta_Cm(1, F16::_delta_CmData),
 		fn_eta_el(1, F16::_eta_elData),
+		m_CyAilerons(0), m_CnAilerons(0), m_ClAilerons(0),
 		m_CxFlaps(0), m_CzFlaps(0),
 		m_CxAirbrake(0),
 		m_diffCgPCT(0)
@@ -338,29 +342,32 @@ public:
 		m_CxFlaps = CxLeft + CxRight;
 	}
 
-	double getCyAilerons(const double dYdail, const F16FlightSurface &fsurf) const
+	void getCyAilerons(const double Cy_delta_a20, const double Cy_delta_a20_lef, const F16FlightSurface &fsurf)
 	{
-		double CyAil = 0.0;
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
+
 		// check
-		//CyAil = dYdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
-		CyAil = dYdail*fsurf.aileron_Right_PCT + dYdail*fsurf.aileron_Left_PCT;
-		return CyAil;
+		//m_CyAilerons = dYdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
+		m_CyAilerons = dYdail*fsurf.aileron_Right_PCT + dYdail*fsurf.aileron_Left_PCT;
 	}
-	double getCnAilerons(const double dNdail, const F16FlightSurface &fsurf) const
+	void getCnAilerons(const double Cn_delta_a20, const double Cn_delta_a20_lef, const F16FlightSurface &fsurf)
 	{
-		double CnAil = 0.0;
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
+
 		// check
-		//CnAil = dNdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
-		CnAil = dNdail*fsurf.aileron_Right_PCT + dNdail*fsurf.aileron_Left_PCT;
-		return CnAil;
+		//m_CnAilerons = dNdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
+		m_CnAilerons = dNdail*fsurf.aileron_Right_PCT + dNdail*fsurf.aileron_Left_PCT;
 	}
-	double getClAilerons(const double dLdail, const F16FlightSurface &fsurf) const
+	void getClAilerons(const double Cl_delta_a20, const double Cl_delta_a20_lef, const F16FlightSurface &fsurf)
 	{
-		double ClAil = 0.0;
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
+
 		// check
-		//ClAil = dLdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
-		ClAil = dLdail*fsurf.aileron_Right_PCT + dLdail*fsurf.aileron_Left_PCT;
-		return ClAil;
+		//m_ClAilerons = dLdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
+		m_ClAilerons = dLdail*fsurf.aileron_Right_PCT + dLdail*fsurf.aileron_Left_PCT;
 	}
 
 
@@ -422,6 +429,10 @@ public:
 		const double Cl_delta_a20 = fn_Cl_a20.m_result - fn_ClEle0.m_result;
 		const double Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - fn_Cl_lef.m_result - Cl_delta_a20;
 
+		getCyAilerons(Cy_delta_a20, Cy_delta_a20_lef, fsurf);
+		getCnAilerons(Cn_delta_a20, Cn_delta_a20_lef, fsurf);
+		getClAilerons(Cl_delta_a20, Cl_delta_a20_lef, fsurf);
+
 		/* XXXXXXXX Cx_tot XXXXXXXX */
 		double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
 		m_Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
@@ -443,29 +454,23 @@ public:
 			+ Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
-		double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 		double dYdR = wingSpanFPS * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
 		double dYdP = wingSpanFPS * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
-		double CyAilerons = getCyAilerons(dYdail, fsurf);
-		m_Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + CyAilerons + Cy_delta_r30*fsurf.rudder_PCT
+		m_Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + m_CyAilerons + Cy_delta_r30*fsurf.rudder_PCT
 			+ dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
 	
 		/* NNNNNNNN Cn_tot NNNNNNNN */ 
-		double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 		double dNdR = wingSpanFPS * (fn_CNr.m_result + fn_delta_CNr_lef.m_result*leadingEdgeFlap_PCT);
 		double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
 		double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*bstate.beta_DEG;
-		double CnAilerons = getCnAilerons(dNdail, fsurf);
-		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan 
-			+ CnAilerons + Cn_delta_r30*fsurf.rudder_PCT + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS + CnDeltaBetaDeg;
+		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan
+			+ m_CnAilerons + Cn_delta_r30*fsurf.rudder_PCT + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS + CnDeltaBetaDeg;
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
-		double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 		double dLdR = wingSpanFPS * (fn_CLr.m_result + fn_delta_CLr_lef.m_result*leadingEdgeFlap_PCT);
 		double dLdP = wingSpanFPS * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
 		double ClDeltaBetaDeg = fn_delta_CLbeta.m_result*bstate.beta_DEG;
-		double ClAilerons = getClAilerons(dLdail, fsurf);
-		m_Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + ClAilerons + Cl_delta_r30*fsurf.rudder_PCT
+		m_Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + m_ClAilerons + Cl_delta_r30*fsurf.rudder_PCT
 			+ dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS + ClDeltaBetaDeg;
 	}
 
