@@ -51,6 +51,9 @@ public:
 	// otherwise only as ailerons.
 	// Normally flaps are down when gear lever is down.
 	// With alternate flaps switch, flaps are extended regardless of gear lever.
+	//
+	// " they will also come down with gear up at a defined low airspeed depending on ADC input"
+	// -> need better info..
 	void fcsCommand(bool isGearUp, bool isAltFlaps, const double airspeed_KTS, const double qbarOverPs)
 	{
 		// use positive values

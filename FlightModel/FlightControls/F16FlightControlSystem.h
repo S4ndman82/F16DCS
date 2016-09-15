@@ -326,10 +326,43 @@ public:
 
 		// TODO: combine flap control with aileron control commands
 
+		//outputDebugInfo(frametime);
+
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
 		flapControl.fcsCommand(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS(), qbarOverPs);
+	}
+
+	void outputDebugInfo(double frametime)
+	{
+		wchar_t dbgmsg[1024] = { 0 };
+
+		// some debug info (temporary)
+		if (pAtmos->getTotalVelocityKTS() >= 239 && pAtmos->getTotalVelocityKTS() <= 241)
+		{
+			swprintf(dbgmsg, 1024, L"KTS: %f QC/PS: %f Dyn: %f m/s: %f M: %f \r\n", 
+				pAtmos->getTotalVelocityKTS(), pAtmos->getQcOverPs(), pAtmos->dynamicPressure, pAtmos->totalVelocity, pAtmos->machNumber);
+			::OutputDebugString(dbgmsg);
+		}
+		else if (pAtmos->getTotalVelocityKTS() >= 369 && pAtmos->getTotalVelocityKTS() <= 371)
+		{
+			swprintf(dbgmsg, 1024, L"KTS: %f QC/PS: %f Dyn: %f m/s: %f M: %f \r\n",
+				pAtmos->getTotalVelocityKTS(), pAtmos->getQcOverPs(), pAtmos->dynamicPressure, pAtmos->totalVelocity, pAtmos->machNumber);
+			::OutputDebugString(dbgmsg);
+		}
+		if (pAtmos->totalVelocity >= 189 && pAtmos->totalVelocity <= 191)
+		{
+			swprintf(dbgmsg, 1024, L"KTS: %f QC/PS: %f Dyn: %f m/s: %f M: %f \r\n",
+				pAtmos->getTotalVelocityKTS(), pAtmos->getQcOverPs(), pAtmos->dynamicPressure, pAtmos->totalVelocity, pAtmos->machNumber);
+			::OutputDebugString(dbgmsg);
+		}
+		else if (pAtmos->totalVelocity >= 122 && pAtmos->totalVelocity <= 124)
+		{
+			swprintf(dbgmsg, 1024, L"KTS: %f QC/PS: %f Dyn: %f m/s: %f M: %f \r\n",
+				pAtmos->getTotalVelocityKTS(), pAtmos->getQcOverPs(), pAtmos->dynamicPressure, pAtmos->totalVelocity, pAtmos->machNumber);
+			::OutputDebugString(dbgmsg);
+		}
 	}
 
 	// combined and differential commands of flight surfaces:
@@ -369,9 +402,11 @@ public:
 
 	// when preparing to land (wheels out),
 	// counteract increased drag
-	void landingGains(double frametime)
-	{
-	}
+	void landingGains(double frametime) {}
+	// gains for gun usage
+	void gunCompensation(double frametime) {}
+	// gains for bombing mode
+	void bombingMode(double frametime) {}
 
 	void updateFrame(double frametime)
 	{

@@ -37,7 +37,7 @@ public:
 	double		altitude;			// Absolute altitude MSL (meters)
 	double		totalVelocity;		// velocity in m/s
 	double		machNumber;			// M, gas compressibility, velocity per speed of sound
-	double		QcOverPs;			// qbar/ps in some spec
+	double		QcOverPs;			// qbar/ps in some spec, impact pressure over static pressure
 
 	F16Atmosphere() 
 		: wind()
