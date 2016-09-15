@@ -14,12 +14,6 @@ protected:
 	F16BodyState *bodyState;
 	F16FlightSurface *flightSurface;
 
-	// TEF actually does not have own actuators 
-	// but use the "flaperon" actuators.
-	// This is only to estimate some "gain" of position movement.
-	// Bit of a hack now really, might need to be in roll controller..
-	F16Actuator actuator;
-
 	// flap control at transonic speeds:
 	// 0..-2 at Qc/Ps 0.787...1.008, 0.8975 is one deg pos?
 	LinearFunction<double> transonicFlap;
@@ -32,7 +26,6 @@ public:
 	F16FcsTrailingFlapController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
-		actuator(10.0, 0, 20.0), // <- check adjustment rate
 		transonicFlap(0.1105, 0.787, 0.787, 1.008, 0, 2), // <- use positive values for flaps
 		isAirRefuelMode(false)
 	{}
@@ -46,6 +39,12 @@ public:
 	//
 	// " they will also come down with gear up at a defined low airspeed depending on ADC input"
 	// -> need better info..
+	// Trailing edge flap deflection (deg)
+	// Note that flaps should be controlled by landing gear level:
+	// when gears go down flaps go down as well.
+	//
+	// In normal flight, flaps are used like normal ailerons.
+	//
 	void fcsCommand(bool isGearUp, bool isAltFlaps, const double airspeed_KTS, const double qbarOverPs)
 	{
 		// use positive values
@@ -62,6 +61,10 @@ public:
 		return 5.0; // <- just some value for placeholder, figure out right one
 		}
 		*/
+
+		// flaps in transonic speeds? 
+		// -2 deg when qbarOverPs >= 1.008
+		// 0..-2 deg when qbarOverPs >= 0.787 && qbarOverPs <= 1.008
 
 		// no "alt flaps" and lg is up -> no flap deflection
 		if (isAltFlaps == false && isGearUp == true)
@@ -100,28 +103,6 @@ public:
 		flightSurface->flap_Command = limit(trailing_edge_flap_deflection, tef_min, tef_max);
 
 		// TODO: roll combination in mixer
-	}
-
-	// Trailing edge flap deflection (deg)
-	// Note that flaps should be controlled by landing gear level:
-	// when gears go down flaps go down as well.
-	//
-	// In normal flight, flaps are used like normal ailerons.
-	//
-	void updateFrame(double frametime)
-	{
-		// flaps in transonic speeds? 
-		// -2 deg when qbarOverPs >= 1.008
-		// 0..-2 deg when qbarOverPs >= 0.787 && qbarOverPs <= 1.008
-
-		actuator.commandMove(flightSurface->flap_Command);
-		actuator.updateFrame(frametime);
-
-		// TODO: roll combination in mixer
-		flightSurface->flap_Right_DEG = actuator.m_current;
-		flightSurface->flap_Left_DEG = actuator.m_current;
-		flightSurface->flap_Right_PCT = flightSurface->flap_Right_DEG / 20.0;
-		flightSurface->flap_Left_PCT = flightSurface->flap_Left_DEG / 20.0;
 	}
 };
 

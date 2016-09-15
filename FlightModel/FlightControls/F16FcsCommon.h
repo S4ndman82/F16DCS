@@ -94,27 +94,28 @@ public:
 	double		leadingEdgeFlap_Left_PCT;			// Leading edge flap as a percent of maximum (0 to 1)
 
 	double		flap_Command;		// command from tef controller (position), can be adjusted by roll controller?
-	double		flap_Right_DEG;			// Trailing edge flap deflection (deg)
-	double		flap_Left_DEG;			// Trailing edge flap deflection (deg)
-	double		flap_Right_PCT;			// Trailing edge flap deflection (0 to 1)
-	double		flap_Left_PCT;			// Trailing edge flap deflection (0 to 1)
+
+	// result of command mixer (flaps and roll commands)
+	double		flaperon_Right_Command;
+	double		flaperon_Left_Command;
+	double		flaperon_Right_DEG;			// flaperon deflection (deg)
+	double		flaperon_Left_DEG;			// flaperon deflection (deg)
+	double		flaperon_Right_PCT;			// flaperon deflection as a percent of maximum (-1 to 1)
+	double		flaperon_Left_PCT;			// flaperon deflection as a percent of maximum (-1 to 1)
+
+	double flap_Left_DEG;
+	double flap_Right_DEG;
+	double flap_Left_PCT;
+	double flap_Right_PCT;
+
+	//double		elevon_Command;
+	//double		elevon_Right_DEG;			// elevon deflection (deg): elevator assist to aileron
+	//double		elevon_Left_DEG;			// elevon deflection (deg): elevator assist to aileron
 
 	double		elevator_Right_DEG;			// Elevator deflection (deg) (pitch)
 	double		elevator_Left_DEG;			// Elevator deflection (deg) (pitch)
 	double		elevator_Right_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 	double		elevator_Left_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
-
-	// result of command mixer
-	//double		flaperon_Command;
-	//double		elevon_Command;
-
-	//double		elevon_Right_DEG;			// elevon deflection (deg): elevator assist to aileron
-	//double		elevon_Left_DEG;			// elevon deflection (deg): elevator assist to aileron
-
-	double		aileron_Right_DEG;			// Aileron deflection (deg)
-	double		aileron_Left_DEG;			// Aileron deflection (deg)
-	double		aileron_Right_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
-	double		aileron_Left_PCT;			// Aileron deflection as a percent of maximum (-1 to 1)
 
 	double		rudder_Command;
 	double		rudder_DEG;			// Rudder  deflection (deg)
@@ -140,20 +141,22 @@ public:
 		leadingEdgeFlap_Right_PCT(0),
 		leadingEdgeFlap_Left_PCT(0),
 		flap_Command(0),
-		flap_Right_DEG(0),
+		flaperon_Right_Command(0),
+		flaperon_Left_Command(0),
+		flaperon_Right_DEG(0),
+		flaperon_Left_DEG(0),
+		flaperon_Right_PCT(0),
+		flaperon_Left_PCT(0),
 		flap_Left_DEG(0),
-		flap_Right_PCT(0),
+		flap_Right_DEG(0),
 		flap_Left_PCT(0),
+		flap_Right_PCT(0),
+		//elevon_Right_DEG(0),
+		//elevon_Left_DEG(0),
 		elevator_Right_DEG(0),
 		elevator_Left_DEG(0),
 		elevator_Right_PCT(0),
 		elevator_Left_PCT(0),
-		//elevon_Right_DEG(0),
-		//elevon_Left_DEG(0),
-		aileron_Right_DEG(0),
-		aileron_Left_DEG(0),
-		aileron_Right_PCT(0),
-		aileron_Left_PCT(0),
 		rudder_Command(0),
 		rudder_DEG(0),
 		rudder_PCT(0),

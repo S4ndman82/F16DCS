@@ -136,8 +136,8 @@ public:
 		, flapControl(&bodyState, &flightSurface)
 		, airbrakeControl(&bodyState, &flightSurface)
 		, lefActuator(25, -2, 25) // <- FLCS diag
-		, flaperonActuatorLeft(80, -23, 20) // <- FLCS diag
-		, flaperonActuatorRight(80, -23, 20) // <- FLCS diag
+		, flaperonActuatorLeft(80, -23, 20) // <- FLCS diag, 21.5 flap limit in old code
+		, flaperonActuatorRight(80, -23, 20) // <- FLCS diag, 21.5 flap limit in old code
 		, elevonActuatorLeft(60, -25, 25) // <- FLCS diag
 		, elevonActuatorRight(60, -25, 25) // <- FLCS diag
 		, rudderActuator(120.0, -30.0, 30.0) // <- FLCS diag
@@ -228,13 +228,13 @@ public:
 	// right-side aileron draw argument
 	float getAileronRSDraw() const
 	{
-		return (float)-flightSurface.aileron_Right_PCT;
+		return (float)-flightSurface.flaperon_Right_PCT;
 	}
 
 	// left-side aileron draw argument
 	float getAileronLSDraw() const
 	{
-		return (float)flightSurface.aileron_Left_PCT;
+		return (float)flightSurface.flaperon_Left_PCT;
 	}
 
 	// right-side elevator draw argument
@@ -357,25 +357,41 @@ public:
 		// actuator/servo dynamics
 		//flightSurface->roll_Command = rollCommandGained;
 
-		// if trailing edge flaps are used, only adjust instead of full control?
+		// this is symmetric command, adjusted by aileron command,
+		// positive values -> more flaps (increase downwards)
 		if (flightSurface.flap_Command > 0)
 		{
+			flightSurface.flap_Left_DEG = flightSurface.flap_Command;
+			flightSurface.flap_Right_DEG = flightSurface.flap_Command;
+			flightSurface.flap_Left_PCT = flightSurface.flap_Left_DEG / 20.0;
+			flightSurface.flap_Right_PCT = flightSurface.flap_Right_DEG / 20.0;
+
+			/*
 			// one side stays at maximum, other side can lift
+			flightSurface.flaperon_Left_Command = flightSurface.flap_Command;
+			flightSurface.flaperon_Right_Command = flightSurface.flap_Command;
+
+			// adjust by roll command
+			flightSurface.flaperon_Left_Command += flightSurface.roll_Command;
+			flightSurface.flaperon_Right_Command += flightSurface.roll_Command;
+			*/
+			flightSurface.flaperon_Left_Command = flightSurface.roll_Command;
+			flightSurface.flaperon_Right_Command = flightSurface.roll_Command;
+		}
+		else
+		{
+			flightSurface.flap_Left_DEG = 0;
+			flightSurface.flap_Right_DEG = 0;
+			flightSurface.flap_Left_PCT = flightSurface.flap_Left_DEG / 20.0;
+			flightSurface.flap_Right_PCT = flightSurface.flap_Right_DEG / 20.0;
+
+			flightSurface.flaperon_Left_Command = flightSurface.roll_Command;
+			flightSurface.flaperon_Right_Command = flightSurface.roll_Command;
 		}
 
-		/*
-		// just some rough testing for now
-		if (flightSurface.roll_Command > 0) // clockwise roll?
-		{
-			flightSurface.elevon_Right_DEG += flightSurface.aileron_Right_DEG*0.294;
-			flightSurface.elevon_Left_DEG -= flightSurface.aileron_Left_DEG*0.294;
-		}
-		else if (flightSurface.roll_Command < 0) // anti-clockwise roll?
-		{
-			flightSurface.elevon_Right_DEG -= flightSurface.aileron_Right_DEG*0.294;
-			flightSurface.elevon_Left_DEG += flightSurface.aileron_Left_DEG*0.294;
-		}
-		*/
+		// TODO:
+		// aileron-rudder interconnect handling
+		// 
 	}
 
 	// when preparing to land (wheels out),
@@ -393,8 +409,6 @@ public:
 
 		// combinations and differential commands in mixer (to actuators)
 		fcsMixer(frametime);
-
-		flapControl.updateFrame(frametime);
 
 		updateCommand(frametime);
 	}
@@ -417,14 +431,14 @@ public:
 		flightSurface.elevator_Right_PCT = elevonActuatorRight.getCurrentPCT();
 
 		// TODO: 
-		//flaperonActuatorLeft.commandMove(flightSurface.roll_Command);
-		//flaperonActuatorRight.commandMove(flightSurface.roll_Command);
-		//flaperonActuatorLeft.updateFrame(frametime);
-		//flaperonActuatorRight.updateFrame(frametime);
-		flightSurface.aileron_Right_DEG = flightSurface.roll_Command;
-		flightSurface.aileron_Left_DEG = flightSurface.roll_Command;
-		flightSurface.aileron_Right_PCT = flightSurface.aileron_Right_DEG / 21.5;
-		flightSurface.aileron_Left_PCT = flightSurface.aileron_Left_DEG / 21.5;
+		flaperonActuatorLeft.commandMove(flightSurface.flaperon_Left_Command);
+		flaperonActuatorRight.commandMove(flightSurface.flaperon_Right_Command);
+		flaperonActuatorLeft.updateFrame(frametime);
+		flaperonActuatorRight.updateFrame(frametime);
+		flightSurface.flaperon_Left_DEG = flaperonActuatorLeft.m_current;
+		flightSurface.flaperon_Right_DEG = flaperonActuatorRight.m_current;
+		flightSurface.flaperon_Left_PCT = flaperonActuatorLeft.getCurrentPCT();
+		flightSurface.flaperon_Right_PCT = flaperonActuatorRight.getCurrentPCT();
 
 		rudderActuator.commandMove(flightSurface.rudder_Command);
 		rudderActuator.updateFrame(frametime);

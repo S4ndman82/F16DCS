@@ -329,6 +329,8 @@ public:
 
 	void getFlapCoeff(const double flap_PCT, const double body_alpha_DEG, double &CzFlap, double &CxFlap) const
 	{
+		// this does not work correctly when flap and aileron are combined
+
 		// FLAPS (From JBSim F16.xml config)
 		double CLFlaps = 0.35 * flap_PCT;
 		double CDFlaps = 0.08 * flap_PCT;
@@ -340,6 +342,8 @@ public:
 		double CzLeft = 0.0, CzRight = 0.0, CxLeft = 0.0, CxRight = 0.0;
 		getFlapCoeff(fsurf.flap_Left_PCT, bstate.alpha_DEG, CzLeft, CxLeft);
 		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, CzRight, CxRight);
+
+		// this does not work correctly when flap and aileron are combined
 
 		// check this
 		m_CzFlaps = CzLeft + CzRight;
@@ -353,9 +357,11 @@ public:
 		const double C_delta_a20_lef = fn_C_a20_lef - fn_C_lef - C_delta_a20;
 		const double dail = C_delta_a20 + C_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 
+		// this does not work correctly when flap and aileron are combined
+
 		// check
 		// dail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
-		return dail*fsurf.aileron_Right_PCT + dail*fsurf.aileron_Left_PCT;
+		return dail*fsurf.flaperon_Right_PCT + dail*fsurf.flaperon_Left_PCT;
 	}
 	void getAileronsCoeff(const F16FlightSurface &fsurf)
 	{
