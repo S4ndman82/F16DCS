@@ -342,27 +342,39 @@ public:
 		m_CxFlaps = CxLeft + CxRight;
 	}
 
-	void getCyAilerons(const double Cy_delta_a20, const double Cy_delta_a20_lef, const F16FlightSurface &fsurf)
+	void getCyAilerons(const F16FlightSurface &fsurf)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+
+		const double Cy_delta_a20 = fn_Cy_a20.m_result - fn_Cy.m_result;
+		const double Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - fn_Cy_lef.m_result - Cy_delta_a20;
+
 		const double dYdail = Cy_delta_a20 + Cy_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 
 		// check
 		//m_CyAilerons = dYdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
 		m_CyAilerons = dYdail*fsurf.aileron_Right_PCT + dYdail*fsurf.aileron_Left_PCT;
 	}
-	void getCnAilerons(const double Cn_delta_a20, const double Cn_delta_a20_lef, const F16FlightSurface &fsurf)
+	void getCnAilerons(const F16FlightSurface &fsurf)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+
+		const double Cn_delta_a20 = fn_Cn_a20.m_result - fn_CnEle0.m_result;
+		const double Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - fn_Cn_lef.m_result - Cn_delta_a20;
+
 		const double dNdail = Cn_delta_a20 + Cn_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 
 		// check
 		//m_CnAilerons = dNdail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
 		m_CnAilerons = dNdail*fsurf.aileron_Right_PCT + dNdail*fsurf.aileron_Left_PCT;
 	}
-	void getClAilerons(const double Cl_delta_a20, const double Cl_delta_a20_lef, const F16FlightSurface &fsurf)
+	void getClAilerons(const F16FlightSurface &fsurf)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+
+		const double Cl_delta_a20 = fn_Cl_a20.m_result - fn_ClEle0.m_result;
+		const double Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - fn_Cl_lef.m_result - Cl_delta_a20;
+
 		const double dLdail = Cl_delta_a20 + Cl_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
 
 		// check
@@ -404,11 +416,6 @@ public:
 		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 		const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
 
-		// get aerodynamic lift position as function of speed (difference from reference CG)
-		getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber);
-		getFlapsCoeff(pAtmos->dynamicPressure, fsurf, bstate);
-		getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
-
 		// calculate values based on interpolation results
 		// TODO: duplicate this for left and right airflow (with differential stabilizer)?
 		const double Cx_delta_lef = fn_Cx_lef.m_result - fn_CxEle0.m_result;
@@ -422,16 +429,14 @@ public:
 		const double Cn_delta_r30 = fn_Cn_r30.m_result - fn_CnEle0.m_result;
 		const double Cl_delta_r30 = fn_Cl_r30.m_result - fn_ClEle0.m_result;
 
-		const double Cy_delta_a20 = fn_Cy_a20.m_result - fn_Cy.m_result;
-		const double Cy_delta_a20_lef = fn_Cy_a20_lef.m_result - fn_Cy_lef.m_result - Cy_delta_a20;
-		const double Cn_delta_a20 = fn_Cn_a20.m_result - fn_CnEle0.m_result;
-		const double Cn_delta_a20_lef = fn_Cn_a20_lef.m_result - fn_Cn_lef.m_result - Cn_delta_a20;
-		const double Cl_delta_a20 = fn_Cl_a20.m_result - fn_ClEle0.m_result;
-		const double Cl_delta_a20_lef = fn_Cl_a20_lef.m_result - fn_Cl_lef.m_result - Cl_delta_a20;
 
-		getCyAilerons(Cy_delta_a20, Cy_delta_a20_lef, fsurf);
-		getCnAilerons(Cn_delta_a20, Cn_delta_a20_lef, fsurf);
-		getClAilerons(Cl_delta_a20, Cl_delta_a20_lef, fsurf);
+		// get aerodynamic lift position as function of speed (difference from reference CG)
+		getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber);
+		getFlapsCoeff(pAtmos->dynamicPressure, fsurf, bstate);
+		getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
+		getCyAilerons(fsurf);
+		getCnAilerons(fsurf);
+		getClAilerons(fsurf);
 
 		/* XXXXXXXX Cx_tot XXXXXXXX */
 		double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
