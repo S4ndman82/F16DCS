@@ -104,16 +104,8 @@ public:
 	}
 	~F16FcsRollController() {}
 
-	bool initialize(double dt)
-	{
-		return true;
-	}
-	void reset(double dt)
-	{
-	}
-
 	// Controller for roll
-	void fcsCommand(double latStickInput, double longStickForce, double dynamicPressure_NM2, double dt)
+	void fcsCommand(double latStickInput, double longStickForce, double dynamicPressure_NM2, bool isGearUp, bool isAltFlaps)
 	{
 		const double roll_rate = bodyState->getRollRateDegs();
 
@@ -130,6 +122,9 @@ public:
 		double rollFeelGain = getRollFeelGain(longStickForce); // <- bug? (should be lateral?)
 		double rollRateCommand = getRollRateCommand(latStickForceBiased * rollFeelGain);
 
+		// stick force, roll cmd gradient -> 1.0 || 0.542 (LG lever, flaps)..
+		//if (isGearUp == false || isAltFlaps == true)
+
 		double rollRateCommandCombined = roll_rate - rollRateCommand - trimState->trimRoll;
 
 		double pressureGain = getPressureGain(dynamicPressure_NM2);
@@ -139,15 +134,6 @@ public:
 
 		// also, using elevators for roll control:
 		// hta proportional to fl deflection: 0.294 of fl deflection in some condition
-	}
-
-	void updateFrame(double frametime) 
-	{
-		// for now, just duplicate, consider flaps as well
-		flightSurface->aileron_Right_DEG = flightSurface->roll_Command;
-		flightSurface->aileron_Left_DEG = flightSurface->roll_Command;
-		flightSurface->aileron_Right_PCT = flightSurface->aileron_Right_DEG / 21.5;
-		flightSurface->aileron_Left_PCT = flightSurface->aileron_Left_DEG / 21.5;
 	}
 };
 

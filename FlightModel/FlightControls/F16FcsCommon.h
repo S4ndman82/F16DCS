@@ -104,6 +104,10 @@ public:
 	double		elevator_Right_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 	double		elevator_Left_PCT;			// Elevator deflection as a percent of maximum (-1 to 1)
 
+	// result of command mixer
+	//double		flaperon_Command;
+	//double		elevon_Command;
+
 	double		elevon_Right_DEG;			// elevon deflection (deg): elevator assist to aileron
 	double		elevon_Left_DEG;			// elevon deflection (deg): elevator assist to aileron
 

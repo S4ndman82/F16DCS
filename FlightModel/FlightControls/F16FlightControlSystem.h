@@ -42,6 +42,7 @@ sources:
 // TODO:
 // - separate command channels with different processing rates?
 // -> asynchronous logic of the actual control system? "skew" of channels
+// -> unique to AFTI modified version of F-16?
 //
 class F16FlightControls
 {
@@ -68,6 +69,9 @@ protected:
 	F16FcsTrailingFlapController flapControl;
 	F16FcsAirbrakeController airbrakeControl;
 
+	// 25(deg)/sec
+	F16Actuator			lefActuator; // symmetric
+
 	// 20 rad/sec min (lowest frequency filter)
 	// flaperon: aileron and flap functionality (trailing edge)
 	F16Actuator		flaperonActuatorLeft;
@@ -75,6 +79,8 @@ protected:
 	// elevon: elevator and aileron functionality (stabilizers)
 	F16Actuator		elevonActuatorLeft;
 	F16Actuator		elevonActuatorRight;
+
+	F16Actuator		rudderActuator;
 
 	Limiter<double>		flaperonLimiter;
 	Limiter<double>		htailLimiter;
@@ -128,10 +134,12 @@ public:
 		, leadingedgeControl(&bodyState, &flightSurface)
 		, flapControl(&bodyState, &flightSurface)
 		, airbrakeControl(&bodyState, &flightSurface)
+		, lefActuator(25, -2, 25)
 		, flaperonActuatorLeft(1) // <- placeholder value
 		, flaperonActuatorRight(1) // <- placeholder value
 		, elevonActuatorLeft(1) // <- placeholder value
 		, elevonActuatorRight(1) // <- placeholder value
+		, rudderActuator(120.0, -30.0, 30.0) // <- FLCS diag
 		, flaperonLimiter(-20, 20) // deflection limit for both sides
 		, htailLimiter(-25, 25) // stab. deflection limits
 		, manualPitchOverride(false)
@@ -320,13 +328,11 @@ public:
 		// -> check control laws, in addition to handling supersonic flutter
 
 		pitchControl.fcsCommand(longStickInput.getValue(), dynamicPressure_kNM2, manualPitchOverride, frametime);
-		rollControl.fcsCommand(latStickInput.getValue(), pitchControl.getLongStickForce(), pAtmos->dynamicPressure, frametime);
+		rollControl.fcsCommand(latStickInput.getValue(), pitchControl.getLongStickForce(), pAtmos->dynamicPressure, isGearUp, isAltFlaps);
 
 		yawControl.fcsCommand(pedInput.getValue(), pitchControl.getAlphaFiltered());
 
 		// TODO: combine flap control with aileron control commands
-
-		//outputDebugInfo(frametime);
 
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
@@ -334,36 +340,6 @@ public:
 		flapControl.fcsCommand(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS(), qbarOverPs);
 	}
 
-	void outputDebugInfo(double frametime)
-	{
-		wchar_t dbgmsg[1024] = { 0 };
-
-		// some debug info (temporary)
-		if (pAtmos->getTotalVelocityKTS() >= 239 && pAtmos->getTotalVelocityKTS() <= 241)
-		{
-			swprintf(dbgmsg, 1024, L"KTS: %f QC/PS: %f Dyn: %f m/s: %f M: %f \r\n", 
-				pAtmos->getTotalVelocityKTS(), pAtmos->getQcOverPs(), pAtmos->dynamicPressure, pAtmos->totalVelocity, pAtmos->machNumber);
-			::OutputDebugString(dbgmsg);
-		}
-		else if (pAtmos->getTotalVelocityKTS() >= 369 && pAtmos->getTotalVelocityKTS() <= 371)
-		{
-			swprintf(dbgmsg, 1024, L"KTS: %f QC/PS: %f Dyn: %f m/s: %f M: %f \r\n",
-				pAtmos->getTotalVelocityKTS(), pAtmos->getQcOverPs(), pAtmos->dynamicPressure, pAtmos->totalVelocity, pAtmos->machNumber);
-			::OutputDebugString(dbgmsg);
-		}
-		if (pAtmos->totalVelocity >= 189 && pAtmos->totalVelocity <= 191)
-		{
-			swprintf(dbgmsg, 1024, L"KTS: %f QC/PS: %f Dyn: %f m/s: %f M: %f \r\n",
-				pAtmos->getTotalVelocityKTS(), pAtmos->getQcOverPs(), pAtmos->dynamicPressure, pAtmos->totalVelocity, pAtmos->machNumber);
-			::OutputDebugString(dbgmsg);
-		}
-		else if (pAtmos->totalVelocity >= 122 && pAtmos->totalVelocity <= 124)
-		{
-			swprintf(dbgmsg, 1024, L"KTS: %f QC/PS: %f Dyn: %f m/s: %f M: %f \r\n",
-				pAtmos->getTotalVelocityKTS(), pAtmos->getQcOverPs(), pAtmos->dynamicPressure, pAtmos->totalVelocity, pAtmos->machNumber);
-			::OutputDebugString(dbgmsg);
-		}
-	}
 
 	// combined and differential commands of flight surfaces:
 	// aileron assist from asymmetric stabilizer movement etc.
@@ -417,11 +393,36 @@ public:
 		fcsMixer(frametime);
 
 		airbrakeControl.updateFrame(frametime);
-		leadingedgeControl.updateFrame(frametime);
-		pitchControl.updateFrame(frametime);
-		rollControl.updateFrame(frametime);
-		yawControl.updateFrame(frametime);
 		flapControl.updateFrame(frametime);
+
+		updateCommand(frametime);
+	}
+
+	void updateCommand(double frametime)
+	{
+		lefActuator.commandMove(flightSurface.leadingEdgeFlap_Command);
+		lefActuator.updateFrame(frametime);
+
+		flightSurface.leadingEdgeFlap_DEG = lefActuator.m_current;
+		flightSurface.leadingEdgeFlap_Left_PCT = flightSurface.leadingEdgeFlap_Right_PCT = lefActuator.getCurrentPCT();
+
+		double pitchDeg = limit(-flightSurface.pitch_Command, -25.0, 25.0);
+		flightSurface.elevator_Right_DEG = pitchDeg;
+		flightSurface.elevator_Left_DEG = pitchDeg;
+		flightSurface.elevator_Right_PCT = flightSurface.elevator_Right_DEG / 25.0;
+		flightSurface.elevator_Left_PCT = flightSurface.elevator_Left_DEG / 25.0;
+
+		// for now, just duplicate, consider flaps as well
+		flightSurface.aileron_Right_DEG = flightSurface.roll_Command;
+		flightSurface.aileron_Left_DEG = flightSurface.roll_Command;
+		flightSurface.aileron_Right_PCT = flightSurface.aileron_Right_DEG / 21.5;
+		flightSurface.aileron_Left_PCT = flightSurface.aileron_Left_DEG / 21.5;
+
+		rudderActuator.commandMove(flightSurface.rudder_Command);
+		rudderActuator.updateFrame(frametime);
+
+		flightSurface.rudder_DEG = rudderActuator.m_current;
+		flightSurface.rudder_PCT = rudderActuator.getCurrentPCT();
 	}
 
 };

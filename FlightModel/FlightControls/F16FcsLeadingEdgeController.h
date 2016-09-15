@@ -21,8 +21,6 @@ protected:
 
 	Limiter<double>		lefLimiter;
 
-	// 25(deg)/sec
-	F16Actuator			lefActuator; // symmetric
 
 	// flap control at transonic speeds:
 	// 0..-2 at Qc/Ps 0.787...1.008, 0.8975 is one deg pos?
@@ -40,19 +38,11 @@ public:
 		leading_edge_flap_rate(0),
 		leading_edge_flap_final(0),
 		lefLimiter(-2, 25),
-		lefActuator(25, -2, 25),
 		transonicFlap(0.1105, 0.787, 0.787, 1.008, 0, 2), // <- change to negative in output
 		isAuto(true)
 	{}
 	~F16FcsLeadingEdgeController() {}
 
-	bool initialize(double dt)
-	{
-		return true;
-	}
-	void reset(double dt)
-	{
-	}
 	void setAutoLocked(bool onoff)
 	{
 		isAuto = onoff;
@@ -99,20 +89,6 @@ public:
 		leading_edge_flap_final = lef_gained - press;
 
 		flightSurface->leadingEdgeFlap_Command = lefLimiter.limit(leading_edge_flap_final);
-	}
-
-	void updateFrame(double frameTime)
-	{
-		// actuator movement here..
-		lefActuator.commandMove(flightSurface->leadingEdgeFlap_Command);
-		lefActuator.updateFrame(frameTime);
-
-		flightSurface->leadingEdgeFlap_DEG = lefActuator.m_current;
-
-		// this is bugged when there's weight on wheels (-2 up), animation support needs fixing too
-		double lef_PCT = limit(flightSurface->leadingEdgeFlap_DEG / 25.0, -1.0, 1.0);
-		flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
-		flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;
 	}
 };
 

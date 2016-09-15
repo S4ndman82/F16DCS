@@ -16,7 +16,6 @@ protected:
 	F16FlightSurface *flightSurface;
 	F16TrimState *trimState;
 
-	F16Actuator		rudderActuator;
 	Limiter<double>		rudderLimiter;
 
 	// F8
@@ -49,20 +48,11 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		trimState(ts),
-		rudderActuator(120.0, -30.0, 30.0), // <- FLCS diag
 		rudderLimiter(-30, 30) // deflection limit
 		//yawAxis(1, 2.04, 3.23, 0.5, 1)
 	{
 	}
 	~F16FcsYawController() {}
-
-	bool initialize(double dt)
-	{
-		return true;
-	}
-	void reset(double dt)
-	{
-	}
 
 	// Controller for yaw
 	void fcsCommand(double pedInput, double alphaFiltered)
@@ -88,15 +78,6 @@ public:
 		// without blending, rudder command == yaw command
 		// -> change in mixer (after this call) if/when necessary
 		flightSurface->rudder_Command = flightSurface->yaw_Command;
-	}
-
-	void updateFrame(double frametime) 
-	{
-		rudderActuator.commandMove(flightSurface->rudder_Command);
-		rudderActuator.updateFrame(frametime);
-
-		flightSurface->rudder_DEG = rudderActuator.m_current;
-		flightSurface->rudder_PCT = flightSurface->rudder_DEG / 30.0;
 	}
 };
 

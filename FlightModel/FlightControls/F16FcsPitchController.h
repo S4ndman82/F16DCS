@@ -78,7 +78,7 @@ protected:
 	}
 
 	// Stick force schedule for pitch control
-	double fcs_pitch_controller_force_command(double longStickInput, double trimPitch, double frameTime)
+	void fcs_pitch_controller_force_command(double longStickInput, double trimPitch, double frameTime)
 	{
 		double longStickInputForce = 0.0;
 		if (longStickInput > 0.0)
@@ -89,13 +89,12 @@ protected:
 		{
 			longStickInputForce = longStickInput * 180.0;
 		}
-		longStickInputForce = limit(longStickInputForce, -180.0, 80.0);
-		m_longStickForce = longStickInputForce;
+		m_longStickForce = limit(longStickInputForce, -180.0, 80.0);
 
 		// TODO: if pitch override command is in effect -> override G-limit
 		//if (manualPitchOverride == true)
 
-		double longStickCommand_G = getPitchRateCommand(longStickInputForce);
+		double longStickCommand_G = getPitchRateCommand(m_longStickForce);
 
 		double longStickCommandWithTrim_G = trimPitch - longStickCommand_G;
 
@@ -103,8 +102,6 @@ protected:
 
 		double longStickCommandWithTrimLimited_G_Rate = 4.0 * (longStickCommandWithTrimLimited_G - m_stickCommandPosFiltered);
 		m_stickCommandPosFiltered += (longStickCommandWithTrimLimited_G_Rate * frameTime);
-
-		return m_stickCommandPosFiltered;
 	}
 
 	// Angle of attack limiter logic
@@ -130,29 +127,20 @@ public:
 	}
 	~F16FcsPitchController() {}
 
-	bool initialize(double dt)
-	{
-		return true;
-	}
-	void reset(double dt)
-	{
-	}
-
 	double getAlphaFiltered() const { return m_alphaFiltered; }
 	double getLongStickForce() const { return m_longStickForce; }
 	double getLatStickForce() const { return m_latStickForce; }
 
 	// Controller for pitch
 	// TODO: implement differential actuator handling to mixer and actuator stages
-	void fcsCommand(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double dt)
+	void fcsCommand(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double frameTime)
 	{
-		double stickCommandPos = fcs_pitch_controller_force_command(longStickInput, trimState->trimPitch, dt);
+		fcs_pitch_controller_force_command(longStickInput, trimState->trimPitch, frameTime);
 		double dynamicPressureScheduled = dynamic_pressure_schedule(dynamicPressure_kNM2);
-
 
 		double alphaLimited = limit(bodyState->alpha_DEG, -5.0, 30.0);
 		double alphaLimitedRate = 10.0 * (alphaLimited - m_alphaFiltered);
-		m_alphaFiltered += (alphaLimitedRate * dt);
+		m_alphaFiltered += (alphaLimitedRate * frameTime);
 
 		double pitchRateWashedOut = bodyState->getPitchRateDegs();
 		double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;
@@ -165,7 +153,7 @@ public:
 		double azFiltered = bodyState->getAccZPerG() - 1.0;
 		double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
 		double gLimiterCommand = -(azFiltered + (pitchRateWashedOut * 0.2));
-		double finalCombinedCommand = dynamicPressureScheduled * (2.5 * (stickCommandPos + limiterCommand + gLimiterCommand));
+		double finalCombinedCommand = dynamicPressureScheduled * (2.5 * (m_stickCommandPosFiltered + limiterCommand + gLimiterCommand));
 
 		double finalCombinedCommandFilteredLimited = limit(finalCombinedCommand, -25.0, 25.0);
 		finalCombinedCommandFilteredLimited = finalCombinedCommandFilteredLimited + finalCombinedCommand;
@@ -177,21 +165,6 @@ public:
 		//finalPitchCommandTotal += stability.result(m_alphaFiltered);
 
 		flightSurface->pitch_Command = finalPitchCommandTotal;
-	}
-
-	void updateFrame(double frametime) 
-	{
-		// TODO: elevator result after mixing with roll controller
-
-
-		// tODO: actuator movement here
-
-		// TODO: separate movements on opposing side (with roll authority)
-		double deg = limit(-flightSurface->pitch_Command, -25.0, 25.0);
-		flightSurface->elevator_Right_DEG = deg;
-		flightSurface->elevator_Left_DEG = deg;
-		flightSurface->elevator_Right_PCT = flightSurface->elevator_Right_DEG / 25.0;
-		flightSurface->elevator_Left_PCT = flightSurface->elevator_Left_DEG / 25.0;
 	}
 };
 

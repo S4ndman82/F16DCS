@@ -166,6 +166,15 @@ public:
 			m_current = m_limiter.limit(m_current);
 		}
 	}
+
+	double getCurrentPCT() const
+	{
+		if (m_limiter.upper_limit == 0)
+		{
+			return 0;
+		}
+		return m_current / m_limiter.upper_limit;
+	}
 };
 
 #endif // ifndef _F16ACTUATOR_H_

@@ -38,14 +38,6 @@ public:
 	{}
 	~F16FcsTrailingFlapController() {}
 
-	bool initialize(double dt)
-	{
-		return true;
-	}
-	void reset(double dt)
-	{
-	}
-
 	// Passive flap schedule for the F-16...nominal for now from flight manual comments
 	// below specific dynamic pressure (q) -> function as flaps,
 	// otherwise only as ailerons.
@@ -87,7 +79,7 @@ public:
 		// else if alt flap switch -> max flaps
 
 		// speed high enough -> no flap deflection
-		if (airspeed_KTS > 370.0) // ~190m/s
+		if (airspeed_KTS > 370.0) // ~190m/s, 0.22(qbar/ps)
 		{
 			// no deflection
 			flightSurface->flap_Command = tef_min;
@@ -95,7 +87,7 @@ public:
 		}
 
 		// low speed -> full deflection
-		if (airspeed_KTS < 240.0) // ~123m/s
+		if (airspeed_KTS < 240.0) // ~123m/s, 0.09(qbar/ps)
 		{
 			// max deflection
 			flightSurface->flap_Command = tef_max;

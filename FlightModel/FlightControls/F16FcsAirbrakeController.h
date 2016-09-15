@@ -45,21 +45,8 @@ public:
 		airbrakeSwitch = !airbrakeSwitch;
 	}
 
-	bool initialize(double dt)
-	{
-		return true;
-	}
-	void reset(double dt)
-	{
-	}
-
 	void fcsCommand(bool isGearDown)
 	{
-		// TODO: change values to degrees here
-
-		// for now, just use frametime for rate of movement
-		// (multiplier 1)
-
 		// note: airbrake limit 60 degrees normally, 
 		// 43 deg when landing gear down (prevent strike to runway)
 		double maxAnglePCT = 60.0; // 60 deg
@@ -92,9 +79,7 @@ public:
 
 		// just use same for both sides for now
 		flightSurface->airbrake_Left_DEG = flightSurface->airbrake_Right_DEG = airbrakeActuator.m_current;
-
-		flightSurface->airbrake_Right_PCT = flightSurface->airbrake_Right_DEG / 60.0;
-		flightSurface->airbrake_Left_PCT = flightSurface->airbrake_Left_DEG / 60.0;
+		flightSurface->airbrake_Left_PCT = flightSurface->airbrake_Right_PCT = airbrakeActuator.getCurrentPCT();
 	}
 };
 
