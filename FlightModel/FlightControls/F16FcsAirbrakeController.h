@@ -19,22 +19,18 @@ public:
 	// note: airbrake limit different when landing gear down (prevent strike to runway)
 	// cx_brk = 0.08, --coefficient, drag, breaks <- for airbrake?
 	bool airbrakeSwitch; // switch status
-	F16Actuator airbrakeActuator;
 
 public:
 	F16FcsAirbrakeController(F16BodyState *bs, F16FlightSurface *fs) :
 		bodyState(bs),
 		flightSurface(fs),
-		airbrakeSwitch(false),
-		airbrakeActuator(30.0, 0, 60.0) // <- check actuator rate
+		airbrakeSwitch(false)
 	{}
 	~F16FcsAirbrakeController() {}
 
 	void initAirBrakeOff()
 	{
 		airbrakeSwitch = false;
-		airbrakeActuator.m_current = 0;
-		airbrakeActuator.m_commanded = 0;
 	}
 	void setAirbrake(bool status)
 	{
@@ -70,16 +66,6 @@ public:
 			// close it
 			flightSurface->airbrake_Command = 0;
 		}
-	}
-
-	void updateFrame(double frametime) 
-	{
-		airbrakeActuator.m_commanded = flightSurface->airbrake_Command;
-		airbrakeActuator.updateFrame(frametime);
-
-		// just use same for both sides for now
-		flightSurface->airbrake_Left_DEG = flightSurface->airbrake_Right_DEG = airbrakeActuator.m_current;
-		flightSurface->airbrake_Left_PCT = flightSurface->airbrake_Right_PCT = airbrakeActuator.getCurrentPCT();
 	}
 };
 

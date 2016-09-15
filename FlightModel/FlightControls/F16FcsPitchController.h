@@ -20,11 +20,6 @@ protected:
 	F16FlightSurface *flightSurface;
 	F16TrimState *trimState;
 
-	/*
-	F16Actuator		elevatorActuatorLeft;
-	F16Actuator		elevatorActuatorRight;
-	*/
-
 	// F2
 	//LinearFunction<double> stability;
 
@@ -78,26 +73,13 @@ protected:
 	}
 
 	// Stick force schedule for pitch control
-	void fcs_pitch_controller_force_command(double longStickInput, double trimPitch, double frameTime)
+	void fcs_pitch_controller_force_command(double longStickForce, double trimPitch, double frameTime)
 	{
-		double longStickInputForce = 0.0;
-		if (longStickInput > 0.0)
-		{
-			longStickInputForce = longStickInput * 80.0;
-		}
-		else
-		{
-			longStickInputForce = longStickInput * 180.0;
-		}
-		m_longStickForce = limit(longStickInputForce, -180.0, 80.0);
-
 		// TODO: if pitch override command is in effect -> override G-limit
 		//if (manualPitchOverride == true)
 
-		double longStickCommand_G = getPitchRateCommand(m_longStickForce);
-
+		double longStickCommand_G = getPitchRateCommand(longStickForce);
 		double longStickCommandWithTrim_G = trimPitch - longStickCommand_G;
-
 		double longStickCommandWithTrimLimited_G = limit(longStickCommandWithTrim_G, -4.0, 8.0);
 
 		double longStickCommandWithTrimLimited_G_Rate = 4.0 * (longStickCommandWithTrimLimited_G - m_stickCommandPosFiltered);
@@ -135,7 +117,18 @@ public:
 	// TODO: implement differential actuator handling to mixer and actuator stages
 	void fcsCommand(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double frameTime)
 	{
-		fcs_pitch_controller_force_command(longStickInput, trimState->trimPitch, frameTime);
+		double longStickInputForce = 0.0;
+		if (longStickInput > 0.0)
+		{
+			longStickInputForce = longStickInput * 80.0;
+		}
+		else
+		{
+			longStickInputForce = longStickInput * 180.0;
+		}
+		m_longStickForce = limit(longStickInputForce, -180.0, 80.0);
+		fcs_pitch_controller_force_command(m_longStickForce, trimState->trimPitch, frameTime);
+
 		double dynamicPressureScheduled = dynamic_pressure_schedule(dynamicPressure_kNM2);
 
 		double alphaLimited = limit(bodyState->alpha_DEG, -5.0, 30.0);

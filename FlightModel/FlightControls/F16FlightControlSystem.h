@@ -81,6 +81,7 @@ protected:
 	F16Actuator		elevonActuatorRight;
 
 	F16Actuator		rudderActuator;
+	F16Actuator		airbrakeActuator;
 
 	Limiter<double>		flaperonLimiter;
 	Limiter<double>		htailLimiter;
@@ -140,6 +141,7 @@ public:
 		, elevonActuatorLeft(1) // <- placeholder value
 		, elevonActuatorRight(1) // <- placeholder value
 		, rudderActuator(120.0, -30.0, 30.0) // <- FLCS diag
+		, airbrakeActuator(30.0, 0, 60.0) // <- check actuator rate
 		, flaperonLimiter(-20, 20) // deflection limit for both sides
 		, htailLimiter(-25, 25) // stab. deflection limits
 		, manualPitchOverride(false)
@@ -392,7 +394,6 @@ public:
 		// combinations and differential commands in mixer (to actuators)
 		fcsMixer(frametime);
 
-		airbrakeControl.updateFrame(frametime);
 		flapControl.updateFrame(frametime);
 
 		updateCommand(frametime);
@@ -423,6 +424,13 @@ public:
 
 		flightSurface.rudder_DEG = rudderActuator.m_current;
 		flightSurface.rudder_PCT = rudderActuator.getCurrentPCT();
+
+		airbrakeActuator.m_commanded = flightSurface.airbrake_Command;
+		airbrakeActuator.updateFrame(frametime);
+
+		// just use same for both sides for now
+		flightSurface.airbrake_Left_DEG = flightSurface.airbrake_Right_DEG = airbrakeActuator.m_current;
+		flightSurface.airbrake_Left_PCT = flightSurface.airbrake_Right_PCT = airbrakeActuator.getCurrentPCT();
 	}
 
 };
