@@ -83,8 +83,12 @@ protected:
 	F16Actuator		rudderActuator;
 	F16Actuator		airbrakeActuator;
 
-	Limiter<double>		flaperonLimiter;
-	Limiter<double>		htailLimiter;
+	// temporary until problem with integration is solved..
+	// 
+	F16Actuator		flapActuator;
+
+	//Limiter<double>		flaperonLimiter;
+	//Limiter<double>		htailLimiter;
 
 
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
@@ -142,8 +146,9 @@ public:
 		, elevonActuatorRight(60, -25, 25) // <- FLCS diag
 		, rudderActuator(120.0, -30.0, 30.0) // <- FLCS diag
 		, airbrakeActuator(30.0, 0, 60.0) // <- check actuator rate
-		, flaperonLimiter(-20, 20) // deflection limit for both sides
-		, htailLimiter(-25, 25) // stab. deflection limits
+		, flapActuator(10.0, 0, 20.0) // temporary only until fixing integration problem
+		//, flaperonLimiter(-20, 20) // deflection limit for both sides
+		//, htailLimiter(-25, 25) // stab. deflection limits
 		, manualPitchOverride(false)
 		//, isGearDown(true)
 		//, isGearUp(false)
@@ -448,6 +453,15 @@ public:
 		flightSurface.flaperon_Right_DEG = flaperonActuatorRight.m_current;
 		flightSurface.flaperon_Left_PCT = flaperonActuatorLeft.getCurrentPCT();
 		flightSurface.flaperon_Right_PCT = flaperonActuatorRight.getCurrentPCT();
+
+
+		// TODO: roll combination in mixer
+		// TODO: figure out problem with integration (command controller vs. aero code)
+		flapActuator.commandMove(flightSurface.flap_Command);
+		flapActuator.updateFrame(frametime);
+		flightSurface.flap_Left_DEG = flightSurface.flap_Right_DEG = flapActuator.m_current;
+		flightSurface.flap_Left_PCT = flightSurface.flap_Right_PCT = flapActuator.getCurrentPCT();
+
 
 		rudderActuator.commandMove(flightSurface.rudder_Command);
 		rudderActuator.updateFrame(frametime);
