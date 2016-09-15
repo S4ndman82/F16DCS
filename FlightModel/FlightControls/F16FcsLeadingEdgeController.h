@@ -82,9 +82,8 @@ public:
 		// also add handling in transonic speeds..
 		// something like this..
 		/**/
-		if (qbarOverPs > 0.787)
+		if (qbarOverPs >= transonicFlap.minRange)
 		{
-			//flightSurface->leadingEdgeFlap_Command = -2.0;
 			flightSurface->leadingEdgeFlap_Command = -transonicFlap.result(qbarOverPs);
 			return;
 		}
@@ -108,10 +107,9 @@ public:
 		lefActuator.commandMove(flightSurface->leadingEdgeFlap_Command);
 		lefActuator.updateFrame(frameTime);
 
-		//flightSurface->leadingEdgeFlap_DEG = flightSurface->leadingEdgeFlap_Command;
 		flightSurface->leadingEdgeFlap_DEG = lefActuator.m_current;
 
-		// this is bugged when there's weight on wheels (-2 up)
+		// this is bugged when there's weight on wheels (-2 up), animation support needs fixing too
 		double lef_PCT = limit(flightSurface->leadingEdgeFlap_DEG / 25.0, -1.0, 1.0);
 		flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
 		flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;

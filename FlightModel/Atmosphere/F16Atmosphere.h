@@ -120,6 +120,9 @@ public:
 	// stagnation pressure? (used to detect transonic speeds?)
 	// dynamic pressure to static pressure ratio
 	//
+	// dynamic pressure (due to compressibility?) higher at higher speed
+	// -> ratio over 1
+	//
 	// get Qc/Ps ratio
 	// 
 	double getQcOverPs() const
