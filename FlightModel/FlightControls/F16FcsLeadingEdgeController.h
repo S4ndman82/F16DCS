@@ -108,10 +108,11 @@ public:
 		lefActuator.commandMove(flightSurface->leadingEdgeFlap_Command);
 		lefActuator.updateFrame(frameTime);
 
-		flightSurface->leadingEdgeFlap_DEG = flightSurface->leadingEdgeFlap_Command;
+		//flightSurface->leadingEdgeFlap_DEG = flightSurface->leadingEdgeFlap_Command;
+		flightSurface->leadingEdgeFlap_DEG = lefActuator.m_current;
 
 		// this is bugged when there's weight on wheels (-2 up)
-		double lef_PCT = limit(flightSurface->leadingEdgeFlap_DEG / 25.0, 0.0, 1.0);
+		double lef_PCT = limit(flightSurface->leadingEdgeFlap_DEG / 25.0, -1.0, 1.0);
 		flightSurface->leadingEdgeFlap_Right_PCT = lef_PCT;
 		flightSurface->leadingEdgeFlap_Left_PCT = lef_PCT;
 	}
