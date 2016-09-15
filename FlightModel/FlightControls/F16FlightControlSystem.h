@@ -135,11 +135,11 @@ public:
 		, leadingedgeControl(&bodyState, &flightSurface)
 		, flapControl(&bodyState, &flightSurface)
 		, airbrakeControl(&bodyState, &flightSurface)
-		, lefActuator(25, -2, 25)
-		, flaperonActuatorLeft(1) // <- placeholder value
-		, flaperonActuatorRight(1) // <- placeholder value
-		, elevonActuatorLeft(1) // <- placeholder value
-		, elevonActuatorRight(1) // <- placeholder value
+		, lefActuator(25, -2, 25) // <- FLCS diag
+		, flaperonActuatorLeft(80, -23, 20) // <- FLCS diag
+		, flaperonActuatorRight(80, -23, 20) // <- FLCS diag
+		, elevonActuatorLeft(60, -25, 25) // <- FLCS diag
+		, elevonActuatorRight(60, -25, 25) // <- FLCS diag
 		, rudderActuator(120.0, -30.0, 30.0) // <- FLCS diag
 		, airbrakeActuator(30.0, 0, 60.0) // <- check actuator rate
 		, flaperonLimiter(-20, 20) // deflection limit for both sides
@@ -403,17 +403,24 @@ public:
 	{
 		lefActuator.commandMove(flightSurface.leadingEdgeFlap_Command);
 		lefActuator.updateFrame(frametime);
-
-		flightSurface.leadingEdgeFlap_DEG = lefActuator.m_current;
+		flightSurface.leadingEdgeFlap_DEG = lefActuator.m_current; // <- lef symmetric
 		flightSurface.leadingEdgeFlap_Left_PCT = flightSurface.leadingEdgeFlap_Right_PCT = lefActuator.getCurrentPCT();
 
-		double pitchDeg = limit(-flightSurface.pitch_Command, -25.0, 25.0);
-		flightSurface.elevator_Right_DEG = pitchDeg;
-		flightSurface.elevator_Left_DEG = pitchDeg;
-		flightSurface.elevator_Right_PCT = flightSurface.elevator_Right_DEG / 25.0;
-		flightSurface.elevator_Left_PCT = flightSurface.elevator_Left_DEG / 25.0;
+		// TODO: integrated command
+		elevonActuatorLeft.commandMove(-flightSurface.pitch_Command);
+		elevonActuatorRight.commandMove(-flightSurface.pitch_Command);
+		elevonActuatorLeft.updateFrame(frametime);
+		elevonActuatorRight.updateFrame(frametime);
+		flightSurface.elevator_Left_DEG = elevonActuatorLeft.m_current;
+		flightSurface.elevator_Right_DEG = elevonActuatorRight.m_current;
+		flightSurface.elevator_Left_PCT = elevonActuatorLeft.getCurrentPCT();
+		flightSurface.elevator_Right_PCT = elevonActuatorRight.getCurrentPCT();
 
-		// for now, just duplicate, consider flaps as well
+		// TODO: 
+		//flaperonActuatorLeft.commandMove(flightSurface.roll_Command);
+		//flaperonActuatorRight.commandMove(flightSurface.roll_Command);
+		//flaperonActuatorLeft.updateFrame(frametime);
+		//flaperonActuatorRight.updateFrame(frametime);
 		flightSurface.aileron_Right_DEG = flightSurface.roll_Command;
 		flightSurface.aileron_Left_DEG = flightSurface.roll_Command;
 		flightSurface.aileron_Right_PCT = flightSurface.aileron_Right_DEG / 21.5;
@@ -421,14 +428,11 @@ public:
 
 		rudderActuator.commandMove(flightSurface.rudder_Command);
 		rudderActuator.updateFrame(frametime);
-
 		flightSurface.rudder_DEG = rudderActuator.m_current;
 		flightSurface.rudder_PCT = rudderActuator.getCurrentPCT();
 
 		airbrakeActuator.m_commanded = flightSurface.airbrake_Command;
 		airbrakeActuator.updateFrame(frametime);
-
-		// just use same for both sides for now
 		flightSurface.airbrake_Left_DEG = flightSurface.airbrake_Right_DEG = airbrakeActuator.m_current;
 		flightSurface.airbrake_Left_PCT = flightSurface.airbrake_Right_PCT = airbrakeActuator.getCurrentPCT();
 	}

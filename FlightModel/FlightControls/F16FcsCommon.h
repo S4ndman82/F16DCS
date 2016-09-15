@@ -108,8 +108,8 @@ public:
 	//double		flaperon_Command;
 	//double		elevon_Command;
 
-	double		elevon_Right_DEG;			// elevon deflection (deg): elevator assist to aileron
-	double		elevon_Left_DEG;			// elevon deflection (deg): elevator assist to aileron
+	//double		elevon_Right_DEG;			// elevon deflection (deg): elevator assist to aileron
+	//double		elevon_Left_DEG;			// elevon deflection (deg): elevator assist to aileron
 
 	double		aileron_Right_DEG;			// Aileron deflection (deg)
 	double		aileron_Left_DEG;			// Aileron deflection (deg)
@@ -148,8 +148,8 @@ public:
 		elevator_Left_DEG(0),
 		elevator_Right_PCT(0),
 		elevator_Left_PCT(0),
-		elevon_Right_DEG(0),
-		elevon_Left_DEG(0),
+		//elevon_Right_DEG(0),
+		//elevon_Left_DEG(0),
 		aileron_Right_DEG(0),
 		aileron_Left_DEG(0),
 		aileron_Right_PCT(0),
