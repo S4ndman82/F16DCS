@@ -166,6 +166,8 @@ public:
 		const double beta = limit(bstate.beta_DEG, -30.0, 30.0);
 
 		// TODO: use left and right rudder angles
+		// for now, symmetric use
+		// TODO: support differential mode
 		const double el = -fsurf.pitch_Command;
 
 		// TODO: speed brake handling..

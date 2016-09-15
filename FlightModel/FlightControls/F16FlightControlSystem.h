@@ -392,6 +392,12 @@ public:
 		// TODO:
 		// aileron-rudder interconnect handling
 		// 
+
+		// start with symmetric command
+		flightSurface.elevon_Left_Command = -flightSurface.pitch_Command;
+		flightSurface.elevon_Right_Command = -flightSurface.pitch_Command;
+
+		// combine with aileron effect
 	}
 
 	// when preparing to land (wheels out),
@@ -421,8 +427,8 @@ public:
 		flightSurface.leadingEdgeFlap_Left_PCT = flightSurface.leadingEdgeFlap_Right_PCT = lefActuator.getCurrentPCT();
 
 		// TODO: integrated command
-		elevonActuatorLeft.commandMove(-flightSurface.pitch_Command);
-		elevonActuatorRight.commandMove(-flightSurface.pitch_Command);
+		elevonActuatorLeft.commandMove(flightSurface.elevon_Left_Command);
+		elevonActuatorRight.commandMove(flightSurface.elevon_Right_Command);
 		elevonActuatorLeft.updateFrame(frametime);
 		elevonActuatorRight.updateFrame(frametime);
 		flightSurface.elevator_Left_DEG = elevonActuatorLeft.m_current;

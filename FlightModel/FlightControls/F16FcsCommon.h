@@ -108,7 +108,8 @@ public:
 	double flap_Left_PCT;
 	double flap_Right_PCT;
 
-	//double		elevon_Command;
+	double		elevon_Left_Command;
+	double		elevon_Right_Command;
 	//double		elevon_Right_DEG;			// elevon deflection (deg): elevator assist to aileron
 	//double		elevon_Left_DEG;			// elevon deflection (deg): elevator assist to aileron
 
@@ -151,6 +152,8 @@ public:
 		flap_Right_DEG(0),
 		flap_Left_PCT(0),
 		flap_Right_PCT(0),
+		elevon_Left_Command(0),
+		elevon_Right_Command(0),
 		//elevon_Right_DEG(0),
 		//elevon_Left_DEG(0),
 		elevator_Right_DEG(0),
