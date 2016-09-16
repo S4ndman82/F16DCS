@@ -29,7 +29,7 @@ protected:
 	UtilMatrix<int> m_indexMat; // used in interpolation, reduce reallocation
 
 public:
-	ND_INFO ndinfo; // dimensions descriptor
+	ndinterp::ND_INFO ndinfo; // dimensions descriptor
 
 	double **m_Xmat; // pointers to static arrays of data (X matrix)
 	double *m_Ydata; // pointer to static array of related data (Y)
@@ -134,7 +134,7 @@ public:
 		double Xpars[1];
 		Xpars[0] = xPar1;
 
-		m_result = interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
+		m_result = ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 		return m_result;
 	}
 
@@ -144,7 +144,7 @@ public:
 		Xpars[0] = xPar1;
 		Xpars[1] = xPar2;
 
-		m_result = interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
+		m_result = ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 		return m_result;
 	}
 
@@ -155,7 +155,7 @@ public:
 		Xpars[1] = xPar2;
 		Xpars[2] = xPar3;
 
-		m_result = interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
+		m_result = ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 		return m_result;
 	}
 };

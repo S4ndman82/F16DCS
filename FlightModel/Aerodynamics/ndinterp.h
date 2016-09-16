@@ -86,7 +86,6 @@ public:
 	}
 };
 
-/**/
 template<typename T> class UtilMatrix
 {
 private:
@@ -137,9 +136,10 @@ public:
 		m_mat = nullptr;
 	}
 };
-/**/
 
 // Start of Utility Functions
+namespace ndinterp
+{
 
 // Struct to define a set of data with a given number of dimenions and points
 typedef struct {
@@ -322,6 +322,7 @@ double interpn(UtilBuffer<int> &indexVector, double **Xmat, const double *Y, con
 
 	return(result);
 }
+} // namespace
 // End of Utility Functions
 
 #endif // ifndef _NDINTERP_H_

@@ -10,19 +10,19 @@
 class F16TrimState
 {
 public:
-	// TODO: limits of trimmer for each axis
-	//const double pitchLimit;
-	//const double rollLimit;
-	//const double yawLimit;
-
 	// increments per "notch" for each axis
 	const double pitchIncrement;
 	const double rollIncrement;
 	const double yawIncrement;
 
-	double trimPitch = 0.0;
-	double trimRoll = 0.0;
-	double trimYaw = 0.0;
+	// TODO: limits of trimmer for each axis
+	//const double pitchLimit; // +/- 0.90 g/sec?
+	//const double rollLimit; // +/- 7.5 deg/sec?
+	//const double yawLimit;
+
+	double trimPitch;
+	double trimRoll;
+	double trimYaw;
 
 public:
 	F16TrimState(const double pitch, const double roll, const double yaw)
@@ -46,19 +46,23 @@ public:
 class F16BodyState
 {
 public:
-	double		alpha_DEG = 0.0;			// Angle of attack (deg)
-	double		beta_DEG = 0.0;			// Slideslip angle (deg)
+	double	alpha_DEG;			// Angle of attack (deg)
+	double	beta_DEG;			// Slideslip angle (deg)
 
-	double		rollRate_RPS = 0.0;			// Body roll rate (rad/sec)
-	double		pitchRate_RPS = 0.0;			// Body pitch rate (rad/sec)
-	double		yawRate_RPS = 0.0;			// Body yaw rate (rad/sec)
+	double	rollRate_RPS;		// Body roll rate (rad/sec)
+	double	pitchRate_RPS;		// Body pitch rate (rad/sec)
+	double	yawRate_RPS;		// Body yaw rate (rad/sec)
 
-	double		ay_world = 0.0;			// World referenced up/down acceleration (m/s^2)
-	double		accz = 0.0;			// Az (per normal direction convention) out the bottom of the a/c (m/s^2)
-	double		accy = 0.0;			// Ay (per normal direction convention) out the right wing (m/s^2)
+	double	ay_world;		// World referenced up/down acceleration (m/s^2)
+	double	accz;			// Az (per normal direction convention) out the bottom of the a/c (m/s^2)
+	double	accy;			// Ay (per normal direction convention) out the right wing (m/s^2)
 
 public:
-	F16BodyState() {}
+	F16BodyState() 
+		: alpha_DEG(0), beta_DEG(0)
+		, rollRate_RPS(0), pitchRate_RPS(0), yawRate_RPS(0)
+		, ay_world(0), accz(0), accy(0)
+	{}
 	~F16BodyState() {}
 
 	double getRollRateDegs() const

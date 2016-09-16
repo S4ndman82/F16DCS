@@ -22,21 +22,24 @@ protected:
 	//LinearFunction<double> tailRoll;
 
 protected:
-	double getRollFeelGain(const double longStickForce) const
+
+	// this code is given longitudinal (pitch) force, but can't find out why..
+	// bug from some old stuff?
+	double getRollFeelGain(const double stickForce) const
 	{
-		double longStickForceGained = longStickForce * 0.0667;
+		double stickForceGained = stickForce * 0.0667;
 		double rollFeelGain = 0.0;
-		if (abs(longStickForce) > 25.0)
+		if (abs(stickForce) > 25.0)
 		{
 			rollFeelGain = 0.7;
 		}
-		else if (longStickForce >= 0.0)
+		else if (stickForce >= 0.0)
 		{
-			rollFeelGain = -0.012 * longStickForceGained + 1.0;
+			rollFeelGain = -0.012 * stickForceGained + 1.0;
 		}
-		else if (longStickForce < 0.0)
+		else if (stickForce < 0.0)
 		{
-			rollFeelGain = 0.012 * longStickForceGained + 1.0;
+			rollFeelGain = 0.012 * stickForceGained + 1.0;
 		}
 		return rollFeelGain;
 	}
@@ -98,7 +101,7 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		trimState(ts),
-		rollCommandLimiter(-21.5, 21.5)
+		rollCommandLimiter(-21.5, 21.5) // roll limit should be -40..40 here? (roll command, not actuator)
 		//tailRoll(1, 0.694, 1.132, 0.25, 0.50)
 	{
 	}
