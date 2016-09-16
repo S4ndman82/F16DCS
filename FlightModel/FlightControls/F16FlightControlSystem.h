@@ -451,6 +451,7 @@ public:
 		flaperonActuatorRight.updateFrame(frametime);
 		flightSurface.flaperon_Left_DEG = flaperonActuatorLeft.m_current;
 		flightSurface.flaperon_Right_DEG = flaperonActuatorRight.m_current;
+
 		flightSurface.flaperon_Left_PCT = flaperonActuatorLeft.getCurrentPCT();
 		flightSurface.flaperon_Right_PCT = flaperonActuatorRight.getCurrentPCT();
 
@@ -472,6 +473,20 @@ public:
 		airbrakeActuator.updateFrame(frametime);
 		flightSurface.airbrake_Left_DEG = flightSurface.airbrake_Right_DEG = airbrakeActuator.m_current;
 		flightSurface.airbrake_Left_PCT = flightSurface.airbrake_Right_PCT = airbrakeActuator.getCurrentPCT();
+
+#if 0
+		outputDebug();
+#endif
+
+	}
+
+	void outputDebug()
+	{
+		wchar_t dbgmsg[1024] = { 0 };
+		swprintf(dbgmsg, 1024, L"F16:: flLp: %f flRp: %f flLd: %f flRd: %f \r\n", 
+			flightSurface.flaperon_Left_PCT, flightSurface.flaperon_Right_PCT, 
+			flightSurface.flaperon_Left_DEG, flightSurface.flaperon_Right_DEG);
+		::OutputDebugString(dbgmsg);
 	}
 
 };
