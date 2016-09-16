@@ -90,6 +90,11 @@ protected:
 	//Limiter<double>		flaperonLimiter;
 	//Limiter<double>		htailLimiter;
 
+	// aileron-rudder interconnect,
+	// according to TP 1538
+	//LinearFunction<double> ariLinear;
+
+	//LinearFunction<double> turncoordination;
 
 	// when MPO pressed down, override AOA/G-limiter and direct control of horiz. tail
 	bool manualPitchOverride;
@@ -140,15 +145,16 @@ public:
 		, flapControl(&bodyState, &flightSurface)
 		, airbrakeControl(&bodyState, &flightSurface)
 		, lefActuator(25, -2, 25) // <- FLCS diag
-		, flaperonActuatorLeft(80, -23, 20) // <- FLCS diag, 21.5 flap limit in old code
-		, flaperonActuatorRight(80, -23, 20) // <- FLCS diag, 21.5 flap limit in old code
-		, elevonActuatorLeft(60, -25, 25) // <- FLCS diag
-		, elevonActuatorRight(60, -25, 25) // <- FLCS diag
+		, flaperonActuatorLeft(80, -23, 20) // <- FLCS diag, 21.5 flap limit in old code (TP 1538)
+		, flaperonActuatorRight(80, -23, 20) // <- FLCS diag, 21.5 flap limit in old code (TP 1538)
+		, elevonActuatorLeft(60, -25, 25) // <- FLCS diag, differential limit smaller (5.38deg)
+		, elevonActuatorRight(60, -25, 25) // <- FLCS diag, differential limit smaller (5.38deg)
 		, rudderActuator(120.0, -30.0, 30.0) // <- FLCS diag
 		, airbrakeActuator(30.0, 0, 60.0) // <- check actuator rate
 		, flapActuator(10.0, 0, 20.0) // temporary only until fixing integration problem
 		//, flaperonLimiter(-20, 20) // deflection limit for both sides
 		//, htailLimiter(-25, 25) // stab. deflection limits
+		//, ariLinear(0.075, , , -30, 30)
 		, manualPitchOverride(false)
 		//, isGearDown(true)
 		//, isGearUp(false)

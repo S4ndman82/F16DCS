@@ -131,6 +131,8 @@ public:
 
 		double dynamicPressureScheduled = dynamic_pressure_schedule(dynamicPressure_kNM2);
 
+		// above alpha 29 roll control is disengaged, yaw control automatic mode?
+
 		double alphaLimited = limit(bodyState->alpha_DEG, -5.0, 30.0);
 		double alphaLimitedRate = 10.0 * (alphaLimited - m_alphaFiltered);
 		m_alphaFiltered += (alphaLimitedRate * frameTime);
