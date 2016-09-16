@@ -380,19 +380,9 @@ public:
 			flightSurface.flaperon_Left_Command += flightSurface.roll_Command;
 			flightSurface.flaperon_Right_Command += flightSurface.roll_Command;
 			*/
-			flightSurface.flaperon_Left_Command = flightSurface.roll_Command;
-			flightSurface.flaperon_Right_Command = flightSurface.roll_Command;
 		}
-		else
-		{
-			flightSurface.flap_Left_DEG = 0;
-			flightSurface.flap_Right_DEG = 0;
-			flightSurface.flap_Left_PCT = flightSurface.flap_Left_DEG / 20.0;
-			flightSurface.flap_Right_PCT = flightSurface.flap_Right_DEG / 20.0;
-
-			flightSurface.flaperon_Left_Command = flightSurface.roll_Command;
-			flightSurface.flaperon_Right_Command = flightSurface.roll_Command;
-		}
+		flightSurface.flaperon_Left_Command = flightSurface.roll_Command;
+		flightSurface.flaperon_Right_Command = flightSurface.roll_Command;
 
 		// TODO:
 		// aileron-rudder interconnect handling
