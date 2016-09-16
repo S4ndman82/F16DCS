@@ -86,8 +86,10 @@ protected:
 	double m_CyRudder;
 	double m_CnRudder;
 	double m_ClRudder;
-	double m_CxFlaps;
-	double m_CzFlaps;
+	double m_CxFlapLeft;
+	double m_CxFlapRight;
+	double m_CzFlapLeft;
+	double m_CzFlapRight;
 	double m_CxAirbrake;
 	double m_diffCgPCT;
 
@@ -151,7 +153,7 @@ public:
 		fn_eta_el(1, F16::_eta_elData),
 		m_CyAilerons(0), m_CnAilerons(0), m_ClAilerons(0),
 		m_CyRudder(0), m_CnRudder(0), m_ClRudder(0),
-		m_CxFlaps(0), m_CzFlaps(0),
+		m_CxFlapLeft(0), m_CxFlapRight(0), m_CzFlapLeft(0), m_CzFlapRight(0),
 		m_CxAirbrake(0),
 		m_diffCgPCT(0)
 	{
@@ -358,15 +360,8 @@ public:
 	}
 	void getFlapsCoeff(const double dynamicPressure_NM2, const F16FlightSurface &fsurf, const F16BodyState &bstate)
 	{
-		double CzLeft = 0.0, CzRight = 0.0, CxLeft = 0.0, CxRight = 0.0;
-		getFlapCoeff(fsurf.flap_Left_PCT, bstate.alpha_DEG, CzLeft, CxLeft);
-		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, CzRight, CxRight);
-
-		// this does not work correctly when flap and aileron are combined
-
-		// check this
-		m_CzFlaps = CzLeft + CzRight;
-		m_CxFlaps = CxLeft + CxRight;
+		getFlapCoeff(fsurf.flap_Left_PCT, bstate.alpha_DEG, m_CzFlapLeft, m_CxFlapLeft);
+		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, m_CzFlapRight, m_CxFlapRight);
 	}
 
 	double getAileronCoeff(const double fn_C_a20, const double fn_C_a20_lef, const double fn_C, const double fn_C_lef, const F16FlightSurface &fsurf) const
@@ -445,15 +440,6 @@ public:
 		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 		const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
 
-		// calculate values based on interpolation results
-		// TODO: duplicate this for left and right airflow (with differential stabilizer)?
-		const double Cx_delta_lef = fn_Cx_lef.m_result - fn_CxEle0.m_result;
-		const double Cz_delta_lef = fn_Cz_lef.m_result - fn_CzEle0.m_result;
-		const double Cm_delta_lef = fn_Cm_lef.m_result - fn_CmEle0.m_result;
-		const double Cy_delta_lef = fn_Cy_lef.m_result - fn_Cy.m_result;
-		const double Cn_delta_lef = fn_Cn_lef.m_result - fn_CnEle0.m_result;
-		const double Cl_delta_lef = fn_Cl_lef.m_result - fn_ClEle0.m_result;
-
 		// get aerodynamic lift position as function of speed (difference from reference CG)
 		getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber);
 		getFlapsCoeff(pAtmos->dynamicPressure, fsurf, bstate);
@@ -462,44 +448,96 @@ public:
 		getRudderCoeff(fsurf);
 
 		/* XXXXXXXX Cx_tot XXXXXXXX */
+		sumCxTotal(meanChordFPS, LgCxGearAero, fsurf, bstate);
+
+		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
+		sumCzTotal(meanChordFPS, LgCzGearAero, fsurf, bstate);
+
+		/* MMMMMMMM Cm_tot MMMMMMMM */ 
+		sumCmTotal(meanChordFPS, fsurf, bstate);
+
+		/* YYYYYYYY Cy_tot YYYYYYYY */
+		sumCyTotal(wingSpanFPS, fsurf, bstate);
+
+		/* NNNNNNNN Cn_tot NNNNNNNN */ 
+		sumCnTotal(wingSpanFPS, meanChordPerWingSpan, fsurf, bstate);
+
+		/* LLLLLLLL Cl_total LLLLLLLL */
+		sumClTotal(wingSpanFPS, fsurf, bstate);
+	}
+
+	void sumCxTotal(const double meanChordFPS, const double LgCxGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
+	{
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double Cx_delta_lef = fn_Cx_lef.m_result - fn_CxEle0.m_result;
+
+		/* XXXXXXXX Cx_tot XXXXXXXX */
 		double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
 		m_Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
-		m_Cx_total += m_CxFlaps + LgCxGearAero;
+		m_Cx_total += m_CxFlapLeft + m_CxFlapRight + LgCxGearAero;
 
 		/* airbrake - testing now*/
 		m_Cx_total += m_CxAirbrake;
+	}
 
-		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
+	void sumCzTotal(const double meanChordFPS, const double LgCzGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
+	{
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double Cz_delta_lef = fn_Cz_lef.m_result - fn_CzEle0.m_result;
+
+		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */
 		double dZdQ = meanChordFPS * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
 		m_Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
-		m_Cz_total += m_CzFlaps + LgCzGearAero;
+		m_Cz_total += m_CzFlapLeft + m_CzFlapRight + LgCzGearAero;
+	}
 
-		/* MMMMMMMM Cm_tot MMMMMMMM */ 
+	void sumCmTotal(const double meanChordFPS, F16FlightSurface &fsurf, F16BodyState &bstate)
+	{
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double Cm_delta_lef = fn_Cm_lef.m_result - fn_CmEle0.m_result;
+
+		/* MMMMMMMM Cm_tot MMMMMMMM */
 		/* ignore deep-stall regime, delta_Cm_ds = 0 */
 		double dMdQ = meanChordFPS * (fn_CMq.m_result + fn_delta_CMq_lef.m_result*leadingEdgeFlap_PCT);
 		double CmDelta = fn_delta_Cm.m_result + 0; // Cm_delta + Cm_delta_ds (0)
 		m_Cm_total = fn_Cm.m_result*fn_eta_el.m_result + m_Cz_total*m_diffCgPCT
 			+ Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
+	}
+
+	void sumCyTotal(const double wingSpanFPS, F16FlightSurface &fsurf, F16BodyState &bstate)
+	{
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double Cy_delta_lef = fn_Cy_lef.m_result - fn_Cy.m_result;
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
 		double dYdR = wingSpanFPS * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
 		double dYdP = wingSpanFPS * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
 		m_Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT + m_CyAilerons + m_CyRudder
 			+ dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
-	
-		/* NNNNNNNN Cn_tot NNNNNNNN */ 
+	}
+	void sumCnTotal(const double wingSpanFPS, const double meanChordPerWingSpan, F16FlightSurface &fsurf, F16BodyState &bstate)
+	{
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double Cn_delta_lef = fn_Cn_lef.m_result - fn_CnEle0.m_result;
+
+		/* NNNNNNNN Cn_tot NNNNNNNN */
 		double dNdR = wingSpanFPS * (fn_CNr.m_result + fn_delta_CNr_lef.m_result*leadingEdgeFlap_PCT);
 		double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
-		double CnDeltaBetaDeg = fn_delta_CNbeta.m_result*bstate.beta_DEG;
 		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan
-			+ m_CnAilerons + m_CnRudder + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS + CnDeltaBetaDeg;
+			+ m_CnAilerons + m_CnRudder + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS
+			+ fn_delta_CNbeta.m_result*bstate.beta_DEG;
+	}
+	void sumClTotal(const double wingSpanFPS, F16FlightSurface &fsurf, F16BodyState &bstate)
+	{
+		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
+		const double Cl_delta_lef = fn_Cl_lef.m_result - fn_ClEle0.m_result;
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
 		double dLdR = wingSpanFPS * (fn_CLr.m_result + fn_delta_CLr_lef.m_result*leadingEdgeFlap_PCT);
 		double dLdP = wingSpanFPS * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
-		double ClDeltaBetaDeg = fn_delta_CLbeta.m_result*bstate.beta_DEG;
 		m_Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT + m_ClAilerons + m_ClRudder
-			+ dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS + ClDeltaBetaDeg;
+			+ dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS
+			+ fn_delta_CLbeta.m_result*bstate.beta_DEG;
 	}
 
 
