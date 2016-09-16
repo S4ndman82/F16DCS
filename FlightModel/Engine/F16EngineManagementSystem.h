@@ -241,7 +241,7 @@ public:
 
 	// return gyroscopic effect of engine for motions,
 	// use angular momentum directly now
-	double getGyroscopicEffect() const
+	double getTurbineMomentum() const
 	{
 		return Engine.engineParams.angular_momentum;
 	}

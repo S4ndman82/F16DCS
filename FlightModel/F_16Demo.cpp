@@ -252,7 +252,7 @@ void ed_fm_simulate(double dt)
 	F16::Motion.updateAeroForces(F16::Aero.getCyTotal(), F16::Aero.getCxTotal(), F16::Aero.getCzTotal(), 
 								F16::Aero.getClTotal(), F16::Aero.getCmTotal(), F16::Aero.getCnTotal());
 
-	F16::Motion.updateEngineForces(F16::EMS.Engine.getThrustN(), F16::EMS.getGyroscopicEffect());
+	F16::Motion.updateEngineForces(F16::EMS.Engine.getThrustN(), F16::EMS.getTurbineMomentum());
 
 	// just internal fuel for now, payload and external tanks later
 	F16::Motion.updateWetMassCg(F16::Fuel.FwdFus.fuel, F16::Fuel.FwdFus.position, F16::Fuel.FwdFus.size);
