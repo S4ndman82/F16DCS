@@ -13,6 +13,8 @@
 #include "F16AeroData.h"
 #include "F16AeroFunction.h"
 
+#include "UtilityFunctions.h"
+
 #include "FlightControls/F16FcsCommon.h"
 
 #include "Atmosphere/F16Atmosphere.h"
@@ -79,6 +81,8 @@ protected:
 	AERO_Function fn_delta_CLbeta;
 	AERO_Function fn_delta_Cm;
 	AERO_Function fn_eta_el;
+
+	LinearFunction<double> cgLiftDiff;
 
 	double m_CyAileronLeft;
 	double m_CnAileronLeft;
@@ -155,6 +159,7 @@ public:
 		fn_delta_CLbeta(1, F16::_delta_CLbetaData),
 		fn_delta_Cm(1, F16::_delta_CmData),
 		fn_eta_el(1, F16::_eta_elData),
+		cgLiftDiff(0.05, 0.30, 0, 2, 0.30, 0.39),
 		m_CyAileronLeft(0), m_CnAileronLeft(0), m_ClAileronLeft(0),
 		m_CyAileronRight(0), m_CnAileronRight(0), m_ClAileronRight(0),
 		m_CyRudder(0), m_CnRudder(0), m_ClRudder(0),
@@ -260,9 +265,13 @@ public:
 		// CG may vary from 0.30 - 0.39, 0.35 at mach 1 (reference point)
 		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
 
-		double diffCgPCT = 0.0;
+		// as a function of mach number (might be better as Qc/Ps..)
+		m_diffCgPCT = cgLiftDiff.result(machNumber);
 
 		// TODO: make actual calculations here (linear function)
+
+		/*
+		double diffCgPCT = 0.0;
 		if (machNumber < 1)
 		{
 			diffCgPCT = F16::referenceCG_PCT - 0.30;
@@ -272,6 +281,7 @@ public:
 			diffCgPCT = F16::referenceCG_PCT - 0.39;
 		}
 		m_diffCgPCT = diffCgPCT;
+		*/
 	}
 
 	// drag caused by aircraft skin in contact with air (friction)
