@@ -142,9 +142,11 @@ public:
 	const T angleFactor; // factor to multiply with (coefficient, ratio of X/Y)
 	const T zeroBias; // zero-point offset
 
-	// range where functional (result varies according to input)
+	// TODO: make optional?
+	// range where functional
 	const T minRange;
 	const T maxRange;
+	bool hasRange;
 
 	// TODO: use limiter here as well
 	//DeltaLimiter<double> limit;
@@ -159,13 +161,23 @@ public:
 		//angleFactor =
 	}
 	*/
+	LinearFunction(const T angle, const T offset, const T lower, const T upper)
+		: angleFactor(angle), zeroBias(offset), minRange(0), maxRange(0), hasRange(false), 
+		limiter(lower, upper)
+	{}
 	LinearFunction(const T angle, const T offset, const T min, const T max, const T lower, const T upper)
-		: angleFactor(angle), zeroBias(offset), minRange(min), maxRange(max), limiter(lower, upper)
+		: angleFactor(angle), zeroBias(offset), minRange(min), maxRange(max), hasRange(true), 
+		limiter(lower, upper)
 	{}
 	~LinearFunction() {}
 
 	bool isInRange(const T input) const
 	{
+		if (hasRange == false)
+		{
+			// no range-limit defined -> always in range
+			return true;
+		}
 		if (input >= minRange && input <= maxRange)
 		{
 			return true;
@@ -177,13 +189,16 @@ public:
 	T result(const T input) const
 	{
 		// no change outside range
-		if (input < minRange)
+		if (hasRange == true)
 		{
-			return limiter.lower_limit;
-		}
-		if (input > maxRange)
-		{
-			return limiter.upper_limit;
+			if (input < minRange)
+			{
+				return limiter.lower_limit;
+			}
+			if (input > maxRange)
+			{
+				return limiter.upper_limit;
+			}
 		}
 
 		// angle * input -> value in line of the graph
