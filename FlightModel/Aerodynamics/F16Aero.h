@@ -267,21 +267,6 @@ public:
 
 		// as a function of mach number (might be better as Qc/Ps..)
 		m_diffCgPCT = cgLiftDiff.result(machNumber);
-
-		// TODO: make actual calculations here (linear function)
-
-		/*
-		double diffCgPCT = 0.0;
-		if (machNumber < 1)
-		{
-			diffCgPCT = F16::referenceCG_PCT - 0.30;
-		}
-		else if (machNumber > 1)
-		{
-			diffCgPCT = F16::referenceCG_PCT - 0.39;
-		}
-		m_diffCgPCT = diffCgPCT;
-		*/
 	}
 
 	// drag caused by aircraft skin in contact with air (friction)
