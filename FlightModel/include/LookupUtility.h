@@ -2,6 +2,22 @@
 // LookupTable : simple helper to generate and manage lookup table during run-time,
 // made as generic and reusable with possibility to adjust resolution of values.
 //
+// Lookup support imprecise and rough values for lookup:
+// using something like atmospheric pressure might need infinite "depth" of values
+// that is not practical to have exact values for.
+//
+// Also the thing about floating point numbers is that they are easily rounded
+// and result of one calculation is not exact match to result of another calculation.
+//
+// For these reasons, lookup should handle cases where values are not exact match.
+// If they were always exact, you could use something like std::map<> instead.
+//
+// There's multiple ways that values could be added to the table:
+// - linear X with Y values from another function in generate() (using std::function<>)
+// - modifying Y values later with setValue() (caching case)
+// - or entirely "manual" adding of values, such as:
+//  for (int i..) setAtIndex(i, X, Y)..
+//
 // Ilkka Prusi 2016 <ilkka.prusi@gmail.com>
 //
 
@@ -17,6 +33,9 @@
 
 #include <functional>
 
+// Create with something like:
+// LookupTable<double,double>
+// .. where 1st is X (par) and 2nd is Y axis (val) type.
 template<typename U, typename V> class LookupTable
 {
 public:
