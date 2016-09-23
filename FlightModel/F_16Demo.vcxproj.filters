@@ -147,6 +147,9 @@
     <ClInclude Include="Aerodynamics\ndinterp.h">
       <Filter>Aerodynamics</Filter>
     </ClInclude>
+    <ClInclude Include="include\LookupUtility.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

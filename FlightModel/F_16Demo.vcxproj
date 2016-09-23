@@ -137,6 +137,7 @@
     <ClInclude Include="include\ED_FM_Utility.h" />
     <ClInclude Include="include\F16Constants.h" />
     <ClInclude Include="include\FM\wHumanCustomPhysicsAPI.h" />
+    <ClInclude Include="include\LookupUtility.h" />
     <ClInclude Include="include\UtilityFunctions.h" />
     <ClInclude Include="Inputs\F16AnalogInput.h" />
     <ClInclude Include="Inputs\F16Inputs.h" />
