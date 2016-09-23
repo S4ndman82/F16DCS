@@ -90,11 +90,9 @@ public:
 		return yAxis[index];
 	}
 
+	// lookup with "halving" method
 	size_t getXIndex(const U xPar) const
 	{
-		// note: lookup with "halving" method
-		// since parameter might not be exact match
-
 		size_t index = xParamCount / 2;
 		size_t xlo = 0, xhi = axisSize;
 		while (xAxis[index] != xPar)
@@ -115,12 +113,9 @@ public:
 				// (floating point rounding perhaps)
 				break;
 			}
-
 			index = (xhi - xlo) / 2;
 		}
-
-		// currently no way to indicate "not in range"
-		return index;
+		return index; 
 	}
 
 	// traditional lookup
@@ -140,9 +135,7 @@ public:
 				return index;
 			}
 		}
-
-		// currently no way to indicate "not in range"
-		return axisSize;
+		return axisSize; 
 	}
 
 	// range check
