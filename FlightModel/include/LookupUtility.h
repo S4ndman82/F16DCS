@@ -69,6 +69,16 @@ public:
 		}
 	}
 
+	void generateX(U parMin, U parMax)
+	{
+		U resolution = (parMax - parMin) / axisSize;
+		U xPar = parMin;
+		for (size_t index = 0; index < axisSize && xPar <= parMax; index++, xPar += resolution)
+		{
+			xAxis[index] = xPar;
+		}
+	}
+
 	// get lamba operator reference to generate values by resolution,
 	// there's still possibility to fill values in other methods in case x-axis values are non-linear:
 	// this is for case where X is linear and Y result of function depending on X
