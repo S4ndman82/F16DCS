@@ -145,6 +145,16 @@ public:
 		return axisSize;
 	}
 
+	// range check
+	bool isInRange(const U xPar) const
+	{
+		if (xPar >= xAxis[0] && xPar <= xAxis[axisSize -1])
+		{
+			return true;
+		}
+		return false;
+	}
+
 };
 
 
