@@ -69,6 +69,8 @@ public:
 		}
 	}
 
+	// helper to generate linear values for X axis,
+	// caller should use some method to set values for Y
 	void generateX(U parMin, U parMax)
 	{
 		U resolution = (parMax - parMin) / axisSize;
@@ -193,7 +195,15 @@ public:
 		return false;
 	}
 
+	// obvious validity check
+	bool isIndex(const size_t index) const
+	{
+		if (index >= 0 && index < axisSize)
+		{
+			return true;
+		}
+		return false;
+	}
 };
-
 
 #endif // ifndef _LOOKUPUTILITY_H_
