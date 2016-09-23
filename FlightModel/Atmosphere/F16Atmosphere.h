@@ -75,7 +75,6 @@ public:
 		wind.z = wind_vz;
 
 		// Get the total absolute velocity acting on the aircraft with wind included
-		// using english units so airspeed is in feet/second here
 		m_airspeed.x = velocity_world_cs.x - wind.x;
 		m_airspeed.y = velocity_world_cs.y - wind.y;
 		m_airspeed.z = velocity_world_cs.z - wind.z;
