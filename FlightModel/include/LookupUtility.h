@@ -90,6 +90,16 @@ public:
 		return yAxis[index];
 	}
 
+	// additional averaging
+	V getValueAvg(const U xPar) const
+	{
+		size_t index = getXIndex(xPar);
+
+		V a = yAxis[index -1];
+		V b = yAxis[index +1];
+		return (a + b)/2;
+	}
+
 	// lookup with "halving" method
 	size_t getXIndex(const U xPar) const
 	{
