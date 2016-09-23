@@ -23,14 +23,8 @@ public:
 	V *yAxis;
 	U *xAxis;
 
-	//size_t yValueCount;
-	//size_t xParamCount;
-	
 	// both must be same size
 	size_t axisSize;
-
-	//U xResolution; // increment
-	//U parMin, parMax;
 
 	LookupTable(size_t count) :
 		yAxis(nullptr), xAxis(nullptr), axisSize(count) /*, xResolution(0)*/
@@ -53,7 +47,8 @@ public:
 	}
 
 	// get lamba operator reference to generate values by resolution,
-	// there's still possibility to fill values in other methods in case x-axis values are non-linear
+	// there's still possibility to fill values in other methods in case x-axis values are non-linear:
+	// this is for case where X is linear and Y result of function depending on X
 	void generate(std::function<V(U)> &fn, U parMin, U parMax, U parIncrement)
 	{
 		U xPar = parMin;
@@ -72,6 +67,7 @@ public:
 		yAxis[index] = yVal;
 	}
 
+	// for setting values entirely in caller (non-linear X and Y)
 	void setAtIndex(const size_t index, const U xPar, const V yVal)
 	{
 		xAxis[index] = xPar;
