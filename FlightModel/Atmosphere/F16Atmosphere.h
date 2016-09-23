@@ -96,22 +96,62 @@ public:
 	}
 
 	/*
-	// note: for testing, not checked
-	double getStaticAirTemperature() const
+	// pressure ratio Pt/Ps
+	double getPressureRatio(const double machNumber) const
 	{
-		double correctionFactor = 1/(1+r0.2M^2)
-
-		return ambientTemperature * correctionFactor;
 	}
 	*/
+
+	// note: for testing, not checked
+	double getStaticAirTemperature(const double measTemp) const
+	{
+		//double Tm = measTemp; // measured (indicated) temperature
+
+		double r = 0.0; // <- value from somewhere..
+		double M = 0.2 * pow(machNumber, 2);
+		double correctionFactor = 1 / (1 + r * M);
+
+		return measTemp * correctionFactor;
+	}
 	// note: for testing, not checked
 	double getTrueAirspeed() const
 	{
 		// should use computed static air temperature in this case?
-		double temp = sqrt(ambientTemperature);
-		temp *= machNumber;
-		temp *= 20.0468;
-		return temp;
+		double Ts = getStaticAirTemperature(ambientTemperature);
+
+		double Vt = sqrt(Ts);
+		Vt *= machNumber;
+		Vt *= 20.0468;
+		return Vt;
+	}
+
+	// get impact pressure Qc
+	// calculations from Introduction to Avionics Systems by R.P.G. Collinson
+	// (mistakes are mine)
+	double getCalibratedAirspeed(const double Vc) const
+	{
+		double Qc = 0.0;
+
+		// used in multiple cases
+		double V = (Vc / 340.294);
+
+		if (Vc <= 340.3) // 340.3m/s ~661.5kts
+		{
+			Qc = 1 + 0.2 * pow(V, 3.5) -1;
+		}
+		else
+		{
+			double upper = 166.92 * pow(V, 7);
+			double denom = 7 * pow(V, 2) - 1;
+			denom = pow(denom, 2.5);
+
+			Qc = upper / denom - 1;
+		}
+
+		// final step in both cases
+		Qc *= 101.325;
+
+		return Qc;
 	}
 
 	// q = impact pressure aka. stagnation pressure aka. pitot pressure: 

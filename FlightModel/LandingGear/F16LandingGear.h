@@ -345,6 +345,13 @@ public:
 
 protected:
 
+	// TODO: calculate tire load on each wheel:
+	// amount of weight of the aircraft (and payload) on the tire, 
+	// minus aerodynamic lift of the aircraft (when moving)
+	void tireLoad()
+	{
+	}
+
 	void gearAeroDrag(/*double airspeed?*/)
 	{
 		// precalculate some things

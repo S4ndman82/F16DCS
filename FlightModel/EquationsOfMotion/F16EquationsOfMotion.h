@@ -288,8 +288,11 @@ public:
 		// TODO: rolling moment of engine
 		// (counter-clockwise?)
 		//Vec3 roll_moment(rolling_moment, 0.0, 0.0);
+		/*
+		// disabled for now, check magnitude, sign, axis..
 		Vec3 roll_moment(0.0, 0.0, rolling_moment);
 		add_local_moment(roll_moment);
+		*/
 	}
 
 	// TODO: left, right and nose wheel forces

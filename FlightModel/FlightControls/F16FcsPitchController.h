@@ -151,7 +151,7 @@ public:
 		double finalCombinedCommand = dynamicPressureScheduled * (2.5 * (m_stickCommandPosFiltered + limiterCommand + gLimiterCommand));
 
 		double finalCombinedCommandFilteredLimited = limit(finalCombinedCommand, -25.0, 25.0);
-		finalCombinedCommandFilteredLimited = finalCombinedCommandFilteredLimited + finalCombinedCommand;
+		finalCombinedCommandFilteredLimited += finalCombinedCommand;
 		double finalPitchCommandTotal = finalCombinedCommandFilteredLimited;
 		finalPitchCommandTotal += (0.5 * m_alphaFiltered);
 
