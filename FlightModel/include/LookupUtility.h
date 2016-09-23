@@ -72,6 +72,17 @@ public:
 		yAxis[index] = yVal;
 	}
 
+	void setAtIndex(const size_t index, const U xPar, const V yVal)
+	{
+		xAxis[index] = xPar;
+		yAxis[index] = yVal;
+	}
+
+	V getAtIndex(const size_t index) const
+	{
+		return yAxis[index];
+	}
+
 	V getValue(const U xPar) const
 	{
 		size_t index = getXIndex(xPar);
