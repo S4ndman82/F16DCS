@@ -34,10 +34,22 @@ public:
 
 	LookupTable(size_t count) :
 		yAxis(nullptr), xAxis(nullptr), axisSize(count) /*, xResolution(0)*/
-	{}
+	{
+		yAxis = new V[count];
+		xAxis = new U[count];
+	}
 	~LookupTable() 
 	{
-
+		if (yAxis != nullptr)
+		{
+			delete yAxis;
+			yAxis = nullptr;
+		}
+		if (xAxis != nullptr)
+		{
+			delete xAxis;
+			xAxis = nullptr;
+		}
 	}
 
 	// get lamba operator reference to generate values by resolution
@@ -53,20 +65,20 @@ public:
 	}
 
 	// hopefully no need for this..
-	void setValue(U xPar, V yVal)
+	void setValue(const U xPar, const V yVal)
 	{
 		size_t index = getXIndex(xPar);
 		yAxis[index] = yVal;
 	}
 
-	V getValue(U xPar)
+	V getValue(const U xPar) const
 	{
 		size_t index = getXIndex(xPar);
 		// x-par found -> get y-val at same index
 		return yAxis[index];
 	}
 
-	size_t getXIndex(U xPar)
+	size_t getXIndex(const U xPar) const
 	{
 		// note: lookup with "halving" method
 		// since parameter might not be exact match
