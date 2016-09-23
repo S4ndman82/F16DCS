@@ -15,6 +15,7 @@
 #include <malloc.h>
 #include <memory.h>
 
+#include <functional>
 
 template<typename U, typename V> class LookupTable
 {
@@ -40,14 +41,14 @@ public:
 	}
 
 	// get lamba operator reference to generate values by resolution
-	void generate([](U xPar) &cb, U parMin, U parMax, U parIncrement)
+	void generate(std::function<V(U)> &fn, U parMin, U parMax, U parIncrement)
 	{
 		U xPar = parMin;
 		for (size_t index = 0; index < axisSize && xPar <= parMax; index++, xPar += parIncrement)
 		{
 			// TODO: callback to function giving y for x
 			xAxis[index] = xPar;
-			yAxis[index] = cb(xPar);
+			yAxis[index] = fn(xPar);
 		}
 	}
 
