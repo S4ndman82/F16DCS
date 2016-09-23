@@ -20,6 +20,10 @@
 template<typename U, typename V> class LookupTable
 {
 public:
+	// TODO: compare with using:
+	// pair<U,V> instead of two-axis approach,
+	// does it slow down (by using cpu-cache more than necessary)?
+
 	V *yAxis;
 	U *xAxis;
 
