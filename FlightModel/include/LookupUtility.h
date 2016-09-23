@@ -52,19 +52,20 @@ public:
 		}
 	}
 
-	// get lamba operator reference to generate values by resolution
+	// get lamba operator reference to generate values by resolution,
+	// there's still possibility to fill values in other methods in case x-axis values are non-linear
 	void generate(std::function<V(U)> &fn, U parMin, U parMax, U parIncrement)
 	{
 		U xPar = parMin;
 		for (size_t index = 0; index < axisSize && xPar <= parMax; index++, xPar += parIncrement)
 		{
-			// TODO: callback to function giving y for x
 			xAxis[index] = xPar;
 			yAxis[index] = fn(xPar);
 		}
 	}
 
 	// hopefully no need for this..
+	// you might need to modify values in some cases perhaps
 	void setValue(const U xPar, const V yVal)
 	{
 		size_t index = getXIndex(xPar);
@@ -84,7 +85,7 @@ public:
 		// since parameter might not be exact match
 
 		size_t index = xParamCount / 2;
-		size_t xlo = 0, xhi = xParamCount;
+		size_t xlo = 0, xhi = axisSize;
 		while (xAxis[index] != xPar)
 		{
 			if (xAxis[index] < xPar)
@@ -106,8 +107,33 @@ public:
 
 			index = (xhi - xlo) / 2;
 		}
+
+		// currently no way to indicate "not in range"
 		return index;
 	}
+
+	// traditional lookup
+	size_t getIndex(const U xPar) const
+	{
+		for (size_t index = 0; index < axisSize; index++)
+		{
+			if (xAxis[index] == xPar)
+			{
+				return index;
+			}
+
+			if ((index + 1) < axisSize && xAxis[index + 1] > xPar)
+			{
+				// not exact match but next one would be larger
+				// (might be floating point rounding difference)
+				return index;
+			}
+		}
+
+		// currently no way to indicate "not in range"
+		return axisSize;
+	}
+
 };
 
 
