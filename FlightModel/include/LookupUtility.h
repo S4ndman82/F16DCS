@@ -111,6 +111,9 @@ public:
 			{
 				// close enough -> use index even if value is not exact match
 				// (floating point rounding perhaps)
+
+				// TODO: averaging of result value in this case
+
 				break;
 			}
 			index = (xhi - xlo) / 2;
@@ -132,6 +135,9 @@ public:
 			{
 				// not exact match but next one would be larger
 				// (might be floating point rounding difference)
+
+				// TODO: averaging of result value in this case
+
 				return index;
 			}
 		}
