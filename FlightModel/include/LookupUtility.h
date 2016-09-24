@@ -12,6 +12,10 @@
 // For these reasons, lookup should handle cases where values are not exact match.
 // If they were always exact, you could use something like std::map<> instead.
 //
+// You can use combinations of complex datatypes such as struct and class,
+// provided that usual comparison operators have been defined.
+// For example: LookupTable<class X, struct Y> is possible.
+//
 // There's multiple ways that values could be added to the table:
 // - linear X with Y values from another function in generate() (using std::function<>)
 // - modifying Y values later with setValue() (caching case)
@@ -36,6 +40,10 @@
 // Create with something like:
 // LookupTable<double,double>
 // .. where 1st is X (par) and 2nd is Y axis (val) type.
+//
+// You can use complex datatypes provided that usual comparison operators
+// have been defined: for example, LookupTable<class X, struct Y>
+//
 template<typename U, typename V> class LookupTable
 {
 public:
