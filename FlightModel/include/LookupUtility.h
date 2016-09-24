@@ -124,6 +124,19 @@ public:
 
 	V getValue(const U xPar) const
 	{
+		// if parameter is not in range, limit to min/max known value
+		if (isInRange(xPar) == false)
+		{
+			if (xPar > yAxis[axisSize -1])
+			{
+				return yAxis[axisSize - 1];
+			}
+			else
+			{
+				return yAxis[0];
+			}
+		}
+
 		size_t index = getXIndex(xPar);
 		// x-par found -> get y-val at same index
 		return yAxis[index];
@@ -133,17 +146,30 @@ public:
 	V getValueAvg(const U xPar) const
 	{
 		size_t index = getXIndex(xPar);
-
-		V a = yAxis[index -1];
-		V b = yAxis[index +1];
-		return (a + b)/2;
+		if (index > 0 && index < (axisSize-1))
+		{
+			V a = yAxis[index -1];
+			V b = yAxis[index +1];
+			return (a + b)/2;
+		}
+		return yAxis[index];
 	}
 
 	// lookup with "halving" method
 	size_t getXIndex(const U xPar) const
 	{
+		// just check possible boundaries first
+		if (xAxis[0] == xPar)
+		{
+			return 0;
+		}
+		if (xAxis[axisSize -1] == xPar)
+		{
+			return axisSize - 1;
+		}
+
 		size_t index = xParamCount / 2;
-		size_t xlo = 0, xhi = axisSize;
+		size_t xlo = 0, xhi = axisSize-1;
 		while (xAxis[index] != xPar)
 		{
 			if (xAxis[index] < xPar)
