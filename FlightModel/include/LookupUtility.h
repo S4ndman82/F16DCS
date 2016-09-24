@@ -125,16 +125,13 @@ public:
 	V getValue(const U xPar) const
 	{
 		// if parameter is not in range, limit to min/max known value
-		if (isInRange(xPar) == false)
+		if (xPar > xAxis[axisSize - 1])
 		{
-			if (xPar > yAxis[axisSize -1])
-			{
-				return yAxis[axisSize - 1];
-			}
-			else
-			{
-				return yAxis[0];
-			}
+			return yAxis[axisSize - 1];
+		}
+		else if (xPar < xAxis[0])
+		{
+			return yAxis[0];
 		}
 
 		size_t index = getXIndex(xPar);
