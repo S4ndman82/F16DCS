@@ -292,6 +292,18 @@ public:
 		//vertical_tail_wetted_area_FT2
 		//fuselage_wetted_area_FT2
 
+		// TODO: get lookup data for Cf (skin friction coefficient)
+
+		// flat plate, zero pressure gradient..
+		// Cf = 1.32824/Re ^1/2
+		//
+		// Rn = 3 * 10^6, Rn = 40 * 10^6
+		// couple of computational methods based on reynolds number:
+		// 
+		// Cf = 0.455 / ((log Re) * 2.58) - A / Re
+		//
+		// Cf ^-1/2 = 4.13 * log (Re Cf)
+
 		return 0;
 	}
 
