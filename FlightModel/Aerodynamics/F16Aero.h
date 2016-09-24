@@ -299,11 +299,6 @@ public:
 	{
 		double airbrakeDrag = 0;
 
-		// after actuator move, calculate new drag at new position
-
-		// TODO: switch to actual angles instead of percentages
-		//double angle = cos(airbrakeActuator.m_current);
-
 		// TEST!
 		// just use full now for testing
 		//double force = dynamicPressure_LBFT2 * 16.0 * cos(60) * 0.7;
@@ -333,13 +328,10 @@ public:
 			//double force = dynamicPressure_NM2 * (F16::airbrakeArea_m2 / 2);
 			double force = dynamicPressure_NM2 * F16::airbrakeArea_m2;
 			double CDAirbrake = cos(fsurf.airbrake_Left_PCT) * 0.7;
-			//airbrakeDrag = -(CDAirbrake * cos(F16::degtorad));
 
+			// TODO: move airbrake integration to motions instead to get it correctly?
+			//CDAirbrake *= force;
 			airbrakeDrag = -(CDAirbrake);
-
-			//double pressureAreaFT2 = airbrakeArea_FT2 * dynamicPressure_LBFT2;
-			//double airbrake_DEG = (airbrakeActuator.m_current * 60); // <- PCT to DEG
-			//airbrakeDrag = -(0.7 * cos(airbrake_DEG));
 		}
 		else
 		{
@@ -483,6 +475,7 @@ public:
 		m_Cx_total += m_CxFlapLeft + m_CxFlapRight + LgCxGearAero;
 
 		/* airbrake - testing now*/
+		// TODO: move integration to motions instead?
 		m_Cx_total += m_CxAirbrake;
 	}
 
