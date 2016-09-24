@@ -272,6 +272,8 @@ public:
 	// drag caused by aircraft skin in contact with air (friction)
 	// see: http://adg.stanford.edu/aa241/drag/wettedarea.html
 	//
+	// - AFWAL-TM-84-203
+	//
 	double getWettedAreaDrag(const double dynamicPressure_NM2, const double machNumber)
 	{
 		//Swetted = 2.0 * (1 + 0.2 t/c) * Sexposed;
