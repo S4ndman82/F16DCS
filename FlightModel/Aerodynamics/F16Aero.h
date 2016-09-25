@@ -279,6 +279,11 @@ public:
 	//
 	double getReynoldsNumber(const double flowVelocity, const double length, const double viscosity) const
 	{
+		if (viscosity != 0)
+		{
+			return (flowVelocity * length) / viscosity;
+		}
+		return 0;
 	}
 
 	double getLaminarFlow() {}
