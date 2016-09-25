@@ -92,13 +92,13 @@ public:
 	// get lamba operator reference to generate values by resolution,
 	// there's still possibility to fill values in other methods in case x-axis values are non-linear:
 	// this is for case where X is linear and Y result of function depending on X
-	void generate(std::function<V(U)> &fn, U parMin, U parMax, U parIncrement)
+	void generate(std::function<V(U)> &fnY, U parMin, U parMax, U parIncrement)
 	{
 		U xPar = parMin;
 		for (size_t index = 0; index < axisSize && xPar <= parMax; index++, xPar += parIncrement)
 		{
 			xAxis[index] = xPar;
-			yAxis[index] = fn(xPar);
+			yAxis[index] = fnY(xPar);
 		}
 	}
 
