@@ -269,6 +269,21 @@ public:
 		m_diffCgPCT = cgLiftDiff.result(machNumber);
 	}
 
+	// just putting equation somewhere I can remember it..
+	//
+	// Re = (VL) / v
+	// ..where:
+	// V is velocity of flow
+	// L is length of body for flow travel over
+	// v is kinematic viscosity of fluid
+	//
+	double getReynoldsNumber(const double flowVelocity, const double length, const double viscosity) const
+	{
+	}
+
+	double getLaminarFlow() {}
+	double getTurbulentFlow() {}
+
 	// drag caused by aircraft skin in contact with air (friction)
 	// see: http://adg.stanford.edu/aa241/drag/wettedarea.html
 	//
@@ -305,6 +320,11 @@ public:
 		// Cf = 0.455 / ((log Re) * 2.58) - A / Re
 		//
 		// Cf ^-1/2 = 4.13 * log (Re Cf)
+
+		// if we have Cf, we could calculate Df:
+		//
+		// Df = (.5*p*V^2) * Cf * Swet
+		// -> first part is dynamic pressure, all we need is Cf now..
 
 		return 0;
 	}
