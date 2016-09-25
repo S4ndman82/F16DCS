@@ -82,10 +82,10 @@ public:
 
 	void updateFrame(const double frameTime)
 	{
+		// reuse V^2, calculate total velocity and dynamic pressure (1/2 * p * V^2)
 		double speedsqr = m_airspeed.x * m_airspeed.x + m_airspeed.y * m_airspeed.y + m_airspeed.z * m_airspeed.z;
 		totalVelocity = sqrt(speedsqr);
-		//dynamicPressure = .5 * ambientDensity * pow(totalVelocity, 2);
-		dynamicPressure = .5 * ambientDensity * speedsqr;
+		dynamicPressure = .5 * ambientDensity * speedsqr; // pow(totalVelocity, 2)
 		QcOverPs = dynamicPressure / ambientPressure;
 		if (speed_of_sound > 0) // avoid crash in case we don't have this yet..
 		{
