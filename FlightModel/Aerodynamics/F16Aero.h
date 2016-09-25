@@ -285,9 +285,22 @@ public:
 		}
 		return 0;
 	}
+	double getLaminarFlowFriction(const double Re) 
+	{
+		double Cf = 1.328 / sqrt(Re);
 
-	double getLaminarFlow() {}
-	double getTurbulentFlow() {}
+		// note: replace L in Re equation with distance from leading edge, then use below:
+		// 
+		//Cf = 0.664 / sqrt(Re);
+		return Cf;
+	}
+	double getTurbulentFlowFriction(const double Re)
+	{
+		double lgre = log(Re);
+		double denom = pow(lgre, 2.58);
+		double Cf = 0.455 / denom;
+		return Cf;
+	}
 
 	// drag caused by aircraft skin in contact with air (friction)
 	// see: http://adg.stanford.edu/aa241/drag/wettedarea.html
@@ -330,6 +343,8 @@ public:
 		//
 		// Df = (.5*p*V^2) * Cf * Swet
 		// -> first part is dynamic pressure, all we need is Cf now..
+
+		//meanChord_m
 
 		return 0;
 	}
