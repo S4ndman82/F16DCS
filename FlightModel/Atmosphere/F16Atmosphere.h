@@ -94,13 +94,27 @@ public:
 		}
 	}
 
+	// calculate dynamic viscosity coefficient
+	// according to Sutherland's formula
 	double getDynamicViscosity() const
 	{
-		// TODO: check, if we need to calculate
-		// according to temperature and pressure
+		const double scAir = 120; // sutherland's constant C in Kelvins
+
+		/*
+		double mu0 = 18.27; // uPa*s
+		double T0 = 291.15; // K
+		double temp = pow((ambientTemperature / T0), 1.5); // T/T0 ^3/2
+		double temp2 = (T0 + scAir) / (ambientTemperature + scAir);
+		return mu * temp * temp2;
+		*/
+
+		// shorter with constant lambda: 
+		const double lambdaAir = 1.512041288;
+		double temp = pow(ambientTemperature, 1.5) / (ambientTemperature + scAir);
+		return lambdaAir * temp;
 
 		// abosolute (dynamic) viscosity of air: 1.983*10^-5
-		return 1.983e-5;
+		//return 1.983e-5;
 	}
 
 	// kinematic viscosity of air
