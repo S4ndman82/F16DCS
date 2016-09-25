@@ -94,6 +94,27 @@ public:
 		}
 	}
 
+	// kinematic viscosity of air
+	// (SI has Stokes: 1 St == 10^-4 m^2/s == 1 cm^2/s)
+	// (poise P == 0.1 Pa*s (Pascal*seconds)
+	double getKinematicViscosity() const
+	{
+		// abosolute (dynamic) viscosity of air: 1.983*10^-5
+		const double airAbsV = 1.983e-5;
+
+		// v = u / p
+		// ..where:
+		// v is kinematic viscosity (m^2/s)
+		// u is absolute/dynamic viscosity (N s/m^2)
+		// p is density (kg/m^3)
+
+		if (ambientDensity != 0)
+		{
+			return airAbsV / ambientDensity;
+		}
+		return 0;
+	}
+
 	/*
 	// pressure ratio Pt/Ps
 	double getPressureRatio(const double machNumber) const
