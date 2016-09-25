@@ -94,13 +94,21 @@ public:
 		}
 	}
 
+	double getDynamicViscosity() const
+	{
+		// TODO: check, if we need to calculate
+		// according to temperature and pressure
+
+		// abosolute (dynamic) viscosity of air: 1.983*10^-5
+		return 1.983e-5;
+	}
+
 	// kinematic viscosity of air
 	// (SI has Stokes: 1 St == 10^-4 m^2/s == 1 cm^2/s)
 	// (poise P == 0.1 Pa*s (Pascal*seconds)
 	double getKinematicViscosity() const
 	{
-		// abosolute (dynamic) viscosity of air: 1.983*10^-5
-		const double airAbsV = 1.983e-5;
+		const double airAbsV = getDynamicViscosity();
 
 		// v = u / p
 		// ..where:

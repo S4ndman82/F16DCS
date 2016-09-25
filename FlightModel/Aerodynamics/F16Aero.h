@@ -346,7 +346,18 @@ public:
 		// Df = (.5*p*V^2) * Cf * Swet
 		// -> first part is dynamic pressure, all we need is Cf now..
 
-		//meanChord_m
+		// we need viscosity as part of calculation for Reynolds number..
+		double visc = pAtmos->getKinematicViscosity();
+
+		// reynolds number over mean chord length
+		double reMeanChord = getReynoldsNumber(pAtmos->totalVelocity, F16::meanChord_m, visc);
+
+		// TODO: how can we detect type of flow (laminar or turbulent)
+		// at given position in given conditions?
+		double CfMeanChord = getLaminarFlowFriction(reMeanChord);
+
+		// skin friction over rest of the body..
+		// iterate over length of whole wing surface?
 
 		return 0;
 	}
