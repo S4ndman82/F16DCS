@@ -254,6 +254,13 @@ public:
 
 	}
 
+	// TODO:
+	// calculate amount of wing flex (if any)
+	// and effect on aerodynamics by it
+	void computeWingFlex()
+	{
+	}
+
 	// In low speeds, lift is in front of reference CG,
 	// in mach 1 lift is at CG position,
 	// over mach 1 lift aft of CG position (towards tail)
@@ -268,6 +275,20 @@ public:
 		// as a function of mach number (might be better as Qc/Ps..)
 		m_diffCgPCT = cgLiftDiff.result(machNumber);
 	}
+
+	/*
+	// just putting as note in case there's need to remember..
+	//
+	double getShearStress()
+	{
+		tau == F/A; // force per area
+
+		// mu is dynamic viscosity coefficient
+		// V is velocity
+		// y is height
+		tau == mu * (dV / dy); 
+	}
+	*/
 
 	// just putting equation somewhere I can remember it..
 	//
