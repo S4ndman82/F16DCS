@@ -307,6 +307,8 @@ public:
 	//
 	// - AFWAL-TM-84-203
 	//
+	// http://www.cfd-online.com/Wiki/Skin_friction_coefficient
+	//
 	double getWettedAreaDrag(const double dynamicPressure_NM2, const double machNumber)
 	{
 		//Swetted = 2.0 * (1 + 0.2 t/c) * Sexposed;
