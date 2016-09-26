@@ -54,7 +54,7 @@ namespace F16
 	const double		inchesToCentim			= 2.54;			// multiplier, in to cm
 
 	//const double		kg_to_newtons			= 9.80665002864;
-	const double		Nm_sq_to_lbft_sq		= 0.020885434273; // (N/m^2) to (lb/ft^2);
+	//const double		Nm_sq_to_lbft_sq		= 0.020885434273; // (N/m^2) to (lb/ft^2);
 
 	const double		lb_to_kg				= 0.45359237; // multiplier, lb to kg
 	const double		lbf_to_N				= 4.44822162825; // multiplier, pound force to Newtons
@@ -67,7 +67,7 @@ namespace F16
 
 	const double		standard_gravity		= 9.80665; // "average", m/s^2
 
-	const double		kelvin_to_rankine		= 1.8; // 
+	//const double		kelvin_to_rankine		= 1.8; // 
 
 	/*
 	////////////////////

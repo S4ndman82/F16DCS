@@ -261,6 +261,11 @@ public:
 	{
 	}
 
+	// calculate side-wind effect on direction, moments etc.
+	void sidewind()
+	{
+	}
+
 	// In low speeds, lift is in front of reference CG,
 	// in mach 1 lift is at CG position,
 	// over mach 1 lift aft of CG position (towards tail)
@@ -321,6 +326,11 @@ public:
 		double denom = pow(lgre, 2.58);
 		double Cf = 0.455 / denom;
 		return Cf;
+	}
+
+	// flow detachment from boundary layer and change in drag as caused by it
+	void computeFlowDetach()
+	{
 	}
 
 	// drag caused by aircraft skin in contact with air (friction)
@@ -440,6 +450,8 @@ public:
 	}
 	void getFlapsCoeff(const double dynamicPressure_NM2, const F16FlightSurface &fsurf, const F16BodyState &bstate)
 	{
+		// TODO: integration of both sides seems to have problem in final stage, check it out
+
 		getFlapCoeff(fsurf.flap_Left_PCT, bstate.alpha_DEG, m_CzFlapLeft, m_CxFlapLeft);
 		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, m_CzFlapRight, m_CxFlapRight);
 	}
@@ -461,6 +473,8 @@ public:
 
 	void getAileronsCoeff(const F16FlightSurface &fsurf)
 	{
+		// TODO: integration of both sides seems to have problem in final stage, check it out
+
 		// since lef is symmetric, it does not matter which one is given below
 		m_CyAileronLeft = getAileronCoeff(
 							fn_Cy_a20.m_result, fn_Cy_a20_lef.m_result, fn_Cy.m_result, fn_Cy_lef.m_result,
@@ -500,6 +514,9 @@ public:
 	void computeTotals(F16FlightSurface &fsurf, F16BodyState &bstate,
 					const double LgCxGearAero, const double LgCzGearAero)
 	{
+		// TODO: finish this, integrate to calculations
+		double CxWet = getWettedAreaDrag(pAtmos->dynamicPressure, pAtmos->machNumber);
+
 		// in original nlplant there is 2*vt, but is that because lift and drag 
 		// are not calculated for both sides separately? (no support for differential deflections)
 		const double AerototalVelocity_FPS = pAtmos->getAeroTotalVelocityFPS() * 2; // <- why 2*vt ?
@@ -560,6 +577,8 @@ public:
 		/* XXXXXXXX Cx_tot XXXXXXXX */
 		double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
 		m_Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
+
+		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cx_total += m_CxFlapLeft + m_CxFlapRight + LgCxGearAero;
 
 		/* airbrake - testing now*/
@@ -575,6 +594,8 @@ public:
 		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */
 		double dZdQ = meanChordFPS * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
 		m_Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
+
+		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cz_total += m_CzFlapLeft + m_CzFlapRight + LgCzGearAero;
 	}
 
@@ -599,9 +620,11 @@ public:
 		/* YYYYYYYY Cy_tot YYYYYYYY */
 		double dYdR = wingSpanFPS * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
 		double dYdP = wingSpanFPS * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
-		m_Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT 
-			+ m_CyAileronLeft + m_CyAileronRight + m_CyRudder
-			+ dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
+		m_Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT; 
+
+		// TODO: this has problem when both sides are integrated into total, check it out
+		m_Cy_total += m_CyAileronLeft + m_CyAileronRight + m_CyRudder;
+		m_Cy_total += dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
 	}
 	void sumCnTotal(const double wingSpanFPS, const double meanChordPerWingSpan, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
@@ -611,9 +634,11 @@ public:
 		/* NNNNNNNN Cn_tot NNNNNNNN */
 		double dNdR = wingSpanFPS * (fn_CNr.m_result + fn_delta_CNr_lef.m_result*leadingEdgeFlap_PCT);
 		double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
-		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan
-			+ m_CnAileronLeft + m_CnAileronRight + m_CnRudder + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS
-			+ fn_delta_CNbeta.m_result*bstate.beta_DEG;
+		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan;
+
+		// TODO: this has problem when both sides are integrated into total, check it out
+		m_Cn_total += m_CnAileronLeft + m_CnAileronRight + m_CnRudder + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS;
+		m_Cn_total += fn_delta_CNbeta.m_result*bstate.beta_DEG;
 	}
 	void sumClTotal(const double wingSpanFPS, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
@@ -623,10 +648,12 @@ public:
 		/* LLLLLLLL Cl_total LLLLLLLL */
 		double dLdR = wingSpanFPS * (fn_CLr.m_result + fn_delta_CLr_lef.m_result*leadingEdgeFlap_PCT);
 		double dLdP = wingSpanFPS * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
-		m_Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT 
-			+ m_ClAileronLeft + m_ClAileronRight + m_ClRudder
-			+ dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS
-			+ fn_delta_CLbeta.m_result*bstate.beta_DEG;
+		m_Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT;
+
+		// TODO: this has problem when both sides are integrated into total, check it out
+		m_Cl_total += m_ClAileronLeft + m_ClAileronRight + m_ClRudder;
+		m_Cl_total += dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS;
+		m_Cl_total += fn_delta_CLbeta.m_result*bstate.beta_DEG;
 	}
 
 
