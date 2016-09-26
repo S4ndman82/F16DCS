@@ -519,17 +519,16 @@ public:
 
 		// in original nlplant there is 2*vt, but is that because lift and drag 
 		// are not calculated for both sides separately? (no support for differential deflections)
-		const double AerototalVelocity_FPS = pAtmos->getAeroTotalVelocityFPS() * 2; // <- why 2*vt ?
-		double meanChordFPS = 0.0;
-		double wingSpanFPS = 0.0;
-		if (AerototalVelocity_FPS != 0.0)
+		const double totalVt = pAtmos->totalVelocity * 2; // 2*vt in original
+		double meanChordVt = 0.0;
+		double wingSpanVt = 0.0;
+		if (totalVt != 0.0)
 		{
-			meanChordFPS = (F16::meanChord_FT / AerototalVelocity_FPS);
-			wingSpanFPS = (F16::wingSpan_FT / AerototalVelocity_FPS);
+			meanChordVt = (F16::meanChord_m / totalVt);
+			wingSpanVt = (F16::wingSpan_m / totalVt);
 		}
+		const double meanChordPerWingSpan = (F16::meanChord_m / F16::wingSpan_m);
 
-		// TODO: left/right side when they can differ according to flight control system
-		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 
 		// TODO: dynamic CG to calculations, uses hardcoded "real" position now
 		// (check: does this actually consider the RSS lift at non-CG position?)
@@ -541,7 +540,6 @@ public:
 		// -> this needs to be calculated as function of velocity
 		//
 		//const double diffCgPCT = (F16::referenceCG_PCT - F16::actualCG_PCT);
-		const double meanChordPerWingSpan = (F16::meanChord_FT / F16::wingSpan_FT);
 
 		// get aerodynamic lift position as function of speed (difference from reference CG)
 		getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber);
@@ -551,103 +549,107 @@ public:
 		getRudderCoeff(fsurf);
 
 		/* XXXXXXXX Cx_tot XXXXXXXX */
-		sumCxTotal(meanChordFPS, LgCxGearAero, fsurf, bstate);
+		sumCxTotal(meanChordVt, LgCxGearAero, fsurf, bstate);
 
 		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */ 
-		sumCzTotal(meanChordFPS, LgCzGearAero, fsurf, bstate);
+		sumCzTotal(meanChordVt, LgCzGearAero, fsurf, bstate);
 
 		/* MMMMMMMM Cm_tot MMMMMMMM */ 
-		sumCmTotal(meanChordFPS, fsurf, bstate);
+		sumCmTotal(meanChordVt, fsurf, bstate);
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
-		sumCyTotal(wingSpanFPS, fsurf, bstate);
+		sumCyTotal(wingSpanVt, fsurf, bstate);
 
 		/* NNNNNNNN Cn_tot NNNNNNNN */ 
-		sumCnTotal(wingSpanFPS, meanChordPerWingSpan, fsurf, bstate);
+		sumCnTotal(wingSpanVt, meanChordPerWingSpan, fsurf, bstate);
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
-		sumClTotal(wingSpanFPS, fsurf, bstate);
+		sumClTotal(wingSpanVt, fsurf, bstate);
 	}
 
-	void sumCxTotal(const double meanChordFPS, const double LgCxGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
+	void sumCxTotal(const double meanChordVt, const double LgCxGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double Cx_delta_lef = fn_Cx_lef.m_result - fn_CxEle0.m_result;
 
 		/* XXXXXXXX Cx_tot XXXXXXXX */
-		double dXdQ = meanChordFPS * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
+		double dXdQ = meanChordVt * (fn_CXq.m_result + fn_delta_CXq_lef.m_result*leadingEdgeFlap_PCT);
 		m_Cx_total = fn_Cx.m_result + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
 
 		// TODO: this has problem when both sides are integrated into total, check it out
-		m_Cx_total += m_CxFlapLeft + m_CxFlapRight + LgCxGearAero;
+		m_Cx_total += ((m_CxFlapLeft + m_CxFlapRight) / 2);
+		m_Cx_total += LgCxGearAero;
 
 		/* airbrake - testing now*/
 		// TODO: move integration to motions instead?
 		m_Cx_total += m_CxAirbrake;
 	}
 
-	void sumCzTotal(const double meanChordFPS, const double LgCzGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
+	void sumCzTotal(const double meanChordVt, const double LgCzGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double Cz_delta_lef = fn_Cz_lef.m_result - fn_CzEle0.m_result;
 
 		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */
-		double dZdQ = meanChordFPS * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
+		double dZdQ = meanChordVt * (fn_CZq.m_result + Cz_delta_lef*leadingEdgeFlap_PCT);
 		m_Cz_total = fn_Cz.m_result + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
 
 		// TODO: this has problem when both sides are integrated into total, check it out
-		m_Cz_total += m_CzFlapLeft + m_CzFlapRight + LgCzGearAero;
+		m_Cz_total += ((m_CzFlapLeft + m_CzFlapRight) / 2);
+		m_Cz_total += LgCzGearAero;
 	}
 
-	void sumCmTotal(const double meanChordFPS, F16FlightSurface &fsurf, F16BodyState &bstate)
+	void sumCmTotal(const double meanChordVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double Cm_delta_lef = fn_Cm_lef.m_result - fn_CmEle0.m_result;
 
 		/* MMMMMMMM Cm_tot MMMMMMMM */
 		/* ignore deep-stall regime, delta_Cm_ds = 0 */
-		double dMdQ = meanChordFPS * (fn_CMq.m_result + fn_delta_CMq_lef.m_result*leadingEdgeFlap_PCT);
+		double dMdQ = meanChordVt * (fn_CMq.m_result + fn_delta_CMq_lef.m_result*leadingEdgeFlap_PCT);
 		double CmDelta = fn_delta_Cm.m_result + 0; // Cm_delta + Cm_delta_ds (0)
-		m_Cm_total = fn_Cm.m_result*fn_eta_el.m_result + m_Cz_total*m_diffCgPCT
-			+ Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
+
+		// moment should be considered as well when flaperons are in differential mode?
+		m_Cm_total = fn_Cm.m_result*fn_eta_el.m_result + m_Cz_total*m_diffCgPCT;
+		m_Cm_total += Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS + CmDelta;
 	}
 
-	void sumCyTotal(const double wingSpanFPS, F16FlightSurface &fsurf, F16BodyState &bstate)
+	void sumCyTotal(const double wingSpanVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double Cy_delta_lef = fn_Cy_lef.m_result - fn_Cy.m_result;
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
-		double dYdR = wingSpanFPS * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
-		double dYdP = wingSpanFPS * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
+		double dYdR = wingSpanVt * (fn_CYr.m_result + fn_delta_CYr_lef.m_result*leadingEdgeFlap_PCT);
+		double dYdP = wingSpanVt * (fn_CYp.m_result + fn_delta_CYp_lef.m_result*leadingEdgeFlap_PCT);
 		m_Cy_total = fn_Cy.m_result + Cy_delta_lef*leadingEdgeFlap_PCT; 
 
 		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cy_total += m_CyAileronLeft + m_CyAileronRight + m_CyRudder;
 		m_Cy_total += dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
 	}
-	void sumCnTotal(const double wingSpanFPS, const double meanChordPerWingSpan, F16FlightSurface &fsurf, F16BodyState &bstate)
+	void sumCnTotal(const double wingSpanVt, const double meanChordPerWingSpan, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double Cn_delta_lef = fn_Cn_lef.m_result - fn_CnEle0.m_result;
 
 		/* NNNNNNNN Cn_tot NNNNNNNN */
-		double dNdR = wingSpanFPS * (fn_CNr.m_result + fn_delta_CNr_lef.m_result*leadingEdgeFlap_PCT);
-		double dNdP = wingSpanFPS * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
+		double dNdR = wingSpanVt * (fn_CNr.m_result + fn_delta_CNr_lef.m_result*leadingEdgeFlap_PCT);
+		double dNdP = wingSpanVt * (fn_CNp.m_result + fn_delta_CNp_lef.m_result*leadingEdgeFlap_PCT);
 		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan;
 
 		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cn_total += m_CnAileronLeft + m_CnAileronRight + m_CnRudder + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS;
 		m_Cn_total += fn_delta_CNbeta.m_result*bstate.beta_DEG;
 	}
-	void sumClTotal(const double wingSpanFPS, F16FlightSurface &fsurf, F16BodyState &bstate)
+	void sumClTotal(const double wingSpanVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double Cl_delta_lef = fn_Cl_lef.m_result - fn_ClEle0.m_result;
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
-		double dLdR = wingSpanFPS * (fn_CLr.m_result + fn_delta_CLr_lef.m_result*leadingEdgeFlap_PCT);
-		double dLdP = wingSpanFPS * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
+		double dLdR = wingSpanVt * (fn_CLr.m_result + fn_delta_CLr_lef.m_result*leadingEdgeFlap_PCT);
+		double dLdP = wingSpanVt * (fn_CLp.m_result + fn_delta_CLp_lef.m_result*leadingEdgeFlap_PCT);
 		m_Cl_total = fn_Cl.m_result + Cl_delta_lef*leadingEdgeFlap_PCT;
 
 		// TODO: this has problem when both sides are integrated into total, check it out

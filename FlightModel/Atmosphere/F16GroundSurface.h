@@ -70,6 +70,8 @@ public:
 		Vec3 airSpeed;
 		pAtmos->getAirspeed(airSpeed);
 
+		// should be parallel to surface for max effect, otherwise reduced
+
 		// also reduction of induced drag when in ground effect -> less thrust needed
 
 		// TODO: check height, set for ground effect simulation?
@@ -79,7 +81,7 @@ public:
 			// in ground effect with the surface?
 			// flying above ground, no weight on wheels?
 
-			//double diff = F16::wingSpan_FT - (F16::meterToFoot*surfaceHeight);
+			//double diff = F16::wingSpan_m - surfaceHeight;
 
 		}
 

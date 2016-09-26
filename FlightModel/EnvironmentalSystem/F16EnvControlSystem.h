@@ -59,12 +59,9 @@ public:
 
 	void updateFrame(const double frameTime)
 	{
-		const double ambientPressure = pAtmos->ambientPressure;
-		const double altitude = pAtmos->getAltitudeFeet();
-
 		// logic of using high/low pressure of bleed air?
 			
-		Oxy.updateFrame(ambientPressure, altitude, frameTime);
+		Oxy.updateFrame(pAtmos->ambientPressure, pAtmos->altitude, frameTime);
 
 		// just use oxygen system pressure directly?
 		cockpitPressure = Oxy.getPressure();

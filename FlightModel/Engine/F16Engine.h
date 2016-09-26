@@ -849,7 +849,7 @@ public:
 		m_power3 += (power3rate * frameTime);
 		m_power3 = limit(m_power3,0.0,100.0);
 
-		double altFeet = pAtmos->getAltitudeFeet();
+		double altFeet = pAtmos->altitude * F16::meterToFoot;
 
 		//From Simulator Study document (use 0 altitude values for now)
 		//TODO: This should really be a look-up table per the document reference but this is sufficient for now...

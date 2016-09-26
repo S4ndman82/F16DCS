@@ -350,7 +350,7 @@ public:
 		// Trailing edge flap deflection (deg)
 		// Note that flaps should be controlled by landing gear level:
 		// when gears go down flaps go down as well
-		flapControl.fcsCommand(isGearUp, isAltFlaps, pAtmos->getTotalVelocityKTS(), qbarOverPs);
+		flapControl.fcsCommand(isGearUp, isAltFlaps, qbarOverPs);
 	}
 
 

@@ -17,9 +17,9 @@ namespace F16
 	const double		degtorad			= M_PI / 180.0;	// 
 	const double		radiansToDegrees	= 180.0 / M_PI;	// Conversion factor from radians to degrees - use value from math.h
 
-	const double		wingSpan_FT				= 32.667;		// F-16 wing-span (ft)
+	//const double		wingSpan_FT				= 32.667;		// F-16 wing-span (ft)
 	const double		wingSpan_m				= 10.00;		// F-16 wing-span (m)
-	const double		wingArea_FT2			= 300.0;		// F-16 wing area (ft^2)
+	//const double		wingArea_FT2			= 300.0;		// F-16 wing area (ft^2)
 	const double		wingArea_m2				= 27.87;		// F-16 wing area (m^2)
 
 	const double		wing_wetted_area_FT2				= 341.1; // from JSBSIM readme
@@ -31,10 +31,10 @@ namespace F16
 	const double		length_m				= 15.03;
 	const double		height_m				= 5.09;
 
-	const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft) 
+	//const double		meanChord_FT			= 11.32;		// F-16 mean aerodynamic chord (ft) 
 	const double		meanChord_m				= 3.450336;		// mean aerodynamic chord (m) 
 
-	const double		airbrakeArea_FT2		= 14.26;		// 
+	//const double		airbrakeArea_FT2		= 14.26;		// 
 	const double		airbrakeArea_m2			= 1.48645;		// based on ~16ft^2 -> m^2
 
 	//note: need dynamic CG to calculations: lift position as function of speed, mass balance by fuel/payload mass

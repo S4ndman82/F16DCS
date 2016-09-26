@@ -212,20 +212,6 @@ public:
 		return QcOverPs;
 	}
 
-	double getAltitudeFeet() const
-	{
-		return altitude * F16::meterToFoot; // meters to feet
-	}
-	double getTotalVelocityKTS() const
-	{
-		return totalVelocity * F16::metersToKnots;
-	}
-	double getAeroTotalVelocityFPS() const
-	{
-		// to feets per second
-		return totalVelocity * F16::meterToFoot;
-	}
-
 	void getAirspeed(Vec3 &airSpeed) const
 	{
 		airSpeed = m_airspeed;

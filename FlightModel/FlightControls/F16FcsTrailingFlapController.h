@@ -18,6 +18,10 @@ protected:
 	// 0..-2 at Qc/Ps 0.787...1.008, 0.8975 is one deg pos?
 	LinearFunction<double> transonicFlap;
 
+	// flap control at low speed:
+	// get proper values and calculation
+	//LinearFunction<double> lowspeedFlap;
+
 	// lowers flaps a few degrees when enabled?
 	// check this
 	bool isAirRefuelMode;
@@ -27,6 +31,7 @@ public:
 		bodyState(bs),
 		flightSurface(fs),
 		transonicFlap(0.1105, 0.787, 0.787, 1.008, 0, 2), // <- use positive values for flaps
+		//lowspeedFlap(),
 		isAirRefuelMode(false)
 	{}
 	~F16FcsTrailingFlapController() {}
@@ -45,7 +50,7 @@ public:
 	//
 	// In normal flight, flaps are used like normal ailerons.
 	//
-	void fcsCommand(bool isGearUp, bool isAltFlaps, const double airspeed_KTS, const double qbarOverPs)
+	void fcsCommand(bool isGearUp, bool isAltFlaps, const double qbarOverPs)
 	{
 		// use positive values
 		const double tef_min = 0.0;
@@ -82,7 +87,7 @@ public:
 		// else if alt flap switch -> max flaps
 
 		// speed high enough -> no flap deflection
-		if (airspeed_KTS > 370.0) // ~190m/s, 0.22(qbar/ps)
+		if (qbarOverPs > 0.22) // ~190m/s, 0.22(qbar/ps)
 		{
 			// no deflection
 			flightSurface->flap_Command = tef_min;
@@ -90,16 +95,18 @@ public:
 		}
 
 		// low speed -> full deflection
-		if (airspeed_KTS < 240.0) // ~123m/s, 0.09(qbar/ps)
+		if (qbarOverPs < 0.09) // ~123m/s, 0.09(qbar/ps)
 		{
 			// max deflection
 			flightSurface->flap_Command = tef_max;
 			return;
 		}
 
+		// TODO: replace with: lowspeedFlap
+
 		// otherwise deflection is some value in between..
 		//if ((airspeed_KTS >= 240.0) && (airspeed_KTS <= 370.0))
-		double trailing_edge_flap_deflection = (1.0 - ((airspeed_KTS - 240.0) / (370.0 - 240.0))) * 20.0;
+		double trailing_edge_flap_deflection = (1.0 - ((qbarOverPs - 0.09) / (0.22 - 0.09))) * 20.0;
 		flightSurface->flap_Command = limit(trailing_edge_flap_deflection, tef_min, tef_max);
 
 		// TODO: roll combination in mixer
