@@ -333,6 +333,13 @@ public:
 	{
 	}
 
+	// at supersonic speeds, compute visous compressible flow
+	// (at subsonic, incompressible should suffice)
+	// -> also needs some calculation at transonic speeds
+	void compressibleFlow()
+	{
+	}
+
 	// drag caused by aircraft skin in contact with air (friction)
 	// see: http://adg.stanford.edu/aa241/drag/wettedarea.html
 	//
@@ -639,7 +646,8 @@ public:
 		m_Cn_total = fn_Cn.m_result + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan;
 
 		// TODO: this has problem when both sides are integrated into total, check it out
-		m_Cn_total += m_CnAileronLeft + m_CnAileronRight + m_CnRudder + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS;
+		m_Cn_total += m_CnAileronLeft + m_CnAileronRight + m_CnRudder;
+		m_Cn_total += dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS;
 		m_Cn_total += fn_delta_CNbeta.m_result*bstate.beta_DEG;
 	}
 	void sumClTotal(const double wingSpanVt, F16FlightSurface &fsurf, F16BodyState &bstate)
