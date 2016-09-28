@@ -318,15 +318,6 @@ public:
 		bool isGearUp = landingGear->isGearUpLocked();
 		bool gearLevelStatus = landingGear->getGearLevelStatus();
 
-		/*
-		wchar_t dbgmsg[1024] = { 0 };
-		swprintf(dbgmsg, 1024, L"F16:: dynP: %f dynPK: %f QcPs: %f airs: %f Qc: %f \r\n",
-			pAtmos->dynamicPressure, dynamicPressure_kNM2, qbarOverPs,
-			pAtmos->totalVelocity, Qc);
-		::OutputDebugString(dbgmsg);
-		*/
-
-
 		// TODO: affecting flaps logic when air refuel triggered
 		//bool refuelingDoor = (airframe->getRefuelingDoorAngle() ? true : false);
 

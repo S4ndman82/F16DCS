@@ -79,7 +79,7 @@
 
 // for debug use
 #include <wchar.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include "ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "F16Constants.h"		// Common constants used throughout this DLL
@@ -1084,6 +1084,14 @@ size_t ed_fm_debug_watch(int level, char *buffer,size_t maxlen)
 	if (level == 1 || level == 2)
 	{
 		return sprintf_s(buffer, maxlen, "fuel: %f", F16::Fuel.getInternalFuel());
+	}
+	*/
+
+	/* not functional at moment
+	if (level > 0)
+	{
+		return _snprintf(buffer, maxlen, "F16:: dynP: %f Vt: %f",
+			F16::Atmos.dynamicPressure, F16::Atmos.totalVelocity);
 	}
 	*/
 	return 0;
