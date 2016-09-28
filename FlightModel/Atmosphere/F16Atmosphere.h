@@ -187,7 +187,10 @@ public:
 			double denom = 7 * pow(V, 2) - 1;
 			denom = pow(denom, 2.5);
 
-			Qc = upper / denom - 1;
+			if (denom != 0)
+			{
+				Qc = upper / denom - 1;
+			}
 		}
 
 		// final step in both cases
