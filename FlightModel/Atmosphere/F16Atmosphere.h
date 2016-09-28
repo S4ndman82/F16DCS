@@ -170,7 +170,7 @@ public:
 	// get impact pressure Qc
 	// calculations from Introduction to Avionics Systems by R.P.G. Collinson
 	// (mistakes are mine)
-	double getCalibratedAirspeed(const double Vc) const
+	double getImpactPressure(const double Vc) const
 	{
 		double Qc = 0.0;
 
