@@ -37,8 +37,6 @@ public:
 	//double *m_xPar; // parameters for interpolation (1-3 pars)
 	double m_xPar1Limit; // upper limit for X-parameter 1 in functions (only upper and only for this)
 
-	double m_result; // result value
-
 	AERO_Function(const int nDimension, double *Ydata)
 		: indexVector()
 		, m_Tbuf()
@@ -49,7 +47,6 @@ public:
 		//, m_xPar(nullptr)
 		, m_Ydata(Ydata)
 		, m_xPar1Limit(0)
-		, m_result(0)
 	{
 		ndinfo.nPoints = nullptr;
 		ndinfo.nDimension = nDimension;
@@ -134,8 +131,7 @@ public:
 		double Xpars[1];
 		Xpars[0] = xPar1;
 
-		m_result = ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
-		return m_result;
+		return ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 	}
 
 	double interpnf2(const double xPar1, const double xPar2)
@@ -144,8 +140,7 @@ public:
 		Xpars[0] = xPar1;
 		Xpars[1] = xPar2;
 
-		m_result = ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
-		return m_result;
+		return ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 	}
 
 	double interpnf3(const double xPar1, const double xPar2, const double xPar3)
@@ -155,8 +150,7 @@ public:
 		Xpars[1] = xPar2;
 		Xpars[2] = xPar3;
 
-		m_result = ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
-		return m_result;
+		return ndinterp::interpn(indexVector, m_Xmat, m_Ydata, Xpars, m_xPointMat, m_indexMat, ndinfo, m_Tbuf);
 	}
 };
 
