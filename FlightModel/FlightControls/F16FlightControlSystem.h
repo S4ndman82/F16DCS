@@ -441,6 +441,15 @@ public:
 		flightSurface.elevator_Left_PCT = elevonActuatorLeft.getCurrentPCT();
 		flightSurface.elevator_Right_PCT = elevonActuatorRight.getCurrentPCT();
 
+		/*
+		wchar_t dbgmsg[1024] = { 0 };
+		swprintf(dbgmsg, 1024, L"F16:: elLC: %f elLD: %f elRC: %f elRD: %f \r\n", 
+			flightSurface.elevon_Left_Command, flightSurface.elevator_Left_DEG, 
+			flightSurface.elevon_Right_Command, flightSurface.elevator_Right_DEG);
+		::OutputDebugString(dbgmsg);
+		*/
+
+
 		// TODO: 
 		flaperonActuatorLeft.commandMove(flightSurface.flaperon_Left_Command);
 		flaperonActuatorRight.commandMove(flightSurface.flaperon_Right_Command);
@@ -448,7 +457,6 @@ public:
 		flaperonActuatorRight.updateFrame(frametime);
 		flightSurface.flaperon_Left_DEG = flaperonActuatorLeft.m_current;
 		flightSurface.flaperon_Right_DEG = flaperonActuatorRight.m_current;
-
 		flightSurface.flaperon_Left_PCT = flaperonActuatorLeft.getCurrentPCT();
 		flightSurface.flaperon_Right_PCT = flaperonActuatorRight.getCurrentPCT();
 
