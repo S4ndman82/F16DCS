@@ -98,6 +98,7 @@
     <ClInclude Include="Aerodynamics\F16Aero.h" />
     <ClInclude Include="Aerodynamics\F16AeroData.h" />
     <ClInclude Include="Aerodynamics\F16AeroFunction.h" />
+    <ClInclude Include="Aerodynamics\F16AeroResults.h" />
     <ClInclude Include="Aerodynamics\ndinterp.h" />
     <ClInclude Include="Airframe\F16Airframe.h" />
     <ClInclude Include="Atmosphere\F16Atmosphere.h" />

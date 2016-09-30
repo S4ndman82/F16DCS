@@ -150,6 +150,9 @@
     <ClInclude Include="include\LookupUtility.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="Aerodynamics\F16AeroResults.h">
+      <Filter>Aerodynamics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
