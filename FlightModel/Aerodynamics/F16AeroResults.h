@@ -16,6 +16,18 @@ public:
 	~F16CoeffRes() {}
 };
 
+class F16CoeffRes3
+{
+public:
+	double r_Cy = 0.0;
+	double r_Cn = 0.0;
+	double r_Cl = 0.0;
+
+public:
+	F16CoeffRes3() {}
+	~F16CoeffRes3() {}
+};
+
 // just container for results:
 // keep in one place and reduce some repeated things
 class F16AeroResults
@@ -49,15 +61,15 @@ public:
 	double r_delta_CMq_lef = 0.0;
 	double r_delta_CNr_lef = 0.0;
 	double r_delta_CNp_lef = 0.0;
-	double r_Cy_r30 = 0.0;
-	double r_Cn_r30 = 0.0;
-	double r_Cl_r30 = 0.0;
-	double r_Cy_a20 = 0.0;
-	double r_Cy_a20_lef = 0.0;
-	double r_Cn_a20 = 0.0;
-	double r_Cn_a20_lef = 0.0;
-	double r_Cl_a20 = 0.0;
-	double r_Cl_a20_lef = 0.0;
+
+	F16CoeffRes3 rudder30;
+	F16CoeffRes3 ail20;
+	F16CoeffRes3 ailLef20;
+
+	//double r_Cy_a20_lef = 0.0;
+	//double r_Cn_a20_lef = 0.0;
+	//double r_Cl_a20_lef = 0.0;
+
 	double r_delta_CNbeta = 0.0;
 	double r_delta_CLbeta = 0.0;
 	double r_delta_Cm = 0.0;

@@ -241,18 +241,18 @@ public:
 		res.r_delta_CNp_lef = fn_delta_CNp_lef.interpnf1Lim(alpha); //CN1520_ALPHA2_509.dat
 
 		/* hifi_rudder */
-		res.r_Cy_r30 = fn_Cy_r30.interpnf2(alpha, beta); //CY0720_ALPHA1_BETA1_405.dat
-		res.r_Cn_r30 = fn_Cn_r30.interpnf2(alpha, beta); //CN0720_ALPHA1_BETA1_503.dat
-		res.r_Cl_r30 = fn_Cl_r30.interpnf2(alpha, beta); //CL0720_ALPHA1_BETA1_603.dat
+		res.rudder30.r_Cy = fn_Cy_r30.interpnf2(alpha, beta); //CY0720_ALPHA1_BETA1_405.dat
+		res.rudder30.r_Cn = fn_Cn_r30.interpnf2(alpha, beta); //CN0720_ALPHA1_BETA1_503.dat
+		res.rudder30.r_Cl = fn_Cl_r30.interpnf2(alpha, beta); //CL0720_ALPHA1_BETA1_603.dat
 
 		/* hifi_ailerons */
-		res.r_Cy_a20 = fn_Cy_a20.interpnf2(alpha, beta); //CY0620_ALPHA1_BETA1_403.dat
-		res.r_Cn_a20 = fn_Cn_a20.interpnf2(alpha, beta); //CN0620_ALPHA1_BETA1_504.dat
-		res.r_Cl_a20 = fn_Cl_a20.interpnf2(alpha, beta); //CL0620_ALPHA1_BETA1_604.dat
+		res.ail20.r_Cy = fn_Cy_a20.interpnf2(alpha, beta); //CY0620_ALPHA1_BETA1_403.dat
+		res.ail20.r_Cn = fn_Cn_a20.interpnf2(alpha, beta); //CN0620_ALPHA1_BETA1_504.dat
+		res.ail20.r_Cl = fn_Cl_a20.interpnf2(alpha, beta); //CL0620_ALPHA1_BETA1_604.dat
 
-		res.r_Cy_a20_lef = fn_Cy_a20_lef.interpnf2Lim(alpha, beta); //CY0920_ALPHA2_BETA1_404.dat
-		res.r_Cn_a20_lef = fn_Cn_a20_lef.interpnf2Lim(alpha, beta); //CN0920_ALPHA2_BETA1_505.dat
-		res.r_Cl_a20_lef = fn_Cl_a20_lef.interpnf2Lim(alpha, beta); //CL0920_ALPHA2_BETA1_605.dat
+		res.ailLef20.r_Cy = fn_Cy_a20_lef.interpnf2Lim(alpha, beta); //CY0920_ALPHA2_BETA1_404.dat
+		res.ailLef20.r_Cn = fn_Cn_a20_lef.interpnf2Lim(alpha, beta); //CN0920_ALPHA2_BETA1_505.dat
+		res.ailLef20.r_Cl = fn_Cl_a20_lef.interpnf2Lim(alpha, beta); //CL0920_ALPHA2_BETA1_605.dat
 
 		/* hifi_other_coeffs */
 		res.r_delta_CNbeta = fn_delta_CNbeta.interpnf1(alpha); //CN9999_ALPHA1_brett.dat
@@ -494,30 +494,30 @@ public:
 
 		// since lef is symmetric, it does not matter which one is given below
 		m_CyAileronLeft = getAileronCoeff(
-							res.r_Cy_a20, res.r_Cy_a20_lef, res.elev.r_Cy, res.lef.r_Cy,
+							res.ail20.r_Cy, res.ailLef20.r_Cy, res.elev.r_Cy, res.lef.r_Cy,
 							fsurf.leadingEdgeFlap_Left_PCT, fsurf.flaperon_Left_PCT);
 		m_CnAileronLeft = getAileronCoeff(
-							res.r_Cn_a20, res.r_Cn_a20_lef, res.elevZero.r_Cn, res.lef.r_Cn,
+							res.ail20.r_Cn, res.ailLef20.r_Cn, res.elevZero.r_Cn, res.lef.r_Cn,
 							fsurf.leadingEdgeFlap_Left_PCT, fsurf.flaperon_Left_PCT);
 		m_ClAileronLeft = getAileronCoeff(
-							res.r_Cl_a20, res.r_Cl_a20_lef, res.elevZero.r_Cl, res.lef.r_Cl, 
+							res.ail20.r_Cl, res.ailLef20.r_Cl, res.elevZero.r_Cl, res.lef.r_Cl, 
 							fsurf.leadingEdgeFlap_Left_PCT, fsurf.flaperon_Left_PCT);
 		m_CyAileronRight = getAileronCoeff(
-							res.r_Cy_a20, res.r_Cy_a20_lef, res.elev.r_Cy, res.lef.r_Cy,
+							res.ail20.r_Cy, res.ailLef20.r_Cy, res.elev.r_Cy, res.lef.r_Cy,
 							fsurf.leadingEdgeFlap_Right_PCT, fsurf.flaperon_Right_PCT);
 		m_CnAileronRight = getAileronCoeff(
-							res.r_Cn_a20, res.r_Cn_a20_lef, res.elevZero.r_Cn, res.lef.r_Cn,
+							res.ail20.r_Cn, res.ailLef20.r_Cn, res.elevZero.r_Cn, res.lef.r_Cn,
 							fsurf.leadingEdgeFlap_Right_PCT, fsurf.flaperon_Right_PCT);
 		m_ClAileronRight = getAileronCoeff(
-							res.r_Cl_a20, res.r_Cl_a20_lef, res.elevZero.r_Cl, res.lef.r_Cl,
+							res.ail20.r_Cl, res.ailLef20.r_Cl, res.elevZero.r_Cl, res.lef.r_Cl,
 							fsurf.leadingEdgeFlap_Right_PCT, fsurf.flaperon_Right_PCT);
 	}
 
 	void getRudderCoeff(const F16FlightSurface &fsurf)
 	{
-		const double Cy_delta_r30 = res.r_Cy_r30 - res.elev.r_Cy;
-		const double Cn_delta_r30 = res.r_Cn_r30 - res.elevZero.r_Cn;
-		const double Cl_delta_r30 = res.r_Cl_r30 - res.elevZero.r_Cl;
+		const double Cy_delta_r30 = res.rudder30.r_Cy - res.elev.r_Cy;
+		const double Cn_delta_r30 = res.rudder30.r_Cn - res.elevZero.r_Cn;
+		const double Cl_delta_r30 = res.rudder30.r_Cl - res.elevZero.r_Cl;
 
 		m_CyRudder = Cy_delta_r30*fsurf.rudder_PCT;
 		m_CnRudder = Cn_delta_r30*fsurf.rudder_PCT;
