@@ -247,7 +247,7 @@ public:
 		// for now, symmetric use
 		// TODO: support differential mode
 		//const double el = -fsurf.pitch_Command;
-		const double el = fsurf.elevon_Left_Command; // just symmetric for now
+		const double el = -fsurf.pitch_Command; // just symmetric for now
 
 		// TODO: speed brake handling..
 		// TODO Speedbrakes aero (from JBSim F16.xml config)
