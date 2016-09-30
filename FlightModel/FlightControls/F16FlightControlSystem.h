@@ -388,6 +388,11 @@ public:
 			flightSurface.flaperon_Right_Command += flightSurface.roll_Command;
 			*/
 		}
+
+		// note: 
+		// aileron command is same for both sides here
+		// TODO: different deflection in opposite side
+		// when flaps are also used (only one side can move, other at maximum)
 		flightSurface.flaperon_Left_Command = flightSurface.roll_Command;
 		flightSurface.flaperon_Right_Command = flightSurface.roll_Command;
 
@@ -395,6 +400,9 @@ public:
 		// aileron-rudder interconnect handling
 		// 
 
+		// TODO: calculate final differential elevator
+		// based on aileron/flaperon command mixing
+		//
 		// start with symmetric command
 		flightSurface.elevon_Left_Command = -flightSurface.pitch_Command;
 		flightSurface.elevon_Right_Command = -flightSurface.pitch_Command;
