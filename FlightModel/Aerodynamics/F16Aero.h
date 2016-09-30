@@ -491,6 +491,10 @@ public:
 		// check
 		// dail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
 		//return dail*fsurf.flaperon_Right_PCT + dail*fsurf.flaperon_Left_PCT;
+
+
+		// check
+		//return cos(flaperon_PCT) * dail;
 		return dail*flaperon_PCT;
 	}
 
@@ -508,6 +512,7 @@ public:
 		m_ClAileronLeft = getAileronCoeff(
 							res.ail20.r_Cl, res.ailLef20.r_Cl, res.elevZero.r_Cl, res.lef.r_Cl, 
 							fsurf.leadingEdgeFlap_Left_PCT, fsurf.flaperon_Left_PCT);
+
 		m_CyAileronRight = getAileronCoeff(
 							res.ail20.r_Cy, res.ailLef20.r_Cy, res.elev.r_Cy, res.lef.r_Cy,
 							fsurf.leadingEdgeFlap_Right_PCT, fsurf.flaperon_Right_PCT);
@@ -633,7 +638,8 @@ public:
 
 		// moment should be considered as well when flaperons are in differential mode?
 		//m_Cm_total = res.elev.r_Cm*res.r_eta_el;
-		m_Cm_total = res.elev.r_Cm * (res.r_eta_elLeft+res.r_eta_elRight);
+		//m_Cm_total = res.elev.r_Cm * (res.r_eta_elLeft+res.r_eta_elRight);
+		m_Cm_total = (res.elev.r_Cm * res.r_eta_elLeft) + (res.elev.r_Cm * res.r_eta_elRight);
 		m_Cm_total += m_Cz_total*m_diffCgPCT;
 		m_Cm_total += Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS;
 		m_Cm_total += res.r_delta_Cm + 0; // Cm_delta + Cm_delta_ds (0);
