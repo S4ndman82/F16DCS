@@ -66,10 +66,6 @@ public:
 	F16CoeffRes3 ail20;
 	F16CoeffRes3 ailLef20;
 
-	//double r_Cy_a20_lef = 0.0;
-	//double r_Cn_a20_lef = 0.0;
-	//double r_Cl_a20_lef = 0.0;
-
 	double r_delta_CNbeta = 0.0;
 	double r_delta_CLbeta = 0.0;
 	double r_delta_Cm = 0.0;
