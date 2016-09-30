@@ -63,14 +63,14 @@ protected:
 	AERO_Function fn_CLp;
 	AERO_Function fn_CLr;
 	AERO_Function fn_delta_CXq_lef;
-	AERO_Function fn_delta_CYr_lef;
-	AERO_Function fn_delta_CYp_lef;
 	AERO_Function fn_delta_CZq_lef;
-	AERO_Function fn_delta_CLr_lef;
-	AERO_Function fn_delta_CLp_lef;
 	AERO_Function fn_delta_CMq_lef;
+	AERO_Function fn_delta_CYp_lef;
+	AERO_Function fn_delta_CYr_lef;
 	AERO_Function fn_delta_CNr_lef;
 	AERO_Function fn_delta_CNp_lef;
+	AERO_Function fn_delta_CLp_lef;
+	AERO_Function fn_delta_CLr_lef;
 	AERO_Function fn_Cy_r30;
 	AERO_Function fn_Cn_r30;
 	AERO_Function fn_Cl_r30;
@@ -142,14 +142,14 @@ public:
 		fn_CLp(1, F16::_ClpData),
 		fn_CLr(1, F16::_ClrData),
 		fn_delta_CXq_lef(1, F16::_delta_CXq_lefData),
-		fn_delta_CYr_lef(1, F16::_delta_CYr_lefData),
-		fn_delta_CYp_lef(1, F16::_delta_CYp_lefData),
 		fn_delta_CZq_lef(1, F16::_delta_CZq_lefData),
-		fn_delta_CLr_lef(1, F16::_delta_CLr_lefData),
-		fn_delta_CLp_lef(1, F16::_delta_CLp_lefData),
 		fn_delta_CMq_lef(1, F16::_delta_CMq_lefData),
+		fn_delta_CYp_lef(1, F16::_delta_CYp_lefData),
+		fn_delta_CYr_lef(1, F16::_delta_CYr_lefData),
 		fn_delta_CNr_lef(1, F16::_delta_CNr_lefData),
 		fn_delta_CNp_lef(1, F16::_delta_CNp_lefData),
+		fn_delta_CLp_lef(1, F16::_delta_CLp_lefData),
+		fn_delta_CLr_lef(1, F16::_delta_CLr_lefData),
 		fn_Cy_r30(2, F16::_Cy_r30Data),
 		fn_Cn_r30(2, F16::_Cn_r30Data),
 		fn_Cl_r30(2, F16::_Cl_r30Data),
@@ -258,7 +258,13 @@ public:
 		res.r_delta_CNbeta = fn_delta_CNbeta.interpnf1(alpha); //CN9999_ALPHA1_brett.dat
 		res.r_delta_CLbeta = fn_delta_CLbeta.interpnf1(alpha); //CL9999_ALPHA1_brett.dat
 		res.r_delta_Cm = fn_delta_Cm.interpnf1(alpha); //CM9999_ALPHA1_brett.dat
-		res.r_eta_el = fn_eta_el.interpnf1(el); //ETA_DH1_brett.dat
+
+		//res.r_eta_el = fn_eta_el.interpnf1(el); //ETA_DH1_brett.dat
+
+		// testing, differential elevator
+		res.r_eta_elLeft = fn_eta_el.interpnf1(fsurf.elevator_Left_DEG);
+		res.r_eta_elRight = fn_eta_el.interpnf1(fsurf.elevator_Right_DEG);
+
 
 		//Cm_delta_ds = 0;       /* ignore deep-stall regime, delta_Cm_ds = 0 */
 
@@ -626,7 +632,9 @@ public:
 		double dMdQ = meanChordVt * (res.r_CMq + res.r_delta_CMq_lef*leadingEdgeFlap_PCT);
 
 		// moment should be considered as well when flaperons are in differential mode?
-		m_Cm_total = res.elev.r_Cm*res.r_eta_el + m_Cz_total*m_diffCgPCT;
+		//m_Cm_total = res.elev.r_Cm*res.r_eta_el;
+		m_Cm_total = res.elev.r_Cm * (res.r_eta_elLeft+res.r_eta_elRight);
+		m_Cm_total += m_Cz_total*m_diffCgPCT;
 		m_Cm_total += Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS;
 		m_Cm_total += res.r_delta_Cm + 0; // Cm_delta + Cm_delta_ds (0);
 	}
