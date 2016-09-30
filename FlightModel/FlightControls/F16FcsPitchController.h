@@ -113,6 +113,23 @@ public:
 	double getLongStickForce() const { return m_longStickForce; }
 	double getLatStickForce() const { return m_latStickForce; }
 
+	// TODO: pitch control gain when landing gears are out
+	// (compensate drag)
+	double getMlgGain(bool gearLevelStatus) const
+	{
+		// 0.334 in TP 1538
+
+		if (gearLevelStatus == true)
+		{
+			return 0.167;
+		}
+		else
+		{
+			//return 0.231;
+			return 0.334;
+		}
+	}
+
 	// Controller for pitch
 	// TODO: implement differential actuator handling to mixer and actuator stages
 	void fcsCommand(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, bool gearLevelStatus, double frameTime)
@@ -148,9 +165,7 @@ public:
 
 		// TODO: pitch control gain when landing gears are out
 		// (compensate drag)
-		if (gearLevelStatus == true)
-		{
-		}
+		double mlgGain = getMlgGain(gearLevelStatus);
 
 		double azFiltered = bodyState->getAccZPerG() - 1.0;
 		double limiterCommand = angle_of_attack_limiter(-m_alphaFiltered, pitchRateCommand);
