@@ -115,7 +115,7 @@ public:
 
 	// Controller for pitch
 	// TODO: implement differential actuator handling to mixer and actuator stages
-	void fcsCommand(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, double frameTime)
+	void fcsCommand(double longStickInput, double dynamicPressure_kNM2, bool manualPitchOverride, bool gearLevelStatus, double frameTime)
 	{
 		double longStickInputForce = 0.0;
 		if (longStickInput > 0.0)
@@ -141,7 +141,14 @@ public:
 		double pitchRateCommand = pitchRateWashedOut * 0.7 * dynamicPressureScheduled;
 
 		// TODO: 
+		// pilot activated pitch limiter override (max g increase)
 		if (manualPitchOverride == true)
+		{
+		}
+
+		// TODO: pitch control gain when landing gears are out
+		// (compensate drag)
+		if (gearLevelStatus == true)
 		{
 		}
 

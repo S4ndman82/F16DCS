@@ -341,7 +341,7 @@ public:
 		// or pitch controller should calculate roll effect too?
 		// -> check control laws, in addition to handling supersonic flutter
 
-		pitchControl.fcsCommand(longStickInput.getValue(), dynamicPressure_kNM2, manualPitchOverride, frametime);
+		pitchControl.fcsCommand(longStickInput.getValue(), dynamicPressure_kNM2, manualPitchOverride, gearLevelStatus, frametime);
 		rollControl.fcsCommand(latStickInput.getValue(), pitchControl.getLongStickForce(), pAtmos->dynamicPressure, isGearUp, isAltFlaps);
 
 		yawControl.fcsCommand(pedInput.getValue(), pitchControl.getAlphaFiltered());
