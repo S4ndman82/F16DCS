@@ -1,28 +1,36 @@
 #ifndef _F16AERORESULTS_H_
 #define _F16AERORESULTS_H_
 
+class F16CoeffRes
+{
+public:
+	double r_Cx = 0.0;
+	double r_Cz = 0.0;
+	double r_Cm = 0.0;
+	double r_Cy = 0.0;
+	double r_Cn = 0.0;
+	double r_Cl = 0.0;
+
+public:
+	F16CoeffRes() {}
+	~F16CoeffRes() {}
+};
+
 // just container for results:
 // keep in one place and reduce some repeated things
 class F16AeroResults
 {
 public:
-	double r_Cx = 0.0;
-	double r_CxEle0 = 0.0;
-	double r_Cz = 0.0;
-	double r_CzEle0 = 0.0;
-	double r_Cm = 0.0;
-	double r_CmEle0 = 0.0;
-	double r_Cy = 0.0;
-	double r_Cn = 0.0;
-	double r_CnEle0 = 0.0;
-	double r_Cl = 0.0;
-	double r_ClEle0 = 0.0;
-	double r_Cx_lef = 0.0;
-	double r_Cz_lef = 0.0;
-	double r_Cm_lef = 0.0;
-	double r_Cy_lef = 0.0;
-	double r_Cn_lef = 0.0;
-	double r_Cl_lef = 0.0;
+
+	// with elevator
+	F16CoeffRes elev;
+
+	// elevator at zero
+	F16CoeffRes elevZero;
+
+	// leading edge flaps
+	F16CoeffRes lef;
+
 	double r_CXq = 0.0;
 	double r_CZq = 0.0;
 	double r_CMq = 0.0;

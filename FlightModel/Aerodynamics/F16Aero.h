@@ -195,19 +195,20 @@ public:
 		// TODO Speedbrakes aero (from JBSim F16.xml config)
 
 		/* hifi_C */
-		res.r_Cx = fn_Cx.interpnf3(alpha, beta, el); //CX0120_ALPHA1_BETA1_DH1_201.dat
-		res.r_Cz = fn_Cz.interpnf3(alpha, beta, el); //CZ0120_ALPHA1_BETA1_DH1_301.dat
-		res.r_Cm = fn_Cm.interpnf3(alpha, beta, el); //CM0120_ALPHA1_BETA1_DH1_101.dat
-		res.r_Cy = fn_Cy.interpnf2(alpha, beta); // CY0320_ALPHA1_BETA1_401.dat
-		res.r_Cn = fn_Cn.interpnf3(alpha, beta, el); //CN0120_ALPHA1_BETA1_DH2_501.dat
-		res.r_Cl = fn_Cl.interpnf3(alpha, beta, el);
+		res.elev.r_Cx = fn_Cx.interpnf3(alpha, beta, el); //CX0120_ALPHA1_BETA1_DH1_201.dat
+		res.elev.r_Cz = fn_Cz.interpnf3(alpha, beta, el); //CZ0120_ALPHA1_BETA1_DH1_301.dat
+		res.elev.r_Cm = fn_Cm.interpnf3(alpha, beta, el); //CM0120_ALPHA1_BETA1_DH1_101.dat
+		res.elev.r_Cy = fn_Cy.interpnf2(alpha, beta); // CY0320_ALPHA1_BETA1_401.dat
+		res.elev.r_Cn = fn_Cn.interpnf3(alpha, beta, el); //CN0120_ALPHA1_BETA1_DH2_501.dat
+		res.elev.r_Cl = fn_Cl.interpnf3(alpha, beta, el);
 
 		// also with zero elevator
-		res.r_CxEle0 = fn_CxEle0.interpnf3(alpha, beta, 0); //CX0120_ALPHA1_BETA1_DH1_201.dat
-		res.r_CzEle0 = fn_CzEle0.interpnf3(alpha, beta, 0); //CZ0120_ALPHA1_BETA1_DH1_301.dat
-		res.r_CmEle0 = fn_CmEle0.interpnf3(alpha, beta, 0); //CM0120_ALPHA1_BETA1_DH1_101.dat
-		res.r_CnEle0 = fn_CnEle0.interpnf3(alpha, beta, 0); //CN0120_ALPHA1_BETA1_DH2_501.dat
-		res.r_ClEle0 = fn_ClEle0.interpnf3(alpha, beta, 0);
+		res.elevZero.r_Cx = fn_CxEle0.interpnf3(alpha, beta, 0); //CX0120_ALPHA1_BETA1_DH1_201.dat
+		res.elevZero.r_Cz = fn_CzEle0.interpnf3(alpha, beta, 0); //CZ0120_ALPHA1_BETA1_DH1_301.dat
+		res.elevZero.r_Cm = fn_CmEle0.interpnf3(alpha, beta, 0); //CM0120_ALPHA1_BETA1_DH1_101.dat
+		res.elevZero.r_Cy = 0; // not used in this case
+		res.elevZero.r_Cn = fn_CnEle0.interpnf3(alpha, beta, 0); //CN0120_ALPHA1_BETA1_DH2_501.dat
+		res.elevZero.r_Cl = fn_ClEle0.interpnf3(alpha, beta, 0);
 
 		/* hifi_damping */
 		res.r_CXq = fn_CXq.interpnf1(alpha); //CX1120_ALPHA1_204.dat
@@ -221,12 +222,12 @@ public:
 		res.r_CNp = fn_CNp.interpnf1(alpha); //CN1220_ALPHA1_508.dat
 
 		/* hifi_C_lef */ // (leading-edge flap)
-		res.r_Cx_lef = fn_Cx_lef.interpnf2Lim(alpha, beta); //CX0820_ALPHA2_BETA1_202.dat
-		res.r_Cz_lef = fn_Cz_lef.interpnf2Lim(alpha, beta); //CZ0820_ALPHA2_BETA1_302.dat
-		res.r_Cm_lef = fn_Cm_lef.interpnf2Lim(alpha, beta); //CM0820_ALPHA2_BETA1_102.dat
-		res.r_Cy_lef = fn_Cy_lef.interpnf2Lim(alpha, beta); //CY0820_ALPHA2_BETA1_402.dat
-		res.r_Cn_lef = fn_Cn_lef.interpnf2Lim(alpha, beta); //CN0820_ALPHA2_BETA1_502.dat
-		res.r_Cl_lef = fn_Cl_lef.interpnf2Lim(alpha, beta);
+		res.lef.r_Cx = fn_Cx_lef.interpnf2Lim(alpha, beta); //CX0820_ALPHA2_BETA1_202.dat
+		res.lef.r_Cz = fn_Cz_lef.interpnf2Lim(alpha, beta); //CZ0820_ALPHA2_BETA1_302.dat
+		res.lef.r_Cm = fn_Cm_lef.interpnf2Lim(alpha, beta); //CM0820_ALPHA2_BETA1_102.dat
+		res.lef.r_Cy = fn_Cy_lef.interpnf2Lim(alpha, beta); //CY0820_ALPHA2_BETA1_402.dat
+		res.lef.r_Cn = fn_Cn_lef.interpnf2Lim(alpha, beta); //CN0820_ALPHA2_BETA1_502.dat
+		res.lef.r_Cl = fn_Cl_lef.interpnf2Lim(alpha, beta);
 
 		/* hifi_damping_lef */
 		res.r_delta_CXq_lef = fn_delta_CXq_lef.interpnf1Lim(alpha); //CX1420_ALPHA2_205.dat
@@ -493,30 +494,30 @@ public:
 
 		// since lef is symmetric, it does not matter which one is given below
 		m_CyAileronLeft = getAileronCoeff(
-							res.r_Cy_a20, res.r_Cy_a20_lef, res.r_Cy, res.r_Cy_lef,
+							res.r_Cy_a20, res.r_Cy_a20_lef, res.elev.r_Cy, res.lef.r_Cy,
 							fsurf.leadingEdgeFlap_Left_PCT, fsurf.flaperon_Left_PCT);
 		m_CnAileronLeft = getAileronCoeff(
-							res.r_Cn_a20, res.r_Cn_a20_lef, res.r_CnEle0, res.r_Cn_lef,
+							res.r_Cn_a20, res.r_Cn_a20_lef, res.elevZero.r_Cn, res.lef.r_Cn,
 							fsurf.leadingEdgeFlap_Left_PCT, fsurf.flaperon_Left_PCT);
 		m_ClAileronLeft = getAileronCoeff(
-							res.r_Cl_a20, res.r_Cl_a20_lef, res.r_ClEle0, res.r_Cl_lef, 
+							res.r_Cl_a20, res.r_Cl_a20_lef, res.elevZero.r_Cl, res.lef.r_Cl, 
 							fsurf.leadingEdgeFlap_Left_PCT, fsurf.flaperon_Left_PCT);
 		m_CyAileronRight = getAileronCoeff(
-							res.r_Cy_a20, res.r_Cy_a20_lef, res.r_Cy, res.r_Cy_lef,
+							res.r_Cy_a20, res.r_Cy_a20_lef, res.elev.r_Cy, res.lef.r_Cy,
 							fsurf.leadingEdgeFlap_Right_PCT, fsurf.flaperon_Right_PCT);
 		m_CnAileronRight = getAileronCoeff(
-							res.r_Cn_a20, res.r_Cn_a20_lef, res.r_CnEle0, res.r_Cn_lef,
+							res.r_Cn_a20, res.r_Cn_a20_lef, res.elevZero.r_Cn, res.lef.r_Cn,
 							fsurf.leadingEdgeFlap_Right_PCT, fsurf.flaperon_Right_PCT);
 		m_ClAileronRight = getAileronCoeff(
-							res.r_Cl_a20, res.r_Cl_a20_lef, res.r_ClEle0, res.r_Cl_lef,
+							res.r_Cl_a20, res.r_Cl_a20_lef, res.elevZero.r_Cl, res.lef.r_Cl,
 							fsurf.leadingEdgeFlap_Right_PCT, fsurf.flaperon_Right_PCT);
 	}
 
 	void getRudderCoeff(const F16FlightSurface &fsurf)
 	{
-		const double Cy_delta_r30 = res.r_Cy_r30 - res.r_Cy;
-		const double Cn_delta_r30 = res.r_Cn_r30 - res.r_CnEle0;
-		const double Cl_delta_r30 = res.r_Cl_r30 - res.r_ClEle0;
+		const double Cy_delta_r30 = res.r_Cy_r30 - res.elev.r_Cy;
+		const double Cn_delta_r30 = res.r_Cn_r30 - res.elevZero.r_Cn;
+		const double Cl_delta_r30 = res.r_Cl_r30 - res.elevZero.r_Cl;
 
 		m_CyRudder = Cy_delta_r30*fsurf.rudder_PCT;
 		m_CnRudder = Cn_delta_r30*fsurf.rudder_PCT;
@@ -586,11 +587,11 @@ public:
 	void sumCxTotal(const double meanChordVt, const double LgCxGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
-		const double Cx_delta_lef = res.r_Cx_lef - res.r_CxEle0;
+		const double Cx_delta_lef = res.lef.r_Cx - res.elevZero.r_Cx;
 
 		/* XXXXXXXX Cx_tot XXXXXXXX */
 		double dXdQ = meanChordVt * (res.r_CXq + res.r_delta_CXq_lef*leadingEdgeFlap_PCT);
-		m_Cx_total = res.r_Cx + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
+		m_Cx_total = res.elev.r_Cx + Cx_delta_lef*leadingEdgeFlap_PCT + dXdQ*bstate.pitchRate_RPS;
 
 		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cx_total += ((m_CxFlapLeft + m_CxFlapRight) / 2);
@@ -604,11 +605,11 @@ public:
 	void sumCzTotal(const double meanChordVt, const double LgCzGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
-		const double Cz_delta_lef = res.r_Cz_lef - res.r_CzEle0;
+		const double Cz_delta_lef = res.lef.r_Cz - res.elevZero.r_Cz;
 
 		/* ZZZZZZZZ Cz_tot ZZZZZZZZ */
 		double dZdQ = meanChordVt * (res.r_CZq + Cz_delta_lef*leadingEdgeFlap_PCT);
-		m_Cz_total = res.r_Cz + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
+		m_Cz_total = res.elev.r_Cz + Cz_delta_lef*leadingEdgeFlap_PCT + dZdQ*bstate.pitchRate_RPS;
 
 		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cz_total += ((m_CzFlapLeft + m_CzFlapRight) / 2);
@@ -618,14 +619,14 @@ public:
 	void sumCmTotal(const double meanChordVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
-		const double Cm_delta_lef = res.r_Cm_lef - res.r_CmEle0;
+		const double Cm_delta_lef = res.lef.r_Cm - res.elevZero.r_Cm;
 
 		/* MMMMMMMM Cm_tot MMMMMMMM */
 		/* ignore deep-stall regime, delta_Cm_ds = 0 */
 		double dMdQ = meanChordVt * (res.r_CMq + res.r_delta_CMq_lef*leadingEdgeFlap_PCT);
 
 		// moment should be considered as well when flaperons are in differential mode?
-		m_Cm_total = res.r_Cm*res.r_eta_el + m_Cz_total*m_diffCgPCT;
+		m_Cm_total = res.elev.r_Cm*res.r_eta_el + m_Cz_total*m_diffCgPCT;
 		m_Cm_total += Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS;
 		m_Cm_total += res.r_delta_Cm + 0; // Cm_delta + Cm_delta_ds (0);
 	}
@@ -633,12 +634,12 @@ public:
 	void sumCyTotal(const double wingSpanVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
-		const double Cy_delta_lef = res.r_Cy_lef - res.r_Cy;
+		const double Cy_delta_lef = res.lef.r_Cy - res.elev.r_Cy;
 
 		/* YYYYYYYY Cy_tot YYYYYYYY */
 		double dYdR = wingSpanVt * (res.r_CYr + res.r_delta_CYr_lef*leadingEdgeFlap_PCT);
 		double dYdP = wingSpanVt * (res.r_CYp + res.r_delta_CYp_lef*leadingEdgeFlap_PCT);
-		m_Cy_total = res.r_Cy + Cy_delta_lef*leadingEdgeFlap_PCT; 
+		m_Cy_total = res.elev.r_Cy + Cy_delta_lef*leadingEdgeFlap_PCT; 
 
 		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cy_total += (m_CyAileronLeft + m_CyAileronRight) / 2;
@@ -647,12 +648,12 @@ public:
 	void sumCnTotal(const double wingSpanVt, const double meanChordPerWingSpan, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
-		const double Cn_delta_lef = res.r_Cn_lef - res.r_CnEle0;
+		const double Cn_delta_lef = res.lef.r_Cn - res.elevZero.r_Cn;
 
 		/* NNNNNNNN Cn_tot NNNNNNNN */
 		double dNdR = wingSpanVt * (res.r_CNr + res.r_delta_CNr_lef*leadingEdgeFlap_PCT);
 		double dNdP = wingSpanVt * (res.r_CNp + res.r_delta_CNp_lef*leadingEdgeFlap_PCT);
-		m_Cn_total = res.r_Cn + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan;
+		m_Cn_total = res.elev.r_Cn + Cn_delta_lef*leadingEdgeFlap_PCT - m_Cy_total*m_diffCgPCT*meanChordPerWingSpan;
 
 		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cn_total += (m_CnAileronLeft + m_CnAileronRight) / 2;
@@ -662,12 +663,12 @@ public:
 	void sumClTotal(const double wingSpanVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
-		const double Cl_delta_lef = res.r_Cl_lef - res.r_ClEle0;
+		const double Cl_delta_lef = res.lef.r_Cl - res.elevZero.r_Cl;
 
 		/* LLLLLLLL Cl_total LLLLLLLL */
 		double dLdR = wingSpanVt * (res.r_CLr + res.r_delta_CLr_lef*leadingEdgeFlap_PCT);
 		double dLdP = wingSpanVt * (res.r_CLp + res.r_delta_CLp_lef*leadingEdgeFlap_PCT);
-		m_Cl_total = res.r_Cl + Cl_delta_lef*leadingEdgeFlap_PCT;
+		m_Cl_total = res.elev.r_Cl + Cl_delta_lef*leadingEdgeFlap_PCT;
 
 		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cl_total += (m_ClAileronLeft + m_ClAileronRight) / 2;
