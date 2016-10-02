@@ -238,11 +238,25 @@ public:
 		fuel_mass_delta = 0;
 	}
 
-	//----------------------------------------------------------------
-	// All prior forces calculated in lbs, needs to be converted
-	// to units.  All prior forces calculated in lb*ft, needs
-	// to be converted into N*m
-	//----------------------------------------------------------------
+	// recalculate current inertia:
+	// - change of mass (fuel, payload)
+	// - change of velocity, direction, orientation
+	//
+	void updateInertia()
+	{
+		// at simplest, inertia would be direction travel and force:
+		// -F = ma
+		//
+		// but do we also need to calculate rolling inertia over each three axis?
+		// -> should have full 6 degrees physics with that?
+
+		// so:
+		// mass in Newtons
+		double massN = total_mass_kg * F16::standard_gravity;
+		inertia = mul_vec3(massN, pAtmos->getAirspeed()); // scalar multiply of vector
+
+	}
+
 	void updateAeroForces(const double Cy_total, const double Cx_total, const double Cz_total, const double Cl_total, const double Cm_total, const double Cn_total)
 	{
 		const double wingPressureN = pAtmos->dynamicPressure * F16::wingArea_m2;

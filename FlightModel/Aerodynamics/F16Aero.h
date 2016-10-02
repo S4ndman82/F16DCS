@@ -595,6 +595,7 @@ public:
 		sumClTotal(wingSpanVt, fsurf, bstate);
 	}
 
+	// Cx - drag along X-axis (engine thrust integration and motions)
 	void sumCxTotal(const double meanChordVt, const double LgCxGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
@@ -613,6 +614,7 @@ public:
 		m_Cx_total += m_CxAirbrake;
 	}
 
+	// Cz
 	void sumCzTotal(const double meanChordVt, const double LgCzGearAero, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
@@ -627,6 +629,7 @@ public:
 		m_Cz_total += LgCzGearAero;
 	}
 
+	// Cm - pitching moment
 	void sumCmTotal(const double meanChordVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
@@ -637,14 +640,13 @@ public:
 		double dMdQ = meanChordVt * (res.r_CMq + res.r_delta_CMq_lef*leadingEdgeFlap_PCT);
 
 		// moment should be considered as well when flaperons are in differential mode?
-		//m_Cm_total = res.elev.r_Cm*res.r_eta_el;
-		//m_Cm_total = res.elev.r_Cm * (res.r_eta_elLeft+res.r_eta_elRight);
 		m_Cm_total = (res.elev.r_Cm * res.r_eta_elLeft) + (res.elev.r_Cm * res.r_eta_elRight);
 		m_Cm_total += m_Cz_total*m_diffCgPCT;
 		m_Cm_total += Cm_delta_lef*leadingEdgeFlap_PCT + dMdQ*bstate.pitchRate_RPS;
 		m_Cm_total += res.r_delta_Cm + 0; // Cm_delta + Cm_delta_ds (0);
 	}
 
+	// Cy
 	void sumCyTotal(const double wingSpanVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
@@ -659,6 +661,8 @@ public:
 		m_Cy_total += (m_CyAileronLeft + m_CyAileronRight) / 2;
 		m_Cy_total += m_CyRudder + dYdR*bstate.yawRate_RPS + dYdP*bstate.rollRate_RPS;
 	}
+
+	// yawing moment
 	void sumCnTotal(const double wingSpanVt, const double meanChordPerWingSpan, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
@@ -674,6 +678,9 @@ public:
 		m_Cn_total += m_CnRudder + dNdR*bstate.yawRate_RPS + dNdP*bstate.rollRate_RPS;
 		m_Cn_total += res.r_delta_CNbeta*bstate.beta_DEG;
 	}
+
+	// rolling moment
+	// note: this should add difference of elevators in differential mode
 	void sumClTotal(const double wingSpanVt, F16FlightSurface &fsurf, F16BodyState &bstate)
 	{
 		const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
@@ -684,10 +691,17 @@ public:
 		double dLdP = wingSpanVt * (res.r_CLp + res.r_delta_CLp_lef*leadingEdgeFlap_PCT);
 		m_Cl_total = res.elev.r_Cl + Cl_delta_lef*leadingEdgeFlap_PCT;
 
+		// TODO: check calculations also when tef flaps are down
+		// (non-symmetric defletion of flaperons)
+
 		// TODO: this has problem when both sides are integrated into total, check it out
 		m_Cl_total += (m_ClAileronLeft + m_ClAileronRight) / 2;
 		m_Cl_total += m_ClRudder + dLdR*bstate.yawRate_RPS + dLdP*bstate.rollRate_RPS;
 		m_Cl_total += res.r_delta_CLbeta*bstate.beta_DEG;
+
+		// TODO: rolling moment by elevators in differential mode (non-symmetric deflection)
+		//(res.r_eta_elLeft - res.r_eta_elRight);
+
 	}
 
 

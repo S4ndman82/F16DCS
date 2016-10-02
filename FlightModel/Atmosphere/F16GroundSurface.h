@@ -67,8 +67,7 @@ public:
 		// wingtip vortices (sidewinders?)
 
 		// we might need airspeed and air pressure to determine magnitude of lift effect
-		Vec3 airSpeed;
-		pAtmos->getAirspeed(airSpeed);
+		Vec3 airSpeed = pAtmos->getAirspeed();
 
 		// should be parallel to surface for max effect, otherwise reduced
 

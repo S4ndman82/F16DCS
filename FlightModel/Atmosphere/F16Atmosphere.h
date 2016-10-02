@@ -215,9 +215,10 @@ public:
 		return QcOverPs;
 	}
 
-	void getAirspeed(Vec3 &airSpeed) const
+	// deep-copy of struct -> should not matter too much
+	const Vec3& getAirspeed() const
 	{
-		airSpeed = m_airspeed;
+		return m_airspeed;
 	}
 };
 

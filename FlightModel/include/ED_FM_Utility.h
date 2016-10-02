@@ -19,6 +19,12 @@ inline Vec3 cross(const Vec3 & a, const Vec3 & b)
 				 a.x * b.y - a.y * b.x);
 }
 
+// multiply by scalar value
+inline Vec3 mul_vec3(const double scal, const Vec3 & v)
+{
+	return Vec3(v.x * scal, v.y * scal, v.z * scal);
+}
+
 // only slightly faster than struct construct&copy when inlined
 inline void clear_vec3(Vec3 &dest)
 {
