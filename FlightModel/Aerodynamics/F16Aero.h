@@ -471,13 +471,6 @@ public:
 		CzFlap = -(CLFlaps * cos(body_alpha_DEG * F16::degtorad) + CDFlaps * sin(F16::degtorad));
 		CxFlap = -(-CLFlaps * sin(body_alpha_DEG * F16::degtorad) + CDFlaps * cos(F16::degtorad));
 	}
-	void getFlapsCoeff(const double dynamicPressure_NM2, const F16FlightSurface &fsurf, const F16BodyState &bstate)
-	{
-		// TODO: integration of both sides seems to have problem in final stage, check it out
-
-		getFlapCoeff(fsurf.flap_Left_PCT, bstate.alpha_DEG, m_CzFlapLeft, m_CxFlapLeft);
-		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, m_CzFlapRight, m_CxFlapRight);
-	}
 
 	double getAileronCoeff(const double fn_C_a20, const double fn_C_a20_lef, const double fn_C, const double fn_C_lef, const double lef_PCT, const double tef_PCT) const
 	{
@@ -487,18 +480,22 @@ public:
 		return dail*tef_PCT;
 	}
 
-	void getAileronsCoeff(const F16FlightSurface &fsurf)
+	void getFlaperonsCoeff(const F16FlightSurface &fsurf, const F16BodyState &bstate)
 	{
-		// check
-		//const double cosLf = cos(fsurf.flaperon_Left_PCT);
-		//const double cosRf = cos(fsurf.flaperon_Right_PCT);
-
 		// TODO: integration of both sides seems to have problem in final stage, check it out
 		//
 		// note!!
 		// at this stage, ailerons have same degree of deflection:
 		// this should be changed to support combined tef+aileron function
 		// for correct lift and drag.
+
+		// check
+		//const double cosLf = cos(fsurf.flaperon_Left_PCT);
+		//const double cosRf = cos(fsurf.flaperon_Right_PCT);
+
+		// this is still temporary until sorting out the handling of combined effects of flaperons
+		getFlapCoeff(fsurf.flap_Left_PCT, bstate.alpha_DEG, m_CzFlapLeft, m_CxFlapLeft);
+		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, m_CzFlapRight, m_CxFlapRight);
 
 		m_CyAileronLeft = getAileronCoeff(
 							res.ail20.r_Cy, res.ailLef20.r_Cy, res.elev.r_Cy, res.lef.r_Cy,
@@ -568,9 +565,8 @@ public:
 
 		// get aerodynamic lift position as function of speed (difference from reference CG)
 		getAeroCgDiff(pAtmos->totalVelocity, pAtmos->machNumber);
-		getFlapsCoeff(pAtmos->dynamicPressure, fsurf, bstate);
 		getAirbrakeDrag(pAtmos->dynamicPressure, fsurf);
-		getAileronsCoeff(fsurf);
+		getFlaperonsCoeff(fsurf, bstate);
 		getRudderCoeff(fsurf);
 
 		/* XXXXXXXX Cx_tot XXXXXXXX */
