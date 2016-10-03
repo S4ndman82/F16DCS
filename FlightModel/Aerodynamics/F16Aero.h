@@ -479,30 +479,27 @@ public:
 		getFlapCoeff(fsurf.flap_Right_PCT, bstate.alpha_DEG, m_CzFlapRight, m_CxFlapRight);
 	}
 
-	double getAileronCoeff(const double fn_C_a20, const double fn_C_a20_lef, const double fn_C, const double fn_C_lef, const double leadingEdgeFlap_PCT, const double flaperon_PCT) const
+	double getAileronCoeff(const double fn_C_a20, const double fn_C_a20_lef, const double fn_C, const double fn_C_lef, const double lef_PCT, const double tef_PCT) const
 	{
-		//const double leadingEdgeFlap_PCT = fsurf.leadingEdgeFlap_Right_PCT;
 		const double C_delta_a20 = fn_C_a20 - fn_C;
 		const double C_delta_a20_lef = fn_C_a20_lef - fn_C_lef - C_delta_a20;
-		const double dail = C_delta_a20 + C_delta_a20_lef*leadingEdgeFlap_PCT; // <- lef symmetric
-
-		// this does not work correctly when flap and aileron are combined
-
-		// check
-		// dail * (fsurf.aileron_Right_PCT + fsurf.aileron_Left_PCT);
-		//return dail*fsurf.flaperon_Right_PCT + dail*fsurf.flaperon_Left_PCT;
-
-
-		// check
-		//return cos(flaperon_PCT) * dail;
-		return dail*flaperon_PCT;
+		const double dail = C_delta_a20 + C_delta_a20_lef*lef_PCT;
+		return dail*tef_PCT;
 	}
 
 	void getAileronsCoeff(const F16FlightSurface &fsurf)
 	{
-		// TODO: integration of both sides seems to have problem in final stage, check it out
+		// check
+		//const double cosLf = cos(fsurf.flaperon_Left_PCT);
+		//const double cosRf = cos(fsurf.flaperon_Right_PCT);
 
-		// since lef is symmetric, it does not matter which one is given below
+		// TODO: integration of both sides seems to have problem in final stage, check it out
+		//
+		// note!!
+		// at this stage, ailerons have same degree of deflection:
+		// this should be changed to support combined tef+aileron function
+		// for correct lift and drag.
+
 		m_CyAileronLeft = getAileronCoeff(
 							res.ail20.r_Cy, res.ailLef20.r_Cy, res.elev.r_Cy, res.lef.r_Cy,
 							fsurf.leadingEdgeFlap_Left_PCT, fsurf.flaperon_Left_PCT);
