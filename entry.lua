@@ -4,6 +4,7 @@ declare_plugin(self_ID,
 {
 installed 	 = true, -- if false that will be place holder , or advertising
 dirName	  	 = current_mod_path,
+displayName  = _("F-16 Demo"),
 version		 = "1.5.4 WIP",		 
 state		 = "installed",
 info		 = _("F-16 Technology Demonstration.  High Fidelity Flight Dynamics Model"),
@@ -22,7 +23,8 @@ Missions =
 		{
 			name		= _("F-16Demo"),
 			dir			= "Missions",
-			CLSID		= "{CLSID5456456346CLSID}",	
+			-- no idea why, remove it
+			--CLSID		= "{CLSID5456456346CLSID}",	
 		},
 	},	
 LogBook =
