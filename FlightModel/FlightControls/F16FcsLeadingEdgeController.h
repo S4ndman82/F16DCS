@@ -30,9 +30,9 @@ protected:
 	bool isAuto;
 
 public:
-	F16FcsLeadingEdgeController(F16BodyState *bs, F16FlightSurface *fs) :
-		bodyState(bs),
-		flightSurface(fs),
+	F16FcsLeadingEdgeController() :
+		bodyState(nullptr),
+		flightSurface(nullptr),
 		leading_edge_flap_integral(0),
 		leading_edge_flap_integrated(0),
 		leading_edge_flap_rate(0),
@@ -42,6 +42,12 @@ public:
 		isAuto(true)
 	{}
 	~F16FcsLeadingEdgeController() {}
+
+	void setRef(F16BodyState *bs, F16FlightSurface *fs)
+	{
+		bodyState = bs;
+		flightSurface = fs;
+	}
 
 	void setAutoLocked(bool onoff)
 	{

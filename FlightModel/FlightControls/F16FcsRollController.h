@@ -97,15 +97,21 @@ protected:
 	}
 
 public:
-	F16FcsRollController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
-		bodyState(bs),
-		flightSurface(fs),
-		trimState(ts),
+	F16FcsRollController() :
+		bodyState(nullptr),
+		flightSurface(nullptr),
+		trimState(nullptr),
 		rollCommandLimiter(-21.5, 21.5) // roll limit should be -40..40 here? (roll command, not actuator)
 		//tailRoll(1, 0.694, 1.132, 0.25, 0.50)
-	{
-	}
+	{}
 	~F16FcsRollController() {}
+
+	void setRef(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts)
+	{
+		bodyState = bs;
+		flightSurface = fs;
+		trimState = ts;
+	}
 
 	// Controller for roll
 	void fcsCommand(double latStickInput, double longStickForce, double dynamicPressure_NM2, bool isGearUp, bool isAltFlaps)

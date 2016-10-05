@@ -138,12 +138,12 @@ public:
 		, longStickInput(-1.0, 1.0)
 		, latStickInput(-1.0, 1.0)
 		, pedInput(-1.0, 1.0)
-		, pitchControl(&bodyState, &flightSurface, &trimState)
-		, rollControl(&bodyState, &flightSurface, &trimState)
-		, yawControl(&bodyState, &flightSurface, &trimState)
-		, leadingedgeControl(&bodyState, &flightSurface)
-		, flapControl(&bodyState, &flightSurface)
-		, airbrakeControl(&bodyState, &flightSurface)
+		, pitchControl()
+		, rollControl()
+		, yawControl()
+		, leadingedgeControl()
+		, flapControl()
+		, airbrakeControl()
 		, lefActuator(25, -2, 25) // <- FLCS diag
 		, flaperonActuatorLeft(80, -23, 20) // <- FLCS diag, 21.5 flap limit in old code (TP 1538)
 		, flaperonActuatorRight(80, -23, 20) // <- FLCS diag, 21.5 flap limit in old code (TP 1538)
@@ -160,7 +160,14 @@ public:
 		//, isGearUp(false)
 		//, gearLevelStatus(false)
 		, isAltFlaps(false)
-	{}
+	{
+		pitchControl.setRef(&bodyState, &flightSurface, &trimState);
+		rollControl.setRef(&bodyState, &flightSurface, &trimState);
+		yawControl.setRef(&bodyState, &flightSurface, &trimState);
+		leadingedgeControl.setRef(&bodyState, &flightSurface);
+		flapControl.setRef(&bodyState, &flightSurface);
+		airbrakeControl.setRef(&bodyState, &flightSurface);
+	}
 	~F16FlightControls() {}
 
 	void setLatStickInput(double value) 

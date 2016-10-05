@@ -27,14 +27,20 @@ protected:
 	bool isAirRefuelMode;
 
 public:
-	F16FcsTrailingFlapController(F16BodyState *bs, F16FlightSurface *fs) :
-		bodyState(bs),
-		flightSurface(fs),
+	F16FcsTrailingFlapController() :
+		bodyState(nullptr),
+		flightSurface(nullptr),
 		transonicFlap(0.1105, 0.787, 0.787, 1.008, 0, 2), // <- use positive values for flaps
 		//lowspeedFlap(),
 		isAirRefuelMode(false)
 	{}
 	~F16FcsTrailingFlapController() {}
+
+	void setRef(F16BodyState *bs, F16FlightSurface *fs)
+	{
+		bodyState = bs;
+		flightSurface = fs;
+	}
 
 	// Passive flap schedule for the F-16...nominal for now from flight manual comments
 	// below specific dynamic pressure (q) -> function as flaps,

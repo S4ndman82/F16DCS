@@ -44,15 +44,21 @@ protected:
 	}
 
 public:
-	F16FcsYawController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
-		bodyState(bs),
-		flightSurface(fs),
-		trimState(ts),
+	F16FcsYawController() :
+		bodyState(nullptr),
+		flightSurface(nullptr),
+		trimState(nullptr),
 		rudderLimiter(-30, 30) // deflection limit
 		//yawAxis(1, 2.04, 3.23, 0.5, 1)
-	{
-	}
+	{}
 	~F16FcsYawController() {}
+
+	void setRef(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts)
+	{
+		bodyState = bs;
+		flightSurface = fs;
+		trimState = ts;
+	}
 
 	// Controller for yaw
 	void fcsCommand(double pedInput, double alphaFiltered)

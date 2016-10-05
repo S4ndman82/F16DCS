@@ -21,12 +21,18 @@ public:
 	bool airbrakeSwitch; // switch status
 
 public:
-	F16FcsAirbrakeController(F16BodyState *bs, F16FlightSurface *fs) :
-		bodyState(bs),
-		flightSurface(fs),
+	F16FcsAirbrakeController() :
+		bodyState(nullptr),
+		flightSurface(nullptr),
 		airbrakeSwitch(false)
 	{}
 	~F16FcsAirbrakeController() {}
+
+	void setRef(F16BodyState *bs, F16FlightSurface *fs)
+	{
+		bodyState = bs;
+		flightSurface = fs;
+	}
 
 	void initAirBrakeOff()
 	{

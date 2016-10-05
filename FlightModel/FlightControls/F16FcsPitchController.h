@@ -96,18 +96,24 @@ protected:
 	}
 
 public:
-	F16FcsPitchController(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts) :
+	F16FcsPitchController() :
 		m_stickCommandPosFiltered(0),
 		m_alphaFiltered(0),
 		m_longStickForce(0),
 		m_latStickForce(0),
-		bodyState(bs),
-		flightSurface(fs),
-		trimState(ts)
+		bodyState(nullptr),
+		flightSurface(nullptr),
+		trimState(nullptr)
 		//stability(0.5, 0.53, 1.79, 0.5, -1)
-	{
-	}
+	{}
 	~F16FcsPitchController() {}
+
+	void setRef(F16BodyState *bs, F16FlightSurface *fs, F16TrimState *ts)
+	{
+		bodyState = bs;
+		flightSurface = fs;
+		trimState = ts;
+	}
 
 	double getAlphaFiltered() const { return m_alphaFiltered; }
 	double getLongStickForce() const { return m_longStickForce; }
