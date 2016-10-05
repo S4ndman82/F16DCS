@@ -57,6 +57,8 @@ public:
 	F16BleedAirSystem BleedAir;
 	//BleedAir.pEpu = &Epu;
 
+	double	throttleInput;	// Throttle input command normalized (-1 to 1)
+
 public:
 	F16EngineManagementSystem(F16Atmosphere *atmos, F16FuelSystem *fuels) 
 		: pAtmos(atmos)
@@ -64,13 +66,13 @@ public:
 		, Engine(ET_F100PW200, atmos)
 		, Gearbox()
 		, BleedAir()
+		, throttleInput(0)
 	{}
 	~F16EngineManagementSystem() {}
 
 	void initEngineOff()
 	{
-		Engine.throttleInput = 0;
-		Engine.m_fuelPerFrame = 0;
+		setThrottleInput(0);
 
 		Engine.starting = false;
 		Engine.stopping = false;
@@ -80,8 +82,7 @@ public:
 	}
 	void initEngineIdle()
 	{
-		Engine.throttleInput = 1;
-		Engine.m_fuelPerFrame = 1;
+		setThrottleInput(0.10);
 
 		Engine.starting = false;
 		Engine.stopping = false;
@@ -91,8 +92,7 @@ public:
 	}
 	void initEngineCruise()
 	{
-		Engine.throttleInput = 50;
-		Engine.m_fuelPerFrame = 10;
+		setThrottleInput(0.80);
 
 		Engine.starting = false;
 		Engine.stopping = false;
@@ -137,18 +137,19 @@ public:
 
 		// --------------------------- OLD STUFF
 		// Coded from the simulator study document
-		Engine.throttleInput = limited;
-		if (Engine.throttleInput < 78.0)
+		throttleInput = limited;
+		if (throttleInput < 78.0)
 		{
-			Engine.m_percentPower = Engine.throttleInput * 0.6923;
+			Engine.m_percentPower = throttleInput * 0.6923;
 		}
 		else
 		{
-			Engine.m_percentPower = Engine.throttleInput *4.5455 - 354.55;
+			Engine.m_percentPower = throttleInput *4.5455 - 354.55;
 		}
 		Engine.m_percentPower = limit(Engine.m_percentPower, 0.0, 100.0);
 
 		// TODO: calculate fuel mixture needed for given throttle setting and flight conditions
+		Engine.m_fuelPerFrame = throttleInput;
 	}
 
 	double getEngineRpm() const
@@ -159,7 +160,7 @@ public:
 		}
 
 		// ED_FM_ENGINE_1_RPM:
-		return (Engine.throttleInput / 100.0) * 3000;
+		return (throttleInput / 100.0) * 3000;
 	}
 	double getEngineRelatedRpm() const
 	{
@@ -169,7 +170,7 @@ public:
 		}
 
 		// ED_FM_ENGINE_1_RELATED_RPM:
-		return (Engine.throttleInput / 100.0);
+		return (throttleInput / 100.0);
 	}
 	double getEngineThrust() const
 	{
@@ -179,7 +180,7 @@ public:
 		}
 
 		// ED_FM_ENGINE_1_THRUST:
-		return (Engine.throttleInput / 100.0) * 5000 * 9.81;
+		return (throttleInput / 100.0) * 5000 * 9.81;
 	}
 	double getEngineRelatedThrust() const
 	{
@@ -189,7 +190,7 @@ public:
 		}
 
 		// ED_FM_ENGINE_1_RELATED_THRUST:
-		return (Engine.throttleInput / 100.0);
+		return (throttleInput / 100.0);
 	}
 
 	/*

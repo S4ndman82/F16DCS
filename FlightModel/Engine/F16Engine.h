@@ -357,7 +357,6 @@ protected:
 
 public:
 	double	m_thrust_N; // Engine thrust (N)
-	double	throttleInput;	// Throttle input command normalized (-1 to 1)
 
 	double m_percentPower;
 	double afterburnerDraw; // just draw argument
@@ -409,7 +408,6 @@ public:
 	F16Engine(EngineType engine, F16Atmosphere *atmos)
 		: m_power3(0)
 		, m_thrust_N(0)
-		, throttleInput(0)
 		, m_percentPower(0)
 		, afterburnerDraw(0)
 		, m_fuelPerFrame(0)
@@ -711,8 +709,15 @@ public:
 
 		// TODO: determine AB effect on thrust and fuel usage,
 		// 
-		afterburnerDraw = (throttleInput - 80.0) / 20.0;
-		afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
+		if (m_percentPower > 80)
+		{
+			afterburnerDraw = (m_percentPower - 80.0) / 20.0;
+			afterburnerDraw = limit(afterburnerDraw, 0.0, 1.0); // just draw argument
+		}
+		else
+		{
+			afterburnerDraw = 0;
+		}
 
 		// TODO: calculate additional fuel usage when afterburner is used
 		//Fuel.weight * 

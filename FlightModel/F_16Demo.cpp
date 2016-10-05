@@ -280,6 +280,9 @@ void ed_fm_simulate(double dt)
 		// TODO: nose-wheel steering, braking forces etc.
 		F16::Motion.updateNoseWheelTurn(F16::LandingGear.getNoseTurnDirection(), F16::LandingGear.getNosegearAngle());
 	}
+
+	// testing, check
+	F16::Motion.updateInertia();
 }
 
 /*
