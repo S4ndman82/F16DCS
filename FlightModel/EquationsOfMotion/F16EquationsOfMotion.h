@@ -254,7 +254,6 @@ public:
 		// mass in Newtons
 		double massN = total_mass_kg * F16::standard_gravity;
 		inertia = mul_vec3(massN, pAtmos->getAirspeed()); // scalar multiply of vector
-
 	}
 
 	void updateAeroForces(const double Cy_total, const double Cx_total, const double Cz_total, const double Cl_total, const double Cm_total, const double Cn_total)

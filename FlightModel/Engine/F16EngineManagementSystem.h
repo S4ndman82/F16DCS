@@ -72,33 +72,18 @@ public:
 
 	void initEngineOff()
 	{
-		setThrottleInput(0);
-
-		Engine.starting = false;
-		Engine.stopping = false;
-
-		// temporary for testing
 		Engine.isIgnited = false;
+		throttleInput = 0;
 	}
 	void initEngineIdle()
 	{
-		setThrottleInput(0.10);
-
-		Engine.starting = false;
-		Engine.stopping = false;
-
-		// temporary for testing
 		Engine.isIgnited = true;
+		setThrottleInput(0.10);
 	}
 	void initEngineCruise()
 	{
-		setThrottleInput(0.80);
-
-		Engine.starting = false;
-		Engine.stopping = false;
-
-		// temporary for testing
 		Engine.isIgnited = true;
+		setThrottleInput(0.80);
 	}
 
 	void JfsStart()
@@ -112,32 +97,29 @@ public:
 
 	void startEngine()
 	{
-		Engine.starting = true;
-		Engine.stopping = false;
-
-		// temporary for testing
-		Engine.isIgnited = true;
+		// just direct start for now..
+		initEngineIdle();
 	}
 	void stopEngine()
 	{
-		Engine.stopping = true;
-		Engine.starting = false;
-
-		// temporary for testing
-		Engine.isIgnited = false;
-		Engine.m_fuelPerFrame = 0;
+		// just direct stop..
+		initEngineOff();
 	}
 
 	// MaksRUD	=	0.85, -- Military power state of the throttle
 	// ForsRUD	=	0.91, -- Afterburner state of the throttle
 	void setThrottleInput(double value)
 	{
+		if (Engine.isIgnited == false)
+		{
+			return;
+		}
+
 		// old code, see if we need changes..
-		double limited = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
+		throttleInput = limit(((-value + 1.0) / 2.0) * 100.0, 0.0, 100.0);
 
 		// --------------------------- OLD STUFF
 		// Coded from the simulator study document
-		throttleInput = limited;
 		if (throttleInput < 78.0)
 		{
 			Engine.m_percentPower = throttleInput * 0.6923;
@@ -149,7 +131,6 @@ public:
 		Engine.m_percentPower = limit(Engine.m_percentPower, 0.0, 100.0);
 
 		// TODO: calculate fuel mixture needed for given throttle setting and flight conditions
-		Engine.m_fuelPerFrame = throttleInput;
 	}
 
 	double getEngineRpm() const
@@ -211,7 +192,8 @@ public:
 		//Engine CIVV control
 
 		//pFuel->updateFrame(frameTime);
-		Engine.updateFrame(frameTime);
+		//Engine.updateFrame(frameTime);
+		Engine.updateOldStuff(frameTime); // use old stuff for now until new code is ready
 
 		/*
 		if (getEngineRpm() < minRpm)

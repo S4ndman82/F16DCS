@@ -282,7 +282,7 @@ void ed_fm_simulate(double dt)
 	}
 
 	// testing, check
-	F16::Motion.updateInertia();
+	//F16::Motion.updateInertia();
 }
 
 /*

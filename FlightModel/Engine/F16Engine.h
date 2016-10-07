@@ -395,8 +395,8 @@ public:
 
 	double inletArea; // area of inlet
 
-	bool starting; // "spooling up"
-	bool stopping; // "spooling down"
+	//bool starting; // "spooling up"
+	//bool stopping; // "spooling down"
 
 	bool isIgnited; // if it is really running or just rotating from airflow? (out of fuel mid-air?)
 
@@ -418,8 +418,8 @@ public:
 		, lpcRotation(0)
 		, hpcRotation(0)
 		, inletArea(0.613643025) // -> m^3
-		, starting(false)
-		, stopping(false)
+		//, starting(false)
+		//, stopping(false)
 		, isIgnited(true) // currently, have it as started always (check initial status handling etc.)
 		, inhibitAbIgnition(false)
 		, engineParams(engine)
@@ -796,13 +796,21 @@ public:
 
 		// calculate bleed air pressure at current engine rpm:
 		// must rotate AB fuel pump at sufficient speed
-
-
-		updateOldStuff(frameTime);
 	}
 
 	void updateOldStuff(double frameTime)
 	{
+		// old stuff does not have engine inertia, windmilling or anything like that
+		// -> abort
+		if (isIgnited == false)
+		{
+			m_thrust_N = 0;
+			m_power3 = 0;
+			m_percentPower = 0;
+			afterburnerDraw = 0;
+			m_fuelPerFrame = 0;
+			return;
+		}
 
 		// --------------------------- OLD STUFF
 		// Coded from the simulator study document
