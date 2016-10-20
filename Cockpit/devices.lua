@@ -11,4 +11,3 @@ devices["ELECTRIC_SYSTEM"]			= counter()--3
 --devices["CLOCK"]					= counter()--4
 --devices["ADI"]						= counter()--5
 --devices["RADAR"]					= counter()--6
---devices["LANDING_GEAR"]				= counter()--7

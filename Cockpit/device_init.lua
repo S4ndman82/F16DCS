@@ -36,7 +36,6 @@ creators[devices.ELECTRIC_SYSTEM]= {"avSimpleElectricSystem",LockOn_Options.scri
 --creators[devices.CLOCK]			 = {"avAChS_1"			    ,LockOn_Options.script_path.."clock.lua"}
 --creators[devices.ADI]			 = {"avBaseIKP"			    ,LockOn_Options.script_path.."adi.lua"}
 --creators[devices.RADAR]			 = {"avSimpleRadar"			,LockOn_Options.script_path.."RADAR/Device/init.lua"}
---creators[devices.LANDING_GEAR]	 = {"avLuaDevice"			,LockOn_Options.script_path.."Systems/landing_gear_system.lua"}
 
 
 -- Indicators
