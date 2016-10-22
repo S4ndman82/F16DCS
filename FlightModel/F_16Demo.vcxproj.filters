@@ -153,6 +153,9 @@
     <ClInclude Include="Aerodynamics\F16AeroResults.h">
       <Filter>Aerodynamics</Filter>
     </ClInclude>
+    <ClInclude Include="LandingGear\SuspensionData.h">
+      <Filter>LandingGear</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

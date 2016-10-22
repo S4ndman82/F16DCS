@@ -5,6 +5,10 @@
 
 #include <cmath>
 
+#ifdef _DEBUG
+#error "DEBUG BUILD NOT SUPPORTED"
+#endif
+
 //-------------------------------------------------------
 // Start of F-16 Simulation Variables
 // Probably doesn't need it's own namespace or anything

@@ -6,6 +6,7 @@
 #include "ED_FM_Utility.h"		// Provided utility functions that were in the initial EFM example
 #include "F16Constants.h"		// Common constants used throughout this DLL
 
+#include "SuspensionData.h"
 #include "F16LandingWheel.h"
 
 #include "Atmosphere/F16Atmosphere.h"

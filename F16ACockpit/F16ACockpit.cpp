@@ -12,7 +12,7 @@
 
 // integrate with EFM DLL
 // -> cockpit DLL may need to call EFM to get/set information
-#include "../FlightModel/F_16Demo.h"
+//#include "../FlightModel/F_16Demo.h"
 
 
 wchar_t dbgmsg[255] = { 0 };
@@ -82,6 +82,7 @@ bool locateEfmDll()
 		return false;
 	}
 
+	/*
 	test *pfnTest = (test*)GetProcAddress(efm_dll, "test");
 	if (pfnTest == NULL)
 	{
@@ -89,6 +90,7 @@ bool locateEfmDll()
 	}
 
 	double res = (double)(*pfnTest)(10.0);
+	*/
 
 	// all successful
 	return true;
