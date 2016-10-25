@@ -405,6 +405,12 @@ public:
 	F16EngineParameters engineParams;
 	F16Atmosphere *pAtmos;
 
+	// position and orientation (direction) of engine:
+	// these can have some small effect on flight dynamics even on single-engined aircraft
+	// when thrust is not exactly through CG
+	Vec3 enginePosition;
+	Vec3 engineOrientation;
+
 	F16Engine(EngineType engine, F16Atmosphere *atmos)
 		: m_power3(0)
 		, m_thrust_N(0)
@@ -424,6 +430,8 @@ public:
 		, inhibitAbIgnition(false)
 		, engineParams(engine)
 		, pAtmos(atmos)
+		, enginePosition(0,0,0) // TODO: find values
+		, engineOrientation(0,0,0) // TODO: find values
 	{}
 	~F16Engine() {}
 
