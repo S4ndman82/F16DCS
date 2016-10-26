@@ -430,7 +430,7 @@ public:
 		, inhibitAbIgnition(false)
 		, engineParams(engine)
 		, pAtmos(atmos)
-		, enginePosition(0,0,0) // TODO: find values
+		, enginePosition(-5.956, 0.272, 0) // TODO: find values
 		, engineOrientation(0,0,0) // TODO: find values
 	{}
 	~F16Engine() {}

@@ -17,3 +17,6 @@
 *.opensdf
 Shapes/F-16DCS.edm.old
 *.ilk
+*.iobj
+*.ipdb
+F16Demo.VC.db

@@ -290,13 +290,12 @@ public:
 
 	// engine thrust,
 	// rolling moment
-	void updateEngineForces(double thrust_N, double rolling_moment)
+	void updateEngineForces(double thrust_N, Vec3 &position, double rolling_moment)
 	{
 		// Thrust	
 		Vec3 thrust_force(thrust_N , 0.0, 0.0);	// Output force in Newtons
-		Vec3 thrust_force_pos(0,0,0);
-		add_local_force_cg(thrust_force /*, thrust_force_pos*/);	
-		//add_local_force(thrust_force, thrust_force_pos);	
+		//Vec3 thrust_force_pos(0,0,0);
+		add_local_force(thrust_force, position);
 
 		// TODO: rolling moment of engine
 		// (counter-clockwise?)
