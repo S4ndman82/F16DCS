@@ -63,12 +63,13 @@ StickBank.controller			= controllers.base_gauge_StickRollPosition
 
 need_to_be_closed = true -- close lua state after initialization 
 
-
+--[[
 Z_test =
 {
 	near = 0.05,
 	far  = 4.0,
 }
+--]]
 
 --[[ available functions 
 
