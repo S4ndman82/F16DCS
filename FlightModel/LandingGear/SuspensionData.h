@@ -43,6 +43,7 @@ public:
 	double amortizer_direct_damper_force_factor;
 	double amortizer_back_damper_force_factor;
 
+	/* already part of F16LandingWheel
 	double wheel_radius;
 	double wheel_static_friction_factor; // Static friction when wheel is not moving (fully braked)
 	double wheel_side_friction_factor;
@@ -50,9 +51,9 @@ public:
 	double wheel_glide_friction_factor; // Sliding aircraft
 	double wheel_damage_force_factor; // Tire is explosing due to hard landing
 	double wheel_damage_speed; // Tire burst due to excessive speed
-
 	double wheel_moment_of_inertia; // wheel moi as rotation body
 	double wheel_brake_moment_max; // maximum value of braking moment  , N*m 
+	*/
 
 	// draw arguments for wheel
 	int arg_post;

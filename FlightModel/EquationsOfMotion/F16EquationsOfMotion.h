@@ -17,6 +17,7 @@ sources:
 #include "Atmosphere/F16Atmosphere.h"			//Atmosphere model functions
 
 #include "F16WeightBalance.h" // for calculating new center of gravity, according to mass distribution
+#include "LandingGear/SuspensionData.h"
 
 class F16Motion
 {
@@ -86,6 +87,14 @@ public:
 	{}
 	~F16Motion() {}
 
+	// split just to make things more obvious
+	Vec3 getDeltaPos(const Vec3 &Force_pos, const Vec3 &Reference_pos) const
+	{
+		return Vec3(Force_pos.x - Reference_pos.x,
+					Force_pos.y - Reference_pos.y,
+					Force_pos.z - Reference_pos.z);
+	}
+
 	// Very important! This function sum up all the forces acting on
 	// the aircraft for this run frame.  It currently assume the force
 	// is acting at the CG
@@ -95,10 +104,7 @@ public:
 		common_force.y += Force.y;
 		common_force.z += Force.z;
 
-		Vec3 delta_pos(Force_pos.x - center_of_gravity.x,
-						Force_pos.y - center_of_gravity.y,
-						Force_pos.z - center_of_gravity.z);
-
+		Vec3 delta_pos = getDeltaPos(Force_pos, center_of_gravity);
 		Vec3 delta_moment = cross(delta_pos, Force);
 
 		common_moment.x += delta_moment.x;
@@ -315,6 +321,7 @@ public:
 
 		// silly hack for now, better approach in progress
 
+		// note: friction values are negative here
 		double xTotal = leftWheelX + rightWheelX + noseWheelX;
 		double zTotal = leftWheelZ + rightWheelZ + noseWheelZ;
 
@@ -323,13 +330,15 @@ public:
 		// note! this is mostly silly hacking now,
 		// better approach in progress
 
-		Vec3 cx_wheel_friction_force(xTotal, 0.0, 0.0);
 		//Vec3 cx_wheel_friction_pos(0.0,0.0,0.0);
-		//add_local_force_cg(cx_wheel_friction_force /*,cx_wheel_friction_pos*/);
-
-		// test, skip some things for now
+		Vec3 cx_wheel_friction_force(xTotal, 0.0, 0.0);
 		sum_vec3(common_force, cx_wheel_friction_force);
+		/*
+		// test, skip some things for now
 		// -> actually need to reduce this from _moment_ not add opposite force?
+		*/
+
+		// TODO: side-slip friction handling
 	}
 
 	// handle brake input (differential support)
@@ -338,25 +347,27 @@ public:
 		// note! this is mostly silly hacking now,
 		// better approach in progress
 
-		/*
-		Vec3 cxr_wheel_friction_force(-rightBrakeForce, 0.0, 0.0);
-		Vec3 cxl_wheel_friction_force(-leftBrakeForce, 0.0, 0.0);
-		if (common_force.x < rightBrakeForce)
+		// TODO: angular momentum of wheel, inertia.. etc.
+
+		Vec3 cxr_wheel_friction_force(-leftBrakeForce, 0.0,0.0);
+		Vec3 cxl_wheel_friction_force(-rightBrakeForce, 0.0,0.0);
+		if (common_force.x < cxr_wheel_friction_force.x)
 		{
-			// silly hack, remove this 
+			// silly hack, remove this
 			cxr_wheel_friction_force.x = -common_force.x;
 		}
-		if (common_force.x < leftBrakeForce)
+
+		Vec3 cxr_wheel_friction_pos(0.0,0.0,-5.0); // TODO: check offset!
+		add_local_force(cxr_wheel_friction_force, cxr_wheel_friction_pos);
+
+		if (common_force.x < cxl_wheel_friction_force.x)
 		{
 			// silly hack, remove this
 			cxl_wheel_friction_force.x = -common_force.x;
 		}
 
-		Vec3 cxr_wheel_friction_pos(0.0, -5.0, 0.0); // TODO: check offset!
-		add_local_force(cxr_wheel_friction_force, cxr_wheel_friction_pos);
-		Vec3 cxl_wheel_friction_pos(0.0, 5.0, 0.0); // TODO: check offset!
+		Vec3 cxl_wheel_friction_pos(0.0,0.0,5.0); // TODO: check offset!
 		add_local_force(cxl_wheel_friction_force, cxl_wheel_friction_pos);
-		*/
 	}
 
 	// something like this to handle when nosewheel is turned?
