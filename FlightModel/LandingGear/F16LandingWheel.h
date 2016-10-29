@@ -144,6 +144,12 @@ public:
 		brakeForce = 0;
 	}
 
+	// get rotation speed by ground speed and wheel radius
+	double getRotationSpeed(const double groundSpeed) const
+	{
+		return 0;
+	}
+
 	// calculate new direction of force and if it exceeds friction (begins sliding)
 	// TODO: need ground speed here for rolling/static friction
 	// also, depending on how many wheels the weight is distributed on
@@ -181,6 +187,11 @@ public:
 			}
 			*/
 		}
+
+		// calculate wheel rotational speed:
+		// if rotation stopped by braking but groundspeed > 0 -> slip friction
+		// if rotation = 0 && groundspeed = 0 -> static friction
+		// if rotation > 0 and groundspeed > 0 -> rolling friction
 
 		// note: DCS has "left-hand notation" so side-slip is Z-axis?
 		CzWheelFriction = wheel_side_friction_factor * weightN; // <- side-slip factor?

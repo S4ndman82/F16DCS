@@ -349,24 +349,19 @@ public:
 
 		// TODO: angular momentum of wheel, inertia.. etc.
 
+		Vec3 cxr_wheel_friction_pos(0.0,0.0,-5.0); // TODO: check offset!
+		Vec3 cxl_wheel_friction_pos(0.0,0.0,5.0); // TODO: check offset!
+
 		Vec3 cxr_wheel_friction_force(-leftBrakeForce, 0.0,0.0);
 		Vec3 cxl_wheel_friction_force(-rightBrakeForce, 0.0,0.0);
-		if (common_force.x < cxr_wheel_friction_force.x)
+		if (common_force.x < (leftBrakeForce + rightBrakeForce))
 		{
-			// silly hack, remove this
+			// simple hack
 			cxr_wheel_friction_force.x = -common_force.x;
-		}
-
-		Vec3 cxr_wheel_friction_pos(0.0,0.0,-5.0); // TODO: check offset!
-		add_local_force(cxr_wheel_friction_force, cxr_wheel_friction_pos);
-
-		if (common_force.x < cxl_wheel_friction_force.x)
-		{
-			// silly hack, remove this
 			cxl_wheel_friction_force.x = -common_force.x;
 		}
 
-		Vec3 cxl_wheel_friction_pos(0.0,0.0,5.0); // TODO: check offset!
+		add_local_force(cxr_wheel_friction_force, cxr_wheel_friction_pos);
 		add_local_force(cxl_wheel_friction_force, cxl_wheel_friction_pos);
 	}
 

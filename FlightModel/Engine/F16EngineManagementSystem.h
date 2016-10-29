@@ -78,7 +78,7 @@ public:
 	void initEngineIdle()
 	{
 		Engine.isIgnited = true;
-		setThrottleInput(0.10);
+		setThrottleInput(0.01);
 	}
 	void initEngineCruise()
 	{
