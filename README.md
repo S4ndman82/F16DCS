@@ -5,6 +5,8 @@ A howto-module for DCS: World about high fidelity flight dynamics and advanced s
 Originally created by CptSmiley. 3D work done by SkateZilla.
 EFM development continued by kazereal.
 
+This does not use ED SDK in any shape or form.
+
 All names are usernames at: https://forums.eagle.ru
 
 License
