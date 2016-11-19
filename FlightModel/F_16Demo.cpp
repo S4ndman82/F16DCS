@@ -967,6 +967,9 @@ double ed_fm_get_param(unsigned param_enum)
 
 void ed_fm_cold_start()
 {
+	swprintf(dbgmsg, 255, L" F16ADemo:: cold start %hs \r\n", __DATE__);
+	::OutputDebugString(dbgmsg);
+
 	// landing gear down
 	// canopy open
 	// electrics off
@@ -982,6 +985,9 @@ void ed_fm_cold_start()
 
 void ed_fm_hot_start()
 {
+	swprintf(dbgmsg, 255, L" F16ADemo:: hot start %hs \r\n", __DATE__);
+	::OutputDebugString(dbgmsg);
+
 	// landing gear down
 	// canopy closed
 	// electrics on
@@ -995,6 +1001,9 @@ void ed_fm_hot_start()
 
 void ed_fm_hot_start_in_air()
 {
+	swprintf(dbgmsg, 255, L" F16ADemo:: hot start in air %hs \r\n", __DATE__);
+	::OutputDebugString(dbgmsg);
+
 	// landing gear up
 	// canopy closed
 	// electrics on
