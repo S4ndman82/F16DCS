@@ -26,6 +26,8 @@ Forum thread: http://forums.eagle.ru/showthread.php?t=95985
 
 Release notes in same thread.
 
+Stall testing video: https://www.youtube.com/watch?v=9k03-pzb8MI
+
 Source data
 -----------
 Original source of aerodynamic calculations:
